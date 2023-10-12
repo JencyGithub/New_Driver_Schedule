@@ -20,10 +20,15 @@ from . import views
 
 app_name = 'Account'
 
-
 urlpatterns = [
     path('', views.index, name='index'), 
-
     path('Form1/', views.getForm1, name='getForm1'), 
-    path('Form2/', views.getForm2, name='getForm2'), 
+    path('Form2/', views.getForm2, name='getForm2'),
+    path('Rcti/', views.rcti, name='rcti'), 
+    path('RctiSave/', views.rctiSave, name='rctiSave'), 
+    path('DriverEntry/', views.driverEntry, name='driverentry'), 
+    path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'), 
+    
+    
+     
 ]
