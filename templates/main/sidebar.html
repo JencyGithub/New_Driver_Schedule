@@ -45,7 +45,14 @@
               <li><a href="index3.html">Dashboard3</a></li>
             </ul>
           </li>
-         
+          <li>
+            <a><i class="fa fa-home"></i> Leave details <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li class=""><a href="{% url 'gearBox:leaveReq'%}"><i class="fa fa-laptop"></i> Leave Request</a></li>
+              <li class=""><a href="{% url 'gearBox:natureOfLeaves'%}"><i class="fa fa-laptop"></i> Nature of leave</a></li>
+            </ul>
+          </li>
+          
         </ul>
         {% endif %}
         {% endif %}

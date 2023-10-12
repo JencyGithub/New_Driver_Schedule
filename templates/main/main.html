@@ -32,7 +32,9 @@
     <!-- Custom Theme Style -->
     <link href="{% static 'Dashboard/build/css/custom.min.css' %}" rel="stylesheet">
 
-    {% block headStyle %}  {% endblock %}
+    <!-- Extraa css  -->
+    {% block headStyle %}  
+    {% endblock %}
 
 
   </head>
@@ -55,7 +57,9 @@
         </div>
     </div>
 
-    {% block footerStyle %}  {% endblock %}
+    <!-- footer start scripts  -->
+    {% block footerStyle %} 
+    {% endblock %}
     <!-- jQuery -->
     <script src='{% static "Dashboard/vendors/jquery/dist/jquery.min.js" %}'></script>
     <!-- Bootstrap -->
@@ -97,6 +101,8 @@
     <!-- Custom Theme Scripts -->
     <script src='{% static "Dashboard/build/js/custom.min.js" %}'></script>
 	
-   
+    <!-- footer end scripts  -->
+    {% block footerStyleEnd %} 
+    {% endblock %}
   </body>
 </html>
