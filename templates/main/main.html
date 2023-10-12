@@ -34,11 +34,13 @@
   <!-- Custom Theme Style -->
   <link href="{% static 'Dashboard/build/css/custom.min.css' %}" rel="stylesheet">
 
+    <!-- Extraa css  -->
   <!-- CSS -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
   <!-- Default theme -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
-  {% block headStyle %} {% endblock %}
+  {% block headStyle %} 
+    {% endblock %}
 
 
 </head>
@@ -61,7 +63,9 @@
     </div>
   </div>
 
-  {% block footerStyle %} {% endblock %}
+    <!-- footer start scripts  -->
+  {% block footerStyle %} 
+   {% endblock %}
   <!-- jQuery -->
   <script src='{% static "Dashboard/vendors/jquery/dist/jquery.min.js" %}'></script>
   <!-- Bootstrap -->
@@ -108,9 +112,12 @@
   {% for message_flash in messages %}
   <script>
     alertify.set('notifier', 'position', 'top-right');
-    alertify.success('{{ message_flash }}');
+    alertify.success('{{ message_flash }}'); 
   </script>
   {% endfor %}
+  <!-- footer end scripts  -->
+  {% block footerStyleEnd %} 
+  {% endblock %}
 </body>
 
 </html>
