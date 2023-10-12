@@ -17,21 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path , include
 from . import views
+from GearBox_app import views
 
+app_name = 'gearBox'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    # main index page
-    path('', views.index, name='index'),
-    path('login',views.loginCall, name='login'),
-    path('loginCheck',views.loginCheck, name='login-check'),
-    path('logout',views.CustomLogOut, name='logout'),
-
-    # Account routes
-    path('account/',include('Account_app.urls')),
-
-    # GearBox routes
-    path('gearBox/',include('GearBox_app.urls')),
-    
+    path('leaveReq/', views.leaveReq, name='leaveReq'), 
+    path('natureOfLeaves/', views.natureOfLeaves, name='natureOfLeaves'), 
 ]
