@@ -39,8 +39,6 @@ def insertIntoModel(dataList):
         
 f = open("File_name_file.txt", 'r')
 file_name = f.read()
-with open('File_name_file.txt', 'w') as f:
-    f.write('')
 
 files = open(f'static/Account/DriverEntry/{file_name}','r')
 reader=csv.reader(files)

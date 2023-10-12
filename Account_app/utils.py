@@ -62,9 +62,9 @@ def appendToCsv(given_list,file_name,folder_name,truckNo):
             # res = ''
 
 # file_path = getFileName()
-args = sys.argv[-1]
+# args = sys.argv[-1]
 
-# args ='20231009125409@_!pdf.csv'
+args ='20231009125409@_!pdf.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 
 while(file_path[-4:] != '.csv'):
@@ -74,9 +74,15 @@ while(file_path[-4:] != '.csv'):
 # File name
 converted_file = "converted_" + args
 
-with open("File_name_file.txt",'w') as f:
-    f.write(converted_file)
-    f.close()
+is_empty = os.path.getsize('File_name_file.txt') == 0
+
+with open('File_name_file.txt', 'w' if is_empty else 'a') as f:
+    if is_empty:
+        f.write(converted_file)
+    else:
+        f.close() 
+        with open('File_name_file.txt', 'w') as f:
+            f.write(converted_file)
 
 folderName =  'static/Account/RCTI/RCTIInvoice'
 # os.makedirs(folderName)
