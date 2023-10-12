@@ -1,0 +1,230 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Driver Form1 {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<style>
+    .cuatom-continer {
+        margin: 0 5rem;
+    }
+
+    .errorMsg {
+        font-size: 0.7rem;
+        color: rgb(255, 0, 0);
+        margin-top: 0.3rem;
+        list-style-type: none;
+    }
+
+    .isInvalid {
+        border: 1px solid rgb(255, 0, 0) !important;
+        border-radius: 7px !important;
+    }
+
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial;
+    }
+
+    .form-select {
+        text-align: left !important;
+        padding: 0.63rem 0.8rem;
+    }
+
+    .dropdown-menu {
+        width: 100%;
+    }
+
+
+    .mybtn {
+        width: 25% !important;
+    }
+
+    @media (max-width: 576px) {
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    .responsive-btn {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .select2-container .select2-selection--single {
+        height: 45px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding: 7px 14px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 7px !important;
+        right: 10px !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Driver trip form</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <form class="" action="" novalidate>
+                                <span class="section">Trip details</span>
+
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="driverId">Driver id :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" name="driverId" required="required" id="driverId" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientId">Client Name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" name="clientName" id="clientId" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftType">Select Shift Type <span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select class="form-control" required id="shiftType" name="shiftType">
+                                            <option value="" disabled selected>Select Shift Type</option>
+                                            <option value="press">Press</option>
+                                            <option value="net">Internet</option>
+                                            <option value="mouth">Word of mouth</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="numberOfLoads">Number of loads :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control number" type="number" data-validate-minmax="1,"
+                                            name="numberOfLoads" id="numberOfLoads" required />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="truckNum">Truck No :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control number" data-validate-minmax="1," name="truckNum"
+                                            id="truckNum" required />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftDate">Shift date:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" class='date' type="date" name="shiftDate" required
+                                            id="shiftDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="startTime">Start time:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" class='time' type="time" name="startTime"
+                                            id="startTime" required='required'>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endTime">End time:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" class='time' type="time" name="endTime" id="endTime"
+                                            required='required'>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="logSheet">Upload logsheet:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" class='time' type="file" name="logSheet"
+                                            id="logSheet" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="logSheet" accept=".jpg, .jpeg, .pdf">
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="comments">Comments<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <textarea name='comments' placeholder="Comments" class="w-100"
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 text-right">
+                                    <button type='reset' class="btn btn-success px-4">Reset</button>
+                                    <button type='submit' class="btn btn-primary px-4">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+<script>
+
+    function hideshow() {
+        var password = document.getElementById("password1");
+        var slash = document.getElementById("slash");
+        var eye = document.getElementById("eye");
+
+        if (password.type === 'password') {
+            password.type = "text";
+            slash.style.display = "block";
+            eye.style.display = "none";
+        }
+        else {
+            password.type = "password";
+            slash.style.display = "none";
+            eye.style.display = "block";
+        }
+
+    }
+
+    // initialize a validator instance from the "FormValidator" constructor.
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
+</script>
+{% endblock %}
+{% endblock %}
