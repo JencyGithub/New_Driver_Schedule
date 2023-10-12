@@ -112,11 +112,12 @@
   {% for message_flash in messages %}
   <script>
     alertify.set('notifier', 'position', 'top-right');
-    alertify.success('{{ message_flash }}'); <!-- footer end scripts  -->
-    {% block footerStyleEnd %} 
-    {% endblock %}
+    alertify.success('{{ message_flash }}'); 
   </script>
   {% endfor %}
+  <!-- footer end scripts  -->
+  {% block footerStyleEnd %} 
+  {% endblock %}
 </body>
 
 </html>
