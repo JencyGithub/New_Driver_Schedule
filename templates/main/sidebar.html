@@ -34,7 +34,8 @@
         <ul class="nav side-menu">
           <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-laptop"></i> Dashboard</a></li>
           {% if request.session.user_type == 'SuperUser' %}
-          <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li>
+          {% comment %} <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li> {% endcomment %}
+          <li class=""><a href="{% url 'Account:getForm2'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li>
           {% endif %}
           <li>
             <a><i class="fa fa-home"></i> Account <span class="fa fa-chevron-down"></span></a>

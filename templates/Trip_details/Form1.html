@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Driver Form1 {% endblock %}
+{% block title %} | Driver trip details {% endblock %}
 {% block headStyle %}
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
 <style>
@@ -20,24 +20,6 @@
         border-radius: 7px !important;
     }
 
-    body {
-        font-family: "Helvetica Neue", Helvetica, Arial;
-    }
-
-    .form-select {
-        text-align: left !important;
-        padding: 0.63rem 0.8rem;
-    }
-
-    .dropdown-menu {
-        width: 100%;
-    }
-
-
-    .mybtn {
-        width: 25% !important;
-    }
-
     @media (max-width: 576px) {
         .cuatom-continer {
             margin: 0;
@@ -49,24 +31,6 @@
         .cuatom-continer {
             margin: 0;
         }
-    }
-
-    .responsive-btn {
-        max-width: 100%;
-        margin: 0 auto;
-    }
-
-    .select2-container .select2-selection--single {
-        height: 45px !important;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        padding: 7px 14px !important;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        top: 7px !important;
-        right: 10px !important;
     }
 </style>
 {% endblock %}
