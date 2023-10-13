@@ -1,0 +1,222 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | RCTI Table{% endblock %}
+{% block headStyle %}
+
+ <!-- Datatables -->
+ <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+
+ <style>
+  .dt-buttons.btn-group{
+    float: right! important;
+  }
+ </style>
+{% endblock %}
+{% block content %}
+
+<div class="right_col" role="main">
+  <div class="">
+
+    <div class="clearfix"></div>
+
+    <div class="row">
+
+      <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>RCTI</h2>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="card-box table-responsive">
+                  <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th>truckNo</th>
+                        <th>docketNumber</th>
+                        <th>docketDate</th>
+                        <th>docketYard</th>
+
+                        <th class="d-none">noOfKm</th>
+                        <th class="d-none">cubicMl</th>
+                        <th class="d-none">cubicMiAndKmsCost</th>
+                        <th class="d-none">destination</th>
+                        <th class="d-none">cartageGSTPayable</th>
+                        <th class="d-none">cartageTotalExGST</th>
+                        <th class="d-none">cartageTotal</th>
+
+                        <th class="d-none">transferKM</th>
+                        <th class="d-none">transferKMCost</th>
+                        <th class="d-none">transferKMGSTPayable</th>
+                        <th class="d-none">transferKMTotalExGST</th>
+                        <th class="d-none">transferKMTotal</th>
+
+                        <th class="d-none">returnKm</th>
+                        <th class="d-none">returnPerKmPerCubicMeterCost</th>
+                        <th class="d-none">returnKmGSTPayable</th>
+                        <th class="d-none">returnKmTotalExGST</th>
+                        <th class="d-none">returnKmTotal</th>
+
+                        <th class="d-none">waitingTimeSCHED</th>
+                        <th class="d-none">waitingTimeSCHEDCost</th>
+                        <th class="d-none">waitingTimeSCHEDGSTPayable</th>
+                        <th class="d-none">waitingTimeSCHEDTotalExGST</th>
+                        <th class="d-none">waitingTimeSCHEDTotal</th>
+
+                        <th class="d-none">waitingTimeInMinutes</th>
+                        <th class="d-none">waitingTimeCost</th>
+                        <th class="d-none">waitingTimeGSTPayable</th>
+                        <th class="d-none">waitingTimeTotalExGST</th>
+                        <th class="d-none">waitingTimeTotal</th>
+
+                        <th class="d-none">standByPerHalfHourCost</th>
+                        <th class="d-none">standByPerHalfHourDuration</th>
+                        <th class="d-none">standByUnit</th>
+                        <th class="d-none">standByGSTPayable</th>
+                        <th class="d-none">standByTotalExGST</th>
+                        <th class="d-none">standByTotal</th>
+
+                        <th class="d-none">minimumLoad</th>
+                        <th class="d-none">loadCost</th>
+                        <th class="d-none">minimumLoadGSTPayable</th>
+                        <th class="d-none">minimumLoadTotalExGST</th>
+                        <th class="d-none">minimumLoadTotal</th>
+
+                        <th class="d-none">surcharge_fixed_normal</th>
+                        <th class="d-none">surcharge_fixed_sunday</th>
+                        <th class="d-none">surcharge_fixed_public_holiday</th>
+                        <th class="d-none">surcharge_per_cubic_meters_normal</th>
+                        <th class="d-none">surcharge_per_cubic_meters_sunday</th>
+                        <th class="d-none">surcharge_per_cubic_meters_public_holiday</th>
+                        <th class="d-none">surcharge_duration</th>
+                        <th class="d-none">surchargeUnit</th>
+                        <th class="d-none">surchargeGSTPayable</th>
+                        <th class="d-none">surchargeTotalExGST</th>
+                        <th class="d-none">surchargeTotal</th>
+
+                        <th class="d-none">others</th>
+                        <th class="d-none">othersCost</th>
+                        <th class="d-none">othersGSTPayable</th>
+                        <th class="d-none">othersTotalExGST</th>
+                        <th class="d-none">othersTotal</th>
+
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for rcti in RCTI %}
+                      <tr>
+                        <td>{{ rcti.truckNo }}</td>
+                        <td>{{ rcti.docketNumber }}</td>
+                        <td>{{ rcti.docketDate }}</td>
+                        <td>{{ rcti.docketYard }}</td>
+
+                        <td class="d-none">{{rcti.noOfKm}}</td>
+                        <td class="d-none">{{rcti.cubicMl}}</td>
+                        <td class="d-none">{{rcti.cubicMiAndKmsCost}}</td>
+                        <td class="d-none">{{rcti.destination}}</td>
+                        <td class="d-none">{{rcti.cartageGSTPayable}}</td>
+                        <td class="d-none">{{rcti.cartageTotalExGST}}</td>
+                        <td class="d-none">{{rcti.cartageTotal}}</td>
+
+                        <td class="d-none">{{rcti.transferKM}}</td>
+                        <td class="d-none">{{rcti.transferKMCost}}</td>
+                        <td class="d-none">{{rcti.transferKMGSTPayable}}</td>
+                        <td class="d-none">{{rcti.transferKMTotalExGST}}</td>
+                        <td class="d-none">{{rcti.transferKMTotal}}</td>
+
+                        <td class="d-none">{{rcti.returnKm}}</td>
+                        <td class="d-none">{{rcti.returnPerKmPerCubicMeterCost}}</td>
+                        <td class="d-none">{{rcti.returnKmGSTPayable}}</td>
+                        <td class="d-none">{{rcti.returnKmTotalExGST}}</td>
+                        <td class="d-none">{{rcti.returnKmTotal}}</td>
+
+                        <td class="d-none">{{rcti.waitingTimeSCHED}}</td>
+                        <td class="d-none">{{rcti.waitingTimeSCHEDCost}}</td>
+                        <td class="d-none">{{rcti.waitingTimeSCHEDGSTPayable}}</td>
+                        <td class="d-none">{{rcti.waitingTimeSCHEDTotalExGST}}</td>
+                        <td class="d-none">{{rcti.waitingTimeSCHEDTotal}}</td>
+
+                        <td class="d-none">{{rcti.waitingTimeInMinutes}}</td>
+                        <td class="d-none">{{rcti.waitingTimeCost}}</td>
+                        <td class="d-none">{{rcti.waitingTimeGSTPayable}}</td>
+                        <td class="d-none">{{rcti.waitingTimeTotalExGST}}</td>
+                        <td class="d-none">{{rcti.waitingTimeTotal}}</td>
+
+                        <td class="d-none">{{rcti.standByPerHalfHourCost}}</td>
+                        <td class="d-none">{{rcti.standByPerHalfHourDuration}}</td>
+                        <td class="d-none">{{rcti.standByUnit}}</td>
+                        <td class="d-none">{{rcti.standByGSTPayable}}</td>
+                        <td class="d-none">{{rcti.standByTotalExGST}}</td>
+                        <td class="d-none">{{rcti.standByTotal}}</td>
+
+                        <td class="d-none">{{rcti.minimumLoad}}</td>
+                        <td class="d-none">{{rcti.loadCost}}</td>
+                        <td class="d-none">{{rcti.minimumLoadGSTPayable}}</td>
+                        <td class="d-none">{{rcti.minimumLoadTotalExGST}}</td>
+                        <td class="d-none">{{rcti.minimumLoadTotal}}</td>
+
+                        <td class="d-none">{{rcti.surcharge_fixed_normal}}</td>
+                        <td class="d-none">{{rcti.surcharge_fixed_sunday}}</td>
+                        <td class="d-none">{{rcti.surcharge_fixed_public_holiday}}</td>
+                        <td class="d-none">{{rcti.surcharge_per_cubic_meters_normal}}</td>
+                        <td class="d-none">{{rcti.surcharge_per_cubic_meters_sunday}}</td>
+                        <td class="d-none">{{rcti.surcharge_per_cubic_meters_public_holiday}}</td>
+                        <td class="d-none">{{rcti.surcharge_duration}}</td>
+                        <td class="d-none">{{rcti.surchargeUnit}}</td>
+                        <td class="d-none">{{rcti.surchargeGSTPayable}}</td>
+                        <td class="d-none">{{rcti.surchargeTotalExGST}}</td>
+                        <td class="d-none">{{rcti.surchargeTotal}}</td>
+
+                        <td class="d-none">{{rcti.others}}</td>
+                        <td class="d-none">{{rcti.othersCost}}</td>
+                        <td class="d-none">{{rcti.othersGSTPayable}}</td>
+                        <td class="d-none">{{rcti.othersTotalExGST}}</td>
+                        <td class="d-none">{{rcti.othersTotal}}</td>
+                        <td>
+                          <label type="" class="btn"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></label>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footerStyleEnd %}
+<script>
+  $(document).ready(function () {
+    $('#datatable-buttons').DataTable();
+  });
+</script>
+  <!-- Datatables -->
+  <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
+{% endblock %}

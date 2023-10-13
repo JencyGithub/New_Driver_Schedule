@@ -36,4 +36,10 @@ urlpatterns = [
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),      
+    
+    # Rcti  Table 
+    path('BasePlant/', views.basePlantTable, name='basePlantTable'),      
+    path('RctiTable/', views.rctiTable, name='rctiTable'),      
+    path('BasePlant/', views.driverTripsTable, name='driverTripsTable'),      
+    
 ]

@@ -262,3 +262,15 @@ def driverEntrySave(request):
         return redirect('/')
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+    
+def rctiTable(request):
+    RCTI_ = RCTI.objects.all()
+    return render(request,'Account/Tables/rctiTable.html',{'RCTI': RCTI_})
+
+def basePlantTable(request):
+    basePlant =BasePlant.objects.all()
+    return render(request,'Account/Table/basePlantTable.html',{'BasePlant',basePlant})
+
+def driverTripsTable(request):
+    return 1
+    
