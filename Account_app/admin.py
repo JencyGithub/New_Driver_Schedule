@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import *
-# from schedule_trip.models import *
+from Account_app.models import *
 from django.core.mail import send_mail, EmailMessage
 from GearBox_app.models import *
 from django.http import HttpResponse
@@ -13,12 +13,31 @@ class DocketInline(admin.StackedInline):
             "docket_details",
             {
                 "fields" : 
-                    ["docketId","tripId","docketNumber","shiftDate","basePlant","docketFile","waitingTimeInMinutes","waitingTimeCost","transferKMS","transferKMSCost","cubicMl","cubicMlCost","minLoad","minLoadCost","others","othersCost","total_cost"]
+                    
+                    [
+                        'docketId',
+                        'tripId',
+                        'shiftDate',
+                        'docketNumber',
+                        'docketFile',
+                        'basePlant',
+                        'noOfKm',
+                        'transferKM',
+                        'returnKm',
+                        'waitingTimeInMinutes',
+                        'minimumLoad',
+                        'surcharge_type',
+                        'surcharge_duration',
+                        'cubicMl',
+                        'minLoad',
+                        'standByPerHalfHourDuration',
+                        'others'
+                    ]
             } 
         )
     ]
         
-    readonly_fields = ["total_cost"]
+    readonly_fields = ["noOfKm"]
     extra = 0
 
 def driver_trip_download_csv(modeladmin, request, queryset):
@@ -31,12 +50,26 @@ def driver_trip_download_csv(modeladmin, request, queryset):
 
     # Write the header row
     writer.writerow(["verified", "driverId", "clientName", "shiftType",
-                     "numberOfLoads", "truckNo", "shiftDate", "basePlant", "startTime", "endTime", "logSheet",
-                     "comment", "docketId", "docketNumber", "docketFile",
-                     "waitingTimeInMinutes", "waitingTimeCost", "transferKMS",
-                     "transferKMSCost", "cubicMl", "cubicMlCost",
-                     "minLoad", "minLoadCost", "others",
-                     "othersCost"])
+                     "numberOfLoads", "truckNo", "shiftDate","startTime", "endTime", "logSheet",
+                     "comment",
+                        "docketId",
+                        "tripId",
+                        "shiftDate",
+                        "docketNumber",
+                        "docketFile",
+                        "basePlant",
+                        "noOfKm",
+                        "transferKM",
+                        "returnKm",
+                        "waitingTimeInMinutes",
+                        "minimumLoad",
+                        "surcharge_type",
+                        "surcharge_duration",
+                        "cubicMl",
+                        "minLoad",
+                        "standByPerHalfHourDuration",
+                        "others"
+                     ])
 
  # Write data rows
     for driver_trip in queryset:
@@ -49,21 +82,48 @@ def driver_trip_download_csv(modeladmin, request, queryset):
             driver_trip.numberOfLoads,
             driver_trip.truckNo,
             driver_trip.shiftDate,
-            driver_trip.basePlant,
             driver_trip.startTime,
             driver_trip.endTime,
             driver_trip.logSheet,
             driver_trip.comment,
-            
-            '', '', '', '', '', '', '', '', '', '', '', '', '' # Initialize empty placeholders for other fields
+            '', 
+            '', 
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '' # Initialize empty placeholders for other fields
         ]
     
-        for docket in driver_trip.docket_set.all():
-            row_data[12:25] = [docket.docketId, docket.docketNumber,
-                    docket.docketFile,docket.waitingTimeInMinutes, docket.waitingTimeCost,
-                    docket.transferKMS,docket.transferKMSCost, docket.cubicMl,
-                    docket.cubicMlCost,docket.minLoad, docket.minLoadCost,
-                    docket.others,docket.othersCost]
+        for docket in driver_trip.driverdocket_set.all():
+            row_data[11:29] = [ docket.docketId,
+                                docket.tripId,
+                                docket.shiftDate,
+                                docket.docketNumber,
+                                docket.docketFile,
+                                docket.basePlant,
+                                docket.noOfKm,
+                                docket.transferKM,
+                                docket.returnKm,
+                                docket.waitingTimeInMinutes,
+                                docket.minimumLoad,
+                                docket.surcharge_type,
+                                docket.surcharge_duration,
+                                docket.cubicMl,
+                                docket.minLoad,
+                                docket.standByPerHalfHourDuration,
+                                docket.others
+                                ]
 
         # Only write the row if at least admin truck data is present
         if driver_trip.driverId:

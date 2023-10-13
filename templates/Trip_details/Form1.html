@@ -1,194 +1,292 @@
-{% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Driver trip details {% endblock %}
-{% block headStyle %}
-<link rel="stylesheet" href="{% static 'css/form.css' %}" />
-<style>
-    .cuatom-continer {
-        margin: 0 5rem;
-    }
 
-    .errorMsg {
-        font-size: 0.7rem;
-        color: rgb(255, 0, 0);
-        margin-top: 0.3rem;
-        list-style-type: none;
-    }
-
-    .isInvalid {
-        border: 1px solid rgb(255, 0, 0) !important;
-        border-radius: 7px !important;
-    }
-
-    @media (max-width: 576px) {
-        .cuatom-continer {
-            margin: 0;
+<head>
+    <title>Driver details form-1</title>
+    <!-- Include Bootstrap CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="/static/css/vendor/bootstrap5/bootstrap5.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/form.css" />
+    {% comment %}
+    <link href="library/bootstrap-5/    .min.css" rel="stylesheet" />
+    {% endcomment %}
+    <script src="library/bootstrap-5/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/vendor/bootstrap5/dselect.js' %}"></script>
+    <!-- select2 for searching dropdown -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .errorMsg {
+            font-size: 0.7rem;
+            color: rgb(255, 0, 0);
+            margin-top: 0.3rem;
+            list-style-type: none;
         }
-    }
 
-    @media (max-width: 768px) {
-
-        .cuatom-continer {
-            margin: 0;
+        .isInvalid {
+            border: 1px solid rgb(255, 0, 0) !important;
+            border-radius: 7px !important;
         }
-    }
-</style>
-{% endblock %}
-{% block content %}
-<!-- page content -->
-<div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
 
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>Driver trip form</h2>
-                        <div class="clearfix"></div>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial;
+        }
+
+        .form-select {
+            text-align: left !important;
+            padding: 0.63rem 0.8rem;
+        }
+
+        .dropdown-menu {
+            width: 100%;
+        }
+
+
+        .mybtn {
+            width: 25% !important;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .mybtn {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .col-md-4 {
+                flex-basis: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+        }
+
+        .responsive-btn {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 45px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding: 7px 14px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 7px !important;
+            right: 10px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid" id="mainCont">
+        <form id="signUpForm" action="{% url 'Account:createFormSession' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-header d-flex mb-4">
+                <span class="stepIndicator text-active">Trip details</span>
+                <span class="stepIndicatorOff text-secondary">Loads details</span>
+            </div>
+
+            <!-- Driverid, Clientid and truck number -->
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="driverId">Driver ID :</label>
+
+                            {% if driver_ids is not None %}
+                            <input type="text" name="driverId" id="driverId"
+                                value="{% if driver_ids is not None %}{{driver_ids}}{% endif %}" readonly
+                                class="d-block" />
+                            {% endif %} {% if drivers is not None%}
+                            <select name="driverId" class="form-select" id="driverId">
+                                <option value="" disabled selected>Select Driver Id</option>
+                                {% for driver in drivers %}
+                                <option value="{{ driver.driverId }}-{{driver.name}}">
+                                    {{ driver.driverId }} - {{driver.name}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
                     </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form class="" action="" novalidate>
-                                <span class="section">Trip details</span>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="clientId">Client Name :</label>
+                            {% if client_names is not None %}
+                            <input type="text" name="clientName" id="clientId"
+                                value="{% if client_names is not None %}{{client_names}}{% endif %}" readonly
+                                class="d-block" />
+                            {% comment %} {% endif %}
+                            {% if client_ids is not None%} {% endcomment %}
+                            {% else %}
 
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="driverId">Driver id :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" name="driverId" required="required" id="driverId" />
-                                    </div>
-                                </div>
+                            <select name="clientName" class="form-select" id="clientId">
+                                <option value="" disabled selected>Select Client Name</option>
+                                {% for client_name in client_ids %}
+                                <option value="{{ client_name }}">{{ client_name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
 
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="clientId">Client Name :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" name="clientName" id="clientId" required />
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="shiftType">Select Shift Type <span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <select class="form-control" required id="shiftType" name="shiftType">
-                                            <option value="" disabled selected>Select Shift Type</option>
-                                            <option value="press">Press</option>
-                                            <option value="net">Internet</option>
-                                            <option value="mouth">Word of mouth</option>
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="numberOfLoads">Number of loads :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control number" type="number" data-validate-minmax="1,"
-                                            name="numberOfLoads" id="numberOfLoads" required />
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="truckNum">Truck No :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control number" data-validate-minmax="1," name="truckNum"
-                                            id="truckNum" required />
-                                    </div>
-                                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="numberOfLoads">Truck No :</label>
 
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="shiftDate">Shift date:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" class='date' type="date" name="shiftDate" required
-                                            id="shiftDate">
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="startTime">Start time:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" class='time' type="time" name="startTime"
-                                            id="startTime" required='required'>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="endTime">End time:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" class='time' type="time" name="endTime" id="endTime"
-                                            required='required'>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="logSheet">Upload logsheet:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" class='time' type="file" name="logSheet"
-                                            id="logSheet" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="logSheet" accept=".jpg, .jpeg, .pdf">
-                                    </div>
-                                </div>
-                                <div class="col-md-12 col-sm-12">
-                                    <label for="comments">Comments<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <textarea name='comments' placeholder="Comments" class="w-100"
-                                            rows="3"></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 text-right">
-                                    <button type='reset' class="btn btn-success px-4">Reset</button>
-                                    <button type='submit' class="btn btn-primary px-4">Submit</button>
-                                </div>
-                            </form>
+                            {% if DriverTruckNum is not None %}
+                            <input type="text" name="truckNum" id="truckNum"
+                                value="{% if DriverTruckNum is not None %}{{DriverTruckNum}}{% endif %}" readonly
+                                class="d-block" />
+
+
+                            {% else %}
+                            <select id="truckNum" class="js-select2 form-control" disabled name="truckNum">
+                                <option value="">Select an Item</option>
+                            </select>
+                            {% endif %}
+
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Number of Logs, shift date and Shift type -->
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="numberOfLoads">Number of load :</label>
+                            <input type="number" min="1" id="numberOfLoads" name="numberOfLoads"
+                                value="{{ request.session.data.numberOfLoads|default_if_none:'' }}" />
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="shiftType">Shift Type :</label>
+                            <select id="shiftType" class="form-select" name="shiftType">
+                                <option value="" selected disabled>Select Shift Type</option>
+                                <option value="day">Day</option>
+                                <option value="night">Night</option>
+                            </select>
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="shiftDate">Shift date:</label>
+                            <input type="date" id="shiftDate" name="shiftDate" />
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------------------------------------------------------------------------------------------------------- -->
+
+            <!-- Startdate and enddate and logSheet-->
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="startTime">Start time :</label>
+                            <input type="time" name="startTime" id="startTime"
+                                value="{{ request.session.data.startTime|default_if_none:'' }}" />
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="endTime">End time :</label>
+                            <input type="time" name="endTime" id="endTime"
+                                value="{{ request.session.data.endTime|default_if_none:'' }}" />
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="step">
+                        <div class="mb-3">
+                            <label for="logSheet">Upload Load Sheet :</label>
+                            <input type="file" placeholder="Load Sheet" name="logSheet" class="p-2" id="logSheet"
+                                accept=".jpg, .jpeg, .pdf" />
+                            <i class="fa" aria-hidden="true"></i>
+                            <li class="errorMsg"></li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <textarea placeholder="Comments" name="comments" class="form-control">
+                    {{ request.session.data.comments|default_if_none:'' }}</textarea>
+            </div>
+            <div class="row">
+                <div class="form-footer">
+                    <input type="submit" id="nextBtn" value="Next"
+                        class="btn btn-primary btn-lg responsive-btn mybtn" />
+                </div>
+            </div>
+        </form>
     </div>
-</div>
-<!-- /page content -->
 
-{% block footerStyle %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-<script>
+    <!-- Include Bootstrap JS -->
+    <script src="/static/js/vendor/bootstrap5/bootstrap5.bundle.min.js"></script>
 
-    function hideshow() {
-        var password = document.getElementById("password1");
-        var slash = document.getElementById("slash");
-        var eye = document.getElementById("eye");
+    <!-- jquery cdn  -->
 
-        if (password.type === 'password') {
-            password.type = "text";
-            slash.style.display = "block";
-            eye.style.display = "none";
-        }
-        else {
-            password.type = "password";
-            slash.style.display = "none";
-            eye.style.display = "block";
-        }
+    <script src="/static/js/vendor/jquery/jquery-3.7.0.min.js"></script>
+    <script src="/static/js/vendor/jquery/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    }
+    {% comment %}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    {% endcomment %}
 
-    // initialize a validator instance from the "FormValidator" constructor.
-    // A "<form>" element is optionally passed as an argument, but is not a must
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-
-</script>
-{% endblock %}
-{% endblock %}
+    <!-- select2 for searching dropdown -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+        integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static 'js/form1.js' %}"></script>
+</body>
