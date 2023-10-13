@@ -37,7 +37,7 @@ class DocketInline(admin.StackedInline):
         )
     ]
         
-    readonly_fields = ["noOfKm"]
+    # readonly_fields = ["noOfKm"]
     extra = 0
 
 def driver_trip_download_csv(modeladmin, request, queryset):
