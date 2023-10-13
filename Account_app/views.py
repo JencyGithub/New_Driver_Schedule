@@ -250,15 +250,10 @@ def driverEntrySave(request):
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, Driver_csv_file)
-        is_empty = os.path.getsize('File_name_file.txt') == 0
-        with open('File_name_file.txt', 'w' if is_empty else 'a') as f:
-            if is_empty:
-                f.write(newFileName)
-            else:
-                f.close() 
-                with open('File_name_file.txt', 'w') as f:
-                    f.write(newFileName)
-                return HttpResponse('work')
+        with open("Driver_reg_file.txt",'w') as f:
+            f.write(newFileName)
+            f.close()
+                # return HttpResponse('work')
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"      
         cmd = ["python","manage.py", "runscript",'DriverCsvToModel.py']

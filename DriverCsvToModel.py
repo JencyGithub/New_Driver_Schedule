@@ -37,7 +37,7 @@ def insertIntoModel(dataList):
         DriverObj.save()
 
         
-f = open("File_name_file.txt", 'r')
+f = open("Driver_reg_file.txt", 'r')
 file_name = f.read()
 
 files = open(f'static/Account/DriverEntry/{file_name}','r')

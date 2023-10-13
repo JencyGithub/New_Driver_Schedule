@@ -9,13 +9,15 @@ def dateConvert(date_):
 
 def insertTopUpRecord(list_):
     RCTIobj = RCTI()
-    RCTIobj.docketDate = dateConvert(list_[1].split()[-1])
-    RCTIobj.docketNumber = list_[1].split()[0]
-    # RCTIobj.docketNumber = 1
-    RCTIobj.others = list_[2]
-    RCTIobj.othersCost = float(list_[6].replace(' ',''))
-    RCTIobj.docketYard = ' '
-    RCTIobj.save()
+    excistingRCTI = RCTI.objects.filter(docketDate = dateConvert(list_[1].split()[-1]) , docketNumber = list_[1].split()[0]).first()
+    if not  excistingRCTI :
+        RCTIobj.docketDate = dateConvert(list_[1].split()[-1])
+        RCTIobj.docketNumber = list_[1].split()[0]
+        # RCTIobj.docketNumber = 1
+        RCTIobj.others = list_[2]
+        RCTIobj.othersCost = float(list_[6].replace(' ',''))
+        RCTIobj.docketYard = ' '
+        RCTIobj.save()
 
     return
 
@@ -130,8 +132,6 @@ def insertIntoModel(dataList):
         
 f = open("File_name_file.txt", 'r')
 file_name = f.read()
-with open('File_name_file.txt', 'w') as f:
-    f.write('')
 # file_name = 'converted_20231012112909@_!pdf.csv'
 
 files = open(f'static/Account/RCTI/RCTIInvoice/{file_name}', 'r')
