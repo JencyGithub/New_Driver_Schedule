@@ -1,134 +1,108 @@
-{% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Driver Loads/stops details {% endblock %}
-{% block headStyle %}
-<link rel="stylesheet" href="{% static 'css/form.css' %}" />
-<style>
-    .cuatom-continer {
-        margin: 0 5rem;
-    }
 
-    .errorMsg {
-        font-size: 0.7rem;
-        color: rgb(255, 0, 0);
-        margin-top: 0.3rem;
-        list-style-type: none;
-    }
-
-    .isInvalid {
-        border: 1px solid rgb(255, 0, 0) !important;
-        border-radius: 7px !important;
-    }
-
-    @media (max-width: 576px) {
-        .cuatom-continer {
-            margin: 0;
+<head>
+    <title>Driver details form-2</title>
+    <!-- Include Bootstrap CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static 'css/vendor/bootstrap5/bootstrap5.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <style>
+        .form-element {
+            margin-bottom: 1rem;
         }
-    }
 
-    @media (max-width: 768px) {
-
-        .cuatom-continer {
-            margin: 0;
+        .file-input.error {
+            border: 2px solid red;
         }
-    }
-</style>
-{% endblock %}
-{% block content %}
-<!-- page content -->
-<div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
 
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>Driver trip form</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form class="" action="" novalidate>
-                                <span class="section">Loads/stops details</span>
-                                {% for i in loads %}
-                                    <div class="col-md-6 col-sm-6">
-                                        <label for="docketNumber{{i}}">{{i}}<sup>st</sup> Docket
-                                            number:</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control number" data-validate-minmax="1," name="docketNumber[{{i}}]"
-                                                id="docketNumber{{i}}" required />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6">
-                                        <label for="docketFile{{i}}">{{i}}<sup>st</sup> Docket File:</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" class='time' type="file" name="docketFile[{{i}}]"
-                                                id="docketNumber{{i}}" required='required' style="padding: 0.25rem 0.2rem" accept=".jpg, .jpeg, .pdf">
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                                <div class="col-md-12 text-right">
-                                    <button type='reset' class="btn btn-success px-4">Reset</button>
-                                    <button type='submit' class="btn btn-primary px-4">Submit</button>
-                                </div>
-                            </form>
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            #signUpForm {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 308px) {
+            .mybtn {
+                width: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <form id="signUpForm" action="{% url 'Account:formsSave' %}" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-header d-flex mb-4">
+                <span class="stepIndicatorOff text-secondary">Trip details</span>
+                <span class="stepIndicator text-active">Loads/stops details</span>
+            </div>
+
+            <div class="card mb-4 ">
+                <div class="card-body pb-0">
+                    <h5 class="fw-bold text-basic mb-3">Fill your load details:</h5>
+                    {% for i in loads %}
+                    <div class="card p-3 my-2">
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <label for="docketNumber{{i}}" class="base-label">{{i}}<sup>st</sup> Docket
+                                    number:</label>
+                                <input required type="number" name="docketNumber[{{i}}]" id="docketNumber{{i}}">
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <label for="docketFile{{i}}" class="base-label">{{i}}<sup>st</sup> Docket File:</label>
+                                <input required type="file" name="docketFile[{{i}}]" id="docketFile{{i}}"
+                                    accept=".jpg, .jpeg, .pdf" class="file-input">
+                                <div class="error-message" style="color: red;font-size: 0.7rem"></div>
+                            </div>
                         </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-footer text-end">
+                    <div class="d-flex flex-wrap">
+                        <a href="{% url 'Account:getForm1' %}" id="prevBtn"
+                            class="d-inline-block mx-1 mybtn">Previous</a>
+                        <input type="submit" id="nextBtn" value="Submit" class="d-inline mx-1   mybtn">
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-</div>
-<!-- /page content -->
 
-{% block footerStyle %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-<script>
+    <!-- Include Bootstrap JS -->
+    <script src="{% static 'js/vendor/bootstrap5/bootstrap5.bundle.min.js' %}"></script>
 
-    function hideshow() {
-        var password = document.getElementById("password1");
-        var slash = document.getElementById("slash");
-        var eye = document.getElementById("eye");
+    <!-- jquery cdn  -->
+    <script src="{% static 'js/vendor/jquery/jquery-3.7.0.min.js' %}"></script>
+    <script src="{% static 'js/vendor/jquery/jquery.validate.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        if (password.type === 'password') {
-            password.type = "text";
-            slash.style.display = "block";
-            eye.style.display = "none";
-        }
-        else {
-            password.type = "password";
-            slash.style.display = "none";
-            eye.style.display = "block";
-        }
+    <script>
+        $(document).ready(function () {
+            $('input[type="file"]').change(function () {
+                var fileName = $(this).val();
+                var allowedExtensions = /(\.jpg|\.jpeg|\.pdf)$/i;
+                var errorMessageElement = $(this).siblings('.error-message');
 
-    }
-
-    // initialize a validator instance from the "FormValidator" constructor.
-    // A "<form>" element is optionally passed as an argument, but is not a must
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-
-</script>
-{% endblock %}
-{% endblock %}
+                if (!allowedExtensions.exec(fileName)) {
+                    errorMessageElement.text('Please upload a JPG, JPEG, or PDF file only.');
+                    $(this).addClass('error'); // Add the error class to the input element
+                } else {
+                    errorMessageElement.text('');
+                    $(this).removeClass('error'); // Remove the error class from the input element
+                }
+            });
+        });
+    </script>
+</body>
