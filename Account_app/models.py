@@ -48,13 +48,13 @@ class DriverDocket(models.Model):
         ('per cubic meters sunday', 'PER CUBIC METERS SUNDAY'),
         ('per cubic meters public holiday', 'PER CUBIC METERS PUBLIC HOLIDAY'),
     )
-    BASE_PLANTS_CHOICE = [('select','SELECT')]
-    basePlants = BasePlant.objects.all()
-    choices_list = BASE_PLANTS_CHOICE 
-    for plant in basePlants:
-        choices_list.append((plant.basePlant, plant.basePlant.upper())) 
+    # BASE_PLANTS_CHOICE = [('select','SELECT')]
+    # basePlants = BasePlant.objects.all()
+    # choices_list = BASE_PLANTS_CHOICE 
+    # for plant in basePlants:
+    #     choices_list.append((plant.basePlant, plant.basePlant.upper())) 
 
-    BASE_PLANTS_CHOICE = tuple(choices_list) 
+    # BASE_PLANTS_CHOICE = tuple(choices_list) 
 
     docketId = models.AutoField(primary_key=True)
     tripId = models.ForeignKey(DriverTrip, on_delete=models.CASCADE)
@@ -62,8 +62,10 @@ class DriverDocket(models.Model):
     docketNumber = models.IntegerField()
     docketFile = models.FileField(upload_to='static/img/docketFiles')
     
-    basePlant = models.CharField(
-        max_length=31, choices=BASE_PLANTS_CHOICE, default='select')
+    # basePlant = models.CharField(
+    #     max_length=31, choices=BASE_PLANTS_CHOICE, default='select')
+    basePlant = models.ForeignKey(BasePlant,on_delete=models.CASCADE)
+    
     
     noOfKm = models.FloatField(default=0)
     transferKM = models.PositiveIntegerField(default=0)

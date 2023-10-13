@@ -176,6 +176,7 @@ def formsSave(request):
                 tripId=trip,
                 docketNumber=Docket_no[i],  # Use the specific value from the list
                 docketFile='static/img/docketFiles/' + Docket_file[i],  # Use the specific value from the list
+                basePlant = BasePlant.objects.get(basePlant="Not selected")
             )
             docket_.save()
 
