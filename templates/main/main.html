@@ -34,7 +34,7 @@
   <!-- Custom Theme Style -->
   <link href="{% static 'Dashboard/build/css/custom.min.css' %}" rel="stylesheet">
 
-    <!-- Extraa css  -->
+    <!-- Extraa css / alertify css -->
   <!-- CSS -->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
   <!-- Default theme -->
@@ -107,8 +107,9 @@
   <!-- Custom Theme Scripts -->
   <script src='{% static "Dashboard/build/js/custom.min.js" %}'></script>
 
-  <!-- JavaScript -->
+  <!-- JavaScript / alertify JS -->
   <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
   {% for message_flash in messages %}
   <script>
     alertify.set('notifier', 'position', 'top-right');

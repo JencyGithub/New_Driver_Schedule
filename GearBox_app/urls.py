@@ -24,4 +24,6 @@ app_name = 'gearBox'
 urlpatterns = [
     path('leaveReq/', views.leaveReq, name='leaveReq'), 
     path('natureOfLeaves/', views.natureOfLeaves, name='natureOfLeaves'), 
+    path('natureOfLeavesEdit/', views.natureOfLeavesEdit, name='natureOfLeavesEdit'), 
+    path('leaveReqEdit/', views.leaveReqEdit, name='leaveReqEdit'), 
 ]
