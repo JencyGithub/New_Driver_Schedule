@@ -183,7 +183,7 @@ def formsSave(request):
     del request.session['data']
 
     messages.success(request, " Form Successfully Filled Up")
-    return redirect('/')
+    return redirect('index')
 
 
 @csrf_protect
