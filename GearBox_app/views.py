@@ -12,3 +12,9 @@ def leaveReq(request):
 def natureOfLeaves(request):
     nature_of_leaves = NatureOfLeave.objects.all()
     return render(request, 'gearBox/natureOfLeaves.html', {'nature_of_leaves': nature_of_leaves})
+
+def natureOfLeavesEdit(request):
+    return render(request,'gearBox/NatureOfLeavesEdit.html')
+
+def leaveReqEdit(request):
+    return render(request,'gearBox/LeaveReqEdit.html')

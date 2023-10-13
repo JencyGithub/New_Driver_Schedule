@@ -64,7 +64,7 @@
                         <td>{{ leave_request.reason.reason }}</td>
                         <td>{{ leave_request.status }}</td>
                         <td>
-                          <label type="" class="btn"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></label>
+                          <label type="button" class="btn" id="redirectButton" data-url="{% url 'gearBox:leaveReqEdit' %}"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></label>
                         </td>
                       </tr>
                       {% endfor %}
@@ -81,6 +81,15 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
+<script>
+  const redirectButton = document.getElementById('redirectButton');
+
+  redirectButton.addEventListener('click', function() {
+    const djangoURL = redirectButton.getAttribute('data-url');
+    
+    window.location.href = djangoURL;
+  });
+</script>
 <script>
   $(document).ready(function () {
     $('#datatable-buttons').DataTable();

@@ -23,8 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # main index page
-    path('', views.index, name='index'),
-    path('login',views.loginCall, name='login'),
+    path('index', views.index, name='index'),
+    path('',views.loginCall, name='login'),
     path('loginCheck',views.loginCheck, name='login-check'),
     path('logout',views.CustomLogOut, name='logout'),
 
