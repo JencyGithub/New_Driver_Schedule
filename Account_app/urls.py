@@ -22,13 +22,18 @@ app_name = 'Account'
 
 urlpatterns = [
     path('', views.index, name='index'), 
+    # Driver trip path
     path('Form1/', views.getForm1, name='getForm1'), 
     path('Form2/', views.getForm2, name='getForm2'),
+    
+     path('createFormSession/',
+         views.createFormSession, name='createFormSession'),
+    path('formsSave/', views.formsSave, name='formsSave'),
+
+    path('getTrucks/', views.getTrucks, name='getTrucks'), 
+    
     path('Rcti/', views.rcti, name='rcti'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
-    path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'), 
-    
-    
-     
+    path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),      
 ]

@@ -28,11 +28,11 @@ var clientId = document.getElementById("clientId");
 var shiftType = document.getElementById("shiftType");
 var numberOfLoads = document.getElementById("numberOfLoads");
 var truckNum = document.getElementById("truckNum");
-var basePlant = document.getElementById("basePlant");
 var shiftDate = document.getElementById("shiftDate");
 var startTime = document.getElementById("startTime");
 var endTime = document.getElementById("endTime");
 var drivers = "{{drivers}}";
+var isValid = true;
 
 function checkData() {
   var driverIdValue = driverId.value.trim();
@@ -40,7 +40,6 @@ function checkData() {
   var shiftTypeValue = shiftType.value.trim();
   var numberOfLoadsValue = numberOfLoads.value.trim();
   var truckNumValue = truckNum.value.trim();
-  var basePlantValue = basePlant.value.trim();
   var shiftDateValue = shiftDate.value.trim();
   var startTimeValue = startTime.value.trim();
   var endTimeValue = endTime.value.trim();
@@ -101,15 +100,6 @@ function checkData() {
     setSuccess(shiftDate);
   }
 
-  if (basePlantValue == "") {
-    setError(basePlant, "basePlant can't be left blank.");
-    $("#basePlant").next(".dselect-wrapper").addClass("isInvalid");
-
-    isValid = false;
-  } else {
-    setSuccess(basePlant);
-  }
-
   if (startTimeValue == "") {
     setError(startTime, "Start time can't be blank.");
     isValid = false;
@@ -123,20 +113,17 @@ function checkData() {
     setSuccess(endTime);
   }
 
-  var invalidInputs = document.querySelectorAll(".isInvalid");
-  invalidInputs.forEach(function (input) {
-    setError(input, "This field is required.");
-  });
+  // var invalidInputs = document.getElementsByClassName("isInvalid");
+  // invalidInputs.forEach(function (input) {
+  //   setError(input, "This field is required.");
+  // });
 
-  return isValid;
-}
-
-$("#logSheet").change(function () {
-  var logSheetValue = $(this).val();
+  var logSheet = document.getElementById("logSheet");
+  var logSheetValue = $("#logSheet").val();
   var allowedExtensions = ["jpg", "jpeg", "pdf"];
-  var fileExtension = logSheetValue.split('.').pop().toLowerCase();
+  var fileExtension = logSheetValue.split(".").pop().toLowerCase();
 
-  if (logSheetValue == "") {
+  if (logSheetValue === "") {
     setError(logSheet, "Please upload a Load Sheet.");
     isValid = false;
   } else if (allowedExtensions.indexOf(fileExtension) === -1) {
@@ -145,7 +132,9 @@ $("#logSheet").change(function () {
   } else {
     setSuccess(logSheet);
   }
-});
+
+  return isValid;
+}
 
 function setError(inputElement, msg) {
   var parentBox = inputElement.parentElement;
@@ -177,11 +166,10 @@ try {
   });
 } catch (error) {}
 
-var select_box_element = document.querySelector("#basePlant");
-
 dselect(select_box_element, {
   search: true,
 });
+
 try {
   if (drivers) {
     var driverIdSelect = document.querySelector("#driverId");
@@ -207,7 +195,7 @@ $("#clientId").on("change", function () {
     $("#truckNum").html('<option value="">Loading...</option>');
     $.ajax({
       type: "POST",
-      url: "/Trips_details_app/getTrucks/",
+      url: "/account/getTrucks/",
       data: {
         clientName: $(this).val(),
       },
@@ -224,6 +212,12 @@ $("#clientId").on("change", function () {
           );
         });
         $("#truckNum").trigger("change.select2");
+
+        if (data.docket) {
+          $("#nextBtn").val("Submit");
+        } else {
+          $("#nextBtn").val("Next");
+        }
       },
     });
   }
