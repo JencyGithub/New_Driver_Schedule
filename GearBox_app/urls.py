@@ -31,4 +31,6 @@ urlpatterns = [
 
     # CRUD Leave Request
     path('leaveRequest/add', views.addLeaveRequest, name='addLeaveRequest'), 
+    path('natureOfLeavesEdit/', views.natureOfLeavesEdit, name='natureOfLeavesEdit'), 
+    path('leaveReqEdit/', views.leaveReqEdit, name='leaveReqEdit'), 
 ]

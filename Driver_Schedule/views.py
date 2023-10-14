@@ -54,7 +54,7 @@ def loginCheck(request):
 
 def CustomLogOut(request):
     logout(request)
-    return redirect('index')
+    return redirect('login')
 
 
     

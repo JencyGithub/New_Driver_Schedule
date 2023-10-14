@@ -47,8 +47,7 @@
                       <tr>
                         <td>{{ nature_of_leaves.reason }}</td>
                         <td>
-                          <button type="button" class="btn btn-success">Edit</button>
-                          <button type="button" class="btn btn-danger">Delete</button>
+                          <label type="button" class="btn" id="redirectButton" data-url="{% url 'gearBox:natureOfLeavesEdit' %}"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></label>
                         </td>
                       </tr>
                       {% endfor %}
@@ -65,6 +64,15 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
+<script>
+  const redirectButton = document.getElementById('redirectButton');
+
+  redirectButton.addEventListener('click', function() {
+    const djangoURL = redirectButton.getAttribute('data-url');
+    
+    window.location.href = djangoURL;
+  });
+</script>
 <script>
   $(document).ready(function () {
     $('#datatable-buttons').DataTable();

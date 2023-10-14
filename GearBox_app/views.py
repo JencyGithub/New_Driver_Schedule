@@ -38,3 +38,9 @@ def addLeaveRequest(request):
     insert = insertIntoTable(tableName='LeaveRequest',dataSet=data)
     return HttpResponse(insert)
     
+
+def natureOfLeavesEdit(request):
+    return render(request,'gearBox/NatureOfLeavesEdit.html')
+
+def leaveReqEdit(request):
+    return render(request,'gearBox/LeaveReqEdit.html')
