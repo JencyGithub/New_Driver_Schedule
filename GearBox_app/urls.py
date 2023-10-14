@@ -24,6 +24,17 @@ app_name = 'gearBox'
 urlpatterns = [
     path('leaveReq/', views.leaveReq, name='leaveReq'), 
     path('natureOfLeaves/', views.natureOfLeaves, name='natureOfLeaves'), 
-    path('natureOfLeavesEdit/', views.natureOfLeavesEdit, name='natureOfLeavesEdit'), 
-    path('leaveReqEdit/', views.leaveReqEdit, name='leaveReqEdit'), 
+    
+    # CRUD Nature of leaves
+    path('natureOfLeaves/add/', views.addNatureOfLeave, name='addNatureOfLeave'), 
+    path('natureOfLeaves/edit/', views.natureOfLeavesEdit, name='natureOfLeavesEdit'), 
+
+
+    # CRUD Leave Request
+    # ADD
+    path('leaveReqForm/', views.leaveReqForm, name='leaveReqForm'), 
+    path('leaveRequest/add/', views.changeLeaveRequest, name='addLeaveRequest'), 
+    # UPDATE
+    path('leaveReq/edit/<int:id>/', views.leaveReqForm, name='leaveReqEdit'), 
+    path('leaveRequest/edit/save/<int:id>/', views.changeLeaveRequest, name='editSaveLeaveRequest'), 
 ]
