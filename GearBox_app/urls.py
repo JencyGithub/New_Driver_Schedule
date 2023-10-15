@@ -26,9 +26,12 @@ urlpatterns = [
     path('natureOfLeaves/', views.natureOfLeaves, name='natureOfLeaves'), 
     
     # CRUD Nature of leaves
-    path('natureOfLeaves/add/', views.addNatureOfLeave, name='addNatureOfLeave'), 
-    path('natureOfLeaves/edit/', views.natureOfLeavesEdit, name='natureOfLeavesEdit'), 
-
+    # ADD
+    path('natureOfLeaveForm/', views.natureOfLeavesForm, name='natureOfLeaveForm'),
+    path('natureOfLeaveForm/add/', views.changeNatureOfLeaves, name='addNatureOfLeave'),
+    # UPDATE
+    path('natureOfLeaves/edit/<int:id>/', views.natureOfLeavesForm, name='natureOfLeavesEdit'), 
+    path('natureOfLeaves/edit/save/<int:id>/', views.changeNatureOfLeaves, name='editSaveNatureOfLeaves'), 
 
     # CRUD Leave Request
     # ADD

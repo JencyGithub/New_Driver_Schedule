@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from rest_framework.decorators import api_view
 from django.contrib import messages
+from django.http import Http404
 
 
 
@@ -19,20 +20,30 @@ def leaveReq(request):
 
 def natureOfLeaves(request):
     nature_of_leaves = NatureOfLeave.objects.all()
-    return render(request, 'gearBox/natureOfLeaves.html', {'nature_of_leaves': nature_of_leaves})
+    return render(request, 'gearBox/NatureOfLeaves.html', {'nature_of_leaves': nature_of_leaves})
 
-def addNatureOfLeave(request):
+def natureOfLeavesForm(request,id=None):
+    data = None
+    if id:
+        try:
+            data = NatureOfLeave.objects.get(id=id)
+        except NatureOfLeave.DoesNotExist:
+            raise Http404("NatureOfLeave does not exist")
+    return render(request,'gearBox/NatureOfLeavesForm.html',{'data': data}) 
+
+@csrf_protect
+@api_view(['POST'])
+def changeNatureOfLeaves(request,id=None):
     data = {
-        'reason' : 'Sickness'
+        'reason' : request.POST.get('Reason'),
     }
-    insert = insertIntoTable(tableName='NatureOfLeave',dataSet=data)
-    
-    return HttpResponse(insert)
-
-    
-
-def natureOfLeavesEdit(request):
-    return render(request,'gearBox/NatureOfLeavesForm.html')
+    if id == None:
+        insert = insertIntoTable(tableName='NatureOfLeave',dataSet=data)
+        messages.success(request,'Adding successfully')
+    else:
+        update = updateIntoTable(id,tableName='NatureOfLeave',dataSet=data)
+        messages.success(request, 'Updating successfully')
+    return redirect('gearBox:natureOfLeaves')
 
 def leaveReqForm(request,id=None):
     natureOfLeaves = NatureOfLeave.objects.all()
