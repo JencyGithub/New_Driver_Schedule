@@ -14,6 +14,16 @@
   .dt-buttons.btn-group{
     float: right! important;
   }
+
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
+  }
+
+  /* Show CSV button */
+  .dt-buttons.btn-group>a:nth-child(2) {
+    display: block !important;
+  }
  </style>
 {% endblock %}
 {% block content %}
@@ -29,6 +39,7 @@
         <div class="x_panel">
           <div class="x_title">
             <h2>Nature of leaves</h2>
+            <a href="{% url 'gearBox:natureOfLeaveForm'%}" class="btn btn-dark float-right">Add</a>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -47,7 +58,7 @@
                       <tr>
                         <td>{{ nature_of_leaves.reason }}</td>
                         <td>
-                          <label type="button" class="btn" id="redirectButton" data-url="{% url 'gearBox:natureOfLeavesEdit' %}"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></label>
+                          <label type="button" class="btn" id="redirectButton"><a href="{% url 'gearBox:natureOfLeavesEdit' id=nature_of_leaves.id %}"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></a></label>
                         </td>
                       </tr>
                       {% endfor %}
@@ -65,14 +76,15 @@
 {% endblock %}
 {% block footerStyleEnd %}
 <script>
-  const redirectButton = document.getElementById('redirectButton');
-
-  redirectButton.addEventListener('click', function() {
-    const djangoURL = redirectButton.getAttribute('data-url');
-    
-    window.location.href = djangoURL;
+  const redirectButtons = document.querySelectorAll('.redirectButton');
+  redirectButtons.forEach(function (button) {
+    button.addEventListener('click', function() {
+      const djangoURL = button.getAttribute('data-url');
+      window.location.href = djangoURL;
+    });
   });
 </script>
+
 <script>
   $(document).ready(function () {
     $('#datatable-buttons').DataTable();

@@ -46,12 +46,13 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Edit leave request</h2>
+                        <h2>{% if data %}Edit{% else %}Add{% endif %} Edit leave request</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form class="" action="" novalidate>
+                            <form class="" action="{% if data %}{% url 'gearBox:editSaveNatureOfLeaves' id=data.id %} {% else %}{% url 'gearBox:addNatureOfLeave' %}{% endif %}" method="POST" novalidate>
+                                {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
                                         <label for="Reason"
@@ -59,7 +60,7 @@
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="Reason" required="required"
-                                                id="Reason" type="number" />
+                                                id="Reason" type="text" value="{% if data %}{{data.reason}}{% else %}{% endif %}"/>
                                         </div>
                                     </div>
                                 </div>
