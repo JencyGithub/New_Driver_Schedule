@@ -28,7 +28,7 @@
       <div class="col-md-12 col-sm-12 ">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Nature of leaves</h2>
+            <h2>Base Plant</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -43,15 +43,15 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {% for basePlant in BasePlant %}
+                      {% for basePlants in BP_ %}
                       <tr>
-                        <td>{{ basePlant.basePlant }}</td>
+                        <td>{{ basePlants.basePlant }}</td>
                         <td>
                           <button type="button" class="btn btn-success">Edit</button>
                           <button type="button" class="btn btn-danger">Delete</button>
                         </td>
                       </tr>
-                      {% endfor %}
+                    {% endfor %}
                     </tbody>
                   </table>
                 </div>
