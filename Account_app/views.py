@@ -1,8 +1,14 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil, os,tabula, requests, colorama, subprocess
+import shutil
+import os
+import tabula
+import requests
+import colorama
+import subprocess
+import csv
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from django.conf import settings
@@ -16,6 +22,7 @@ from GearBox_app.models import *
 def index(request):
     return render(request, 'Account/dashboard.html')
 
+
 def getForm1(request):
     params = {}
     if request.user.is_authenticated:
@@ -25,15 +32,15 @@ def getForm1(request):
             'adminTruckNumber', flat=True).distinct()
         client_truck_no = ClientTruckConnection.objects.values_list(
             'clientTruckId', flat=True).distinct()
-    
+
         params = {
             'client_ids': client_names,
             'admin_truck_no': admin_truck_no,
             'client_truck_no': client_truck_no,
         }
         try:
-            Driver_  = Driver.objects.get(email=user_email)
-            driver_id = str(Driver_.driverId) + '-' + str(Driver_.name)   
+            Driver_ = Driver.objects.get(email=user_email)
+            driver_id = str(Driver_.driverId) + '-' + str(Driver_.name)
             params['driver_ids'] = driver_id
             params['drivers'] = None
             # DriverTruckNum = ClientTruckConnection.objects.get(driverId = Driver_.driverId)
@@ -47,42 +54,45 @@ def getForm1(request):
             params['drivers'] = drivers
             params['DriverTruckNum'] = None
             params['client_names'] = None
-            
+
         return render(request, 'Trip_details/form1.html', params)
 
     else:
         return redirect('login')
-    
+
     # return render(request, 'Trip_details/Form1.html')
+
 
 def getForm2(request):
     params = {
-            'loads': [i+1 for i in range(int(request.session['data'].get('numberOfLoads')))]
-        }
+        'loads': [i+1 for i in range(int(request.session['data'].get('numberOfLoads')))]
+    }
     # params = {
     #         'loads': [1,2,3]
     #     }
-    return render(request, 'Trip_details/Form2.html',params)
+    return render(request, 'Trip_details/Form2.html', params)
 
 # @csrf_protect
 # @api_view(['POST'])
+
+
 def createFormSession(request):
     clientName = request.POST.get('clientName')
     logSheet = request.FILES.get('logSheet')
     if logSheet:
-        
+
         load_sheet_folder_path = 'Temp_Load_Sheet'
         fileName = logSheet.name
         time = (str(timezone.now())).replace(':', '').replace(
             '-', '').replace(' ', '').split('.')
         time = time[0]
-        
+
         log_sheet_new_filename = 'Load_Sheet' + time + \
             '!_@' + fileName.replace(" ", "").replace("\t", "")
-            
+
         lfs = FileSystemStorage(location=load_sheet_folder_path)
-        l_filename = lfs.save(log_sheet_new_filename, logSheet)  
-              
+        l_filename = lfs.save(log_sheet_new_filename, logSheet)
+
         data = {
             'driverId': request.POST.get('driverId').split('-')[0],
             'clientName': clientName,
@@ -96,15 +106,13 @@ def createFormSession(request):
             'comments': request.POST.get('comments')
         }
 
-        
-        
-    data['docketGiven'] = True if Client.objects.get(name = clientName).docketGiven else False
-     
+    data['docketGiven'] = True if Client.objects.get(
+        name=clientName).docketGiven else False
+
     request.session['data'] = data
     # request.session.set_expiry(5)
-    
-    return formsSave(request) if Client.objects.get(name = clientName).docketGiven else redirect('Account:getForm2')
 
+    return formsSave(request) if Client.objects.get(name=clientName).docketGiven else redirect('Account:getForm2')
 
 
 # @csrf_protect
@@ -125,17 +133,17 @@ def formsSave(request):
     Docket_no = []
     Docket_file = []
     time = (str(timezone.now())).replace(':', '').replace(
-                    '-', '').replace(' ', '').split('.')
+        '-', '').replace(' ', '').split('.')
     time = time[0]
-    
+
     if not request.session['data']['docketGiven']:
         for i in range(1, int(numberOfLoads)+1):
-            
+
             key = f"docketNumber[{i}]"
             docket_number = request.POST.get(key)
             Docket_no.append(docket_number)
             key_files = f"docketFile[{i}]"
-            
+
             docket_files = request.FILES.get(key_files)
 
             temp_logSheet = temp_logSheet + '-' + docket_number
@@ -145,15 +153,17 @@ def formsSave(request):
                 pdf_folder_path = 'static/img/docketFiles'
                 fileName = docket_files.name
                 # return HttpResponse(fileName.split('.')[-1])
-                docket_new_filename =  time + '!_@' + docket_number + '.' +  fileName.split('.')[-1]
+                docket_new_filename = time + '!_@' + \
+                    docket_number + '.' + fileName.split('.')[-1]
                 # return HttpResponse(docket_new_filename)
                 pfs = FileSystemStorage(location=pdf_folder_path)
                 pfs.save(docket_new_filename, docket_files)
-                Docket_file.append(docket_new_filename) 
-    
+                Docket_file.append(docket_new_filename)
+
     if not os.path.exists('static/img/finalLogSheet/' + logSheet):
-        shutil.move('Temp_Load_Sheet/' + logSheet, 'static/img/finalLogSheet/' + logSheet)
-        
+        shutil.move('Temp_Load_Sheet/' + logSheet,
+                    'static/img/finalLogSheet/' + logSheet)
+
     driver = Driver.objects.get(driverId=driverId)
 
     trip = DriverTrip(
@@ -169,14 +179,16 @@ def formsSave(request):
         shiftDate=shiftDate
     )
     trip.save()
-    
+
     if not request.session['data']['docketGiven']:
         for i in range(len(Docket_no)):
             docket_ = DriverDocket(
                 tripId=trip,
-                docketNumber=Docket_no[i],  # Use the specific value from the list
-                docketFile='static/img/docketFiles/' + Docket_file[i],  # Use the specific value from the list
-                basePlant = BasePlant.objects.get(basePlant="Not selected")
+                # Use the specific value from the list
+                docketNumber=Docket_no[i],
+                # Use the specific value from the list
+                docketFile='static/img/docketFiles/' + Docket_file[i],
+                basePlant=BasePlant.objects.get(basePlant="Not selected")
             )
             docket_.save()
 
@@ -205,8 +217,9 @@ def getTrucks(request):
 
 
 def rcti(request):
-    return render(request , 'Account/rctiForm.html')
-    
+    return render(request, 'Account/rctiForm.html')
+
+
 @csrf_protect
 def rctiSave(request):
     invoiceFile = request.FILES.get('RctiFile')
@@ -214,7 +227,8 @@ def rctiSave(request):
     if not invoiceFile:
         return HttpResponse("No file uploaded")
     try:
-        time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(invoiceFile.name)
         location = 'static/Account/RCTI/tempRCTIInvoice'
@@ -222,21 +236,24 @@ def rctiSave(request):
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
 
-        cmd = ["python","Account_app/utils.py", newFileName]
-        subprocess.Popen(cmd,stdout=subprocess.PIPE)  
+        cmd = ["python", "Account_app/utils.py", newFileName]
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
         # return HttpResponse('work')
         if save_data == '1':
             colorama.AnsiToWin32.stream = None
-            os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"      
-            cmd = ["python","manage.py", "runscript",'csvToModel.py']
-            subprocess.Popen(cmd,stdout=subprocess.PIPE)        
-        messages.success(request, "Please wait 5 minutes. The data conversion process continues")
-        return redirect('/')
+            os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+            cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
+            subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        messages.success(
+            request, "Please wait 5 minutes. The data conversion process continues")
+        return redirect('Account:index')
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
-    
+
+
 def driverEntry(request):
-    return render(request , 'Account/driverEntryForm.html')
+    return render(request, 'Account/driverEntryForm.html')
+
 
 @csrf_protect
 def driverEntrySave(request):
@@ -244,27 +261,100 @@ def driverEntrySave(request):
     if not Driver_csv_file:
         return HttpResponse("No file uploaded")
     try:
-        time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(Driver_csv_file.name)
         location = 'static/Account/DriverEntry'
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, Driver_csv_file)
-        is_empty = os.path.getsize('File_name_file.txt') == 0
-        with open('File_name_file.txt', 'w' if is_empty else 'a') as f:
-            if is_empty:
-                f.write(newFileName)
-            else:
-                f.close() 
-                with open('File_name_file.txt', 'w') as f:
-                    f.write(newFileName)
-                return HttpResponse('work')
+        with open("Driver_reg_file.txt", 'w') as f:
+            f.write(newFileName)
+            f.close()
         colorama.AnsiToWin32.stream = None
-        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"      
-        cmd = ["python","manage.py", "runscript",'DriverCsvToModel.py']
-        subprocess.Popen(cmd,stdout=subprocess.PIPE)
-        messages.success(request, "Please wait 5 minutes. The data conversion process continues")
-        return redirect('/')
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'DriverCsvToModel.py']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        messages.success(
+            request, "Please wait 5 minutes. The data conversion process continues")
+        return redirect('Account:index')
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+
+def rctiTable(request):
+    RCTI_ = RCTI.objects.all()
+    return render(request, 'Account/Tables/rctiTable.html', {'RCTI': RCTI_})
+
+
+def basePlantTable(request):
+    basePlant_ = BasePlant.objects.all()
+    return render(request, 'Account/Tables/basePlantTable.html', {'BP_': basePlant_})
+
+
+def driverTripsTable(request):
+    driver_trip = DriverTrip.objects.all()
+    # driver_docket = DriverDocket.objects.all()
+    return render(request, 'Account/Tables/driverTripsTable.html', {'driverTrip': driver_trip})
+
+
+def driverTripCsv(request):
+    driver_trip = DriverTrip.objects.all()
+    data_list = []
+    temp_trip_data_list = []
+    temp_docket_data_list = []
+
+    for trip in driver_trip:
+        temp_trip_data_list.append([
+            trip.verified,
+            trip.driverId.name,
+            trip.clientName,
+            trip.shiftType,
+            trip.numberOfLoads,
+            trip.truckNo,
+            trip.shiftDate,
+            trip.startTime,
+            trip.endTime,
+            trip.logSheet,
+            trip.comment,
+        ])
+        related_dockets = DriverDocket.objects.filter(
+            tripId=trip.id).values_list()
+        if related_dockets:
+            for docket in related_dockets:
+                temp_docket_data_list.append(list(docket))
+
+            for i in range(len(temp_docket_data_list)):
+                data_list.append(
+                    temp_trip_data_list[0] + temp_docket_data_list[i])
+            temp_trip_data_list.clear()
+            temp_docket_data_list.clear()
+        else:
+            data_list.extend(temp_trip_data_list)
+
+    time = str(timezone.now()).replace(':', '').replace(
+        '-', '').replace(' ', '').split('.')
+    newFileName = time[0]
+
+    location = 'static/Account/DriverTripCsvDownload/'
+
+    lfs = FileSystemStorage(location=location)
+
+    csv_filename = newFileName + '.csv'
+
+    header = ['verified','driverId', 'clientName', 'shiftType', 'numberOfLoads', 'truckNo', 'shiftDate', 'startTime', 'endTime', 'logSheet', 'comment', 'docketId', 'tripId', 'shiftDate', 'docketNumber', 'docketFile', 'basePlant', 'noOfKm', 'transferKM', 'returnKm', 'waitingTimeInMinutes', 'minimumLoad','surcharge_type', 'surcharge_duration', 'cubicMl', 'minLoad', 'standByPerHalfHourDuration', 'others']
+
+    file_name = location + csv_filename
+
+# Open the CSV file in append mode ('a')
+    myFile = open(file_name, 'a', newline='')
+
+    # Create a CSV writer
+    writer = csv.writer(myFile)
+    writer.writerow(header)
+    writer.writerows(data_list)
+    myFile.close()
+    messages.success(
+            request, "Csv Complete")
+    return redirect('Account:index')

@@ -36,4 +36,14 @@ urlpatterns = [
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),      
+    
+    # Account Tables 
+    path('BasePlantTable/', views.basePlantTable, name='basePlantTable'),      
+    path('RctiTable/', views.rctiTable, name='rctiTable'),      
+    path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),  
+    
+    # Trip Csv
+    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
+    
+    
 ]
