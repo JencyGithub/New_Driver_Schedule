@@ -8,7 +8,7 @@ import tabula
 import requests
 import colorama
 import subprocess
-import csv
+import csv , io
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from django.conf import settings
@@ -17,6 +17,9 @@ from django.utils import timezone
 from django.contrib import messages
 from Account_app.models import *
 from GearBox_app.models import *
+from django.http import FileResponse
+from CRUD import *
+
 
 
 def index(request):
@@ -343,9 +346,10 @@ def driverTripCsv(request):
 
     csv_filename = newFileName + '.csv'
 
-    header = ['verified','driverId', 'clientName', 'shiftType', 'numberOfLoads', 'truckNo', 'shiftDate', 'startTime', 'endTime', 'logSheet', 'comment', 'docketId', 'tripId', 'shiftDate', 'docketNumber', 'docketFile', 'basePlant', 'noOfKm', 'transferKM', 'returnKm', 'waitingTimeInMinutes', 'minimumLoad','surcharge_type', 'surcharge_duration', 'cubicMl', 'minLoad', 'standByPerHalfHourDuration', 'others']
+    header = ['verified','driverId', 'clientName', 'shiftType', 'numberOfLoads', 'truckNo', 'shiftDate', 'startTime', 'endTime', 'loadSheet', 'comment', 'docketId', 'tripId', 'shiftDate', 'docketNumber', 'docketFile', 'basePlant', 'noOfKm', 'transferKM', 'returnKm', 'waitingTimeInMinutes', 'minimumLoad','surcharge_type', 'surcharge_duration', 'cubicMl', 'minLoad', 'standByPerHalfHourDuration', 'others']
 
     file_name = location + csv_filename
+    # return HttpResponse(file_name)
 
 # Open the CSV file in append mode ('a')
     myFile = open(file_name, 'a', newline='')
@@ -355,6 +359,18 @@ def driverTripCsv(request):
     writer.writerow(header)
     writer.writerows(data_list)
     myFile.close()
-    messages.success(
-            request, "Csv Complete")
-    return redirect('Account:index')
+    return FileResponse(open('static/Account/DriverTripCsvDownload/20231015055523.csv','rb'),as_attachment = True)   
+# messages.success(
+    #         request, "Csv Download")
+    return response
+    # return redirect('Account:index')
+
+
+def DriverTripEditForm(request,id):
+    driver_trip = DriverTrip.objects.get(id = id)
+    print(driver_trip.loadSheet)
+    driver_trip.shiftDate = dateConverterFromTableToPageFormate(driver_trip.shiftDate)
+    driver_docket = DriverDocket.objects.filter(tripId = id)
+    for i in driver_docket:
+        i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
+    return render(request,'Account/Tables/DriverTrip&Docket/tripEditForm.html',{'driverDocket':driver_docket,'driverTrip':driver_trip})

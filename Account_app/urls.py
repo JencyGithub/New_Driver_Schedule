@@ -42,8 +42,11 @@ urlpatterns = [
     path('RctiTable/', views.rctiTable, name='rctiTable'),      
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),  
     
-    # Trip Csv
+    # DriverTrip Csv
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
     
+    # Edit
+    path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
+    # path('natureOfLeaves/edit/save/<int:id>/', views.changeNatureOfLeaves, name='editSaveNatureOfLeaves'),
     
 ]

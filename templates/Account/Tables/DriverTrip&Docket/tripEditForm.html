@@ -1,0 +1,303 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Driver Trip &Docket Edit {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<style>
+    .cuatom-continer {
+        margin: 0 5rem;
+    }
+
+    .errorMsg {
+        font-size: 0.7rem;
+        color: rgb(255, 0, 0);
+        margin-top: 0.3rem;
+        list-style-type: none;
+    }
+
+    .isInvalid {
+        border: 1px solid rgb(255, 0, 0) !important;
+        border-radius: 7px !important;
+    }
+
+    @media (max-width: 576px) {
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <form class="" method="POST" action="{% url 'Account:driverEntrySave'%}" novalidate
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Driver Trip Edit Form</h2>
+                            <label for="verified" class="float-right ml-2">Varified</label>
+                            <input type="checkbox" id="verified" name="verified"
+                                checked="{% if driverTrip.verified %}checked{% endif %}" class="float-right "
+                                style="margin-top: .2rem;">
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="custom-continer">
+                                <!-- driver-id client-name shift-type  -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="driverId">Driver Id:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.driverId}}" type="text"
+                                            name="driverId" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="driverId">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientName">Client Name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.clientName}}" type="text"
+                                            name="clientName" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="clientName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="shiftType">ShiftType :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select class="form-control">
+                                            <option value="{{driverTrip.shiftType}}">Day</option>
+                                            <option value="{{driverTrip.shiftType}}">Night</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- numberOfLoads truckNo  shiftDate  -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.numberOfLoads}}" type="number"
+                                            name="numberOfLoads" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="numberOfLoads">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="truckNo">Truck No:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.truckNo}}" type="text"
+                                            name="truckNo" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="truckNo">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftDate">Shift Date:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.shiftDate}}" type="date"
+                                            name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="shiftDate">
+                                    </div>
+                                </div>
+                                <!-- startTime    endTime    logSheet -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="startTime">Start Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.startTime}}" type="time"
+                                            name="startTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="startTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endTime">End Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.endTime}}" type="time"
+                                            name="endTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="endTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="loadSheet">loadSheet :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{driverTrip.loadSheet}}" type="file"
+                                            name="loadSheet" style="padding: 0.25rem 0.2rem;" id="loadSheet">
+                                    </div>
+                                </div>
+                                <!-- comment  -->
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="comment">Comment :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <textarea placeholder="comment" required='required' name="comment"
+                                            class="form-control">{{driverTrip.comment}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% for item in driverDocket %}
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Driver Docket Edit Form</h2>
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="custom-continer">
+
+                                <!-- shiftDate client-name shift-type  -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftDate">shiftDate :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.shiftDate}}" type="date"
+                                            name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="shiftDate">
+                                    </div>
+                                </div>
+                                <!-- <div class="col-md-4 col-sm-4">
+                                    <label for="clientName">Client Name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.clientName}}" type="text"
+                                            name="clientName" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="clientName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="shiftType">ShiftType :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select class="form-control">
+                                            <option value="{{item.shiftType}}">Day</option>
+                                            <option value="{{item.shiftType}}">Night</option>
+                                        </select>
+                                    </div>
+                                </div> -->
+                                <!-- numberOfLoads truckNo  shiftDate  -->
+                                <!-- <div class="col-md-4 col-sm-4">
+                                    <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.numberOfLoads}}" type="number"
+                                            name="numberOfLoads" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="numberOfLoads">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="truckNo">Truck No:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.truckNo}}" type="text"
+                                            name="truckNo" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="truckNo">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftDate">Shift Date:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.shiftDate}}" type="date"
+                                            name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="shiftDate">
+                                    </div>
+                                </div> -->
+                                <!-- startTime    endTime    logSheet -->
+                                <!-- <div class="col-md-4 col-sm-4">
+                                    <label for="startTime">Start Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.startTime}}" type="time"
+                                            name="startTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="startTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endTime">End Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.endTime}}" type="time"
+                                            name="endTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="endTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="logSheet">logSheet :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{item.logSheet}}" type="file"
+                                            name="logSheet" style="padding: 0.25rem 0.2rem;" id="logSheet">
+                                    </div>
+                                </div> -->
+                                <!-- comment  -->
+                                <!-- <div class="col-md-12 col-sm-12">
+                                    <label for="comment">Comment :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <textarea placeholder="comment" required='required' name="comment"
+                                            class="form-control">{{item.comment}}</textarea>
+
+                                    </div>
+                                </div> -->
+
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+<script>
+
+    function hideshow() {
+        var password = document.getElementById("password1");
+        var slash = document.getElementById("slash");
+        var eye = document.getElementById("eye");
+
+        if (password.type === 'password') {
+            password.type = "text";
+            slash.style.display = "block";
+            eye.style.display = "none";
+        }
+        else {
+            password.type = "password";
+            slash.style.display = "none";
+            eye.style.display = "block";
+        }
+
+    }
+
+    // initialize a validator instance from the "FormValidator" constructor.
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
+</script>
+{% endblock %}
+{% endblock %}

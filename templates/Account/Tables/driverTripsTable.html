@@ -14,8 +14,13 @@
   rel="stylesheet">
 
 <style>
-  .dt-buttons.btn-group {
-    float: right ! important;
+  .dt-buttons.btn-group{
+    float: right! important;
+  }
+
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
   }
 </style>
 {% endblock %}
@@ -77,7 +82,11 @@
                         {% endif %}
                         {% endfor %} -->
                         <td>
-                          <a href="#" class=""><i class="fa fa-edit"></i></a>
+                          <label type="button" class="btn" id="redirectButton">
+                            <a href="{% url 'Account:DriverTripEdit' id=driverTtips.id%}">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                            </a>
+                          </label>
                         </td>
                       </tr>
                       {% endfor %}
