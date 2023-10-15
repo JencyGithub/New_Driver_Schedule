@@ -355,4 +355,6 @@ def driverTripCsv(request):
     writer.writerow(header)
     writer.writerows(data_list)
     myFile.close()
-    return HttpResponse(data_list)
+    messages.success(
+            request, "Csv Complete")
+    return redirect('Account:index')
