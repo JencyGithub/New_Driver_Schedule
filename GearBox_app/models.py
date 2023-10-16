@@ -65,11 +65,10 @@ class NatureOfLeave(models.Model):
     def __str__(self) -> str:
             return str(self.reason)
 
-
 class LeaveRequest(models.Model):
     employee = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    start_date = models.DateTimeField(null=True, default=None)
-    end_date = models.DateTimeField(null=True, default=None)
+    start_date = models.DateField(null=True, default=None)
+    end_date = models.DateField(null=True, default=None)
     reason = models.ForeignKey(NatureOfLeave,on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Denied', 'Denied')], default='Pending')
     # Add other fields as needed

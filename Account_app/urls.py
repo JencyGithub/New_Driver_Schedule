@@ -46,4 +46,9 @@ urlpatterns = [
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
     
     
+    # Filters
+    path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
+    path('clientFilter/', views.clientFilter, name='clientFilter'),  
+    path('dateRangeFilter/', views.dateRangeFilter, name='dateRangeFilter'),  
+
 ]
