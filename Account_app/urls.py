@@ -49,4 +49,9 @@ urlpatterns = [
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
     # path('natureOfLeaves/edit/save/<int:id>/', views.changeNatureOfLeaves, name='editSaveNatureOfLeaves'),
     
+    # Filters
+    path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
+    path('clientFilter/', views.clientFilter, name='clientFilter'),  
+    path('dateRangeFilter/', views.dateRangeFilter, name='dateRangeFilter'),  
+
 ]
