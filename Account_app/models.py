@@ -14,8 +14,6 @@ class BasePlant(models.Model):
 
     def __str__(self) -> str:
         return str(self.basePlant)
-    
-
 
 # -----------------------------------
 # Trips section
@@ -24,11 +22,11 @@ class BasePlant(models.Model):
 class DriverTrip(models.Model):
     verified = models.BooleanField(default=False)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    clientName = models.CharField(max_length=200)
-    shiftType = models.CharField(max_length=200)
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
+    shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')))
     numberOfLoads = models.IntegerField()
     truckNo = models.IntegerField()
-    shiftDate = models.DateTimeField(null=True, default=None)
+    shiftDate = models.DateField(null=True, default=None)
     startTime = models.CharField(max_length=200)
     endTime = models.CharField(max_length=200)
     logSheet = models.FileField(upload_to='static/img/finalLogSheet')
@@ -39,7 +37,6 @@ class DriverTrip(models.Model):
 
 
 class DriverDocket(models.Model):
-        
     SURCHARGE_NATURE_CHOICES = (
         ('fixed normal', 'FIXED NORMAL'),
         ('fixed sunday', 'FIXED SUNDAY'),
@@ -48,42 +45,24 @@ class DriverDocket(models.Model):
         ('per cubic meters sunday', 'PER CUBIC METERS SUNDAY'),
         ('per cubic meters public holiday', 'PER CUBIC METERS PUBLIC HOLIDAY'),
     )
-    # BASE_PLANTS_CHOICE = [('select','SELECT')]
-    # basePlants = BasePlant.objects.all()
-    # choices_list = BASE_PLANTS_CHOICE 
-    # for plant in basePlants:
-    #     choices_list.append((plant.basePlant, plant.basePlant.upper())) 
-
-    # BASE_PLANTS_CHOICE = tuple(choices_list) 
-
     docketId = models.AutoField(primary_key=True)
+    shiftDate = models.DateField(null=True, default=None)
     tripId = models.ForeignKey(DriverTrip, on_delete=models.CASCADE)
-    shiftDate = models.DateTimeField(null=True, default=None)
     docketNumber = models.IntegerField()
     docketFile = models.FileField(upload_to='static/img/docketFiles')
-    
-    # basePlant = models.CharField(
-    #     max_length=31, choices=BASE_PLANTS_CHOICE, default='select')
     basePlant = models.ForeignKey(BasePlant,on_delete=models.CASCADE)
-    
-    
     noOfKm = models.FloatField(default=0)
     transferKM = models.PositiveIntegerField(default=0)
     returnKm = models.FloatField(default=0)
     waitingTimeInMinutes = models.CharField(max_length=255)
     minimumLoad = models.FloatField(default=0)
-    surcharge_type = models.CharField(
-        max_length=31, choices=SURCHARGE_NATURE_CHOICES, default='fixed normal')
+    surcharge_type = models.CharField(max_length=31, choices=SURCHARGE_NATURE_CHOICES, default='fixed normal')
     surcharge_duration = models.FloatField(default=0)
     cubicMl = models.PositiveIntegerField(default=0)
     minLoad = models.PositiveIntegerField(default=0)
     standByPerHalfHourDuration = models.FloatField(default=0)
     others = models.PositiveIntegerField(default=0)
-
-    # @property
-    # def total_cost(self):
-    #     return self.waitingTimeCost + self.transferKMSCost + self.cubicMlCost + self.minLoadCost + self.othersCost
-
+    
     def __str__(self) -> str:
         return str(self.tripId)
 
@@ -97,27 +76,27 @@ class PastTrip(models.Model):
         ('Night', 'Night'),
     )
 
-    Date = models.DateTimeField(null=True, default=None)
+    Date = models.DateField(null=True, default=None)
     Truck_No = models.CharField(max_length=255, null=True, default=None)
     Truck_Type = models.CharField(max_length=255, null=True, default=None)
     Replacement = models.CharField(max_length=255, null=True, default=None)
     Driver_Name = models.CharField(max_length=255, null=True, default=None)
     Docket_NO = models.CharField(max_length=255, null=True, default=None)
-    Load_Time = models.DateTimeField(null=True, default=None)
-    Return_time = models.DateTimeField(null=True, default=None)
+    Load_Time = models.TimeField(null=True, default=None)
+    Return_time = models.TimeField(null=True, default=None)
     Load_qty = models.PositiveIntegerField(null=True, default=None)
     Doc_KMs = models.FloatField(null=True, default=None)
     Actual_KMs = models.FloatField(null=True, default=None)
-    waiting_time_starts_Onsite = models.DateTimeField(null=True, default=None)
-    waiting_time_end_offsite = models.DateTimeField(null=True, default=None)
+    waiting_time_starts_Onsite = models.PositiveIntegerField(null=True, default=None)
+    waiting_time_end_offsite = models.PositiveIntegerField(null=True, default=None)
     Total_minutes = models.IntegerField(null=True, default=None)
     Returned_Qty = models.PositiveIntegerField(null=True, default=None)
     Returned_KM = models.FloatField(null=True, default=None)
     Returned_to_Yard = models.BooleanField(null=True, default=None)
     Comment = models.TextField(null=True, default=None)
     Transfer_KM = models.FloatField(null=True, default=None)
-    stand_by_Start_Time = models.DateTimeField(null=True, default=None)
-    stand_by_end_time = models.DateTimeField(null=True, default=None)
+    stand_by_Start_Time = models.PositiveIntegerField(null=True, default=None)
+    stand_by_end_time = models.PositiveIntegerField(null=True, default=None)
     stand_by_total_minute = models.IntegerField(null=True, default=None)
     Stand_by_slot = models.CharField(max_length=255, null=True, default=None)
     category = models.CharField(max_length=255, null=True, default=None)
