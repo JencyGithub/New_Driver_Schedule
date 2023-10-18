@@ -627,3 +627,156 @@ def driverEntryUpdate(request, ids):
         docketObj.save()
     messages.success(request, "Docket updated successfully")
     return redirect('Account:driverTripsTable')
+
+
+@csrf_protect
+def DriverTripEditForm(request, id):
+    driver_trip = DriverTrip.objects.get(id=id)
+    driver = Driver.objects.all()
+    clientName = Client.objects.all()
+    AdminTrucks = AdminTruck.objects.all()
+    driver_trip.shiftDate = dateConverterFromTableToPageFormate(
+        driver_trip.shiftDate)
+    driver_docket = DriverDocket.objects.filter(tripId=id)
+    count_ = 0
+    for i in driver_docket:
+        i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
+        i.count_ = count_
+        count_ += 1
+    base_plant = BasePlant.objects.all()
+
+    params = {
+        'driverTrip': driver_trip,
+        'driverDocket': driver_docket,
+        'basePlants': base_plant,
+        'Driver': driver,
+        'Client': clientName,
+        'trucks': AdminTrucks
+    }
+    return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
+
+
+@csrf_protect
+def driverEntryUpdate(request, ids):
+    # Update Trip Save
+    driver_trip = DriverTrip.objects.get(id=ids)
+
+    driver_trip.verified = True if request.POST.get(
+        'verified') == 'on' else False
+    driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
+    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
+    driver_trip.shiftType = request.POST.get('shiftType')
+    driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
+    driver_trip.truckNo = request.POST.get('truckNo')
+    driver_trip.shiftDate = request.POST.get('shiftDate')
+    driver_trip.startTime = request.POST.get('startTime')
+    driver_trip.endTime = request.POST.get('endTime')
+    if request.FILES.get('loadSheet'):
+        loadSheet = request.FILES.get('loadSheet')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
+        time = time[0]
+        newFileName = 'Load_Sheet' + time + "@_!" + str(loadSheet.name)
+        location = 'static/img/finalloadSheet/'
+
+        lfs = FileSystemStorage(location=location)
+        lfs.save(newFileName, loadSheet)
+        driver_trip.loadSheet = 'static/img/finalloadSheet/' + newFileName
+
+    driver_trip.comment = request.POST.get('comment')
+    driver_trip.save()
+    
+    # update Docket Save 
+    
+    
+    
+    driver_docket = DriverDocket.objects.filter(tripId=ids).values()
+    count_ = 0
+    for i in driver_docket:
+        docketObj = DriverDocket.objects.get(pk=i['docketId'])
+        docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
+        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
+        if request.FILES.get(f'docketFile{count_}'):
+            docketFiles = request.FILES.get(f'docketFile{count_}')
+            time = (str(timezone.now())).replace(':', '').replace(
+                '-', '').replace(' ', '').split('.')
+            newFileName = time[0] + "@_!" + str(docketFiles.name)
+            location = 'static/img/docketFiles/'
+
+            lfs = FileSystemStorage(location=location)
+            lfs.save(newFileName, docketFiles)
+            
+            docketObj.docketFile = 'static/img/docketFiles/' + newFileName
+        docketObj.basePlant = BasePlant.objects.get(
+            pk=request.POST.get(f'basePlant{count_}'))
+        docketObj.noOfKm = request.POST.get(f'noOfKm{count_}')
+        docketObj.transferKM = request.POST.get(f'transferKM{count_}')
+        docketObj.returnKm = request.POST.get(f'returnKm{count_}')
+        docketObj.waitingTimeInMinutes = request.POST.get(
+            f'waitingTimeInMinutes{count_}')
+        docketObj.minimumLoad = request.POST.get(f'minimumLoad{count_}')
+        docketObj.surcharge_type = request.POST.get(f'surcharge_type{count_}')
+        docketObj.surcharge_duration = request.POST.get(
+            f'surcharge_duration{count_}')
+        docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
+        docketObj.minLoad = request.POST.get(f'minLoad{count_}')
+        docketObj.standByPerHalfHourDuration = request.POST.get(
+            f'standByPerHalfHourDuration{count_}')
+        docketObj.others = request.POST.get(f'others{count_}')
+
+        count_ += 1
+        docketObj.save()
+    messages.success(request, "Docket updated successfully")
+    return redirect('Account:driverTripsTable')
+
+
+# Reconciliation
+
+def reconciliationForm(request):
+    drivers = Driver.objects.all() 
+    clients = Client.objects.all() 
+    trucks = AdminTruck.objects.all()
+    return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
+
+
+def reconciliationResult(request):
+    dataList = request.session['reconciliationResultData']
+    params = {
+        'dataList' : dataList
+    }
+    return render(request, 'Reconciliation/reconciliation-result.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def reconciliationAnalysis(request):
+    startDate = dateConvert(request.POST.get('startDate'))
+    endDate =dateConvert(request.POST.get('endDate')) 
+    driverDocketList = DriverDocket.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    RCTIList = RCTI.objects.filter(docketDate__range=(startDate, endDate)).values()
+    unique_RCTI = {int(item['docketNumber']) for item in RCTIList}
+    unique_driverDocket = {item['docketNumber'] for item in driverDocketList}
+    common_docket = unique_RCTI.intersection(unique_driverDocket)
+
+    dataList = []
+
+
+    for i in RCTIList:
+       dataList.append(
+           {
+               'docketNumber' : int(i['docketNumber']),
+                'class' : 'bg-danger' if int(i['docketNumber']) not in common_docket else 'bg-success'
+           }
+       )
+    for j in driverDocketList:
+        dataList.append(
+            {
+                'docketNumber' : i['docketNumber'],
+                'class' : 'bg-danger' if i['docketNumber'] not in common_docket else 'bg-success'
+            }
+        )
+    request.session['reconciliationResultData'] = dataList
+
+    return redirect('Account:reconciliationResult')
+
+def reconciliationDocketView(request):
+    return render(request,'Reconciliation/reconciliation-docket.html')
