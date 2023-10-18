@@ -1,5 +1,7 @@
 from Account_app.models import *
 from GearBox_app.models import *
+from datetime import datetime
+
 
 def dateConverterFromTableToPageFormate(date):
     formated_data = str(date).split()[0]
@@ -46,4 +48,9 @@ def updateIntoTable(record_id,tableName:str,dataSet:dict,model_mapping=model_map
     except Exception as e:
         print(f"Error: {e}")
         return f"{e}"
-        
+
+# Date convert : 2018-02-28 to date(year,month,day)    
+def dateConvert(givenDate):
+    givenDate = givenDate.split('-')
+    formattedDate = date(int(givenDate[0]),int(givenDate[1]),int(givenDate[2]))
+    return formattedDate

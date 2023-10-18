@@ -21,9 +21,9 @@ from . import views
 app_name = 'Account'
 
 urlpatterns = [
-    path('', views.index, name='index'), 
+    path('', views.index, name='index'),
     # Driver trip path
-    path('Form1/', views.getForm1, name='getForm1'), 
+    path('Form1/', views.getForm1, name='getForm1'),
     path('Form2/', views.getForm2, name='getForm2'),
     
      path('createFormSession/',
@@ -49,6 +49,12 @@ urlpatterns = [
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
     path('clientFilter/', views.clientFilter, name='clientFilter'),  
-    path('dateRangeFilter/', views.dateRangeFilter, name='dateRangeFilter'),  
+    path('dateRangeFilter/', views.dateRangeFilter, name='dateRangeFilter'),
+
+    # Reconciliation
+    path('reconciliation/form/', views.reconciliationForm, name='reconciliationForm'),
+    path('reconciliation/analysis/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
+    path('reconciliation/result/', views.reconciliationResult, name='reconciliationResult'),
+    path('reconciliation/docket/view/', views.reconciliationDocketView, name='reconciliationDocketView'),
 
 ]

@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.contrib import messages
 from Account_app.models import *
 from GearBox_app.models import *
+from CRUD import *
 
 
 def index(request):
@@ -412,3 +413,55 @@ def dateRangeFilter(request):
     dataList = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate)).values()
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
+
+
+# Reconciliation
+
+def reconciliationForm(request):
+    drivers = Driver.objects.all() 
+    clients = Client.objects.all() 
+    trucks = AdminTruck.objects.all()
+    return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
+
+
+def reconciliationResult(request):
+    dataList = request.session['reconciliationResultData']
+    params = {
+        'dataList' : dataList
+    }
+    return render(request, 'Reconciliation/reconciliation-result.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def reconciliationAnalysis(request):
+    startDate = dateConvert(request.POST.get('startDate'))
+    endDate =dateConvert(request.POST.get('endDate')) 
+    driverDocketList = DriverDocket.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    RCTIList = RCTI.objects.filter(docketDate__range=(startDate, endDate)).values()
+    unique_RCTI = {int(item['docketNumber']) for item in RCTIList}
+    unique_driverDocket = {item['docketNumber'] for item in driverDocketList}
+    common_docket = unique_RCTI.intersection(unique_driverDocket)
+
+    dataList = []
+
+
+    for i in RCTIList:
+       dataList.append(
+           {
+               'docketNumber' : int(i['docketNumber']),
+                'class' : 'bg-danger' if int(i['docketNumber']) not in common_docket else 'bg-success'
+           }
+       )
+    for j in driverDocketList:
+        dataList.append(
+            {
+                'docketNumber' : i['docketNumber'],
+                'class' : 'bg-danger' if i['docketNumber'] not in common_docket else 'bg-success'
+            }
+        )
+    request.session['reconciliationResultData'] = dataList
+
+    return redirect('Account:reconciliationResult')
+
+def reconciliationDocketView(request):
+    return render(request,'Reconciliation/reconciliation-docket.html')

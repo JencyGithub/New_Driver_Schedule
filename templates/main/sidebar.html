@@ -33,13 +33,10 @@
           <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-laptop"></i> Dashboard</a></li>
           {% if request.session.user_type == 'SuperUser' %}
           <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li>
-          {% comment %} <li class=""><a href="{% url 'Account:getForm2'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li> {% endcomment %}
           {% endif %}
           <li>
             <a><i class="fa fa-home"></i> Account <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              {% comment %} <li><a href="{% url 'Account:getForm1'%}">Driver Form1</a></li>
-              <li><a href="{% url 'Account:getForm2'%}">Driver Form2</a></li> {% endcomment %}
               <li><a href="{% url 'Account:driverentry'%}">Driver Entry(CSV)</a></li>
               <li><a href="{% url 'Account:rcti'%}">RCTI</a></li>
             </ul>
@@ -58,6 +55,12 @@
             <ul class="nav child_menu">
               <li class=""><a href="{% url 'gearBox:leaveReq'%}"><i class="fa fa-laptop"></i> Leave Request</a></li>
               <li class=""><a href="{% url 'gearBox:natureOfLeaves'%}"><i class="fa fa-laptop"></i> Nature of leave</a></li>
+            </ul>
+          </li>
+          <li>
+            <a><i class="fa fa-home"></i> Reconciliation details <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li class=""><a href="{% url 'Account:reconciliationForm'%}"><i class="fa fa-laptop"></i> Reconciliation </a></li>
             </ul>
           </li>
         
