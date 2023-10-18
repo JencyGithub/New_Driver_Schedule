@@ -3,5 +3,8 @@
 *.sqlite3
 db.sqlite3
 docketFiles
+DriverEntry
+DriverTripCsvDownload
+RCTIInvoice
 finalloadSheet
 .zip
