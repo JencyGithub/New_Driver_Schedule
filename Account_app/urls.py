@@ -44,6 +44,7 @@ urlpatterns = [
     path('RctiTable/', views.rctiTable, name='rctiTable'),      
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),  
     
+    
     # DriverTrip Csv
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
     

@@ -351,6 +351,16 @@ def driverTripsTable(request):
         'clientName': clientName
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
+# def driverTripsTable(request):
+#     # return HttpResponse('work')
+#     driver_trip = DriverTrip.objects.all()
+#     clientName = Client.objects.all()
+#     return HttpResponse(driver_trip)
+#     params = {
+#         'driverTrip': driver_trip,
+#         'clientName': clientName
+#     }
+#     return render(request, 'Account/Tables/driverTripsTable.html', params)
 
 
 def foreignKeySet(dataset):
