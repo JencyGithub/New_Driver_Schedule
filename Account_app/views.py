@@ -135,8 +135,7 @@ def formsSave(request):
     temp_loadSheet = ''
     Docket_no = []
     Docket_file = []
-    time = (str(timezone.now())).replace(':', '').replace(
-        '-', '').replace(' ', '').split('.')
+    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
     time = time[0]
 
     if not request.session['data']['docketGiven']:
@@ -305,46 +304,50 @@ def driverDocketEntry(request, ids):
 def driverDocketEntrySave(request, ids):
 
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
-    
+
     # return HttpResponse(docketNumber)
     # return redirect(request.META.get('HTTP_REFERER'))
 
     if driver_trip_id:
-            try:
-                docketNumber = DriverDocket.objects.get(docketNumber = int(float(request.POST.get('docketNumber'))))
-                messages.error(request, "This Docket Number already exists for this Trip!")
-                return redirect(request.META.get('HTTP_REFERER'))
-            except:
-                docketFile = request.FILES.get('docketFile')
-                time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
-                time = time[0]
-                newFileName = 'Load_Sheet' + time + "@_!" + str(docketFile.name)
-                location = 'static/img/docketFiles/'
+        try:
+            docketNumber = DriverDocket.objects.get(
+                docketNumber=int(float(request.POST.get('docketNumber'))))
+            messages.error(
+                request, "This Docket Number already exists for this Trip!")
+            return redirect(request.META.get('HTTP_REFERER'))
+        except:
+            docketFile = request.FILES.get('docketFile')
+            time = (str(timezone.now())).replace(':', '').replace(
+                '-', '').replace(' ', '').split('.')
+            time = time[0]
+            newFileName = 'Load_Sheet' + time + "@_!" + str(docketFile.name)
+            location = 'static/img/docketFiles/'
 
-                lfs = FileSystemStorage(location=location)
-                lfs.save(newFileName, docketFile)
-                # return HttpResponse(location + newFileName)
-            DriverDocketObj = DriverDocket(
-                shiftDate=request.POST.get('shiftDate'),
-                tripId=driver_trip_id,
-                docketNumber=int(float(request.POST.get('docketNumber'))),
-                docketFile= 'static/img/docketFiles/' + newFileName,
-                basePlant=BasePlant.objects.get(pk=request.POST.get('basePlant')),
-                noOfKm=request.POST.get('noOfKm'),
-                transferKM=request.POST.get('transferKM'),
-                returnKm=request.POST.get('returnKm'),
-                waitingTimeInMinutes=request.POST.get('waitingTimeInMinutes'),
-                minimumLoad=request.POST.get('minimumLoad'),
-                surcharge_type=request.POST.get('surcharge_type'),
-                surcharge_duration=request.POST.get('surcharge_duration'),
-                cubicMl=request.POST.get('cubicMl'),
-                minLoad=request.POST.get('minLoad'),
-                standByPerHalfHourDuration=request.POST.get('standByPerHalfHourDuration'),
-                others=request.POST.get('others')
-            )
-            DriverDocketObj.save()
-            messages.success(request, "Docket Added successfully")
-            return redirect('Account:driverTripsTable')            
+            lfs = FileSystemStorage(location=location)
+            lfs.save(newFileName, docketFile)
+            # return HttpResponse(location + newFileName)
+        DriverDocketObj = DriverDocket(
+            shiftDate=request.POST.get('shiftDate'),
+            tripId=driver_trip_id,
+            docketNumber=int(float(request.POST.get('docketNumber'))),
+            docketFile='static/img/docketFiles/' + newFileName,
+            basePlant=BasePlant.objects.get(pk=request.POST.get('basePlant')),
+            noOfKm=request.POST.get('noOfKm'),
+            transferKM=request.POST.get('transferKM'),
+            returnKm=request.POST.get('returnKm'),
+            waitingTimeInMinutes=request.POST.get('waitingTimeInMinutes'),
+            minimumLoad=request.POST.get('minimumLoad'),
+            surcharge_type=request.POST.get('surcharge_type'),
+            surcharge_duration=request.POST.get('surcharge_duration'),
+            cubicMl=request.POST.get('cubicMl'),
+            minLoad=request.POST.get('minLoad'),
+            standByPerHalfHourDuration=request.POST.get(
+                'standByPerHalfHourDuration'),
+            others=request.POST.get('others')
+        )
+        DriverDocketObj.save()
+        messages.success(request, "Docket Added successfully")
+        return redirect('Account:driverTripsTable')
     else:
         messages.warning(request, "Invalid Request ")
         return redirect('Account:driverTripsTable')
@@ -369,12 +372,16 @@ def driverTripsTable(request):
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
 
+
 def foreignKeySet(dataset):
     for data in dataset:
-        data['clientName_id'] = Client.objects.filter(pk=data['clientName_id']).first().name
-        data['driverId_id'] = Driver.objects.filter(pk=data['driverId_id']).first().name
+        data['clientName_id'] = Client.objects.filter(
+            pk=data['clientName_id']).first().name
+        data['driverId_id'] = Driver.objects.filter(
+            pk=data['driverId_id']).first().name
 
     return dataset
+
 
 @csrf_protect
 @api_view(['POST'])
@@ -388,29 +395,34 @@ def driverTripCsv(request):
     startDate_values = request.POST.getlist('startDate[]')
     endDate_values = request.POST.getlist('endDate[]')
     # print(verified_,ClientId,startDate_values,endDate_values)
-    
+
     if verified_ == '1':
         driver_trip = DriverTrip.objects.filter(verified=True).values()
     elif verified_ == '0':
         driver_trip = DriverTrip.objects.filter(verified=False).values()
     elif ClientId:
-        driver_trip = DriverTrip.objects.filter(clientName=request.POST.get('id_')).values()
+        driver_trip = DriverTrip.objects.filter(
+            clientName=request.POST.get('id_')).values()
         foreignKeySet(driver_trip)
-    elif startDate_values[0]  != 'NaN' and  endDate_values[1] != 'NaN':
-        startDate = date(int(startDate_values[0]), int(startDate_values[1]), int(startDate_values[2]))
-        endDate = date(int(endDate_values[0]), int(endDate_values[1]), int(endDate_values[2]))
-        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    elif startDate_values[0] != 'NaN' and endDate_values[1] != 'NaN':
+        startDate = date(int(startDate_values[0]), int(
+            startDate_values[1]), int(startDate_values[2]))
+        endDate = date(int(endDate_values[0]), int(
+            endDate_values[1]), int(endDate_values[2]))
+        driver_trip = DriverTrip.objects.filter(
+            shiftDate__range=(startDate, endDate)).values()
         foreignKeySet(driver_trip)
     else:
         driver_trip = DriverTrip.objects.all()
-        
-    # print(verified_,ClientId,startDate_values,endDate_values)   
-    if verified_   or ClientId    or startDate_values[0]    or endDate_values  :
+
+    # print(verified_,ClientId,startDate_values,endDate_values)
+    if verified_ or ClientId or startDate_values[0] or endDate_values:
         try:
             for trip in driver_trip:
                 temp_trip_data_list.append([
                     trip['verified'],
-                    trip['driverId_id'],  # Access related field using double underscore
+                    # Access related field using double underscore
+                    trip['driverId_id'],
                     trip['clientName_id'],
                     trip['shiftType'],
                     trip['numberOfLoads'],
@@ -422,13 +434,15 @@ def driverTripCsv(request):
                     trip['comment'],
                 ])
 
-                related_dockets = DriverDocket.objects.filter(tripId=trip['id']).values_list()
+                related_dockets = DriverDocket.objects.filter(
+                    tripId=trip['id']).values_list()
                 if related_dockets:
                     for docket in related_dockets:
                         temp_docket_data_list.append(list(docket))
                     for i in range(len(temp_docket_data_list)):
-                        data_list.append( temp_trip_data_list[0] + temp_docket_data_list[i])
-                        
+                        data_list.append(
+                            temp_trip_data_list[0] + temp_docket_data_list[i])
+
                     temp_trip_data_list.clear()
                     temp_docket_data_list.clear()
                 else:
@@ -449,13 +463,15 @@ def driverTripCsv(request):
                     trip.loadSheet,
                     trip.comment,
                 ])
-                related_dockets = DriverDocket.objects.filter(tripId=trip.id).values_list()
+                related_dockets = DriverDocket.objects.filter(
+                    tripId=trip.id).values_list()
                 if related_dockets:
                     for docket in related_dockets:
                         temp_docket_data_list.append(list(docket))
                     for i in range(len(temp_docket_data_list)):
-                        data_list.append( temp_trip_data_list[0] + temp_docket_data_list[i])
-                        
+                        data_list.append(
+                            temp_trip_data_list[0] + temp_docket_data_list[i])
+
                     temp_trip_data_list.clear()
                     temp_docket_data_list.clear()
                 else:
@@ -487,13 +503,12 @@ def driverTripCsv(request):
     writer.writerow(header)
     writer.writerows(data_list)
     myFile.close()
-    
+
     # response = FileResponse(open(file_name, 'rb'), as_attachment=True)
     # response['Content-Disposition'] = f'attachment; filename="{csv_filename}"'
     # return response
     return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
     return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
-
 
 
 @csrf_protect
@@ -511,7 +526,8 @@ def verifiedFilter(request):
 @csrf_protect
 @api_view(['POST'])
 def clientFilter(request):
-    dataList = DriverTrip.objects.filter( clientName=request.POST.get('id')).values()
+    dataList = DriverTrip.objects.filter(
+        clientName=request.POST.get('id')).values()
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
 
@@ -521,9 +537,12 @@ def dateRangeFilter(request):
     print(request.POST)
     startDate_values = request.POST.getlist('startDate[]')
     endDate_values = request.POST.getlist('endDate[]')
-    startDate = date(int(startDate_values[0]), int(startDate_values[1]), int(startDate_values[2]))
-    endDate = date(int(endDate_values[0]), int(endDate_values[1]), int(endDate_values[2]))
-    dataList = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    startDate = date(int(startDate_values[0]), int(
+        startDate_values[1]), int(startDate_values[2]))
+    endDate = date(int(endDate_values[0]), int(
+        endDate_values[1]), int(endDate_values[2]))
+    dataList = DriverTrip.objects.filter(
+        shiftDate__range=(startDate, endDate)).values()
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
 
@@ -563,7 +582,8 @@ def driverEntryUpdate(request, ids):
     driver_trip.verified = True if request.POST.get(
         'verified') == 'on' else False
     driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
-    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
+    driver_trip.clientName = Client.objects.get(
+        pk=request.POST.get('clientName'))
     driver_trip.shiftType = request.POST.get('shiftType')
     driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
     driver_trip.truckNo = request.POST.get('truckNo')
@@ -584,17 +604,16 @@ def driverEntryUpdate(request, ids):
 
     driver_trip.comment = request.POST.get('comment')
     driver_trip.save()
-    
-    # update Docket Save 
-    
-    
-    
+
+    # update Docket Save
+
     driver_docket = DriverDocket.objects.filter(tripId=ids).values()
     count_ = 0
     for i in driver_docket:
         docketObj = DriverDocket.objects.get(pk=i['docketId'])
         docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
-        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
+        docketObj.docketNumber = int(
+            float(request.POST.get(f'docketNumber{count_}')))
         if request.FILES.get(f'docketFile{count_}'):
             docketFiles = request.FILES.get(f'docketFile{count_}')
             time = (str(timezone.now())).replace(':', '').replace(
@@ -604,108 +623,7 @@ def driverEntryUpdate(request, ids):
 
             lfs = FileSystemStorage(location=location)
             lfs.save(newFileName, docketFiles)
-            
-            docketObj.docketFile = 'static/img/docketFiles/' + newFileName
-        docketObj.basePlant = BasePlant.objects.get(
-            pk=request.POST.get(f'basePlant{count_}'))
-        docketObj.noOfKm = request.POST.get(f'noOfKm{count_}')
-        docketObj.transferKM = request.POST.get(f'transferKM{count_}')
-        docketObj.returnKm = request.POST.get(f'returnKm{count_}')
-        docketObj.waitingTimeInMinutes = request.POST.get(
-            f'waitingTimeInMinutes{count_}')
-        docketObj.minimumLoad = request.POST.get(f'minimumLoad{count_}')
-        docketObj.surcharge_type = request.POST.get(f'surcharge_type{count_}')
-        docketObj.surcharge_duration = request.POST.get(
-            f'surcharge_duration{count_}')
-        docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
-        docketObj.minLoad = request.POST.get(f'minLoad{count_}')
-        docketObj.standByPerHalfHourDuration = request.POST.get(
-            f'standByPerHalfHourDuration{count_}')
-        docketObj.others = request.POST.get(f'others{count_}')
 
-        count_ += 1
-        docketObj.save()
-    messages.success(request, "Docket updated successfully")
-    return redirect('Account:driverTripsTable')
-
-
-@csrf_protect
-def DriverTripEditForm(request, id):
-    driver_trip = DriverTrip.objects.get(id=id)
-    driver = Driver.objects.all()
-    clientName = Client.objects.all()
-    AdminTrucks = AdminTruck.objects.all()
-    driver_trip.shiftDate = dateConverterFromTableToPageFormate(
-        driver_trip.shiftDate)
-    driver_docket = DriverDocket.objects.filter(tripId=id)
-    count_ = 0
-    for i in driver_docket:
-        i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
-        i.count_ = count_
-        count_ += 1
-    base_plant = BasePlant.objects.all()
-
-    params = {
-        'driverTrip': driver_trip,
-        'driverDocket': driver_docket,
-        'basePlants': base_plant,
-        'Driver': driver,
-        'Client': clientName,
-        'trucks': AdminTrucks
-    }
-    return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
-
-
-@csrf_protect
-def driverEntryUpdate(request, ids):
-    # Update Trip Save
-    driver_trip = DriverTrip.objects.get(id=ids)
-
-    driver_trip.verified = True if request.POST.get(
-        'verified') == 'on' else False
-    driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
-    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
-    driver_trip.shiftType = request.POST.get('shiftType')
-    driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
-    driver_trip.truckNo = request.POST.get('truckNo')
-    driver_trip.shiftDate = request.POST.get('shiftDate')
-    driver_trip.startTime = request.POST.get('startTime')
-    driver_trip.endTime = request.POST.get('endTime')
-    if request.FILES.get('loadSheet'):
-        loadSheet = request.FILES.get('loadSheet')
-        time = (str(timezone.now())).replace(':', '').replace(
-            '-', '').replace(' ', '').split('.')
-        time = time[0]
-        newFileName = 'Load_Sheet' + time + "@_!" + str(loadSheet.name)
-        location = 'static/img/finalloadSheet/'
-
-        lfs = FileSystemStorage(location=location)
-        lfs.save(newFileName, loadSheet)
-        driver_trip.loadSheet = 'static/img/finalloadSheet/' + newFileName
-
-    driver_trip.comment = request.POST.get('comment')
-    driver_trip.save()
-    
-    # update Docket Save 
-    
-    
-    
-    driver_docket = DriverDocket.objects.filter(tripId=ids).values()
-    count_ = 0
-    for i in driver_docket:
-        docketObj = DriverDocket.objects.get(pk=i['docketId'])
-        docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
-        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
-        if request.FILES.get(f'docketFile{count_}'):
-            docketFiles = request.FILES.get(f'docketFile{count_}')
-            time = (str(timezone.now())).replace(':', '').replace(
-                '-', '').replace(' ', '').split('.')
-            newFileName = time[0] + "@_!" + str(docketFiles.name)
-            location = 'static/img/docketFiles/'
-
-            lfs = FileSystemStorage(location=location)
-            lfs.save(newFileName, docketFiles)
-            
             docketObj.docketFile = 'static/img/docketFiles/' + newFileName
         docketObj.basePlant = BasePlant.objects.get(
             pk=request.POST.get(f'basePlant{count_}'))
@@ -733,8 +651,8 @@ def driverEntryUpdate(request, ids):
 # Reconciliation
 
 def reconciliationForm(request):
-    drivers = Driver.objects.all() 
-    clients = Client.objects.all() 
+    drivers = Driver.objects.all()
+    clients = Client.objects.all()
     trucks = AdminTruck.objects.all()
     return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
 
@@ -742,41 +660,44 @@ def reconciliationForm(request):
 def reconciliationResult(request):
     dataList = request.session['reconciliationResultData']
     params = {
-        'dataList' : dataList
+        'dataList': dataList
     }
-    return render(request, 'Reconciliation/reconciliation-result.html',params)
+    return render(request, 'Reconciliation/reconciliation-result.html', params)
+
 
 @csrf_protect
 @api_view(['POST'])
 def reconciliationAnalysis(request):
     startDate = dateConvert(request.POST.get('startDate'))
-    endDate =dateConvert(request.POST.get('endDate')) 
-    driverDocketList = DriverDocket.objects.filter(shiftDate__range=(startDate, endDate)).values()
-    RCTIList = RCTI.objects.filter(docketDate__range=(startDate, endDate)).values()
+    endDate = dateConvert(request.POST.get('endDate'))
+    driverDocketList = DriverDocket.objects.filter(
+        shiftDate__range=(startDate, endDate)).values()
+    RCTIList = RCTI.objects.filter(
+        docketDate__range=(startDate, endDate)).values()
     unique_RCTI = {int(item['docketNumber']) for item in RCTIList}
     unique_driverDocket = {item['docketNumber'] for item in driverDocketList}
     common_docket = unique_RCTI.intersection(unique_driverDocket)
 
     dataList = []
 
-
     for i in RCTIList:
-       dataList.append(
-           {
-               'docketNumber' : int(i['docketNumber']),
-                'class' : 'bg-danger' if int(i['docketNumber']) not in common_docket else 'bg-success'
-           }
-       )
+        dataList.append(
+            {
+                'docketNumber': int(i['docketNumber']),
+                'class': 'bg-danger' if int(i['docketNumber']) not in common_docket else 'bg-success'
+            }
+        )
     for j in driverDocketList:
         dataList.append(
             {
-                'docketNumber' : i['docketNumber'],
-                'class' : 'bg-danger' if i['docketNumber'] not in common_docket else 'bg-success'
+                'docketNumber': i['docketNumber'],
+                'class': 'bg-danger' if i['docketNumber'] not in common_docket else 'bg-success'
             }
         )
     request.session['reconciliationResultData'] = dataList
 
     return redirect('Account:reconciliationResult')
 
+
 def reconciliationDocketView(request):
-    return render(request,'Reconciliation/reconciliation-docket.html')
+    return render(request, 'Reconciliation/reconciliation-docket.html')
