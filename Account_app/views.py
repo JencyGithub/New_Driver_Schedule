@@ -426,8 +426,10 @@ def reconciliationForm(request):
 
 def reconciliationResult(request):
     dataList = request.session['reconciliationResultData']
+    basePlants = BasePlant.objects.all() 
     params = {
-        'dataList' : dataList
+        'dataList' : dataList,
+        'basePlants' : basePlants
     }
     return render(request, 'Reconciliation/reconciliation-result.html',params)
 
@@ -449,14 +451,14 @@ def reconciliationAnalysis(request):
        dataList.append(
            {
                'docketNumber' : int(i['docketNumber']),
-                'class' : 'bg-danger' if int(i['docketNumber']) not in common_docket else 'bg-success'
+                'class' : 'text-danger' if int(i['docketNumber']) not in common_docket else 'text-success'
            }
        )
     for j in driverDocketList:
         dataList.append(
             {
                 'docketNumber' : i['docketNumber'],
-                'class' : 'bg-danger' if i['docketNumber'] not in common_docket else 'bg-success'
+                'class' : 'text-danger' if i['docketNumber'] not in common_docket else 'text-success'
             }
         )
     request.session['reconciliationResultData'] = dataList

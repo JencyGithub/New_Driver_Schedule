@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | REconciliation {% endblock %}
+{% block title %} | Reconciliation docket {% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -30,16 +30,16 @@
 </style>
 {% endblock %}
 {% block content %}
-
-<div class="right_col" role="main">
+<div class="right_col" style="min-height: 0px!important;">
     <div class="">
-
         <div class="clearfix"></div>
-
         <div class="row">
-
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Reconciliation result</h2>
+                        <div class="clearfix"></div>
+                    </div>
                     <div class="x_content">
                         <div class="row">
                             <div class="col-sm-12">
@@ -47,32 +47,18 @@
                                     <table id="datatable-buttons" class="table table-striped table-bordered"
                                         style="width:100%">
                                         <thead>
-                                            <tr class="">
-                                                <th>Docket Number</th>
+                                            <tr>
+                                                <th>Docket number</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% comment %} {% for item in dataList %}
-                                            <tr
-                                                class="{% if item.class == 'bg-success' %}bg-success{% elif item.class == 'bg-danger' %}bg-danger{% endif %}">
-                                                <td
-                                                    style="color: {% if item.class == 'bg-success' %}white{% elif item.class == 'bg-danger' %}white{% else %}black{% endif %}">
-                                                    {{ item.docketNumber }}</td>
-                                                <td></td>
-                                            </tr>
-                                            {% endfor %} {% endcomment %}
                                             {% for item in dataList %}
-                                            <tr
-                                                class="{% if item.class == 'bg-success' %}bg-success{% elif item.class == 'bg-danger' %}bg-danger{% endif %}">
+                                            <tr>
                                                 <td>
-                                                    <a href="{% url 'Account:reconciliationDocketView' %}" target=""
-                                                        style="color: {% if item.class == 'bg-success' %}white{% elif item.class == 'bg-danger' %}white{% else %}black{% endif %}">
-                                                        {{ item.docketNumber }}
-                                                    </a>
+                                                    <a href="{% url 'Account:reconciliationDocketView' %}" target="" class="{{ item.class }}">{{ item.docketNumber }} </a>
                                                 </td>
                                                 <td></td>
-                                                <!-- Assuming there's an 'action' attribute in your data -->
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -87,21 +73,8 @@
     </div>
 </div>
 {% endblock %}
+
 {% block footerStyleEnd %}
-<script>
-    const redirectButton = document.getElementById('redirectButton');
-
-    redirectButton.addEventListener('click', function () {
-        const djangoURL = redirectButton.getAttribute('data-url');
-
-        window.location.href = djangoURL;
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        $('#datatable-buttons').DataTable();
-    });
-</script>
 <!-- Datatables -->
 <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
