@@ -104,12 +104,19 @@
   <!-- JavaScript / alertify JS -->
   <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
 
-  {% for message_flash in messages %}
+  {% for message in messages %}
   <script>
     alertify.set('notifier', 'position', 'top-right');
-    alertify.success('{{ message_flash }}'); 
+    {% if message.tags == 'error' %}
+      alertify.error('{{ message|escapejs }}');
+    {% elif message.tags == 'success' %}
+      alertify.success('{{ message|escapejs }}');
+    {% elif message.tags == 'warning' %}
+      alertify.warning('{{ message|escapejs }}');
+    {% endif %}
   </script>
-  {% endfor %}
+{% endfor %}
+
   <!-- footer end scripts  -->
   {% block footerStyleEnd %} 
   {% endblock %}

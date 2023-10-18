@@ -1,6 +1,8 @@
 from Account_app.models import *
 from GearBox_app.models import *
 from datetime import datetime
+from django.core.files.storage import FileSystemStorage
+
 
 
 def dateConverterFromTableToPageFormate(date):
@@ -54,3 +56,28 @@ def dateConvert(givenDate):
     givenDate = givenDate.split('-')
     formattedDate = date(int(givenDate[0]),int(givenDate[1]),int(givenDate[2]))
     return formattedDate
+
+def docketFileSave(docketFile,docketNumber = None,returnVal ='default'):
+    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+    time = time[0]
+    pdf_folder_path = 'static/img/docketFiles'
+    fileName = docketFile.name
+    docket_new_filename = time + '!_@' +  str(docketNumber) + '.' + fileName.split('.')[-1]
+    pfs = FileSystemStorage(location=pdf_folder_path)
+    pfs.save(docket_new_filename, docketFile)
+    if returnVal != 'default':
+        return docket_new_filename
+    else:
+        return 'static/img/docketFiles/' + docket_new_filename
+
+def loadFileSave(loadFile):
+    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+    time = time[0]
+    pdf_folder_path = 'static/img/finalloadSheet'
+    loadFileName = loadFile.name
+    load_new_filename = 'Load_Sheet' + time +  '!_@' + loadFileName.replace(" ", "").replace("\t", "")   ##time + '!_@' +  '.' + fileName.split('.')[-1]
+    pfs = FileSystemStorage(location=pdf_folder_path)
+    pfs.save(load_new_filename, loadFile)
+    return 'static/img/finalloadSheet/' + load_new_filename
+
+

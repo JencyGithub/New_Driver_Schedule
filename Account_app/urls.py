@@ -35,16 +35,22 @@ urlpatterns = [
     path('Rcti/', views.rcti, name='rcti'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
-    path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),      
+    path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),           
+    path('DriverDocketEntry/<int:ids>/', views.driverDocketEntry, name='driverDocketEntry'),      
+    path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'),      
     
     # Account Tables 
     path('BasePlantTable/', views.basePlantTable, name='basePlantTable'),      
     path('RctiTable/', views.rctiTable, name='rctiTable'),      
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),  
     
-    # Trip Csv
+    # DriverTrip Csv
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
     
+    # Edit
+    path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
+    path('driverTrip/update/<int:ids>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
+    # path('natureOfLeaves/edit/save/<int:id>/', views.changeNatureOfLeaves, name='editSaveNatureOfLeaves'),
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  

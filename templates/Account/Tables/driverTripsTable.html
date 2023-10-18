@@ -14,8 +14,13 @@
   rel="stylesheet">
 
 <style>
-  .dt-buttons.btn-group {
-    float: right ! important;
+  .dt-buttons.btn-group{
+    float: right! important;
+  }
+
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
   }
 
   .dropdown-toggle {
@@ -58,7 +63,6 @@
                 <a class="dropdown-item" onclick="verifiedFilter(this,0)"><i class="fa fa-close text-danger"> </i> Not
                   verified </a>
               </div>
-              <input type="text" hidden id="verifiedInput" name="verifiedInput" value="">
             </div>
             <!-- Client name -->
             <div class="btn-group">
@@ -71,7 +75,6 @@
                 <a class="dropdown-item" onclick="clientFilter({{client.clientId}})">{{client.name}} </a>
                 {% endfor %}
               </div>
-              <input type="text" hidden id="clientInput" name="clientInput" value="">
             </div>
             <!-- Date range -->
             <div id="reportrange_right" class="pull-right"
@@ -79,13 +82,23 @@
               <i class="fa fa-calendar"></i>
               <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
             </div>
-            <input type="text" hidden id="startDate" name="startDate" value="">
-            <input type="text" hidden id="endDate" name="endDate" value="">
+            
 
             <!-- CSV Download -->
-            <a href="{% url 'Account:driverTripCsv'%}" class="btn btn-app float-right mr-1">
-              <i class="fa fa-download" style="font-size:1rem"></i>
-            </a>
+            {% comment %} <a class="btn btn-app float-right mr-1" onclick="csvDownloadFilter()"> {% endcomment %}
+            <form action="{% url 'Account:driverTripCsv' %}" class="d-inline" method="POST" id="filterForm">
+              {% csrf_token %}
+
+              <input type="text" hidden id="verifiedInput" name="verifiedInput" value="">
+              <input type="text" hidden id="clientInput" name="clientInput" value="">
+              <input type="text" hidden id="startDate" name="startDate" value="">
+              <input type="text" hidden id="endDate" name="endDate" value="">
+              
+              <button type="submit" class="btn btn-app float-right mr-1 d-inline">
+                <i class="fa fa-download" style="font-size:1rem"></i>
+              </button>
+
+            </form>
 
             <div class="clearfix"></div>
           </div>
@@ -119,7 +132,11 @@
                         <td>{{ driverTtips.shiftDate }}</td>
                         <td>{{ driverTtips.numberOfLoads }}</td>
                         <td>
-                          <a href="#" class=""><i class="fa fa-edit"></i></a>
+                          <label type="button" class="btn" id="redirectButton">
+                            <a href="{% url 'Account:DriverTripEdit' id=driverTtips.id%}  " title="update">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                            </a>
+                          </label>
                         </td>
                       </tr>
                       {% endfor %}
