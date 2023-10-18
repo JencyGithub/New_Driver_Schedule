@@ -88,10 +88,9 @@
             <input type="text" hidden id="endDate" name="endDate" value="">
 
             <!-- CSV Download -->
-            <a href="{% url 'Account:driverTripCsv'%}" class="btn btn-app float-right mr-1">
+            <a class="btn btn-app float-right mr-1" onclick="csvDownloadFilter()">
               <i class="fa fa-download" style="font-size:1rem"></i>
             </a>
-
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -125,7 +124,7 @@
                         <td>{{ driverTtips.numberOfLoads }}</td>
                         <td>
                           <label type="button" class="btn" id="redirectButton">
-                            <a href="{% url 'Account:DriverTripEdit' id=driverTtips.id%}">
+                            <a href="{% url 'Account:DriverTripEdit' id=driverTtips.id%}  " title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                           </label>

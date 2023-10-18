@@ -50,7 +50,7 @@ def driver_trip_download_csv(modeladmin, request, queryset):
 
     # Write the header row
     writer.writerow(["verified", "driverId", "clientName", "shiftType",
-                     "numberOfLoads", "truckNo", "shiftDate","startTime", "endTime", "logSheet",
+                     "numberOfLoads", "truckNo", "shiftDate","startTime", "endTime", "loadSheet",
                      "comment",
                         "docketId",
                         "tripId",
@@ -84,7 +84,7 @@ def driver_trip_download_csv(modeladmin, request, queryset):
             driver_trip.shiftDate,
             driver_trip.startTime,
             driver_trip.endTime,
-            driver_trip.logSheet,
+            driver_trip.loadSheet,
             driver_trip.comment,
             '', 
             '', 
@@ -133,7 +133,7 @@ def driver_trip_download_csv(modeladmin, request, queryset):
 
 class DriverTrip_(admin.ModelAdmin):
 
-    list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"numberOfLoads", "logSheet","shiftDate"]
+    list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"numberOfLoads", "loadSheet","shiftDate"]
     # search_fields = ["driverId", 'clientName']
     list_filter = ('shiftType', 'clientName')
     actions = [driver_trip_download_csv]
