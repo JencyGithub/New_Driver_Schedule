@@ -26,7 +26,7 @@ function appendDataIntoTable(data) {
     row += `<td>${item.driverId_id}</td>`;
     row += `<td>${item.shiftDate}</td>`;
     row += `<td>${item.numberOfLoads}</td>`;
-    row += `<td><a href='#'><i class='fa fa-edit'></i></a></td>`;
+    row += `<td><a href="/account/driverTrip/edit/${item.id}/ " title="update"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></a></td>`;
     row += `</tr>`;
     $(".table tbody").append(row);
   });

@@ -11,8 +11,19 @@
  <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
 
  <style>
-  .dt-buttons.btn-group{
-    float: right! important;
+
+  .dt-buttons.btn-group {
+    float: right ! important;
+  }
+
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
+  }
+
+  /* Show CSV button */
+  .dt-buttons.btn-group>a:nth-child(2) {
+    display: block !important;
   }
  </style>
 {% endblock %}
@@ -47,8 +58,13 @@
                       <tr>
                         <td>{{ basePlants.basePlant }}</td>
                         <td>
-                          <button type="button" class="btn btn-success">Edit</button>
-                          <button type="button" class="btn btn-danger">Delete</button>
+                          {% comment %} <button type="button" class="btn btn-success">Edit</button> {% endcomment %}
+                          <label type="button" class="btn" id="redirectButton">
+                            <a href="#" title="update">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                            </a>
+                          </label>
+                          {% comment %} <button type="button" class="btn btn-danger">Delete</button> {% endcomment %}
                         </td>
                       </tr>
                     {% endfor %}

@@ -391,7 +391,7 @@ def driverTripCsv(request):
     elif ClientId:
         driver_trip = DriverTrip.objects.filter(clientName=ClientId).values()
         foreignKeySet(driver_trip)
-    elif startDate_values and endDate_values:
+    elif request.POST.get('startDate')  and request.POST.get('endDate'):
         startDate = date(int(startDate_values[0]),int(startDate_values[1]),int(startDate_values[2]))
         endDate = date(int(endDate_values[0]), int(endDate_values[1]), int(endDate_values[2]))
         print(startDate_values,endDate_values)

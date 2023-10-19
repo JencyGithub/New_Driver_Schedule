@@ -11,8 +11,18 @@
  <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
 
  <style>
-  .dt-buttons.btn-group{
-    float: right! important;
+  .dt-buttons.btn-group {
+    float: right ! important;
+  }
+
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
+  }
+
+  /* Show CSV button */
+  .dt-buttons.btn-group>a:nth-child(2) {
+    display: block !important;
   }
  </style>
 {% endblock %}
