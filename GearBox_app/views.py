@@ -16,11 +16,11 @@ from django.http import Http404
 # Create your views here.
 def leaveReq(request):
     leave_requests = LeaveRequest.objects.all()
-    return render(request, 'gearBox/LeaveReq.html', {'leave_requests': leave_requests})
+    return render(request, 'gearBox/table/LeaveReq.html', {'leave_requests': leave_requests})
 
 def natureOfLeaves(request):
     nature_of_leaves = NatureOfLeave.objects.all()
-    return render(request, 'gearBox/NatureOfLeaves.html', {'nature_of_leaves': nature_of_leaves})
+    return render(request, 'gearBox/table/NatureOfLeaves.html', {'nature_of_leaves': nature_of_leaves})
 
 def natureOfLeavesForm(request,id=None):
     data = None
