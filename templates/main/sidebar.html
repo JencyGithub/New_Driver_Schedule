@@ -37,26 +37,28 @@
           <li>
             <a><i class="fa fa-home"></i> Account <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li><a href="{% url 'Account:driverentry'%}">Driver entry(CSV)</a></li>
-              <li><a href="{% url 'Account:rcti'%}">RCTI</a></li>
-
-            </ul>
-          </li>
-          <li>
-            <a><i class="fa fa-home"></i> Account tables<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-              <li class=""><a href="{% url 'Account:basePlantTable'%}">BasePlant</a></li>
-              <li class=""><a href="{% url 'Account:rctiCsvForm'%}"> RCTI </a></li>
+              {% comment %} <li><a href="{% url 'Account:driverentry'%}">Driver entry(CSV)</a></li> {% endcomment %}
+              <li class=""><a href="{% url 'Account:basePlantTable'%}">Base Plant </a></li>
+              <li><a href="{% url 'Account:rcti'%}">RCTI Entry</a></li>
+              <li class=""><a href="{% url 'Account:rctiCsvForm'%}"> Existing RCTI </a></li>
               <li class=""><a href="{% url 'Account:driverTripsTable'%}"> Driver Trip </a></li>
 
+
+
             </ul>
           </li>
           <li>
-            <a><i class="fa fa-home"></i> Leave details <span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-home"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
+              <li><a href="{% url 'Account:driverentry'%}">Driver entry(CSV)</a></li>
               <li class=""><a href="{% url 'gearBox:leaveReq'%}"> Leave request</a></li>
               <li class=""><a href="{% url 'gearBox:natureOfLeaves'%}"> Nature of leave</a></li>
-              <li class=""><a href="{% url 'Account:publicHoliday' %}"> Public holiday</a></li>
+
+            </ul>
+          </li>
+          <li>
+            <a><i class="fa fa-home"></i> Appointments <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
             </ul>
           </li>
           <li>

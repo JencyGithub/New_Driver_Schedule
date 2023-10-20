@@ -243,7 +243,7 @@ def admin_truck_download_csv(modeladmin, request, queryset):
     for admin_truck in queryset:
         row_data = [
             admin_truck.adminTruckNumber,
-            '', '', '', '', '', '', '', '', '', '', '', '', '', '',  # Initialize empty placeholders for other fields
+            '', '', '', '', '', '', '', '', '', '', '', '', '', '',  
         ]
 
         for client_truck in admin_truck.clienttruckconnection_set.all():
@@ -261,6 +261,7 @@ def admin_truck_download_csv(modeladmin, request, queryset):
     return response
 
 
+admin.site.register(RateCard)
 class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]
@@ -372,3 +373,4 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 admin.site.register(PastTrip)
 
 admin.site.register(PublicHoliday)
+

@@ -337,6 +337,17 @@ def rctiCsvForm(request):
     BasePlant_ = BasePlant.objects.all()
     return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
 
+def driverSampleCsv(request):
+    # header = ['name', 'phone', 'email', 'password']
+
+    # # Open the CSV file in append mode ('a')
+    # myFile = open('DriverEntrySample.csv', 'a', newline='')
+    # writer = csv.writer(myFile)
+    # writer.writerow(header)
+    # myFile.close()
+    return FileResponse(open(f'DriverEntrySample.csv', 'rb'), as_attachment=True)
+
+
 @csrf_protect
 @api_view(['POST'])
 def rctiTable(request):
@@ -479,8 +490,7 @@ def driverTripCsv(request):
     except Exception as e :
         print(e)
         
-    time = str(timezone.now()).replace(':', '').replace(
-        '-', '').replace(' ', '').split('.')
+    time = str(timezone.now()).replace(':', '').replace('-', '').replace(' ', '').split('.')
     newFileName = time[0]
     location = 'static/Account/DriverTripCsvDownload/'
     lfs = FileSystemStorage(location=location)

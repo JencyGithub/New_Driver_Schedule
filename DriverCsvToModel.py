@@ -9,7 +9,7 @@ def get_valid_mobile_number(mobile_no):
         return None
             
 def insertIntoModel(dataList):
-    dump = dataList[:4]
+    dump = dataList[:4]     
     mobile_no = dump[1].strip()
     M_pattern = get_valid_mobile_number(mobile_no)
     users = User.objects.all()
