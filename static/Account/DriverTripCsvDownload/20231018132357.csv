@@ -1,2 +1,0 @@
-verified,driverId,clientName,shiftType,numberOfLoads,truckNo,shiftDate,startTime,endTime,loadSheet,comment,docketId,shiftDatetripId,tripId,docketNumber,docketFile,basePlant,noOfKm,transferKM,returnKm,waitingTimeInMinutes,minimumLoad,surcharge_type,surcharge_duration,cubicMl,minLoad,standByPerHalfHourDuration,others
-True,driver,Boral,Day,1,111111,2023-10-17,22:22,15:49,static/img/finalloadSheet/Load_Sheet20231018132046!_@DSA11.pdf,Et rerum consectetur,1,2023-10-18,1,12345,static/img/docketFiles/20231018132046!_@12345.pdf,Not selected,0.0,0,0.0,0,0.0,fixed normal,0.0,0,0,0.0,0
