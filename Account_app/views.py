@@ -301,19 +301,20 @@ def driverDocketEntry(request, ids):
 def driverDocketEntrySave(request, ids):
 
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
+    docketNumber_ = int(float(request.POST.get('docketNumber')))
+    shiftDate_ = request.POST.get('shiftDate')
 
     try:
-        docketNumber = DriverDocket.objects.get(docketNumber=int(float(request.POST.get('docketNumber'))))
-        messages.error(request, "This Docket Number already exists for this Trip!")
+        docketNumber = DriverDocket.objects.get(docketNumber=docketNumber_,shiftDate=shiftDate_)
+        messages.error(request, "This docket number and date already exists!")
         return redirect(request.META.get('HTTP_REFERER'))
     except:
         docketFile = request.FILES.get('docketFile')
-        docketNumber = int(float(request.POST.get('docketNumber')))
         DriverDocketObj = DriverDocket(
-            shiftDate=request.POST.get('shiftDate'),
+            shiftDate=shiftDate_,
             tripId=driver_trip_id,
-            docketNumber=docketNumber,
-            docketFile=docketFileSave(docketFile,docketNumber),
+            docketNumber=docketNumber_,
+            docketFile=docketFileSave(docketFile,docketNumber_),
             basePlant=BasePlant.objects.get(pk=request.POST.get('basePlant')),
             noOfKm=request.POST.get('noOfKm'),
             transferKM=request.POST.get('transferKM'),
@@ -332,10 +333,33 @@ def driverDocketEntrySave(request, ids):
         return redirect('Account:driverTripsTable')
 
 
+def rctiCsvForm(request):
+    BasePlant_ = BasePlant.objects.all()
+    return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
 
+@csrf_protect
+@api_view(['POST'])
 def rctiTable(request):
-    RCTI_ = RCTI.objects.all()
-    return render(request, 'Account/Tables/rctiTable.html', {'RCTI': RCTI_})
+    startDate_ = request.POST.get('startDate')
+    endDate_ = request.POST.get('endDate')
+    basePlant_ = request.POST.get('basePlant')
+
+    if startDate_:
+        if endDate_:
+            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+        else:
+            messages.error(request,"Please enter End Date.")
+            return redirect(request.META.get('HTTP_REFERER'))
+    elif basePlant_:
+        rctiData = RCTI.objects.filter(docketYard=basePlant_.upper()).values()
+    else:
+        messages.error(request,"Please select either Start Date or Base Plant.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    # return HttpResponse(request.session['user_type'])
+    params = {
+        'RCTIs': rctiData,
+    }
+    return render(request, 'Account/Tables/rctiTable.html', params)
 
 
 def basePlantTable(request):
@@ -377,6 +401,17 @@ def driverTripsTable(request):
         'clientName': clientName
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
+# def driverTripsTable(request):
+#     # return HttpResponse('work')
+#     driver_trip = DriverTrip.objects.all()
+#     clientName = Client.objects.all()
+#     return HttpResponse(driver_trip)
+#     params = {
+#         'driverTrip': driver_trip,
+#         'clientName': clientName
+#     }
+#     return render(request, 'Account/Tables/driverTripsTable.html', params)
+
 
 def foreignKeySet(dataset):
     for data in dataset:
@@ -409,7 +444,6 @@ def driverTripCsv(request):
     elif request.POST.get('startDate')  and request.POST.get('endDate'):
         startDate = date(int(startDate_values[0]),int(startDate_values[1]),int(startDate_values[2]))
         endDate = date(int(endDate_values[0]), int(endDate_values[1]), int(endDate_values[2]))
-        print(startDate_values,endDate_values)
         driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate)).values()
         foreignKeySet(driver_trip)
     else:
@@ -466,6 +500,8 @@ def driverTripCsv(request):
     return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
 
 
+
+    
 @csrf_protect
 @api_view(['POST'])
 def verifiedFilter(request):
@@ -485,6 +521,7 @@ def clientFilter(request):
         clientName=request.POST.get('id')).values()
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
+
 
 
 @api_view(['POST'])
@@ -544,24 +581,19 @@ def driverEntryUpdate(request, ids):
     driver_trip.endTime = request.POST.get('endTime') 
     if request.FILES.get('loadSheet'):
         loadSheet = request.FILES.get('loadSheet')
-        # time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
-        # time = time[0]
-        # newFileName = 'Load_Sheet' + time + "@_!" + str(loadSheet.name)
-        # location = 'static/img/finalloadSheet/'
-
-        # lfs = FileSystemStorage(location=location)
-        # lfs.save(newFileName, loadSheet)
-        # driver_trip.loadSheet = 'static/img/finalloadSheet/' + newFileName
         driver_trip.loadSheet = loadFileSave(loadSheet)
 
     driver_trip.comment = request.POST.get('comment')
     driver_trip.save()
 
-    # update Docket Save
-
+    
     driver_docket = DriverDocket.objects.filter(tripId=ids).values()
     count_ = 0
     for i in driver_docket:
+        docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))),shiftDate=request.POST.get(f'shiftDate{count_}'))
+        if docketNumberVal.docketId != i['docketId']:
+            messages.error(request, "Docket must be unique.")
+            return redirect(request.META.get('HTTP_REFERER'))
         docketObj = DriverDocket.objects.get(pk=i['docketId'])
         docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
         docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
@@ -583,7 +615,7 @@ def driverEntryUpdate(request, ids):
 
         count_ += 1
         docketObj.save()
-    messages.success(request, "Docket updated successfully")
+    messages.success(request, "Data updated successfully")
     return redirect('Account:driverTripsTable')
 
 
