@@ -77,6 +77,7 @@ function clientFilter(id) {
   });
 }
 
+
 function dateConverter(date) {
   var dateObj = new Date(date);
 

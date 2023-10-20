@@ -10,7 +10,7 @@ from GearBox_app.models import *
 # -----------------------------------
 
 class BasePlant(models.Model):
-    basePlant = models.CharField(primary_key=True, max_length=200)
+    basePlant = models.CharField(unique= True,max_length=200)
 
     def __str__(self) -> str:
         return str(self.basePlant)
@@ -144,7 +144,7 @@ class RCTI(models.Model):
     waitingTimeSCHEDTotalExGST = models.FloatField(default=0)
     waitingTimeSCHEDTotal = models.FloatField(default=0)
     
-    waitingTimeInMinutes = models.CharField(max_length=255)
+    waitingTimeInMinutes = models.FloatField(max_length=255,default=0)
     waitingTimeCost = models.FloatField(default=0)
     waitingTimeGSTPayable = models.FloatField(default=0)
     waitingTimeTotalExGST = models.FloatField(default=0)
@@ -175,7 +175,7 @@ class RCTI(models.Model):
     surchargeTotalExGST = models.FloatField(default=0)
     surchargeTotal = models.FloatField(default=0)
    
-    others = models.CharField(max_length=255,default= '')
+    others = models.CharField(max_length=255,default= '', null= True , blank=True)
     othersCost = models.FloatField(default=0)
     othersGSTPayable = models.FloatField(default=0)
     othersTotalExGST = models.FloatField(default=0)
@@ -230,4 +230,17 @@ class RCTIDocketAdjustment(models.Model):
     def total_cost(self):
         return self.waitingTimeCost + self.transferKMSCost + self.cubicMlCost + self.minLoadCost + self.othersCost
 
-
+# -----------------------------------
+# Holiday section
+# -----------------------------------
+class PublicHoliday(models.Model):
+    date = models.DateField()
+    stateName = models.CharField(max_length=100)
+    description = models.CharField(max_length=255)
+    
+    def __str__(self) -> str:
+        return str(self.description)
+    
+    
+    
+    

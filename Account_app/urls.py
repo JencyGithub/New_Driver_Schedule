@@ -47,6 +47,7 @@ urlpatterns = [
     
     # DriverTrip Csv
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
+    path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),  
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
@@ -57,6 +58,7 @@ urlpatterns = [
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
     path('clientFilter/', views.clientFilter, name='clientFilter'),  
     path('dateRangeFilter/', views.dateRangeFilter, name='dateRangeFilter'),
+
 
     # Reconciliation
     path('reconciliation/form/', views.reconciliationForm, name='reconciliationForm'),
