@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil
+import shutil, json
 import os
 import tabula
 import requests
@@ -21,7 +21,7 @@ from GearBox_app.models import *
 from django.http import FileResponse
 from CRUD import *
 from django.http import Http404
-# from polls.models import Poll
+from django.core.serializers.json import DjangoJSONEncoder
 
 def index(request):
     return render(request, 'Account/dashboard.html')
@@ -342,6 +342,32 @@ def basePlantTable(request):
     basePlant_ = BasePlant.objects.all()
     return render(request, 'Account/Tables/basePlantTable.html', {'BP_': basePlant_})
 
+def basePlantForm(request,id=None):
+    basePlant = None
+    if id:
+        basePlant = BasePlant.objects.get(pk=id)
+
+    params = {
+        'data' : basePlant  
+    }
+
+    return render(request, "Account/Tables/basePlantForm.html", params)
+
+@csrf_protect
+@api_view(['POST'])
+def basePlantSave(request, id=None):
+    dataList = {
+        'basePlant' : request.POST.get('basePlant')
+    }   
+    if id is not None:
+        updateIntoTable(record_id=id,tableName='BasePlant',dataSet=dataList)
+        messages.success(request, 'BasePlant updated successfully')
+    else:
+        insertIntoTable(tableName='BasePlant',dataSet=dataList)
+        messages.success(request, 'BasePlant added successfully')
+
+    return redirect('Account:basePlantTable')
+    
 
 def driverTripsTable(request):
     driver_trip = DriverTrip.objects.all()
@@ -351,17 +377,6 @@ def driverTripsTable(request):
         'clientName': clientName
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
-# def driverTripsTable(request):
-#     # return HttpResponse('work')
-#     driver_trip = DriverTrip.objects.all()
-#     clientName = Client.objects.all()
-#     return HttpResponse(driver_trip)
-#     params = {
-#         'driverTrip': driver_trip,
-#         'clientName': clientName
-#     }
-#     return render(request, 'Account/Tables/driverTripsTable.html', params)
-
 
 def foreignKeySet(dataset):
     for data in dataset:
@@ -580,9 +595,14 @@ def reconciliationForm(request):
     trucks = AdminTruck.objects.all()
     return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
 
-
 def reconciliationResult(request):
-    dataList = request.session['reconciliationResultData']
+    serialized_data = request.session.get('reconciliationResultData', "[]")
+    dataList = json.loads(serialized_data)
+    
+    for entry in dataList:
+        if 'docketDate' in entry:
+            entry['docketDate'] = datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
+
     basePlants = BasePlant.objects.all() 
     params = {
         'dataList': dataList,
@@ -590,40 +610,95 @@ def reconciliationResult(request):
     }
     return render(request, 'Reconciliation/reconciliation-result.html', params)
 
-
 @csrf_protect
 @api_view(['POST'])
 def reconciliationAnalysis(request):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-    driverDocketList = DriverDocket.objects.filter(
-        shiftDate__range=(startDate, endDate)).values()
-    RCTIList = RCTI.objects.filter(
-        docketDate__range=(startDate, endDate)).values()
-    unique_RCTI = {int(item['docketNumber']) for item in RCTIList}
-    unique_driverDocket = {item['docketNumber'] for item in driverDocketList}
+    
+    rcti_data = RCTI.objects.filter(docketDate__range=(startDate, endDate)).values()
+
+    driver_docket_data = DriverDocket.objects.filter(shiftDate__range=(startDate, endDate)).values()
+
+    unique_RCTI = {int(item['docketNumber']) for item in rcti_data}
+    unique_driverDocket = {item['docketNumber'] for item in driver_docket_data}
     common_docket = unique_RCTI.intersection(unique_driverDocket)
+
+    rcti_data = list(rcti_data)
+    for entry in rcti_data:
+        entry['docketDate'] = entry['docketDate'].strftime('%Y-%m-%d')
+
+    driver_docket_data = list(driver_docket_data)
+    for entry in driver_docket_data:
+        entry['shiftDate'] = entry['shiftDate'].strftime('%Y-%m-%d')
 
     dataList = []
 
-    for i in RCTIList:
-        dataList.append(
-            {
-                'docketNumber': int(i['docketNumber']),
-                'class': 'text-danger' if int(i['docketNumber']) not in common_docket else 'text-success'
-            }
-        )
-    for j in driverDocketList:
-        dataList.append(
-            {
-                'docketNumber' : i['docketNumber'],
-                'class' : 'text-danger' if i['docketNumber'] not in common_docket else 'text-success'
-            }
-        )
-    request.session['reconciliationResultData'] = dataList
+    for rcti_entry in rcti_data:
+        docket_number = int(rcti_entry['docketNumber'])
+        data_entry = {
+            'docketNumber': docket_number,
+            'class': 'text-danger' if docket_number not in common_docket else 'text-success',
+            'transferKM': rcti_entry['transferKM'],
+            'waitingTimeTotal': rcti_entry['waitingTimeTotal'],
+            'surchargeTotal': rcti_entry['surchargeTotal'],
+            'returnKM': rcti_entry['returnKm'],
+            'standByTotal': rcti_entry['standByTotal'],
+            'othersTotal': rcti_entry['othersTotal'],
+            **rcti_entry  
+        }
+        dataList.append(data_entry)
+
+    for driver_docket_entry in driver_docket_data:
+        docket_number = driver_docket_entry['docketNumber']
+        data_entry = {
+            'docketNumber': docket_number,
+            'class': 'text-danger' if docket_number not in common_docket else 'text-success',
+            **driver_docket_entry 
+        }
+        dataList.append(data_entry)
+
+    serialized_data = json.dumps(dataList, cls=DjangoJSONEncoder)
+    request.session['reconciliationResultData'] = serialized_data
 
     return redirect('Account:reconciliationResult')
 
 
 def reconciliationDocketView(request):
     return render(request, 'Reconciliation/reconciliation-docket.html')
+
+
+
+def publicHoliday(request):
+    data = PublicHoliday.objects.all()
+    params = {
+        'data' : data
+    }
+    return render(request,'Account/Tables/PublicHoliday.html',params) 
+
+def publicHolidayForm(request,id=None):
+    data = None
+    if id:
+        data = PublicHoliday.objects.get(pk=id)
+        data.date = dateConverterFromTableToPageFormate(data.date)
+    params = {
+        'data' : data
+    }
+    return render(request,'Account/PublicHolidayForm.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def publicHolidaySave(request,id=None):
+    dataList = {
+        'date' : request.POST.get('date'),
+        'stateName' : request.POST.get('state'),
+        'description' :request.POST.get('description') 
+    }
+    if id:
+        updateIntoTable(record_id=id,tableName='PublicHoliday',dataSet=dataList)
+        messages.success(request, 'Holiday updated successfully')
+    else:
+        insertIntoTable(tableName='PublicHoliday',dataSet=dataList)
+        messages.success(request, 'Holiday added successfully')
+
+    return redirect('Account:publicHoliday')

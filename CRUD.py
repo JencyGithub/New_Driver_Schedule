@@ -21,7 +21,8 @@ model_mapping = {
     'DriverDocket' : DriverDocket,
     'PastTrip' : PastTrip,
     'RCTI' : RCTI,
-    'RCTIDocketAdjustment' : RCTIDocketAdjustment
+    'RCTIDocketAdjustment' : RCTIDocketAdjustment,
+    'PublicHoliday':PublicHoliday
 }
 
 def insertIntoTable(tableName:str,dataSet:dict,model_mapping=model_mapping):

@@ -26,7 +26,7 @@ urlpatterns = [
     path('Form1/', views.getForm1, name='getForm1'),
     path('Form2/', views.getForm2, name='getForm2'),
     
-     path('createFormSession/',
+    path('createFormSession/',
          views.createFormSession, name='createFormSession'),
     path('formsSave/', views.formsSave, name='formsSave'),
 
@@ -40,9 +40,15 @@ urlpatterns = [
     path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'),      
     
     # Account Tables 
-    path('BasePlantTable/', views.basePlantTable, name='basePlantTable'),      
-    path('RctiTable/', views.rctiTable, name='rctiTable'),      
-    path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),  
+    # Base plant routes
+    path('BasePlantTable/', views.basePlantTable, name='basePlantTable'),
+    path('BasePlant/add/', views.basePlantForm, name='basePlantAdd'),
+    path('BasePlant/add/save/', views.basePlantSave, name='basePlantAddSave'),   
+    path('BasePlant/edit/<int:id>/', views.basePlantForm, name='basePlantEdit'),      
+    path('BasePlant/edit/save/<int:id>/', views.basePlantSave, name='basePlantEditSave'),   
+
+    path('RctiTable/', views.rctiTable, name='rctiTable'),
+    path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
     
     
     # DriverTrip Csv
@@ -63,5 +69,13 @@ urlpatterns = [
     path('reconciliation/analysis/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
     path('reconciliation/result/', views.reconciliationResult, name='reconciliationResult'),
     path('reconciliation/docket/view/', views.reconciliationDocketView, name='reconciliationDocketView'),
+
+    # Public holiday
+    path('publicHoliday/', views.publicHoliday, name='publicHoliday'),
+    path('publicHoliday/add/', views.publicHolidayForm, name='publicHolidayAdd'),
+    path('publicHoliday/add/save/', views.publicHolidaySave, name='publicHolidaySave'),
+
+    path('publicHoliday/edit/<int:id>/', views.publicHolidayForm, name='publicHolidayEdit'),
+    path('publicHoliday/edit/save/<int:id>/', views.publicHolidaySave, name='publicHolidayEditSave'),
 
 ]

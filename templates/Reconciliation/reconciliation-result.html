@@ -44,7 +44,8 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                     <div class="x_title">
                         <h2>Reconciliation result</h2>
                         <div class="float-right">
-                            <button class="btn btn-sm btn-default submit" value="Mark as complete">Mark as complete</button>
+                            <button class="btn btn-sm btn-default submit" value="Mark as complete">Mark as
+                                complete</button>
                         </div>
                         <div class="clearfix"></div>
                     </div>
@@ -75,12 +76,12 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                         class="{{ item.class }}">{{ item.docketNumber }}
                                                     </a>
                                                 </td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td>{{ item.transferKM }}</td>
+                                                <td>{{ item.waitingTimeTotal }}</td>
+                                                <td>{{ item.surchargeTotal }}</td>
+                                                <td>{{ item.returnKM }}</td>
+                                                <td>{{ item.standByTotal }}</td>
+                                                <td>{{ item.othersTotal }}</td>
                                                 <td><a href="" class="btn btn-sm btn-default">Escalation</a></td>
                                             </tr>
                                             {% endfor %}

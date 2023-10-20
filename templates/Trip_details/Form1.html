@@ -89,41 +89,38 @@
             top: 7px !important;
             right: 10px !important;
         }
+        .navbar-brand {
+            font-size: 1.5rem; /* Adjust the font size */
+        }
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
         <div class="container-fluid">
-        <div class="navbar-brand">PNR Group</div>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-mdb-toggle="collapse"
-            data-mdb-target="#navbarExample01"
-            aria-controls="navbarExample01"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <i class="fas fa-bars"></i>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarExample01">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li class="nav-item active">
-                <a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'Account:getForm1'%}">Driver Trip</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-              </li>  
-            </ul>
-          </div>
+            <a class="navbar-brand" href="{% url 'index' %}">PNR Group</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav ml-auto ">
+                    <li class="nav-item active">
+                        <a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Account:getForm1'%}">Driver Trip</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-      </nav>
+    </nav>
     <div class="container-fluid" id="mainCont">
-        <form id="signUpForm" action="{% url 'Account:createFormSession' %}" method="POST" enctype="multipart/form-data">
+        <form id="signUpForm" action="{% url 'Account:createFormSession' %}" method="POST"
+            enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-header d-flex mb-4">
                 <span class="stepIndicator text-active">Trip details</span>
@@ -192,8 +189,6 @@
                             <input type="text" name="truckNum" id="truckNum"
                                 value="{% if DriverTruckNum is not None %}{{DriverTruckNum}}{% endif %}" readonly
                                 class="d-block" />
-
-
                             {% else %}
                             <select id="truckNum" class="js-select2 form-control" disabled name="truckNum">
                                 <option value="">Select an Item</option>
@@ -322,15 +317,15 @@
     <script>
         $(document).ready(function () {
             var currentDate = new Date();
-        
+
             var yesterdayDate = new Date(currentDate);
             yesterdayDate.setDate(currentDate.getDate() - 1);
-        
+
             var currentDateFormatted = currentDate.toISOString().slice(0, 10);
             var yesterdayDateFormatted = yesterdayDate.toISOString().slice(0, 10);
-        
-            $('#shiftDate').attr('max', currentDateFormatted); 
-            $('#shiftDate').attr('min', yesterdayDateFormatted); 
+
+            $('#shiftDate').attr('max', currentDateFormatted);
+            $('#shiftDate').attr('min', yesterdayDateFormatted);
         });
     </script>
 

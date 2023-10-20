@@ -156,7 +156,7 @@
                                 <div class="col-md-12 col-sm-12">
                                     <label for="comment">Comment :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <textarea placeholder="comment" required='required' name="comment"
+                                        <textarea placeholder="comment" name="comment"
                                             class="form-control">{{driverTrip.comment}}</textarea>
                                     </div>
                                 </div>
@@ -208,7 +208,7 @@
                                     <div class="field item form-group">
                                         <select name="basePlant{{item.count_}}" class="form-control">
                                             {% for basePlant_ in basePlants %}
-                                            <option value="{{ basePlant_.basePlant }}" {% if item.basePlant.basePlant == basePlant_.basePlant %}selected="selected" {% endif %}>{{ basePlant_.basePlant }}</option>
+                                            <option value="{{ basePlant_.id }}" {% if item.basePlant.basePlant == basePlant_.basePlant %}selected="selected" {% endif %}>{{ basePlant_.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>

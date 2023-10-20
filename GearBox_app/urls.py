@@ -40,4 +40,5 @@ urlpatterns = [
     # UPDATE
     path('leaveReq/edit/<int:id>/', views.leaveReqForm, name='leaveReqEdit'), 
     path('leaveRequest/edit/save/<int:id>/', views.changeLeaveRequest, name='editSaveLeaveRequest'), 
+
 ]

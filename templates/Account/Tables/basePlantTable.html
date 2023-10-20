@@ -40,6 +40,8 @@
         <div class="x_panel">
           <div class="x_title">
             <h2>Base Plant</h2>
+            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-dark float-right">Add</a>
+
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -58,13 +60,11 @@
                       <tr>
                         <td>{{ basePlants.basePlant }}</td>
                         <td>
-                          {% comment %} <button type="button" class="btn btn-success">Edit</button> {% endcomment %}
                           <label type="button" class="btn" id="redirectButton">
-                            <a href="#" title="update">
+                            <a href="{% url 'Account:basePlantEdit' id=basePlants.id %}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                           </label>
-                          {% comment %} <button type="button" class="btn btn-danger">Delete</button> {% endcomment %}
                         </td>
                       </tr>
                     {% endfor %}

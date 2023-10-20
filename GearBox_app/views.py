@@ -47,8 +47,10 @@ def changeNatureOfLeaves(request,id=None):
 
 def leaveReqForm(request,id=None):
     natureOfLeaves = NatureOfLeave.objects.all()
+    drivers = Driver.objects.all()
     params = {
-            "natureOfLeaves" : natureOfLeaves
+            "natureOfLeaves" : natureOfLeaves,
+            "drivers" : drivers,
         }
     if id:
         data = LeaveRequest.objects.get(id=id)
@@ -81,4 +83,3 @@ def changeLeaveRequest(request,id=None):
         
     return redirect('gearBox:leaveReq')
 
-    

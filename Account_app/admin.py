@@ -370,3 +370,5 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 #     send_email_action.short_description = 'Send email to selected applicants'
 
 admin.site.register(PastTrip)
+
+admin.site.register(PublicHoliday)

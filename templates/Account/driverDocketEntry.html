@@ -78,7 +78,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <select name="basePlant" class="form-control">
                                             {% for basePlant_ in basePlants %}
-                                            <option value="{{ basePlant_.basePlant }}">{{ basePlant_.basePlant }}</option>
+                                            <option value="{{ basePlant_.id }}">{{ basePlant_.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>

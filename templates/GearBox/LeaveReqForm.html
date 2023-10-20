@@ -26,8 +26,12 @@ request {% endblock %} {% block headStyle %}
                                             class="col-form-label col-md-3 col-sm-3 label-align">DriverId :<span
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="driverId" required="required"
-                                                id="driverId" type="number" value="{% if data %}{{data.employee.driverId}}{% else %}' '{% endif %}"/>
+                                                <select class="form-control" name="driverId" required="required" id="driverId">
+                                                    <option value="">Select a driver</option>
+                                                    {% for driver in drivers %}
+                                                        <option value="{{ driver.driverId }}" {% if data and data.employee.driverId == driver.driverId %}selected{% endif %}>{{ driver.driverId }}</option>
+                                                    {% endfor %}
+                                                </select>
                                         </div>
                                     </div>
                                 </div>
