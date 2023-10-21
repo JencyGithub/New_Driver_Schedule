@@ -40,5 +40,14 @@ urlpatterns = [
     # UPDATE
     path('leaveReq/edit/<int:id>/', views.leaveReqForm, name='leaveReqEdit'), 
     path('leaveRequest/edit/save/<int:id>/', views.changeLeaveRequest, name='editSaveLeaveRequest'), 
+    
+    # Existing Drivers Table + CRUD
+    path('drivers/', views.driversView, name='driversTable'),
+    
+    path('driverForm/', views.driverForm, name='driverFormAdd'),
+    path('driverForm/add/', views.driverFormSave, name='driverFormSave'),
+    
+    path('driverForm/edit/<int:id>/', views.driverForm, name='driverFormEdit'),
+    path('driverForm/edit/save/<int:id>/', views.driverFormSave, name='driverFormEditSave'),
 
 ]

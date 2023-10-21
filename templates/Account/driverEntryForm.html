@@ -47,6 +47,7 @@
                         <h2>DriverEntry csv upload</h2>
                         <a href="{% url 'Account:driverSampleCsv'%}" class="btn float-right ">
                             <i class="fa fa-download"></i>
+                            Get sample file
                           </a>
                         <div class="clearfix"></div>
                     </div>
@@ -54,21 +55,17 @@
                         <div class="cuatom-continer">
                             <form class="" method="POST" action="{% url 'Account:driverEntrySave'%}" novalidate  enctype="multipart/form-data">
                                 {% csrf_token %}
-                                {% comment %} <span class="section">Trip details</span> {% endcomment %}
-
-
-
 
                                 <div class="col-md-6 col-sm-6">
                                     <label for="DentryFile">Upload DriverEntry Csv:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control"  type="file" name="driverEntryFile"
                                              required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="DentryFile" accept=".csv">
+                                            id="DentryFile" accept=".xlsx">
                                     </div>
                                 </div>
-                                <div class="col-md-12 text-right">
-                                    <button type='submit' class="btn btn-primary px-4">Submit</button>
+                                <div class="col-md-6 col-sm-6 text-right">
+                                    <button type='submit' class="btn btn-default w-25 mt-4">Submit</button>
                                 </div>
                             </form>
                         </div>

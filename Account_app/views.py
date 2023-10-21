@@ -264,8 +264,8 @@ def driverEntrySave(request):
         time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(Driver_csv_file.name)
-        location = 'static/Account/DriverEntry'
 
+        location = 'static/Account/DriverEntry'
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, Driver_csv_file)
         with open("Driver_reg_file.txt", 'w') as f:
@@ -338,14 +338,14 @@ def rctiCsvForm(request):
     return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
 
 def driverSampleCsv(request):
-    # header = ['name', 'phone', 'email', 'password']
+    # header = ['Driver Id','Driver name', 'Drover phone', 'Email', 'Password']
 
     # # Open the CSV file in append mode ('a')
     # myFile = open('DriverEntrySample.csv', 'a', newline='')
     # writer = csv.writer(myFile)
     # writer.writerow(header)
     # myFile.close()
-    return FileResponse(open(f'DriverEntrySample.csv', 'rb'), as_attachment=True)
+    return FileResponse(open(f'static/Account/DriverEntrySample.csv', 'rb'), as_attachment=True)
 
 
 @csrf_protect

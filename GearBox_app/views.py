@@ -80,6 +80,44 @@ def changeLeaveRequest(request,id=None):
     else:
         data['status'] = request.POST.get('Status')
         update = updateIntoTable(record_id=id,tableName='LeaveRequest',dataSet=data)
+        messages.success(request,'Updated successfully')
+        
         
     return redirect('gearBox:leaveReq')
 
+
+def driversView(request):
+    drivers = Driver.objects.all()
+    params = {
+        'drivers' : drivers
+    }
+    return render(request,'GearBox/table/driverTable.html',params)
+
+
+def driverForm(request, id=None):
+    data = None
+    if id:
+        data = Driver.objects.get(pk = id)   
+    params = {
+        'data' : data
+    }
+    return render(request, 'GearBox/driverForm.html',params)
+
+
+@csrf_protect
+@api_view(['POST'])
+def driverFormSave(request, id= None):
+    dataList = {
+        'driverId' : request.POST.get('driverId'),
+        'name' : request.POST.get('name'),
+        'phone' : request.POST.get('phone'),
+        'email' : request.POST.get('email')
+    }
+    if id:
+        updateIntoTable(record_id=id,tableName='Driver',dataSet=dataList)
+        messages.success(request,'Updated successfully')
+    else:
+        insertIntoTable(tableName='Driver',dataSet=dataList)
+        messages.success(request,'Adding successfully')
+
+    return redirect('gearBox:driversTable')
