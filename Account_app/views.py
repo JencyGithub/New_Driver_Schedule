@@ -264,8 +264,8 @@ def driverEntrySave(request):
         time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(Driver_csv_file.name)
-        location = 'static/Account/DriverEntry'
 
+        location = 'static/Account/DriverEntry'
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, Driver_csv_file)
         with open("Driver_reg_file.txt", 'w') as f:
