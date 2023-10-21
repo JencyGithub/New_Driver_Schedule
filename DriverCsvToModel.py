@@ -10,19 +10,20 @@ def get_valid_mobile_number(mobile_no):
         return None
             
 def insertIntoModel(dataList):
-    dump = dataList[:4]     
-    mobile_no = dump[1].strip()
-    M_pattern = get_valid_mobile_number(mobile_no)
+    dump = dataList[:5]  
+    M_pattern = get_valid_mobile_number(dump[2])
     users = User.objects.all()
 
     usernames = [user.username for user in users]
     email_addresses = [user.email for user in users]
-    if dump[1].strip() == M_pattern and dump[0].strip().replace(' ','') not in usernames and dump[2].strip().replace(' ','') not in email_addresses:
+    print(dump[2] == M_pattern)
+    if dump[2] == M_pattern and dump[1].strip().replace(' ','') not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
         DriverObj = Driver()
-        DriverObj.name = dump[0].strip().replace(' ','')
-        DriverObj.phone = dump[1].strip() 
-        DriverObj.email = dump[2].strip().replace(' ','')
-        DriverObj.password = dump[3].strip()
+        DriverObj.driverId = dump[0]
+        DriverObj.name = dump[1].strip().replace(' ','')
+        DriverObj.phone = dump[2] 
+        DriverObj.email = dump[3].strip().replace(' ','')
+        DriverObj.password = dump[4].strip()
         
         user_ = User.objects.create(
             username=DriverObj.name,
@@ -45,4 +46,3 @@ fileName = f'static/Account/DriverEntry/{file_name}'
 df = pd.read_excel(fileName)
 for index, row in df.iterrows():
     insertIntoModel(row)
-    
