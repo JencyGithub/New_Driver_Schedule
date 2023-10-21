@@ -50,6 +50,10 @@ urlpatterns = [
     path('RctiTable/', views.rctiTable, name='rctiTable'),
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
     
+    # Rate Card 
+    path('RateCardTable', views.rateCardTable, name='rateCardTable'),
+    path('RateCardForm', views.rateCardForm, name='rateCardForm'),
+    path('RateCardSave', views.rateCardSave, name='rateCardSave'),
     
     # DriverTrip Csv
     path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
@@ -80,5 +84,7 @@ urlpatterns = [
 
     path('publicHoliday/edit/<int:id>/', views.publicHolidayForm, name='publicHolidayEdit'),
     path('publicHoliday/edit/save/<int:id>/', views.publicHolidaySave, name='publicHolidayEditSave'),
+    
+
 
 ]

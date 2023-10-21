@@ -23,7 +23,7 @@ standby_time_grace_options = (
 )
 
 class RateCard(models.Model):
-    rate_card_name = models.CharField(max_length=255)
+    rate_card_name = models.CharField(max_length=255 , unique=True)
     
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -45,7 +45,6 @@ class CostParameters(models.Model):
     waiting_cost_per_minute = models.FloatField(default=0)
     call_out_fees = models.FloatField(default=0)
     demurrage_fees = models.FloatField(default=0)
-    
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
 
@@ -70,7 +69,7 @@ class ThresholdDayShift(models.Model):
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
-    min_load_in_cubic_meters_tip = models.FloatField(default=0)
+    min_load_in_cubic_meters_trip = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
@@ -95,7 +94,7 @@ class ThresholdNightShift(models.Model):
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
-    min_load_in_cubic_meters_tip = models.FloatField(default=0)
+    min_load_in_cubic_meters_trip = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))

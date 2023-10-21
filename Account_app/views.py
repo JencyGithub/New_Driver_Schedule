@@ -338,14 +338,7 @@ def rctiCsvForm(request):
     return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
 
 def driverSampleCsv(request):
-    # header = ['name', 'phone', 'email', 'password']
-
-    # # Open the CSV file in append mode ('a')
-    # myFile = open('DriverEntrySample.csv', 'a', newline='')
-    # writer = csv.writer(myFile)
-    # writer.writerow(header)
-    # myFile.close()
-    return FileResponse(open(f'DriverEntrySample.csv', 'rb'), as_attachment=True)
+    return FileResponse(open(f'static/Account/DriverEntrySample.csv', 'rb'), as_attachment=True)
 
 
 @csrf_protect
@@ -412,16 +405,7 @@ def driverTripsTable(request):
         'clientName': clientName
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
-# def driverTripsTable(request):
-#     # return HttpResponse('work')
-#     driver_trip = DriverTrip.objects.all()
-#     clientName = Client.objects.all()
-#     return HttpResponse(driver_trip)
-#     params = {
-#         'driverTrip': driver_trip,
-#         'clientName': clientName
-#     }
-#     return render(request, 'Account/Tables/driverTripsTable.html', params)
+
 
 
 def foreignKeySet(dataset):
@@ -744,3 +728,144 @@ def publicHolidaySave(request,id=None):
         messages.success(request, 'Holiday added successfully')
 
     return redirect('Account:publicHoliday')
+
+
+# ````````````````````````````````````
+# Rate Card 
+
+# ```````````````````````````````````
+
+def rateCardTable(request):
+    RateCards = RateCard.objects.all()
+    params = {
+        'rateCard' : RateCards
+    }
+    return render(request , 'Account/Tables/rateCardTable.html',params)
+
+def rateCardForm(request):
+    return render(request, 'Account/rateCardForm.html')
+
+@csrf_protect
+@api_view(['POST'])
+def rateCardSave(request):
+    # Rate Card 
+    rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
+    rateCard.save()
+    rateCard = RateCard.objects.get_or_create(rate_card_name=request.POST.get('rate_card_name'))
+
+    
+    
+    # CostParameters 
+    costParameters = CostParameters(
+        rate_card_name = rateCard,
+        loading_cost_per_cubic_meter = float(request.POST.get('costParameters_loading_cost_per_cubic_meter')),
+        km_cost = float(request.POST.get('costParameters_km_cost')),
+        surcharge_fixed_normal_cost = float(request.POST.get('costParameters_surcharge_fixed_normal_cost')),
+        surcharge_fixed_sunday_cost = float(request.POST.get('costParameters_surcharge_fixed_sunday_cost')),
+        surcharge_fixed_public_holiday_cost = float(request.POST.get('costParameters_surcharge_fixed_public_holiday_cost')),
+        surcharge_per_cubic_meters_normal_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_normal_cost')),
+        surcharge_per_cubic_meters_sunday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_sunday_cost')),
+        surcharge_per_cubic_meters_public_holiday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_public_holiday_cost')),
+        transfer_cost = float(request.POST.get('costParameters_transfer_cost')),
+        return_cost = float(request.POST.get('costParameters_return_cost')),
+        standby_time_slot_size = float(request.POST.get('costParameters_standby_time_slot_size')),
+        standby_cost_per_slot = float(request.POST.get('costParameters_standby_cost_per_slot')),
+        waiting_cost_per_minute = float(request.POST.get('costParameters_waiting_cost_per_minute')),
+        call_out_fees = float(request.POST.get('costParameters_call_out_fees')),
+        demurrage_fees = float(request.POST.get('costParameters_demurrage_fees')),
+        start_date = request.POST.get('costParameters_start_date'),
+        end_date = request.POST.get('costParameters_end_date')
+    )
+    costParameters.save()
+    
+    
+    # ThresholdDayShift
+    
+    thresholdDayShifts  = ThresholdDayShift(
+        rate_card_name = rateCard,
+        threshold_amount_per_day_shift = float(request.POST.get('thresholdDayShift_threshold_amount_per_day_shift')),
+        loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdDayShift_loading_cost_per_cubic_meter_included') == 'on' else False,
+        km_cost_included = True if request.POST.get('thresholdDayShift_km_cost_included') == 'on' else False,
+        surcharge_fixed_normal_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_normal_cost_included') == 'on' else False ,
+        surcharge_fixed_sunday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_sunday_cost_included') == 'on' else False ,
+        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_sunday_cost_included  = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
+        transfer_cost_included = True if request.POST.get('thresholdDayShift_transfer_cost_included') == 'on' else False,
+        return_cost_included = True if request.POST.get('thresholdDayShift_return_cost_included') == 'on' else False,
+        standby_cost_included = True if request.POST.get('thresholdDayShift_standby_cost_included') == 'on' else False,
+        waiting_cost_included = True if request.POST.get('thresholdDayShift_waiting_cost_included') == 'on' else False,
+        call_out_fees_included = True if request.POST.get('thresholdDayShift_call_out_fees_included') == 'on' else False,
+        demurrage_fees_included = True if request.POST.get('thresholdDayShift_demurrage_fees_included') == 'on' else False,
+        min_load_in_cubic_meters = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters')),
+        min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
+        min_load_in_cubic_meters_trip = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_trip')),
+        start_date = request.POST.get('thresholdDayShift_start_date'),
+        end_date = request.POST.get('thresholdDayShift_end_date')
+    )
+    thresholdDayShifts.save()
+    
+    # ThresholdNightShift 
+    print(request.POST.get('thresholdNightShift_threshold_amount_per_night_shift'))
+    thresholdNightShifts = ThresholdNightShift(
+        rate_card_name = rateCard,
+        threshold_amount_per_night_shift = request.POST.get('thresholdNightShift_threshold_amount_per_night_shift'),
+        loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdNightShift_loading_cost_per_cubic_meter_included') == 'on' else False,
+        km_cost_included = True if request.POST.get('thresholdNightShift_km_cost_included') == 'on' else False,
+        surcharge_fixed_normal_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_normal_cost_included') == 'on' else False,
+        surcharge_fixed_sunday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_sunday_cost_included') == 'on' else False,
+        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_sunday_cost_included  = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
+        transfer_cost_included = True if request.POST.get('thresholdNightShift_transfer_cost_included') == 'on' else False,
+        return_cost_included = True if request.POST.get('thresholdNightShift_return_cost_included') == 'on' else False,
+        standby_cost_included = True if request.POST.get('thresholdNightShift_standby_cost_included') == 'on' else False,
+        waiting_cost_included = True if request.POST.get('thresholdNightShift_waiting_cost_included') == 'on' else False,
+        call_out_fees_included = True if request.POST.get('thresholdNightShift_call_out_fees_included') == 'on' else False,
+        demurrage_fees_included = True if request.POST.get('thresholdNightShift_demurrage_fees_included') == 'on' else False,
+        min_load_in_cubic_meters = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters')),
+        min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
+        min_load_in_cubic_meters_trip = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_trip')),
+        start_date = request.POST.get('thresholdNightShift_start_date'),
+        end_date = request.POST.get('thresholdNightShift_end_date')
+    )
+    thresholdNightShifts.save()
+    
+    # Grace 
+    grace = Grace(
+        rate_card_name = rateCard,
+        load_km_grace = request.POST.get('grace_load_km_grace'),
+        transfer_km_grace = float(request.POST.get('grace_transfer_km_grace')),
+        return_km_grace = float(request.POST.get('grace_return_km_grace')),
+        standby_time_grace_in_minutes = float(request.POST.get('grace_standby_time_grace_in_minutes')),
+        chargeable_standby_time_starts_after = float(request.POST.get('grace_chargeable_standby_time_starts_after')),
+        waiting_time_grace_in_minutes = float(request.POST.get('grace_waiting_time_grace_in_minutes')),
+        chargeable_waiting_time_starts_after = float(request.POST.get('grace_chargeable_waiting_time_starts_after')),
+        start_date = request.POST.get('grace_start_date'),
+        end_date = request.POST.get('grace_end_date'),
+    )
+    grace.save()
+    
+    onLease = OnLease(
+        rate_card_name=rateCard,
+        hourly_subscription_charge = float(request.POST.get('onLease_hourly_subscription_charge')),
+        daily_subscription_charge = float(request.POST.get('onLease_daily_subscription_charge')),
+        monthly_subscription_charge = float(request.POST.get('onLease_monthly_subscription_charge')),
+        quarterly_subscription_charge = float(request.POST.get('onLease_quarterly_subscription_charge')),
+        surcharge_fixed_normal_cost_included = True if request.POST.get('onLease_surcharge_fixed_normal_cost_included') == 'on' else False,
+        surcharge_fixed_sunday_cost_included = True if request.POST.get('onLease_surcharge_fixed_sunday_cost_included') == 'on' else False,
+        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_sunday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
+        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
+        transfer_cost_applicable = True if request.POST.get('onLease_transfer_cost_applicable') == 'on' else False,
+        return_cost_applicable = True if request.POST.get('onLease_return_cost_applicable') == 'on' else False,
+        standby_cost_per_slot_applicable = True if request.POST.get('onLease_standby_cost_per_slot_applicable') == 'on' else False,
+        waiting_cost_per_minute_applicable = True if request.POST.get('onLease_waiting_cost_per_minute_applicable') == 'on' else False,
+        call_out_fees_applicable = True if request.POST.get('onLease_call_out_fees_applicable') == 'on' else False,
+    )
+    onLease.save()
+    messages.success(request , 'Data successfully add ')
+    return redirect('Account:rateCardTable')
