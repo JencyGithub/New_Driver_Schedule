@@ -46,7 +46,7 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>{% if data %}View truck details{% else %}Add Truck {% endif %}</h2>
+                        <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
                         {% if data %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
@@ -57,23 +57,14 @@
                         {% csrf_token %}
                         <div class="x_content">
                             <div class="col-md-4 col-sm-4">
-                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Truck number :<span class="required">*</span></label>
+                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Truck number<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <input class="form-control" data-validate-length-range="6,6" value="{% if data %}{{data.adminTruckNumber}}{% else %} {% endif %}" {% if data %}readonly{% endif %} type="text" name="truckNo" required='required' style="padding: 0.25rem 0.2rem;" id="truckNo">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="truckNo" required='required' style="padding: 0.25rem 0.2rem;" id="truckNo">
                                 </div>
                             </div>
-                            <div class="col-md-4 col-sm-4">
-                                <label for="truckType" style="margin-bottom: 0.3rem!important;">Truck type:<span class="required">*</span></label>
-                                <div class="field item form-group">
-                                    <select name="truckType" class="form-control" id="truckType" {% if data %}disabled{% endif %}>
-                                        <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
-                                        <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
-                                    </select>
-                                </div>
-                            </div> 
-                            <div class="col-md-4 col-am-4 text-right">
+                            <div class="col-md-8 col-am-8 text-right">
                                 {% if not data  %}
-                                <button type='submit' class="btn btn-primary w-50 mt-4">Submit</button> 
+                                <button type='submit' class="btn btn-primary w-25 mt-4">Submit</button> 
                                 {% endif %}
                             </div>                       
                         </div>
@@ -88,36 +79,46 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <div class="col-md-2 col-sm-2">
-                                    <label for="clientTruckNumber">Client truck number <span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.clientTruckId}}{% else %} {% endif %}" {% if connection %}readonly{% endif %} type="number" name="clientTruckNumber" required='required' style="padding: 0.25rem 0.2rem;" id="clientTruckNumber">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="clientTruckNumber{{connection.count}}">Client truck number <span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.clientTruckId}}{% endif %}" {% if connection %}readonly{% endif %} type="number" name="clientTruckNumber{{count}}" required='required' style="padding: 0.25rem 0.2rem;" id="clientTruckNumber{{count}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="rate_card_name{{connection.count}}">Rate card <span class="required">*</span></label>
+                                        <select name="rate_card_name{{connection.count}}" class="form-control" id="rate_card_name{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
+                                            {% for card in rateCards%}
+                                            <option value="{{card.id}}" {% if card.id == connection.rate_card_name_id %} selected {% endif %} >{{card.rate_card_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="clientId{{connection.count}}"> Client name <span class="required">*</span></label>
+                                        <select name="clientId{{connection.count}}" class="form-control" id="clientId{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
+                                            {% for client in clientIds%}
+                                            <option value="{{client.clientId}}" {% if client.clientId == connection.clientId_id %} selected {% endif %} >{{client.name}}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="rate_card_name">Rate card <span class="required">*</span></label>
-                                    <select name="rate_card_name" class="form-control" id="rate_card_name" required="required" {% if connection %}disabled{% endif %}>
-                                        {% for card in rateCards%}
-                                        <option value="{{card.id}}" {% if card.id == connection.rate_card_name_id %} selected {% endif %} >{{card.rate_card_name}}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="clientId"> Client name <span class="required">*</span></label>
-                                    <select name="clientId" class="form-control" id="clientId" required="required" {% if connection %}disabled{% endif %}>
-                                        {% for client in clientIds%}
-                                        <option value="{{client.clientId}}" {% if client.clientId == connection.clientId_id %} selected {% endif %} >{{client.name}}</option>
-                                        
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-2 col-sm-2">
-                                    <label for="startDate"> Start date<span class="required">*</span></label>
-                                    <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.startDate}}{% else %} {% endif %}" {% if connection %}readonly{% endif %} type="date" name="startDate" required='required' style="padding: 0.25rem 0.2rem;" id="startDate">
-                                </div>
-                                <div class="col-md-2 col-sm-2">
-                                    <label for="endDate"> End date<span class="required">*</span></label>
-                                    <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% else %} {% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate" required='required' style="padding: 0.25rem 0.2rem;" id="endDate">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="truckType{{connection.count}}"> Truck type<span class="required" >*</span></label>
+                                        <select name="truckType{{connection.count}}" class="form-control" id="truckType{{connection.count}}" {% if connection %}disabled{% endif %}>
+                                            <option value="Embedded" {% if connection.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
+                                            <option value="Casual" {% if connection.truckType == 'Casual' %} selected {% endif %}>Casual</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="startDate{{connection.count}}"> Start date<span class="required">*</span></label>
+                                        <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.startDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="startDate{{connection.count}}" required='required' style="padding: 0.25rem 0.2rem;" id="startDate{{connection.count}}">
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
+                                        <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}" required='required' style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
+                                    </div>
                                 </div>
                             </div>
                         </div>

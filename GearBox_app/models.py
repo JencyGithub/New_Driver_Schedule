@@ -160,7 +160,6 @@ class Client(models.Model):
 class AdminTruck(models.Model):
     adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     
-    
     def __str__(self):
         return str(self.adminTruckNumber)
 

@@ -71,6 +71,17 @@ request {% endblock %} {% block headStyle %}
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="truckType" class="col-form-label col-md-3 col-sm-3 label-align">Truck type:<span class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <select name="truckType" class="form-control" id="truckType" {% if data %}disabled{% endif %}>
+                                                <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
+                                                <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                               
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
