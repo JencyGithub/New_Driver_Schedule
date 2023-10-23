@@ -305,7 +305,7 @@ def driverDocketEntrySave(request, ids):
     shiftDate_ = request.POST.get('shiftDate')
 
     try:
-        docketNumber = DriverDocket.objects.get(docketNumber=docketNumber_,shiftDate=shiftDate_)
+        docketNumber = DriverDocket.objects.get(docketNumber=docketNumber_,shiftDate=shiftDate_,tripId = driver_trip_id)
         messages.error(request, "This docket number and date already exists!")
         return redirect(request.META.get('HTTP_REFERER'))
     except:
@@ -318,16 +318,21 @@ def driverDocketEntrySave(request, ids):
             basePlant=BasePlant.objects.get(pk=request.POST.get('basePlant')),
             noOfKm=request.POST.get('noOfKm'),
             transferKM=request.POST.get('transferKM'),
-            returnKm=request.POST.get('returnKm'),
-            waitingTimeInMinutes=request.POST.get('waitingTimeInMinutes'),
-            minimumLoad=request.POST.get('minimumLoad'),
+            returnToYard = True if request.POST.get('returnToYard') == 'on' else False,
             surcharge_type=request.POST.get('surcharge_type'),
             surcharge_duration=request.POST.get('surcharge_duration'),
             cubicMl=request.POST.get('cubicMl'),
-            minLoad=request.POST.get('minLoad'),
-            standByPerHalfHourDuration=request.POST.get('standByPerHalfHourDuration'),
             others=request.POST.get('others')
         )
+        if DriverDocketObj.returnToYard:
+                DriverDocketObj.returnQty = request.POST.get('returnQty')
+                DriverDocketObj.returnKm = request.POST.get('returnKm')
+        DriverDocketObj.waitingTimeStart = request.POST.get('waitingTimeStart')        
+        DriverDocketObj.waitingTimeEnd = request.POST.get('waitingTimeEnd')
+        DriverDocketObj.totalWaitingInMinute = getTimeDifference(DriverDocketObj.waitingTimeStart,DriverDocketObj.waitingTimeEnd,'minutes')
+        DriverDocketObj.standByStartTime = request.POST.get('standByStartTime')
+        DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
+        DriverDocketObj.comment = request.POST.get('comment')
         DriverDocketObj.save()
         messages.success(request, "Docket Added successfully")
         return redirect('Account:driverTripsTable')
@@ -584,10 +589,13 @@ def driverEntryUpdate(request, ids):
     driver_docket = DriverDocket.objects.filter(tripId=ids).values()
     count_ = 0
     for i in driver_docket:
-        docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))),shiftDate=request.POST.get(f'shiftDate{count_}'))
-        if docketNumberVal.docketId != i['docketId']:
-            messages.error(request, "Docket must be unique.")
-            return redirect(request.META.get('HTTP_REFERER'))
+        try:
+            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))),shiftDate=request.POST.get(f'shiftDate{count_}'))
+            if docketNumberVal.docketId != i['docketId']:
+                messages.error(request, "Docket must be unique.")
+                return redirect(request.META.get('HTTP_REFERER'))
+        except:
+            pass
         docketObj = DriverDocket.objects.get(pk=i['docketId'])
         docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
         docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
@@ -597,16 +605,21 @@ def driverEntryUpdate(request, ids):
         docketObj.basePlant = BasePlant.objects.get(pk=request.POST.get(f'basePlant{count_}'))
         docketObj.noOfKm = request.POST.get(f'noOfKm{count_}')
         docketObj.transferKM = request.POST.get(f'transferKM{count_}')
-        docketObj.returnKm = request.POST.get(f'returnKm{count_}')
-        docketObj.waitingTimeInMinutes = request.POST.get(f'waitingTimeInMinutes{count_}')
-        docketObj.minimumLoad = request.POST.get(f'minimumLoad{count_}')
+        docketObj.returnToYard = True if request.POST.get(f'returnToYard{count_}') == 'on' else False
+        if docketObj.returnToYard:
+            docketObj.returnQty = request.POST.get(f'returnQty{count_}')
+            docketObj.returnKm = request.POST.get(f'returnKm{count_}')
+        # return HttpResponse(docketObj.returnToYard)
+        docketObj.waitingTimeStart = request.POST.get(f'waitingTimeStart{count_}')        
+        docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
+        docketObj.totalWaitingInMinute = getTimeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd,'minutes')
         docketObj.surcharge_type = request.POST.get(f'surcharge_type{count_}')
         docketObj.surcharge_duration = request.POST.get(f'surcharge_duration{count_}')
         docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
-        docketObj.minLoad = request.POST.get(f'minLoad{count_}')
-        docketObj.standByPerHalfHourDuration = request.POST.get(f'standByPerHalfHourDuration{count_}')
+        docketObj.standByStartTime = request.POST.get(f'standByStartTime{count_}')
+        docketObj.standByEndTime = request.POST.get(f'standByEndTime{count_}')
         docketObj.others = request.POST.get(f'others{count_}')
-
+        docketObj.comment = request.POST.get(f'comment{count_}')
         count_ += 1
         docketObj.save()
     messages.success(request, "Data updated successfully")
