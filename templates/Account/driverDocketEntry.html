@@ -42,35 +42,41 @@ request {% endblock %} {% block headStyle %}
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> Add Driver Docket Form Trip :-{{id}}</h2>
-                    
+                            <h2> Driver Docket Entry Form </h2>
+                            <label for="returnToYard" class="float-right ml-2"
+                                style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+                            <input type="checkbox" id="returnToYard" onclick="returnToYard_()" name="returnToYard" class="float-right "
+                                style="margin-top: .8rem;">
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
                             <div class="custom-continer">
-                    
+
                                 <!-- shiftDate docketNumber docketFile  -->
                                 <div class="col-md-4 col-sm-4">
                                     <label for="shiftDate">ShiftDate :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="date" name="shiftDate" required='required'
+                                        <input class="form-control"  type="date"
+                                            name="shiftDate" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="shiftDate">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="docketNumber">Docket Number :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type=" text" name="docketNumber" required='required'
+                                        <input class="form-control"  type="text"
+                                            name="docketNumber" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="docketNumber">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="docketFile">DocketFile :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="file" name="docketFile" required='required' style="padding: 0.25rem 0.2rem;"
+                                        <input class="form-control"  type="file"
+                                            name="docketFile" style="padding: 0.25rem 0.2rem;" required="required"
                                             id="docketFile">
                                     </div>
-                    
+
                                 </div>
                                 <!-- basePlant noOfKm  transferKM  -->
                                 <div class="col-md-4 col-sm-4 ">
@@ -78,7 +84,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <select name="basePlant" class="form-control">
                                             {% for basePlant_ in basePlants %}
-                                            <option value="{{ basePlant_.id }}">{{ basePlant_.basePlant }}</option>
+                                            <option " {% if item.basePlant.basePlant == basePlant_.basePlant %}selected="selected" {% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -86,99 +92,136 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="noOfKm">No Of Km:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="noOfKm" required='required'
+                                        <input class="form-control"  type="number"
+                                            name="noOfKm" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="noOfKm">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="transferKM">Transfer Km :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="transferKM" required='required'
+                                        <input class="form-control"  type="number"
+                                            name="transferKM" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="transferKM">
                                     </div>
                                 </div>
-                                <!-- returnKm    waitingTimeInMinutes    minimumLoad -->
+                                <!--    returnQty  returnKm  waitingTimeStart      -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="returnQty">Return Qty:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="number"
+                                            name="returnQty" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="returnQty" disabled>
+                                    </div>
+                                </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="returnKm">Return Km:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="returnKm" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="returnKm">
+                                        <input class="form-control"  type="number"
+                                            name="returnKm" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="returnKm" disabled>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="waitingTimeInMinutes">Waiting Time In Minutes :<span class="required">*</span></label>
+                                    <label for="waitingTimeStart">Waiting Time Start :<span
+                                            class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="waitingTimeInMinutes" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeInMinutes">
+                                        <input class="form-control"   type="time"
+                                            name="waitingTimeStart" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeStart">
+                                    </div>
+                                </div>
+
+                                {% comment %} totalWaitingInMinute waitingTimeEnd surcharge_type {% endcomment %}
+                                
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="waitingTimeEnd">Waiting Time End :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"   type="time"
+                                            name="waitingTimeEnd" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="minimumLoad">Minimum Load :<span class="required">*</span></label>
+                                    <label for="totalWaitingInMinute">Total Waiting In Minute :<span
+                                            class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" required = "required" name="minimumLoad" style="padding: 0.25rem 0.2rem;"
-                                            id="minimumLoad">
+                                        <input class="form-control" disabled  type="number"
+                                            name="totalWaitingInMinute" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute">
                                     </div>
                                 </div>
-                    
-                                <!-- surcharge_type    surcharge_duration    cubicMl -->
                                 <div class="col-md-4 col-sm-4">
                                     <label for="surcharge_type">Surcharge Type:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="surcharge_type" class="form-control">
-                                            <option value="fixed normal">fixed normal</option>
-                                            <option value="fixed sunday">fixed sunday</option>
-                                            <option value="fixed public holiday">fixed public holiday</option>
-                                            <option value="per cubic meters normal">per cubic meters normal</option>
-                                            <option value="per cubic meters sunday">per cubic meters sunday</option>
-                                            <option value="per cubic meters public holiday">per cubic meters public holiday
+                                        <select name="surcharge_type" class="form-control" >
+                                            <option value="fixed normal" {% if item.surcharge_type == 'fixednormal' %}selected="selected" {% endif %}>fixed normal</option>
+                                            <option value="fixed sunday" {% if item.surcharge_type == 'fixed sunday'%}selected="selected" {% endif %}>fixed sunday</option>
+                                            <option value="fixed public holiday" {% if item.surcharge_type == 'fixed public holiday' %}selected="selected" {% endif %}>fixed public holiday</option>
+                                            <option value="per cubic meters normal" {% if item.surcharge_type == 'per cubic meters normal' %}selected="selected" {% endif %}>per cubic meters normal</option>
+                                            <option value="per cubic meters sunday" {% if item.surcharge_type == 'per cubic meters sunday' %}selected="selected" {% endif %}>per cubic meters sunday</option>
+                                            <option value="per cubic meters public holiday" {% if driverTrip.surcharge_type == 'per cubic meters public holiday'%}selected="selected" {% endif %}>per cubic meters public holiday
                                             </option>
                                         </select>
                                     </div>
                                 </div>
+                                <!--     surcharge_duration    cubicMl standByStartTime -->
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="surcharge_duration">Surcharge Duration :<span class="required">*</span></label>
+                                    <label for="surcharge_duration">Surcharge Duration :<span
+                                            class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="surcharge_duration" required='required'
+                                        <input class="form-control"  type="number"
+                                            name="surcharge_duration" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="surcharge_duration">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="cubicMl">Cubic Meter :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="cubicMl" required = "required" style="padding: 0.25rem 0.2rem;"
-                                            id="cubicMl">
+                                        <input class="form-control"  type="number"
+                                            name="cubicMl" required="required"
+                                            style="padding: 0.25rem 0.2rem;" id="cubicMl">
                                     </div>
                                 </div>
-                    
-                                <!-- minLoad    standByPerHalfHourDuration    others -->
+
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="minLoad">Surcharge Min Load :<span class="required">*</span></label>
+                                    <label for="standByStartTime">StandBy start Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="minLoad" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="minLoad">
+                                        <input class="form-control"  type="time"
+                                            name="standByStartTime" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="standByStartTime">
                                     </div>
                                 </div>
+                                <!--     standByEndTime   others  comment-->
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="standByPerHalfHourDuration">SandBy Per Half Hour Duration :<span
-                                            class="required">*</span></label>
+                                    <label for="standByEndTime">StandBy End Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="standByPerHalfHourDuration" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByPerHalfHourDuration">
+                                        <input class="form-control"  type="time"
+                                            name="standByEndTime" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="others">Others :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="others" required = "required" style="padding: 0.25rem 0.2rem;"
-                                            id="others">
+                                        <input class="form-control"  type="number"
+                                            name="others" style="padding: 0.25rem 0.2rem;"
+                                            required="required" id="others">
                                     </div>
                                 </div>
-                                <div class="col-md-12 text-right p-0">
-                                    <button type='submit' style="margin: 8px;" class="btn btn-primary px-4">Submit</button>
+                                
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="comment">Comment :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <textarea placeholder="comment" id="comment" name="comment"
+                                            class="form-control"></textarea>
+                                    </div>
                                 </div>
-                    
                             </div>
-                    
+                            <div class="col-md-12 text-right p-0">
+                                <button type='submit' style="margin: 0px;" class="btn btn-primary px-4">Save</button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -198,6 +241,17 @@ request {% endblock %} {% block headStyle %}
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+
+    function returnToYard_(){
+        let selected = $(('#returnToYard')).is(':checked')
+        if(selected){
+            $('#returnQty').removeAttr('disabled')
+            $('#returnKm').removeAttr('disabled')
+        }else{
+            $('#returnQty').attr('disabled',true)
+            $('#returnKm').attr('disabled',true)
+        }
+    }
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
     var validator = new FormValidator(
@@ -218,11 +272,12 @@ request {% endblock %} {% block headStyle %}
         validator.reset();
     };
     // stuff related ONLY for this demo page:
-    $(".toggleValidationTooltips")
-        .change(function () {
-            validator.settings.alerts = !this.checked;
-            if (this.checked) $("form .alert").remove();
-        })
-        .prop("checked", false);
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+    
+    
 </script>
 {% endblock %} {% endblock %}
