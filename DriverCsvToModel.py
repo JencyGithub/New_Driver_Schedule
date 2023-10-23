@@ -16,7 +16,6 @@ def insertIntoModel(dataList):
 
     usernames = [user.username for user in users]
     email_addresses = [user.email for user in users]
-    print(dump[2] == M_pattern)
     if dump[2] == M_pattern and dump[1].strip().replace(' ','') not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
         DriverObj = Driver()
         DriverObj.driverId = dump[0]
@@ -24,6 +23,7 @@ def insertIntoModel(dataList):
         DriverObj.phone = dump[2] 
         DriverObj.email = dump[3].strip().replace(' ','')
         DriverObj.password = dump[4].strip()
+        DriverObj.save()
         
         user_ = User.objects.create(
             username=DriverObj.name,
@@ -36,7 +36,7 @@ def insertIntoModel(dataList):
         
         user_.set_password(DriverObj.password)
         user_.save()
-        DriverObj.save()
+        
 
 f = open("Driver_reg_file.txt", 'r')
 file_name = f.read()

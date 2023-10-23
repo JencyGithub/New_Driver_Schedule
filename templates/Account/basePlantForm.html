@@ -51,7 +51,7 @@
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form class="" action="{% if data %} {% url 'Account:basePlantEditSave' id=data.id %} {% else %} '{% url 'Account:basePlantAddSave' %} {% endif %}" method="POST" novalidate>
+                            <form class="" action="{% if data %} {% url 'Account:basePlantEditSave' id=data.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST" novalidate>
                                 {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">

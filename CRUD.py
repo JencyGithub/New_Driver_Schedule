@@ -1,6 +1,6 @@
 from Account_app.models import *
 from GearBox_app.models import *
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 
 
@@ -82,3 +82,11 @@ def loadFileSave(loadFile):
     return 'static/img/finalloadSheet/' + load_new_filename
 
 
+def getYesterdayDate(curDate):
+    try:
+        date_obj = datetime.strptime(curDate, "%Y-%m-%d")
+        yesterday = date_obj - timedelta(days=1)
+        yesterday_str = yesterday.strftime("%Y-%m-%d")
+        return yesterday_str
+    except ValueError:
+        return None

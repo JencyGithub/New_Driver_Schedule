@@ -54,12 +54,12 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {% for rateCard_ in rateCard %}
+                      {% for card in rateCard %}
                       <tr>
-                        <td>{{ rateCard_.rate_card_name }}</td>
+                        <td>{{ card.rate_card_name }}</td>
                         <td>
                           <label type="button" class="btn" id="redirectButton">
-                            <a href="">
+                            <a href="{% url 'Account:rateCardView' id=card.id%}">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                           </label>

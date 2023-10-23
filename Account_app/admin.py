@@ -16,22 +16,26 @@ class DocketInline(admin.StackedInline):
                     
                     [
                         'docketId',
-                        'tripId',
                         'shiftDate',
+                        'tripId',
                         'docketNumber',
                         'docketFile',
                         'basePlant',
                         'noOfKm',
                         'transferKM',
+                        'returnToYard',
+                        'returnQty',
                         'returnKm',
-                        'waitingTimeInMinutes',
-                        'minimumLoad',
+                        'waitingTimeStart',
+                        'waitingTimeEnd',
+                        'totalWaitingInMinute',
                         'surcharge_type',
                         'surcharge_duration',
                         'cubicMl',
-                        'minLoad',
-                        'standByPerHalfHourDuration',
-                        'others'
+                        'standByStartTime',
+                        'standByEndTime',
+                        'others',
+                        'comment'
                     ]
             } 
         )
@@ -40,103 +44,103 @@ class DocketInline(admin.StackedInline):
     # readonly_fields = ["noOfKm"]
     extra = 0
 
-def driver_trip_download_csv(modeladmin, request, queryset):
-    # Create a response object with CSV content type
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="DriverTripInfo.csv"'
+# def driver_trip_download_csv(modeladmin, request, queryset):
+#     # Create a response object with CSV content type
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="DriverTripInfo.csv"'
 
-    # Create a CSV writer using the response object
-    writer = csv.writer(response)
+#     # Create a CSV writer using the response object
+#     writer = csv.writer(response)
 
-    # Write the header row
-    writer.writerow(["verified", "driverId", "clientName", "shiftType",
-                     "numberOfLoads", "truckNo", "shiftDate","startTime", "endTime", "loadSheet",
-                     "comment",
-                        "docketId",
-                        "tripId",
-                        "shiftDate",
-                        "docketNumber",
-                        "docketFile",
-                        "basePlant",
-                        "noOfKm",
-                        "transferKM",
-                        "returnKm",
-                        "waitingTimeInMinutes",
-                        "minimumLoad",
-                        "surcharge_type",
-                        "surcharge_duration",
-                        "cubicMl",
-                        "minLoad",
-                        "standByPerHalfHourDuration",
-                        "others"
-                     ])
+#     # Write the header row
+#     writer.writerow(["verified", "driverId", "clientName", "shiftType",
+#                      "numberOfLoads", "truckNo", "shiftDate","startTime", "endTime", "loadSheet",
+#                      "comment",
+#                         "docketId",
+#                         "tripId",
+#                         "shiftDate",
+#                         "docketNumber",
+#                         "docketFile",
+#                         "basePlant",
+#                         "noOfKm",
+#                         "transferKM",
+#                         "returnKm",
+#                         "waitingTimeInMinutes",
+#                         "minimumLoad",
+#                         "surcharge_type",
+#                         "surcharge_duration",
+#                         "cubicMl",
+#                         "minLoad",
+#                         "standByPerHalfHourDuration",
+#                         "others"
+#                      ])
 
- # Write data rows
-    for driver_trip in queryset:
-        # print(queryset)
-        row_data = [
-            driver_trip.verified,
-            driver_trip.driverId,
-            driver_trip.clientName,
-            driver_trip.shiftType,
-            driver_trip.numberOfLoads,
-            driver_trip.truckNo,
-            driver_trip.shiftDate,
-            driver_trip.startTime,
-            driver_trip.endTime,
-            driver_trip.loadSheet,
-            driver_trip.comment,
-            '', 
-            '', 
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '',
-            '' # Initialize empty placeholders for other fields
-        ]
+#  # Write data rows
+#     for driver_trip in queryset:
+#         # print(queryset)
+#         row_data = [
+#             driver_trip.verified,
+#             driver_trip.driverId,
+#             driver_trip.clientName,
+#             driver_trip.shiftType,
+#             driver_trip.numberOfLoads,
+#             driver_trip.truckNo,
+#             driver_trip.shiftDate,
+#             driver_trip.startTime,
+#             driver_trip.endTime,
+#             driver_trip.loadSheet,
+#             driver_trip.comment,
+#             '', 
+#             '', 
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '',
+#             '' # Initialize empty placeholders for other fields
+#         ]
     
-        for docket in driver_trip.driverdocket_set.all():
-            row_data[11:29] = [ docket.docketId,
-                                docket.tripId,
-                                docket.shiftDate,
-                                docket.docketNumber,
-                                docket.docketFile,
-                                docket.basePlant,
-                                docket.noOfKm,
-                                docket.transferKM,
-                                docket.returnKm,
-                                docket.waitingTimeInMinutes,
-                                docket.minimumLoad,
-                                docket.surcharge_type,
-                                docket.surcharge_duration,
-                                docket.cubicMl,
-                                docket.minLoad,
-                                docket.standByPerHalfHourDuration,
-                                docket.others
-                                ]
+#         for docket in driver_trip.driverdocket_set.all():
+#             row_data[11:29] = [ docket.docketId,
+#                                 docket.tripId,
+#                                 docket.shiftDate,
+#                                 docket.docketNumber,
+#                                 docket.docketFile,
+#                                 docket.basePlant,
+#                                 docket.noOfKm,
+#                                 docket.transferKM,
+#                                 docket.returnKm,
+#                                 docket.waitingTimeInMinutes,
+#                                 docket.minimumLoad,
+#                                 docket.surcharge_type,
+#                                 docket.surcharge_duration,
+#                                 docket.cubicMl,
+#                                 docket.minLoad,
+#                                 docket.standByPerHalfHourDuration,
+#                                 docket.others
+#                                 ]
 
-        # Only write the row if at least admin truck data is present
-        if driver_trip.driverId:
-            writer.writerow(row_data)
+#         # Only write the row if at least admin truck data is present
+#         if driver_trip.driverId:
+#             writer.writerow(row_data)
 
-    return response
+#     return response
 
 class DriverTrip_(admin.ModelAdmin):
 
     list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"numberOfLoads", "loadSheet","shiftDate"]
     # search_fields = ["driverId", 'clientName']
     list_filter = ('shiftType', 'clientName')
-    actions = [driver_trip_download_csv]
+    # actions = [driver_trip_download_csv]
     inlines = [DocketInline]
 
 admin.site.register(DriverTrip,DriverTrip_)

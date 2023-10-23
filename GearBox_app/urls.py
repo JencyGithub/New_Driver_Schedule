@@ -49,5 +49,18 @@ urlpatterns = [
     
     path('driverForm/edit/<int:id>/', views.driverForm, name='driverFormEdit'),
     path('driverForm/edit/save/<int:id>/', views.driverFormSave, name='driverFormEditSave'),
+    
+    # Truck Table 
+    
+    path('truckTable', views.truckTable, name='truckTable'),
+    path('truckForm', views.truckForm, name='truckForm'),
+    path('truckForm/add/', views.truckFormSave, name='truckFormAdd'),
+    
+    path('truck/view/<int:id>/', views.truckForm, name='truckView'),
+    
+    path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
+    path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
+    
+    
 
 ]

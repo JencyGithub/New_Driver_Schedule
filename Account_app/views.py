@@ -338,7 +338,7 @@ def rctiCsvForm(request):
     return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
 
 def driverSampleCsv(request):
-    return FileResponse(open(f'static/Account/DriverEntrySample.csv', 'rb'), as_attachment=True)
+    return FileResponse(open(f'static/Account/sampleDriverEntry.xlsx', 'rb'), as_attachment=True)
 
 
 @csrf_protect
@@ -379,7 +379,7 @@ def basePlantForm(request,id=None):
         'data' : basePlant  
     }
 
-    return render(request, "Account/Tables/basePlantForm.html", params)
+    return render(request, "Account/basePlantForm.html", params)
 
 @csrf_protect
 @api_view(['POST'])
@@ -742,22 +742,73 @@ def rateCardTable(request):
     }
     return render(request , 'Account/Tables/rateCardTable.html',params)
 
-def rateCardForm(request):
-    return render(request, 'Account/rateCardForm.html')
+def rateCardForm(request,id = None):
+
+    rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = None
+    if id:
+        rateCard = RateCard.objects.get(pk=id)
+        costParameters = CostParameters.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
+        thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first() 
+        thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
+        grace = Grace.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
+        onLease = OnLease.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
+        
+        costParameters['start_date'] = dateConverterFromTableToPageFormate(costParameters['start_date'])
+        thresholdDayShift['start_date'] = dateConverterFromTableToPageFormate(thresholdDayShift['start_date'])
+        thresholdNightShift['start_date'] = dateConverterFromTableToPageFormate(thresholdNightShift['start_date'])
+        grace['start_date'] = dateConverterFromTableToPageFormate(grace['start_date'])
+        onLease['start_date'] = dateConverterFromTableToPageFormate(onLease['start_date'])
+        
+        
+    params = {
+        'rateCard' : rateCard,
+        'costParameters' : costParameters,
+        'thresholdDayShift' : thresholdDayShift,
+        'thresholdNightShift' : thresholdNightShift,
+        'grace' : grace,    
+        'onLease' : onLease
+    }
+    return render(request, 'Account/rateCardForm.html',params)
 
 @csrf_protect
 @api_view(['POST'])
-def rateCardSave(request):
+def rateCardSave(request, id=None):
+    # print(type(request.POST.get('costParameters_start_date')))
+    # return HttpResponse('work')
     # Rate Card 
-    rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
-    rateCard.save()
-    rateCard = RateCard.objects.get_or_create(rate_card_name=request.POST.get('rate_card_name'))
+    rateCardID = None
+    if not id:
+        rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
+        rateCard.save()
+        rateCardID = RateCard.objects.get(rate_card_name=request.POST.get('rate_card_name'))
+    else:
+        rateCardID = RateCard.objects.get(pk=id)
 
-    
+        oldCostParameters = CostParameters.objects.get(rate_card_name = rateCardID.id, end_date = None)
+        oldCostParameters.end_date = getYesterdayDate(request.POST.get('costParameters_start_date'))
+        print(oldCostParameters.end_date)
+        oldCostParameters.save()
+
+        oldThresholdDayShift = ThresholdDayShift.objects.get(rate_card_name = rateCardID.id, end_date = None)
+        oldThresholdDayShift.end_date = getYesterdayDate(request.POST.get('thresholdDayShift_start_date'))
+        oldThresholdDayShift.save()
+        
+        oldThresholdNightShift = ThresholdNightShift.objects.get(rate_card_name = rateCardID.id, end_date = None)
+        oldThresholdNightShift.end_date = getYesterdayDate(request.POST.get('thresholdNightShift_start_date'))
+        oldThresholdNightShift.save()
+        
+        oldGrace = Grace.objects.get(rate_card_name = rateCardID.id, end_date = None)
+        oldGrace.end_date = getYesterdayDate(request.POST.get('grace_start_date'))
+        oldGrace.save()
+        
+        oldOnLease = OnLease.objects.get(rate_card_name = rateCardID.id, end_date = None)
+        oldOnLease.end_date = getYesterdayDate(request.POST.get('onLease_start_date'))
+        oldOnLease.save()
+        
     
     # CostParameters 
     costParameters = CostParameters(
-        rate_card_name = rateCard,
+        rate_card_name = rateCardID,
         loading_cost_per_cubic_meter = float(request.POST.get('costParameters_loading_cost_per_cubic_meter')),
         km_cost = float(request.POST.get('costParameters_km_cost')),
         surcharge_fixed_normal_cost = float(request.POST.get('costParameters_surcharge_fixed_normal_cost')),
@@ -773,16 +824,14 @@ def rateCardSave(request):
         waiting_cost_per_minute = float(request.POST.get('costParameters_waiting_cost_per_minute')),
         call_out_fees = float(request.POST.get('costParameters_call_out_fees')),
         demurrage_fees = float(request.POST.get('costParameters_demurrage_fees')),
-        start_date = request.POST.get('costParameters_start_date'),
-        end_date = request.POST.get('costParameters_end_date')
+        start_date = request.POST.get('costParameters_start_date')
     )
     costParameters.save()
-    
     
     # ThresholdDayShift
     
     thresholdDayShifts  = ThresholdDayShift(
-        rate_card_name = rateCard,
+        rate_card_name = rateCardID,
         threshold_amount_per_day_shift = float(request.POST.get('thresholdDayShift_threshold_amount_per_day_shift')),
         loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdDayShift_loading_cost_per_cubic_meter_included') == 'on' else False,
         km_cost_included = True if request.POST.get('thresholdDayShift_km_cost_included') == 'on' else False,
@@ -801,15 +850,13 @@ def rateCardSave(request):
         min_load_in_cubic_meters = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
         min_load_in_cubic_meters_trip = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_trip')),
-        start_date = request.POST.get('thresholdDayShift_start_date'),
-        end_date = request.POST.get('thresholdDayShift_end_date')
+        start_date = request.POST.get('thresholdDayShift_start_date')
     )
     thresholdDayShifts.save()
     
     # ThresholdNightShift 
-    print(request.POST.get('thresholdNightShift_threshold_amount_per_night_shift'))
     thresholdNightShifts = ThresholdNightShift(
-        rate_card_name = rateCard,
+        rate_card_name = rateCardID,
         threshold_amount_per_night_shift = request.POST.get('thresholdNightShift_threshold_amount_per_night_shift'),
         loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdNightShift_loading_cost_per_cubic_meter_included') == 'on' else False,
         km_cost_included = True if request.POST.get('thresholdNightShift_km_cost_included') == 'on' else False,
@@ -828,14 +875,13 @@ def rateCardSave(request):
         min_load_in_cubic_meters = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
         min_load_in_cubic_meters_trip = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_trip')),
-        start_date = request.POST.get('thresholdNightShift_start_date'),
-        end_date = request.POST.get('thresholdNightShift_end_date')
+        start_date = request.POST.get('thresholdNightShift_start_date')
     )
     thresholdNightShifts.save()
     
     # Grace 
     grace = Grace(
-        rate_card_name = rateCard,
+        rate_card_name = rateCardID,
         load_km_grace = request.POST.get('grace_load_km_grace'),
         transfer_km_grace = float(request.POST.get('grace_transfer_km_grace')),
         return_km_grace = float(request.POST.get('grace_return_km_grace')),
@@ -843,13 +889,12 @@ def rateCardSave(request):
         chargeable_standby_time_starts_after = float(request.POST.get('grace_chargeable_standby_time_starts_after')),
         waiting_time_grace_in_minutes = float(request.POST.get('grace_waiting_time_grace_in_minutes')),
         chargeable_waiting_time_starts_after = float(request.POST.get('grace_chargeable_waiting_time_starts_after')),
-        start_date = request.POST.get('grace_start_date'),
-        end_date = request.POST.get('grace_end_date'),
+        start_date = request.POST.get('grace_start_date')
     )
     grace.save()
     
     onLease = OnLease(
-        rate_card_name=rateCard,
+        rate_card_name=rateCardID,
         hourly_subscription_charge = float(request.POST.get('onLease_hourly_subscription_charge')),
         daily_subscription_charge = float(request.POST.get('onLease_daily_subscription_charge')),
         monthly_subscription_charge = float(request.POST.get('onLease_monthly_subscription_charge')),
@@ -865,7 +910,10 @@ def rateCardSave(request):
         standby_cost_per_slot_applicable = True if request.POST.get('onLease_standby_cost_per_slot_applicable') == 'on' else False,
         waiting_cost_per_minute_applicable = True if request.POST.get('onLease_waiting_cost_per_minute_applicable') == 'on' else False,
         call_out_fees_applicable = True if request.POST.get('onLease_call_out_fees_applicable') == 'on' else False,
+        start_date = request.POST.get('onLease_start_date')
+        
     )
     onLease.save()
+    
     messages.success(request , 'Data successfully add ')
     return redirect('Account:rateCardTable')

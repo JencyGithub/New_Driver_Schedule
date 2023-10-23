@@ -3,6 +3,11 @@ from django.core.validators import MaxValueValidator, MinValueValidator,RegexVal
 from datetime import date
 from django.utils import timezone
 
+TRUCK_TYPE_CHOICES = (
+    ('Embedded','Embedded'),
+    ('Casual','Casual'),
+    
+)
 
 # -----------------------------------
 # Rate Card
@@ -46,7 +51,8 @@ class CostParameters(models.Model):
     call_out_fees = models.FloatField(default=0)
     demurrage_fees = models.FloatField(default=0)
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
+    # end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
+    end_date = models.DateField(null=True, blank=True)
 
 class ThresholdDayShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -72,7 +78,7 @@ class ThresholdDayShift(models.Model):
     min_load_in_cubic_meters_trip = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
+    end_date = models.DateField(null=True, blank=True)
 
 class ThresholdNightShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -97,7 +103,7 @@ class ThresholdNightShift(models.Model):
     min_load_in_cubic_meters_trip = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
+    end_date = models.DateField(null=True, blank=True)
 
 class Grace(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -110,7 +116,7 @@ class Grace(models.Model):
     chargeable_waiting_time_starts_after = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
+    end_date = models.DateField(null=True, blank=True)
 
 class OnLease(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -129,6 +135,8 @@ class OnLease(models.Model):
     standby_cost_per_slot_applicable = models.BooleanField(default=True)
     waiting_cost_per_minute_applicable = models.BooleanField(default=True)
     call_out_fees_applicable = models.BooleanField(default=True)
+    start_date = models.DateField(default=timezone.now())
+    end_date = models.DateField(null=True, blank=True)
 
 
 
@@ -145,14 +153,13 @@ class Client(models.Model):
     def __str__(self) -> str:
         return str(self.name) 
     
-    
-    
 # -----------------------------------
 # Trucks section
 # -----------------------------------
 
 class AdminTruck(models.Model):
     adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
+    
     
     def __str__(self):
         return str(self.adminTruckNumber)
@@ -176,7 +183,7 @@ class Driver(models.Model):
 
 class ClientTruckConnection(models.Model):
     truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
-    truckType = models.CharField(max_length=254 , default='Embedded')
+    truckType = models.CharField(max_length=254 , choices=TRUCK_TYPE_CHOICES, default='Embedded')
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE)
     clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  

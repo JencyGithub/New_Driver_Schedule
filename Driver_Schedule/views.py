@@ -55,12 +55,14 @@ def loginCheck(request):
                     request.session['user_type'] = 'SuperUser'
                     return redirect('Account:index')
             else:
-                message = 'Login failed!'
-                return HttpResponse(message)
+                messages.error(request, "Login failed!")
+                return redirect(request.META.get('HTTP_REFERER'))
+                return redirect('login')
     
 
 def CustomLogOut(request):
     logout(request)
+    messages.success(request, "Logout successfully")
     return redirect('login')
 
 

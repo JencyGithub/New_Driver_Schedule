@@ -121,3 +121,78 @@ def driverFormSave(request, id= None):
         messages.success(request,'Adding successfully')
 
     return redirect('gearBox:driversTable')
+
+def truckTable(request):
+    adminTruck = AdminTruck.objects.all()
+    # return HttpResponse(adminTruck)
+    params = {
+        'adminTrucks' : adminTruck
+    }
+    return render(request , 'GearBox/table/truckTable.html',params)
+
+def truckForm(request, id=None):
+    clientIds = Client.objects.all()
+    rateCards = RateCard.objects.all()
+    data=connections = None
+    if id:
+        data = AdminTruck.objects.get(pk=id)
+        connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
+        for i in connections:
+            i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
+            if i['endDate']:
+                i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
+                
+    params = {
+        'clientIds' : clientIds,
+        'rateCards' : rateCards,
+        'data' : data,
+        'connections' : connections
+    }
+    return render(request,'GearBox/truckForm.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def truckFormSave(request):
+    dataList = {
+        'adminTruckNumber' : request.POST.get('truckNo'),
+        'truckType' : request.POST.get('truckType')
+    }
+    insertIntoTable(tableName='AdminTruck',dataSet=dataList)
+    
+    messages.success(request,'Adding successfully')
+    return redirect('gearBox:truckTable')
+
+def truckConnectionForm(request, id):
+    clientIds = Client.objects.all()
+    rateCards = RateCard.objects.all()
+    params = {
+        'clientIds' : clientIds,
+        'rateCards' : rateCards,
+        'id' : id
+    }
+    return render(request,'GearBox/clientTruckConnectionForm.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def truckConnectionSave(request,id):
+    try:
+        oldData = ClientTruckConnection.objects.get(clientId=request.POST.get('clientId'),clientTruckId=request.POST.get('clientTruckNumber'),truckNumber=id)
+        if oldData:
+            oldData.endDate = getYesterdayDate(request.POST.get('StartDate'))
+            oldData.save()
+    except:
+        pass
+    adminTruck = AdminTruck.objects.get(id=id)
+
+    rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
+    client = Client.objects.get(pk=request.POST.get('clientId'))
+    dataList = {
+        'truckNumber' : adminTruck,
+        'rate_card_name' : rateCard,
+        'clientId' : client,
+        'clientTruckId' : request.POST.get('clientTruckNumber'),
+        'startDate' : request.POST.get('StartDate')
+    }
+    insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
+    messages.success(request,'Adding successfully')
+    return redirect('gearBox:truckTable')
