@@ -158,7 +158,8 @@ class Client(models.Model):
 # -----------------------------------
 
 class AdminTruck(models.Model):
-    adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
+    # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
+    adminTruckNumber = models.PositiveIntegerField(unique=True)
     
     
     def __str__(self):
@@ -186,7 +187,8 @@ class ClientTruckConnection(models.Model):
     truckType = models.CharField(max_length=254 , choices=TRUCK_TYPE_CHOICES, default='Embedded')
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE)
-    clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  
+    clientTruckId = models.PositiveIntegerField(default=0)  
+    # clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  
     startDate = models.DateField(default=timezone.now())  
     endDate = models.DateField(null=True, blank=True)
 
