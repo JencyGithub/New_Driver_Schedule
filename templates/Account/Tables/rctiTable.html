@@ -52,7 +52,7 @@
                         <th>docketNumber</th>
                         <th>docketDate</th>
                         <th>docketYard</th>
-
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -62,8 +62,13 @@
                         <td>{{ rcti.docketNumber }}</td>
                         <td>{{ rcti.docketDate }}</td>
                         <td>{{ rcti.docketYard }}</td>
-
-                       
+                        <td>
+                          <label type="button" class="btn" id="redirectButton">
+                            <a href="{% url 'Account:rctiForm' id=rcti.id %}">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                            </a>
+                          </label>
+                        </td>                       
                       </tr>
                       {% endfor %}
                     </tbody>

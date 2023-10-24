@@ -1,0 +1,565 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Edit base plant {% endblock %}
+
+{% block content %}
+
+
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Cost Parameters Form :-</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="custom-continer">
+                                <!-- truckNo,docketNumber,docketDate,docketYard -->
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="truckNo">Truck no :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="truckNo"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{ rcti.truckNo }}" id="truckNo"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="docketNumber">Docket number :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="docketNumber"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketNumber }}"
+                                            id="docketNumber" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="docketDate">Docket date :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="date" name="docketDate" 
+                                            style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketDate }}"
+                                            id="docketDate" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="docketYard">Docket yard :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="text" name="docketYard"
+                                            style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketYard }}"
+                                            id="docketYard" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="noOfKm">Number of km :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="noOfKm"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.noOfKm  }}" id="noOfKm"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="cubicMl">Cubic Ml :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="cubicMl"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.cubicMl  }}" id="cubicMl"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="cubicMiAndKmsCost">Cubic MI and Kms cost :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="cubicMiAndKmsCost"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.cubicMiAndKmsCost  }}"
+                                            id="cubicMiAndKmsCost" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="destination">Destination :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="text" name="destination"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.destination  }}"
+                                            id="destination" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="cartageGSTPayable">Cartage GST payable :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="cartageGSTPayable"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageGSTPayable  }}"
+                                            id="cartageGSTPayable" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="cartageTotalExGST">Cartage total exclude GST :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="cartageTotalExGST"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageTotalExGST  }}"
+                                            id="cartageTotalExGST" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="cartageTotal">Cartage Total :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="cartageTotal"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageTotal  }}"
+                                            id="cartageTotal" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="transferKM">Transfer KM :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="transferKM"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.transferKM  }}"
+                                            id="transferKM" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="transferKMCost">Transfer KM cost :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="transferKMCost"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.transferKMCost  }}"
+                                            id="transferKMCost" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="transferKMGSTPayable">Transfer KM GST Payable :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="transferKMGSTPayable"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.transferKMGSTPayable  }}"
+                                            id="transferKMGSTPayable" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="transferKMTotalExGST">Transfer KM total exclude GST :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="transferKMTotalExGST"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.transferKMTotalExGST  }}"
+                                            id="transferKMTotalExGST" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="transferKMTotal">Transfer KM total :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="transferKMTotal"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.transferKMTotal  }}"
+                                            id="transferKMTotal" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="returnKm">Return KM :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="returnKm"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.returnKm  }}" id="returnKm"
+                                            readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="returnPerKmPerCubicMeterCost">Return per KM per cubic meter cost :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number"
+                                            name="returnPerKmPerCubicMeterCost" pattern="[0-9]*" required
+                                            data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                            value="{{  rcti.returnPerKmPerCubicMeterCost  }}"
+                                            id="returnPerKmPerCubicMeterCost" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="returnKmGSTPayable">Return KM GST payable :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="returnKmGSTPayable"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.returnKmGSTPayable  }}"
+                                            id="returnKmGSTPayable" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="returnKmTotalExGST">Return KM total exclude GST :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="returnKmTotalExGST"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.returnKmTotalExGST  }}"
+                                            id="returnKmTotalExGST" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="returnKmTotal">Return KM total :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="returnKmTotal"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.returnKmTotal  }}"
+                                            id="returnKmTotal" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="waitingTimeSCHED">Waiting time surcharge :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="waitingTimeSCHED"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeSCHED  }}"
+                                            id="waitingTimeSCHED" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="waitingTimeSCHEDCost">Waiting time surcharge cost :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" required type="number" name="waitingTimeSCHEDCost"
+                                            pattern="[0-9]*" required data-validate-length-range="0,5"
+                                            style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeSCHEDCost  }}"
+                                            id="waitingTimeSCHEDCost" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeSCHEDGSTPayable">Waiting time GST payable :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeSCHEDGSTPayable"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeSCHEDGSTPayable  }}"
+                                        id="waitingTimeSCHEDGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeSCHEDTotalExGST">Waiting time surcharge total exclude GST :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeSCHEDTotalExGST"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeSCHEDTotalExGST  }}"
+                                        id="waitingTimeSCHEDTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeSCHEDTotal">Waiting time surcharge total :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeSCHEDTotal"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeSCHEDTotal  }}"
+                                        id="waitingTimeSCHEDTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeInMinutes">waiting time in minutes :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeInMinutes"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeInMinutes  }}"
+                                        id="waitingTimeInMinutes" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeCost">Waiting time cost :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeCost"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeCost  }}"
+                                        id="waitingTimeCost" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeGSTPayable">Waiting time GST payable :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeGSTPayable"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeGSTPayable  }}"
+                                        id="waitingTimeGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeTotalExGST">Waiting time total exclude GST :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeTotalExGST"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeTotalExGST  }}"
+                                        id="waitingTimeTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="waitingTimeTotal">Waiting time total :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="waitingTimeTotal"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.waitingTimeTotal  }}"
+                                        id="waitingTimeTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByPerHalfHourCost">Stand by per half hour cost :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="standByPerHalfHourCost"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5"
+                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.standByPerHalfHourCost  }}"
+                                        id="standByPerHalfHourCost" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByPerHalfHourDuration">Stand by per half hour duration :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="standByPerHalfHourDuration"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.standByPerHalfHourDuration  }}" id="standByPerHalfHourDuration" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByUnit">Stand by unit :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="text" name="standByUnit" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.standByUnit  }}" id="standByUnit" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByGSTPayable">Stand by GST payable :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="standByGSTPayable" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.standByGSTPayable  }}" id="standByGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByTotalExGST">Stand by total exclude GST :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="standByTotalExGST" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.standByTotalExGST  }}" id="standByTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="standByTotal">Stand by total :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="standByTotal" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.standByTotal  }}" id="standByTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="minimumLoad">Minimum load :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="minimumLoad" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.minimumLoad  }}" id="minimumLoad" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="loadCost">Load cost :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="loadCost" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.loadCost  }}" id="loadCost" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="minimumLoadGSTPayable">Minimum load GST payable :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="minimumLoadGSTPayable" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.minimumLoadGSTPayable  }}" id="minimumLoadGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="minimumLoadTotalExGST">Minimum load total exclude GST :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="minimumLoadTotalExGST" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.minimumLoadTotalExGST  }}" id="minimumLoadTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="minimumLoadTotal">Minimum load total :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="minimumLoadTotal" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.minimumLoadTotal  }}" id="minimumLoadTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_fixed_normal">Surcharge fixed normal :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_fixed_normal"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_fixed_normal  }}" id="surcharge_fixed_normal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_fixed_sunday">Surcharge fixed sunday :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_fixed_sunday"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_fixed_sunday  }}" id="surcharge_fixed_sunday" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_fixed_public_holiday">Surcharge fixed public holiday :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_fixed_public_holiday"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_fixed_public_holiday  }}" id="surcharge_fixed_public_holiday"
+                                        readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_per_cubic_meters_normal">Surcharge per cubic meters normal :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_per_cubic_meters_normal"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_per_cubic_meters_normal  }}"
+                                        id="surcharge_per_cubic_meters_normal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_per_cubic_meters_sunday">Surcharge per cubic meters sunday :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_per_cubic_meters_sunday"
+                                        pattern="[0-9]*" required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_per_cubic_meters_sunday  }}"
+                                        id="surcharge_per_cubic_meters_sunday" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_per_cubic_meters_public_holiday">Surcharge per cubic meters public holiday
+                                    :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number"
+                                        name="surcharge_per_cubic_meters_public_holiday" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_per_cubic_meters_public_holiday  }}"
+                                        id="surcharge_per_cubic_meters_public_holiday" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surcharge_duration">Surcharge duration :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surcharge_duration" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surcharge_duration  }}" id="surcharge_duration" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surchargeUnit">Surcharge unit :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="text" name="surchargeUnit" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surchargeUnit  }}" id="surchargeUnit" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surchargeGSTPayable">Surcharge GST payable :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surchargeGSTPayable" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surchargeGSTPayable  }}" id="surchargeGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surchargeTotalExGST">Surcharge total exclude GST :<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surchargeTotalExGST" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surchargeTotalExGST  }}" id="surchargeTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="surchargeTotal">Surcharge total :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="surchargeTotal" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.surchargeTotal  }}" id="surchargeTotal" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="others">Others :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="others" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.others  }}" id="others" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="othersCost">Others cost :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="othersCost" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.othersCost  }}" id="othersCost" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="othersGSTPayable">Others GST payable :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="othersGSTPayable" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.othersGSTPayable  }}" id="othersGSTPayable" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="othersTotalExGST">Others total exclude GST :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="othersTotalExGST" pattern="[0-9]*"
+                                        required data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.othersTotalExGST  }}" id="othersTotalExGST" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="othersTotal">Others total :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" required type="number" name="othersTotal" pattern="[0-9]*" required
+                                        data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
+                                        value="{{  rcti.othersTotal  }}" id="othersTotal" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
