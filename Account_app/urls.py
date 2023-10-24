@@ -33,6 +33,7 @@ urlpatterns = [
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     
     path('Rcti/', views.rcti, name='rcti'), 
+    path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),           
@@ -87,6 +88,7 @@ urlpatterns = [
     path('publicHoliday/edit/<int:id>/', views.publicHolidayForm, name='publicHolidayEdit'),
     path('publicHoliday/edit/save/<int:id>/', views.publicHolidaySave, name='publicHolidayEditSave'),
     
-
+    # Past trip
+    path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
 
 ]

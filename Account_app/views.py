@@ -20,6 +20,7 @@ from Account_app.models import *
 from GearBox_app.models import *
 from django.http import FileResponse
 from CRUD import *
+from .models import RCTI
 from django.http import Http404
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -219,6 +220,13 @@ def getTrucks(request):
 def rcti(request):
     return render(request, 'Account/rctiForm.html')
 
+
+def rctiForm(request, id):
+    rcti = RCTI.objects.get(id=id)
+    params = {
+        'rcti': rcti,
+    }
+    return render(request, 'Account/Tables/rctiForm.html', params)
 
 @csrf_protect
 def rctiSave(request):
@@ -917,3 +925,11 @@ def rateCardSave(request, id=None):
     
     messages.success(request , 'Data successfully add ')
     return redirect('Account:rateCardTable')
+
+# ````````````````````````````````````
+# Past trip
+
+# ```````````````````````````````````
+
+def PastTripForm(request):
+    return render(request, 'Account/pastTrip.html')
