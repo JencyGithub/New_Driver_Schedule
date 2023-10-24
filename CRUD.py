@@ -90,3 +90,38 @@ def getYesterdayDate(curDate):
         return yesterday_str
     except ValueError:
         return None
+
+def createTime(time):
+    if len(time) == 5:
+        time_ = time + ':00'
+        return time_
+    else:
+        return time
+    
+def getTimeDifference(time_str1,time_str2,type:str):
+
+# Convert the time strings to datetime objects
+    # if (time_str1)
+    # time_str1 = len(time_str1)
+    time_str1 =createTime(time_str1)
+    time_str2 =createTime(time_str2)
+    
+    time_format = "%H:%M:%S"
+    time1 = datetime.strptime(time_str1, time_format)
+    time2 = datetime.strptime(time_str2, time_format)
+
+    # Calculate the time difference
+    time_difference = time1 - time2
+
+    # Calculate the total number of seconds in the time difference
+    total_seconds = time_difference.total_seconds()
+
+    # Calculate hours and minutes from total_seconds
+    hours, seconds = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    if type == 'minutes':
+        return abs(int(hours)*60 + int(minutes))
+    else:
+        hours = [int(hours) , int(minutes)]
+        return abs(hours)
+

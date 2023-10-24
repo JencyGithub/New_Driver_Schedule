@@ -134,10 +134,14 @@ def truckForm(request, id=None):
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     data=connections = None
+    count_ = 1
     if id:
         data = AdminTruck.objects.get(pk=id)
         connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
+
         for i in connections:
+            i['count'] = count_
+            count_ += 1
             i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
             if i['endDate']:
                 i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
@@ -146,7 +150,7 @@ def truckForm(request, id=None):
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'data' : data,
-        'connections' : connections
+        'connections' : connections,
     }
     return render(request,'GearBox/truckForm.html',params)
 
@@ -155,7 +159,6 @@ def truckForm(request, id=None):
 def truckFormSave(request):
     dataList = {
         'adminTruckNumber' : request.POST.get('truckNo'),
-        'truckType' : request.POST.get('truckType')
     }
     insertIntoTable(tableName='AdminTruck',dataSet=dataList)
     
@@ -168,6 +171,7 @@ def truckConnectionForm(request, id):
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
+        'truckType' : request.POST.get('truckType'),
         'id' : id
     }
     return render(request,'GearBox/clientTruckConnectionForm.html',params)
