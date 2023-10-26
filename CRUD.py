@@ -2,7 +2,7 @@ from Account_app.models import *
 from GearBox_app.models import *
 from datetime import datetime, timedelta
 from django.core.files.storage import FileSystemStorage
-
+from django.contrib.auth.models import User , Group
 
 
 def dateConverterFromTableToPageFormate(date):
@@ -22,7 +22,8 @@ model_mapping = {
     'PastTrip' : PastTrip,
     'RCTI' : RCTI,
     'RCTIDocketAdjustment' : RCTIDocketAdjustment,
-    'PublicHoliday':PublicHoliday
+    'PublicHoliday':PublicHoliday,
+    'User' : User 
 }
 
 def insertIntoTable(tableName:str,dataSet:dict,model_mapping=model_mapping):
@@ -91,37 +92,39 @@ def getYesterdayDate(curDate):
     except ValueError:
         return None
 
-def createTime(time):
-    if len(time) == 5:
-        time_ = time + ':00'
-        return time_
-    else:
-        return time
     
-def getTimeDifference(time_str1,time_str2,type:str):
+def getTimeDifference(startDate,endDate):
+    print(startDate,endDate)
+    startDate = int(startDate[0:2])*60 + int(startDate[3:5])
+    endDate = int(endDate[0:2])*60 + int(endDate[3:5])
+    print(startDate,endDate)
+    return abs(endDate-startDate)
 
-# Convert the time strings to datetime objects
-    # if (time_str1)
-    # time_str1 = len(time_str1)
-    time_str1 =createTime(time_str1)
-    time_str2 =createTime(time_str2)
+
+def getMaxTimeFromTwoTime(time1, time2, type=None):
+    time1_str = time1.split(':')
+    time2_str = time2.split(':')
     
-    time_format = "%H:%M:%S"
-    time1 = datetime.strptime(time_str1, time_format)
-    time2 = datetime.strptime(time_str2, time_format)
-
-    # Calculate the time difference
-    time_difference = time1 - time2
-
-    # Calculate the total number of seconds in the time difference
-    total_seconds = time_difference.total_seconds()
-
-    # Calculate hours and minutes from total_seconds
-    hours, seconds = divmod(total_seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    if type == 'minutes':
-        return abs(int(hours)*60 + int(minutes))
+    if type == None:
+        if int(time1_str[0] )> int(time2_str[0]):
+            return time1
+        elif int(time1_str[0]) == int(time2_str[0]):
+            if int(time1_str[1]) > int(time2_str[1]):
+                return time1
+            else:
+                return time2
+        else:
+            return time2
     else:
-        hours = [int(hours) , int(minutes)]
-        return abs(hours)
+        if int(time1_str[0]) < int(time2_str[0]):
+            return time1
+        elif int(time1_str[0]) == int(time2_str[0]):
+            if int(time1_str[1]) < int(time2_str[1]):
+                return time1
+            else:
+                return time2
+        else:
+            return time2
+        
+    
 

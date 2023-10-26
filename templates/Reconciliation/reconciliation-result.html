@@ -56,13 +56,15 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                     <table id="dataTable" class="table table-striped table-bordered">
                                         <thead>
                                             <th></th>
+                                            
                                             <th>Docket number</th>
-                                            <th>Transfer KM</th>
-                                            <th>Waiting time</th>
+                                            <th>Load & Km cost</th>
+                                            {% comment %} <th>Km cost</th> {% endcomment %}
                                             <th>Surcharge </th>
-                                            <th>Return KM</th>
-                                            <th>Stand by</th>
-                                            <th>Other</th>
+                                            <th>Waiting cost</th>
+                                            <th>Stand by cost</th>
+                                            <th>Total cost</th>
+                                            <th></th>
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
@@ -72,11 +74,11 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                     {{ item.docketNumber }}
                                                 </td>
                                                 <td>
-                                                    <a href="{% url 'Account:reconciliationDocketView' %}" target=""
+                                                    <a href="{% url 'Account:reconciliationDocketView' docketNumber=item.docketNumber %}" target=""
                                                         class="{{ item.class }}">{{ item.docketNumber }}
                                                     </a>
                                                 </td>
-                                                <td>{{ item.transferKM }}</td>
+                                                <td>{{ item.loadAndKmCost }}</td>
                                                 <td>{{ item.waitingTimeTotal }}</td>
                                                 <td>{{ item.surchargeTotal }}</td>
                                                 <td>{{ item.returnKM }}</td>

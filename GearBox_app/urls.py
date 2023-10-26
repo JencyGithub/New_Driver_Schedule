@@ -62,5 +62,14 @@ urlpatterns = [
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
     
     
-
+    # Client Table
+    
+    path('clientTable', views.clientTable, name='clientTable'),
+    
+    path('client/add/', views.clientForm, name='clientAdd'),
+    path('client/add/save/', views.clientChange, name='clientAddSave'),
+    
+    path('client/edit/<int:id>/', views.clientForm, name='clientEdit'),
+    path('client/edit/save/<int:id>/', views.clientChange, name='clientEditSave'),
+    
 ]

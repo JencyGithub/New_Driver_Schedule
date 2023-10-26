@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_protect
 from rest_framework.decorators import api_view
 from django.contrib import messages
 from django.http import Http404
-
+from django.contrib.auth.models import User , Group
 
 
 # Create your views here.
@@ -107,24 +107,39 @@ def driverForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def driverFormSave(request, id= None):
+    group = Group.objects.get(name='Driver')
+    driver = Driver.objects.get(pk=id)
+    userId = User.objects.get(email = driver.email)
+    
     dataList = {
         'driverId' : request.POST.get('driverId'),
         'name' : request.POST.get('name'),
         'phone' : request.POST.get('phone'),
-        'email' : request.POST.get('email')
+        'email' : request.POST.get('email'),
+        'password' : request.POST.get('password'),
     }
+    
+    user_ = {
+        'username' : dataList['name'],
+        'email' : dataList['email'],
+        'is_staff' : True,
+    }
+      
     if id:
         updateIntoTable(record_id=id,tableName='Driver',dataSet=dataList)
+        updateIntoTable(record_id=userId.id,tableName='User',dataSet=user_)
         messages.success(request,'Updated successfully')
     else:
         insertIntoTable(tableName='Driver',dataSet=dataList)
+        user_.groups.add(group)
+        user_.set_password(dataList['password'])
+        insertIntoTable(tableName='User',dataSet=user_)
         messages.success(request,'Adding successfully')
 
     return redirect('gearBox:driversTable')
 
 def truckTable(request):
     adminTruck = AdminTruck.objects.all()
-    # return HttpResponse(adminTruck)
     params = {
         'adminTrucks' : adminTruck
     }
@@ -198,5 +213,46 @@ def truckConnectionSave(request,id):
         'startDate' : request.POST.get('StartDate')
     }
     insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
-    messages.success(request,'Adding successfully')
+    messages.success(request,'Added successfully')
     return redirect('gearBox:truckTable')
+
+
+# ```````````````````````````````````
+# Client 
+# ```````````````````````````````````
+
+def clientTable(request):
+    clients = Client.objects.all()
+    params = {
+        'clients' : clients
+    }
+    return render(request,'GearBox/table/client.html',params)
+
+def clientForm(request, id=None):
+    data = None
+    if id:
+        data = Client.objects.get(pk=id)
+
+    params = {
+        'data' : data
+    }
+    return render(request, 'GearBox/clientForm.html', params)
+
+@csrf_protect
+@api_view(['POST'])
+def clientChange(request, id=None):
+    
+    dataList = {
+        'name' : request.POST.get('name'),
+        'email' : request.POST.get('email'),
+        'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False
+    }
+    
+    if id:
+        updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
+        messages.success(request,'Updated successfully')
+    else:
+        insertIntoTable(tableName='Client',dataSet=dataList)
+        messages.success(request,'Added successfully')
+
+    return redirect('gearBox:clientTable')

@@ -1,0 +1,623 @@
+File:20231026082013@_!pastTrip.xlsx
+
+Line no : 103, Error : Field 'docketNumber' expected a number but got nan. 
+ Date                            2023-04-03 00:00:00
+Truck No.                                       731
+Truck Type                                   Casual
+Cateogry                                        A11
+Driver's Name                         Gurneet Singh
+Docket  NO                                      NaN
+Load Time                                       NaN
+Return time                                     NaN
+Load qty                                        NaN
+Doc KMs                                         NaN
+Actual KMs                                      NaN
+waiting time starts (Onsite)                    NaN
+waiting time end (Ofsite)                       NaN
+Total mintes                                      0
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                               Only tfr kms.
+Transfer KM                                    50.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 103, dtype: object 
+
+
+Line no : 236, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-05 00:00:00
+Truck No.                                       654
+Truck Type                                   Casual
+Cateogry                                        A54
+Driver's Name                         Lovejot Singh
+Docket  NO                                 383593.0
+Load Time                                  09:47:00
+Return time                                     NaN
+Load qty                                        6.4
+Doc KMs                                        15.0
+Actual KMs                                     15.0
+waiting time starts (Onsite)               10:30:00
+waiting time end (Ofsite)                  12:30:00
+Total mintes                                    120
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 236, dtype: object 
+
+
+Line no : 243, Error : UNIQUE constraint failed: Account_app_driverdocket.docketNumber, Account_app_driverdocket.shiftDate 
+ Date                            2023-04-05 00:00:00
+Truck No.                                       473
+Truck Type                                   Casual
+Cateogry                                        A58
+Driver's Name                             Navkaran 
+Docket  NO                               26538280.0
+Load Time                                  07:49:00
+Return time                                08:50:00
+Load qty                                        6.8
+Doc KMs                                         4.0
+Actual KMs                                      4.0
+waiting time starts (Onsite)               08:25:00
+waiting time end (Ofsite)                  08:45:00
+Total mintes                                     20
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                   116.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 243, dtype: object 
+
+
+Line no : 299, Error : Field 'docketNumber' expected a number but got nan. 
+ Date                            2023-04-04 00:00:00
+Truck No.                                       730
+Truck Type                                   Casual
+Cateogry                                        A74
+Driver's Name                       Simrandip Singh
+Docket  NO                                      NaN
+Load Time                                       NaN
+Return time                                     NaN
+Load qty                                        NaN
+Doc KMs                                         NaN
+Actual KMs                                      NaN
+waiting time starts (Onsite)                    NaN
+waiting time end (Ofsite)                       NaN
+Total mintes                                      0
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                               Only transfer
+Transfer KM                                    59.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 299, dtype: object 
+
+
+Line no : 379, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-11 00:00:00
+Truck No.                                       552
+Truck Type                                 Embedded
+Cateogry                                        A96
+Driver's Name                    Abhay Pratap Singh
+Docket  NO                               25645999.0
+Load Time                                  14:15:00
+Return time                                     NaN
+Load qty                                        0.8
+Doc KMs                                        12.5
+Actual KMs                                     12.5
+waiting time starts (Onsite)               15:05:00
+waiting time end (Ofsite)                  15:40:00
+Total mintes                                     35
+Returned Qty.                                   0.6
+Returned KM                                    64.0
+Returned to Yard                                 No
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 379, dtype: object 
+
+
+Line no : 382, Error : invalid literal for int() with base 10: 'nan' 
+ Date                                                          2023-04-11 00:00:00
+Truck No.                                                                     702
+Truck Type                                                               Embedded
+Cateogry                                                                      A97
+Driver's Name                                                               Nitoo
+Docket  NO                                                               141814.0
+Load Time                                                                12:56:00
+Return time                                                                   NaN
+Load qty                                                                      3.5
+Doc KMs                                                                       8.0
+Actual KMs                                                                    8.0
+waiting time starts (Onsite)                                             13:30:00
+waiting time end (Ofsite)                                                13:50:00
+Total mintes                                                                   20
+Returned Qty.                                                                 3.5
+Returned KM                                                                  17.0
+Returned to Yard                                                               No
+Comment                         Full load return.Customer already told they do...
+Transfer KM                                                                   NaN
+Blow Back                                                                     NaN
+stand by Start Time                                                           NaN
+stand by end time                                                             NaN
+stand by total minute                                                           0
+Name: 382, dtype: object 
+
+
+Line no : 383, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-11 00:00:00
+Truck No.                                       702
+Truck Type                                 Embedded
+Cateogry                                        A97
+Driver's Name                                 Nitoo
+Docket  NO                               25841530.0
+Load Time                                  15:08:00
+Return time                                     NaN
+Load qty                                        6.0
+Doc KMs                                        10.0
+Actual KMs                                     10.0
+waiting time starts (Onsite)               15:50:00
+waiting time end (Ofsite)                  16:40:00
+Total mintes                                     50
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     6.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 383, dtype: object 
+
+
+Line no : 386, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-11 00:00:00
+Truck No.                                       783
+Truck Type                                 Embedded
+Cateogry                                        A98
+Driver's Name                          Sahil Taneja
+Docket  NO                               26721264.0
+Load Time                                  14:15:00
+Return time                                     NaN
+Load qty                                        3.3
+Doc KMs                                        13.5
+Actual KMs                                     15.0
+waiting time starts (Onsite)               15:22:00
+waiting time end (Ofsite)                  15:52:00
+Total mintes                                     30
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 386, dtype: object 
+
+
+Line no : 395, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-06 00:00:00
+Truck No.                                       728
+Truck Type                                 Embedded
+Cateogry                                         B2
+Driver's Name                         Lovejot Singh
+Docket  NO                               25645963.0
+Load Time                                  14:00:00
+Return time                                     NaN
+Load qty                                        5.0
+Doc KMs                                        22.0
+Actual KMs                                     22.0
+waiting time starts (Onsite)               15:00:00
+waiting time end (Ofsite)                  15:40:00
+Total mintes                                     40
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 395, dtype: object 
+
+
+Line no : 435, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-12 00:00:00
+Truck No.                                       472
+Truck Type                                   Casual
+Cateogry                                        B13
+Driver's Name                           Sahil Kajal
+Docket  NO                               26538370.0
+Load Time                                  13:20:00
+Return time                                     NaN
+Load qty                                        7.0
+Doc KMs                                        11.5
+Actual KMs                                     11.5
+waiting time starts (Onsite)               14:05:00
+waiting time end (Ofsite)                  15:35:00
+Total mintes                                     90
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                    57.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 435, dtype: object 
+
+
+Line no : 500, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-03 00:00:00
+Truck No.                                       726
+Truck Type                                 Embedded
+Cateogry                                        B29
+Driver's Name                   Tejinder Singh Mann
+Docket  NO                               25526800.0
+Load Time                                  16:00:00
+Return time                                     NaN
+Load qty                                        3.0
+Doc KMs                                         4.0
+Actual KMs                                      4.0
+waiting time starts (Onsite)               16:15:00
+waiting time end (Ofsite)                  17:30:00
+Total mintes                                     75
+Returned Qty.                                   2.5
+Returned KM                                    14.0
+Returned to Yard                                 No
+Comment                                2.0 Blowback
+Transfer KM                                     NaN
+Blow Back                                       Yes
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 500, dtype: object 
+
+
+Line no : 505, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-04 00:00:00
+Truck No.                                       726
+Truck Type                                 Embedded
+Cateogry                                        B30
+Driver's Name                   Tejinder Singh Mann
+Docket  NO                               25526892.0
+Load Time                                  15:00:00
+Return time                                     NaN
+Load qty                                        4.0
+Doc KMs                                         8.5
+Actual KMs                                      8.5
+waiting time starts (Onsite)               15:30:00
+waiting time end (Ofsite)                  16:30:00
+Total mintes                                     60
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 505, dtype: object 
+
+
+Line no : 551, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-13 00:00:00
+Truck No.                                       783
+Truck Type                                 Embedded
+Cateogry                                        B44
+Driver's Name                          Sahil Taneja
+Docket  NO                               26721339.0
+Load Time                                  14:47:00
+Return time                                     NaN
+Load qty                                        6.4
+Doc KMs                                         1.5
+Actual KMs                                      1.5
+waiting time starts (Onsite)               15:07:00
+waiting time end (Ofsite)                  15:45:00
+Total mintes                                     38
+Returned Qty.                                   0.4
+Returned KM                                    12.0
+Returned to Yard                                 No
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 551, dtype: object 
+
+
+Line no : 628, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-14 00:00:00
+Truck No.                                       726
+Truck Type                                 Embedded
+Cateogry                                        B63
+Driver's Name                   Tejinder Singh Mann
+Docket  NO                               25527444.0
+Load Time                                  14:47:00
+Return time                                     NaN
+Load qty                                        3.0
+Doc KMs                                         4.0
+Actual KMs                                      4.0
+waiting time starts (Onsite)               15:00:00
+waiting time end (Ofsite)                  16:30:00
+Total mintes                                     90
+Returned Qty.                                   3.0
+Returned KM                                    40.0
+Returned to Yard                                 No
+Comment                                         NaN
+Transfer KM                                    36.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 628, dtype: object 
+
+
+Line no : 630, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-14 00:00:00
+Truck No.                                       654
+Truck Type                                   Casual
+Cateogry                                        B64
+Driver's Name                         Lovejot Singh
+Docket  NO                               25527355.0
+Load Time                                  09:40:00
+Return time                                     NaN
+Load qty                                        3.0
+Doc KMs                                        10.0
+Actual KMs                                     10.0
+waiting time starts (Onsite)               10:05:00
+waiting time end (Ofsite)                  10:45:00
+Total mintes                                     40
+Returned Qty.                                   2.0
+Returned KM                                    28.0
+Returned to Yard                                 No
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 630, dtype: object 
+
+
+Line no : 668, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-13 00:00:00
+Truck No.                                       654
+Truck Type                                   Casual
+Cateogry                                        B75
+Driver's Name                         Lovejot Singh
+Docket  NO                               27185013.0
+Load Time                                  12:20:00
+Return time                                     NaN
+Load qty                                        4.3
+Doc KMs                                         3.5
+Actual KMs                                      3.5
+waiting time starts (Onsite)               12:45:00
+waiting time end (Ofsite)                  13:25:00
+Total mintes                                     40
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 668, dtype: object 
+
+
+Line no : 678, Error : invalid literal for int() with base 10: '1900-01-04 19' 
+ Date                            2023-04-13 00:00:00
+Truck No.                                       703
+Truck Type                                 Embedded
+Cateogry                                        B77
+Driver's Name                         Jasmeet Singh
+Docket  NO                               25527305.0
+Load Time                       1900-01-04 19:50:00
+Return time                                17:35:00
+Load qty                                        7.0
+Doc KMs                                         8.0
+Actual KMs                                      8.0
+waiting time starts (Onsite)               16:25:00
+waiting time end (Ofsite)                  17:10:00
+Total mintes                                     45
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 678, dtype: object 
+
+
+Line no : 686, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-12 00:00:00
+Truck No.                                       726
+Truck Type                                 Embedded
+Cateogry                                        B79
+Driver's Name                   Tejinder Singh Mann
+Docket  NO                               25527153.0
+Load Time                                  13:45:00
+Return time                                     NaN
+Load qty                                        5.0
+Doc KMs                                         4.0
+Actual KMs                                      4.0
+waiting time starts (Onsite)               14:00:00
+waiting time end (Ofsite)                  15:00:00
+Total mintes                                     60
+Returned Qty.                                   0.5
+Returned KM                                    74.0
+Returned to Yard                                 No
+Comment                                2.0 blowback
+Transfer KM                                     NaN
+Blow Back                                       Yes
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 686, dtype: object 
+
+
+Line no : 780, Error : UNIQUE constraint failed: Account_app_driverdocket.docketNumber, Account_app_driverdocket.shiftDate 
+ Date                            2023-04-15 00:00:00
+Truck No.                                       728
+Truck Type                                 Embedded
+Cateogry                                         C6
+Driver's Name                         Jaspal singh 
+Docket  NO                               25527453.0
+Load Time                                  06:55:00
+Return time                                08:30:00
+Load qty                                        7.0
+Doc KMs                                         7.0
+Actual KMs                                      7.0
+waiting time starts (Onsite)               07:15:00
+waiting time end (Ofsite)                  08:05:00
+Total mintes                                     50
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                    56.0
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 780, dtype: object 
+
+
+Line no : 813, Error : UNIQUE constraint failed: Account_app_driverdocket.docketNumber, Account_app_driverdocket.shiftDate 
+ Date                            2023-04-15 00:00:00
+Truck No.                                       787
+Truck Type                                 Embedded
+Cateogry                                        C18
+Driver's Name                        Manpreet Singh
+Docket  NO                               26721376.0
+Load Time                                  07:08:00
+Return time                                09:42:00
+Load qty                                        4.0
+Doc KMs                                         6.5
+Actual KMs                                      6.5
+waiting time starts (Onsite)               07:45:00
+waiting time end (Ofsite)                  09:25:00
+Total mintes                                    100
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 813, dtype: object 
+
+
+Line no : 814, Error : UNIQUE constraint failed: Account_app_driverdocket.docketNumber, Account_app_driverdocket.shiftDate 
+ Date                            2023-04-15 00:00:00
+Truck No.                                       787
+Truck Type                                 Embedded
+Cateogry                                        C18
+Driver's Name                        Manpreet Singh
+Docket  NO                               26721390.0
+Load Time                                  09:50:00
+Return time                                11:47:00
+Load qty                                        4.6
+Doc KMs                                         6.5
+Actual KMs                                      6.5
+waiting time starts (Onsite)               10:30:00
+waiting time end (Ofsite)                  11:30:00
+Total mintes                                     60
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 814, dtype: object 
+
+
+Line no : 815, Error : UNIQUE constraint failed: Account_app_driverdocket.docketNumber, Account_app_driverdocket.shiftDate 
+ Date                            2023-04-15 00:00:00
+Truck No.                                       787
+Truck Type                                 Embedded
+Cateogry                                        C18
+Driver's Name                        Manpreet Singh
+Docket  NO                               26721397.0
+Load Time                                  11:52:00
+Return time                                12:42:00
+Load qty                                        3.6
+Doc KMs                                         1.5
+Actual KMs                                      1.5
+waiting time starts (Onsite)               12:05:00
+waiting time end (Ofsite)                  12:35:00
+Total mintes                                     30
+Returned Qty.                                   0.0
+Returned KM                                     0.0
+Returned to Yard                                NaN
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 815, dtype: object 
+
+
+Line no : 854, Error : invalid literal for int() with base 10: 'nan' 
+ Date                            2023-04-11 00:00:00
+Truck No.                                       782
+Truck Type                                 Embedded
+Cateogry                                        C29
+Driver's Name                          Kane Lintern
+Docket  NO                               20254951.0
+Load Time                                  13:43:00
+Return time                                     NaN
+Load qty                                        7.0
+Doc KMs                                        35.0
+Actual KMs                                     35.0
+waiting time starts (Onsite)               14:45:00
+waiting time end (Ofsite)                  15:45:00
+Total mintes                                     60
+Returned Qty.                                   1.0
+Returned KM                                    35.0
+Returned to Yard                                Yes
+Comment                                         NaN
+Transfer KM                                     NaN
+Blow Back                                       NaN
+stand by Start Time                             NaN
+stand by end time                               NaN
+stand by total minute                             0
+Name: 854, dtype: object 
+
+

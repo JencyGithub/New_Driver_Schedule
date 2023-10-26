@@ -45,15 +45,15 @@
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Past trip</h2>
-                        <a href="" class="btn float-right ">
+                        <a href="/static/subprocessFiles/errorFromPastTrip.txt" class="btn float-right" target="_blanck">
                             <i class="fa fa-download"></i>
-                            Get sample file
+                            Get errors
                           </a>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form class="" method="POST" action="" novalidate  enctype="multipart/form-data">
+                            <form method="POST" action="{% url 'Account:pastTripSave'%}" novalidate  enctype="multipart/form-data">
                                 {% csrf_token %}
 
                                 <div class="col-md-6 col-sm-6">

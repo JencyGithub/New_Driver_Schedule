@@ -1,4 +1,4 @@
-{% extends "main/main.html" %} {% load static %} {% block title %} | Driver change{% endblock %} {% block headStyle %}
+{% extends "main/main.html" %} {% load static %} {% block title %} | Client change{% endblock %} {% block headStyle %}
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
@@ -12,32 +12,19 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>{% if data %}Edit{% else %}Add{% endif %} driver</h2>
+                        <h2>{% if data %}Edit{% else %}Add{% endif %} client</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
                             <form
-                                action="{% if data %}{% url 'gearBox:driverFormEditSave' id=data.driverId %} {% else %}{% url 'gearBox:driverFormSave' %}{% endif %}"
+                                action="{% if data %}{% url 'gearBox:clientEditSave' id=data.clientId %} {% else %}{% url 'gearBox:clientAddSave' %}{% endif %}"
                                 method="POST" novalidate>
                                 {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label for="driverId"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">DriverId :<span
-                                                class="required">*</span></label>
-
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="driverId" required="required"
-                                                id="driverId" type="number"
-                                                value="{% if data %}{{data.driverId}}{% else %}{% endif %}" {% if data %}readonly{% else %}{% endif %}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
                                         <label for="name"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Driver name :<span
+                                            class="col-form-label col-md-3 col-sm-3 label-align">Client name :<span
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="name" required="required"
@@ -46,6 +33,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
                                         <label for="email" class="col-form-label col-md-3 col-sm-3 label-align">Email :<span class="required">*</span></label>
@@ -58,21 +46,10 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label for="phone" class="col-form-label col-md-3 col-sm-3 label-align">Phone :<span class="required">*</span></label>
+                                        <div class="col-md-3 col-sm-3"></div>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="phone" required="required" id="phone"
-                                                type="number" data-validate-length-range="10,10"
-                                                value="{% if data %}{{data.phone}}{% else %}{% endif %}" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="password" class="col-form-label col-md-3 col-sm-3 label-align">Password :<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="password" required="required" id="password"
-                                                type="password" data-validate-length-range="10,10"
-                                                value="{% if data %}{{data.password}}{% else %}{% endif %}" autocomplete="off"/>
+                                            <input type="checkbox" name="docketGiven" id="docketGiven" {% if data.docketGiven %}Checked{% endif %}>
+                                            <label for="docketGiven" class="float-right mb-0 ml-1 d-inline-block">Docket given<span class="required">*</span></label>
                                         </div>
                                     </div>
                                 </div>

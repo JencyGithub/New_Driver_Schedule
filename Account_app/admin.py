@@ -355,7 +355,11 @@ class NatureOfLeaveAdmin(admin.ModelAdmin):
 admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 
 
-
+# class DriverDocketAdmin(admin.ModelAdmin):
+#     list_display=['Docket_NO']
+#     search_fields = ['Docket_NO']
+    
+# admin.site.register(DriverDocket,DriverDocketAdmin)
 # @admin.register(Appointment)
 # class AppointmentAdmin(admin.ModelAdmin):
 #     search_fields = ('driver', 'client',)
@@ -382,4 +386,3 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 admin.site.register(PastTrip)
 
 admin.site.register(PublicHoliday)
-

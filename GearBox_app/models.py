@@ -44,7 +44,8 @@ class CostParameters(models.Model):
     surcharge_per_cubic_meters_sunday_cost = models.FloatField(default=0)
     surcharge_per_cubic_meters_public_holiday_cost = models.FloatField(default=0)
     transfer_cost = models.FloatField(default=0)
-    return_cost = models.FloatField(default=0)
+    return_load_cost = models.FloatField(default=0)# change name added
+    return_km_cost = models.FloatField(default=0) # new added
     standby_time_slot_size = models.PositiveIntegerField(default=0)
     standby_cost_per_slot = models.FloatField(default=0)
     waiting_cost_per_minute = models.FloatField(default=0)
@@ -76,6 +77,8 @@ class ThresholdDayShift(models.Model):
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
     min_load_in_cubic_meters_trip = models.FloatField(default=0)
+     
+    return_load_grace = models.FloatField(default=1)# new added
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(null=True, blank=True)
@@ -101,6 +104,8 @@ class ThresholdNightShift(models.Model):
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
     min_load_in_cubic_meters_trip = models.FloatField(default=0)
+
+    return_load_grace = models.FloatField(default=1)# new added
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(null=True, blank=True)
@@ -148,6 +153,7 @@ class OnLease(models.Model):
 class Client(models.Model):
     clientId = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
+    email = models.CharField(max_length=255,default=None, null=True, blank=True)
     docketGiven = models.BooleanField(default=False)
 
     def __str__(self) -> str:

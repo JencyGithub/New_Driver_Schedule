@@ -23,6 +23,7 @@ from CRUD import *
 from .models import RCTI
 from django.http import Http404
 from django.core.serializers.json import DjangoJSONEncoder
+from Account_app.reconciliationUtils import *
 
 def index(request):
     return render(request, 'Account/dashboard.html')
@@ -618,9 +619,11 @@ def driverEntryUpdate(request, ids):
             docketObj.returnQty = request.POST.get(f'returnQty{count_}')
             docketObj.returnKm = request.POST.get(f'returnKm{count_}')
         # return HttpResponse(docketObj.returnToYard)
-        docketObj.waitingTimeStart = request.POST.get(f'waitingTimeStart{count_}')        
+        docketObj.waitingTimeStart = request.POST.get(f'waitingTimeStart{count_}')     
         docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
-        docketObj.totalWaitingInMinute = getTimeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd,'minutes')
+        print(docketObj.waitingTimeEnd)
+        # return HttpResponse(docketObj.waitingTimeStart)   
+        docketObj.totalWaitingInMinute = getTimeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
         docketObj.surcharge_type = request.POST.get(f'surcharge_type{count_}')
         docketObj.surcharge_duration = request.POST.get(f'surcharge_duration{count_}')
         docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
@@ -648,7 +651,7 @@ def reconciliationResult(request):
     
     for entry in dataList:
         if 'docketDate' in entry:
-            entry['docketDate'] = datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
+            entry['docketDate'] = datetime.datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
 
     basePlants = BasePlant.objects.all() 
     params = {
@@ -686,7 +689,7 @@ def reconciliationAnalysis(request):
         data_entry = {
             'docketNumber': docket_number,
             'class': 'text-danger' if docket_number not in common_docket else 'text-success',
-            'transferKM': rcti_entry['transferKM'],
+            'loadAndKmCost': checkLoadAndKmCost(rcti_entry['cartageTotalExGST'],rcti_entry['docketNumber'],rcti_entry['docketDate']),
             'waitingTimeTotal': rcti_entry['waitingTimeTotal'],
             'surchargeTotal': rcti_entry['surchargeTotal'],
             'returnKM': rcti_entry['returnKm'],
@@ -703,7 +706,8 @@ def reconciliationAnalysis(request):
             'class': 'text-danger' if docket_number not in common_docket else 'text-success',
             **driver_docket_entry 
         }
-        dataList.append(data_entry)
+        if data_entry['docketNumber'] not in common_docket:
+            dataList.append(data_entry)
 
     serialized_data = json.dumps(dataList, cls=DjangoJSONEncoder)
     request.session['reconciliationResultData'] = serialized_data
@@ -711,8 +715,17 @@ def reconciliationAnalysis(request):
     return redirect('Account:reconciliationResult')
 
 
-def reconciliationDocketView(request):
-    return render(request, 'Reconciliation/reconciliation-docket.html')
+def reconciliationDocketView(request,docketNumber):
+    rctiDocket = RCTI.objects.get(docketNumber = docketNumber)
+    driverDocket = DriverDocket.objects.get(docketNumber = docketNumber)
+    rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
+    driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
+    params = {
+        'rctiDocket' : rctiDocket,
+        'driverDocket' : driverDocket
+    }
+    
+    return render(request, 'Reconciliation/reconciliation-docket.html',params)
 
 
 
@@ -839,7 +852,8 @@ def rateCardSave(request, id=None):
         surcharge_per_cubic_meters_sunday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_sunday_cost')),
         surcharge_per_cubic_meters_public_holiday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_public_holiday_cost')),
         transfer_cost = float(request.POST.get('costParameters_transfer_cost')),
-        return_cost = float(request.POST.get('costParameters_return_cost')),
+        return_load_cost = float(request.POST.get('costParameters_return_load_cost')),
+        return_km_cost = float(request.POST.get('costParameters_return_km_cost')),
         standby_time_slot_size = float(request.POST.get('costParameters_standby_time_slot_size')),
         standby_cost_per_slot = float(request.POST.get('costParameters_standby_cost_per_slot')),
         waiting_cost_per_minute = float(request.POST.get('costParameters_waiting_cost_per_minute')),
@@ -871,6 +885,7 @@ def rateCardSave(request, id=None):
         min_load_in_cubic_meters = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
         min_load_in_cubic_meters_trip = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_trip')),
+        return_load_grace = float(request.POST.get('thresholdDayShift_return_load_grace')),
         start_date = request.POST.get('thresholdDayShift_start_date')
     )
     thresholdDayShifts.save()
@@ -896,6 +911,7 @@ def rateCardSave(request, id=None):
         min_load_in_cubic_meters = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
         min_load_in_cubic_meters_trip = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_trip')),
+        return_load_grace = float(request.POST.get('thresholdNightShift_return_load_grace')),
         start_date = request.POST.get('thresholdNightShift_start_date')
     )
     thresholdNightShifts.save()
@@ -939,10 +955,39 @@ def rateCardSave(request, id=None):
     messages.success(request , 'Data successfully add ')
     return redirect('Account:rateCardTable')
 
-# ````````````````````````````````````
+# ```````````````````````````````````
 # Past trip
-
 # ```````````````````````````````````
 
 def PastTripForm(request):
     return render(request, 'Account/pastTrip.html')
+
+@csrf_protect
+@api_view(['POST'])
+def pastTripSave(request):
+    pastTrip_csv_file = request.FILES.get('pastTripFile')
+    if not pastTrip_csv_file:
+        return HttpResponse("No file uploaded")
+    try:
+        time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
+        time = time[0]
+        newFileName = time + "@_!" + str(pastTrip_csv_file.name)
+
+        location = 'static/Account/PastTripsEntry'
+        lfs = FileSystemStorage(location=location)
+        lfs.save(newFileName, pastTrip_csv_file)
+        with open("pastTrip_entry.txt", 'w') as f:
+            f.write(newFileName)
+            f.close()
+            
+        colorama.AnsiToWin32.stream = None
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'PastDataSave.py']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        messages.success(
+            request, "Please wait for some time, it takes some time to update the data.")
+        return redirect('Account:index')
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
+
+    

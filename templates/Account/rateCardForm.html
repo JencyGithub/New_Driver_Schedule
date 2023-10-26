@@ -173,7 +173,7 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
 
-                                <!-- transfer_cost,return_cost,standby_time_slot_size,standby_cost_per_slot -->
+                                <!-- transfer_cost,return_load_cost,return_km_cost,standby_time_slot_size,standby_cost_per_slot -->
 
 
                                 <div class="col-md-3 col-sm-3">
@@ -186,12 +186,21 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="return_cost">Return cost :<span class="required">*</span></label>
+                                    <label for="return_load_cost">Return Load cost :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="costParameters_return_cost" required='required'
-                                        value="{% if costParameters %}{{costParameters.return_cost}}{% else %} {% endif %}" 
+                                        <input class="form-control" type="number" name="costParameters_return_load_cost" required='required'
+                                        value="{% if costParameters %}{{costParameters.return_load_cost}}{% else %} {% endif %}" 
                                             {% if costParameters %} readonly {% else %} {% endif %}
-                                            style="padding: 0.25rem 0.2rem;" id="return_cost">
+                                            style="padding: 0.25rem 0.2rem;" id="return_load_cost">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="return_km_cost">Return Km cost :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" type="number" name="costParameters_return_km_cost" required='required'
+                                        value="{% if costParameters %}{{costParameters.return_km_cost}}{% else %} {% endif %}" 
+                                            {% if costParameters %} readonly {% else %} {% endif %}
+                                            style="padding: 0.25rem 0.2rem;" id="return_km_cost">
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
@@ -275,7 +284,7 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-6 col-sm-6">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <!-- start_date,threshold_amount_per_day_shift,min_load_in_cubic_meters,min_load_in_cubic_meters_return_to_yard,min_load_in_cubic_meters_return_to_yard, -->
+                                            <!-- start_date,threshold_amount_per_day_shift,min_load_in_cubic_meters,min_load_in_cubic_meters_return_to_yard,min_load_in_cubic_meters_return_to_yard,return_load_grace -->
                                             
                                             
                                             <div class="col-md-6 col-sm-6">
@@ -320,6 +329,15 @@ request {% endblock %} {% block headStyle %}
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.min_load_in_cubic_meters_trip}}{% else %} {% endif %}" 
                                                             {% if thresholdDayShift %} readonly {% else %} {% endif %}
                                                         style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_min_load_in_cubic_meters_trip">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="thresholdDayShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control"  type="number" name="thresholdDayShift_return_load_grace" required='required'
+                                                    value="{% if thresholdDayShift %}{{thresholdDayShift.return_load_grace}}{% else %} {% endif %}" 
+                                                            {% if thresholdDayShift %} readonly {% else %} {% endif %}
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_return_load_grace">
                                                 </div>
                                             </div>
                                         </div>
@@ -440,7 +458,7 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-6 col-sm-6">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <!-- start_date,end_date,threshold_amount_per_night_shift,min_load_in_cubic_meters,min_load_in_cubic_meters_return_to_yard,min_load_in_cubic_meters_return_to_yard, -->
+                                            <!-- start_date,end_date,threshold_amount_per_night_shift,min_load_in_cubic_meters,min_load_in_cubic_meters_return_to_yard,min_load_in_cubic_meters_return_to_yard,return_load_grace -->
                                             
                                             
                                             <div class="col-md-6 col-sm-6">
@@ -484,6 +502,15 @@ request {% endblock %} {% block headStyle %}
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.min_load_in_cubic_meters_trip}}{% else %} {% endif %}" 
                                                             {% if thresholdNightShift %} readonly {% else %} {% endif %}
                                                         style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_min_load_in_cubic_meters_trip">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="thresholdNightShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control"  type="number" name="thresholdNightShift_return_load_grace" required='required'
+                                                    value="{% if thresholdNightShift %}{{thresholdNightShift.return_load_grace}}{% else %} {% endif %}" 
+                                                            {% if thresholdNightShift %} readonly {% else %} {% endif %}
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_return_load_grace">
                                                 </div>
                                             </div>
                                         </div>

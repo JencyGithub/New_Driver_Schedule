@@ -78,7 +78,7 @@ urlpatterns = [
     path('reconciliation/form/', views.reconciliationForm, name='reconciliationForm'),
     path('reconciliation/analysis/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
     path('reconciliation/result/', views.reconciliationResult, name='reconciliationResult'),
-    path('reconciliation/docket/view/', views.reconciliationDocketView, name='reconciliationDocketView'),
+    path('reconciliation/docket/view/<int:docketNumber>/', views.reconciliationDocketView, name='reconciliationDocketView'),
 
     # Public holiday
     path('publicHoliday/', views.publicHoliday, name='publicHoliday'),
@@ -90,5 +90,6 @@ urlpatterns = [
     
     # Past trip
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
+    path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
 
 ]

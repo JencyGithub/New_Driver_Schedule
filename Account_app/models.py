@@ -11,7 +11,6 @@ from GearBox_app.models import *
 
 class BasePlant(models.Model):
     basePlant = models.CharField(unique= True,max_length=200)
-    basePlant = models.CharField(unique= True,max_length=200)
 
     def __str__(self) -> str:
         return str(self.basePlant)
@@ -69,7 +68,7 @@ class DriverDocket(models.Model):
     comment = models.CharField(max_length=255, null=True, default='None')
     
     def __str__(self) -> str:
-        return str(self.tripId)
+        return str(self.docketNumber)
 
     class Meta:
         unique_together = (('docketNumber', 'shiftDate'),)
