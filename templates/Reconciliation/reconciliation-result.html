@@ -78,7 +78,7 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                         class="{{ item.class }}">{{ item.docketNumber }}
                                                     </a>
                                                 </td>
-                                                <td>{{ item.loadAndKmCost }}</td>
+                                                <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td>
                                                 <td>{{ item.waitingTimeTotal }}</td>
                                                 <td>{{ item.surchargeTotal }}</td>
                                                 <td>{{ item.returnKM }}</td>

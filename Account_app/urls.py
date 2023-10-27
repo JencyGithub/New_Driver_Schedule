@@ -66,7 +66,6 @@ urlpatterns = [
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
     path('driverTrip/update/<int:ids>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
-    # path('natureOfLeaves/edit/save/<int:id>/', views.changeNatureOfLeaves, name='editSaveNatureOfLeaves'),
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
@@ -80,6 +79,11 @@ urlpatterns = [
     path('reconciliation/result/', views.reconciliationResult, name='reconciliationResult'),
     path('reconciliation/docket/view/<int:docketNumber>/', views.reconciliationDocketView, name='reconciliationDocketView'),
 
+
+    path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
+
+
+
     # Public holiday
     path('publicHoliday/', views.publicHoliday, name='publicHoliday'),
     path('publicHoliday/add/', views.publicHolidayForm, name='publicHolidayAdd'),
@@ -91,5 +95,8 @@ urlpatterns = [
     # Past trip
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
+    
+    
+    
 
 ]

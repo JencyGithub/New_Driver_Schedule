@@ -291,18 +291,22 @@ def driverEntrySave(request):
         return HttpResponse(f"Error: {str(e)}")
 
 
-def driverDocketEntry(request, ids):
+def driverDocketEntry(request, ids, driverDocketNumber=None):
+    docketData = None
+    if driverDocketNumber:
+        docketData = DriverDocket.objects.filter(docketNumber = driverDocketNumber).first()
+
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
         
         base_plant = BasePlant.objects.all()
         params = {
             'basePlants': base_plant,
-            'id': ids
+            'id': ids,
+            'docketData' :docketData
         }
         return render(request, 'Account/driverDocketEntry.html', params)
     else:
-        # raise Http404("Poll does not exist")
         messages.warning(request, "Invalid Request ")
         return redirect('Account:driverTripsTable')
 
@@ -716,18 +720,21 @@ def reconciliationAnalysis(request):
 
 
 def reconciliationDocketView(request,docketNumber):
-    rctiDocket = RCTI.objects.get(docketNumber = docketNumber)
-    driverDocket = DriverDocket.objects.get(docketNumber = docketNumber)
-    rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
-    driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
+    # try:
+    rctiDocket = RCTI.objects.filter(docketNumber = docketNumber).first()
+    driverDocket = DriverDocket.objects.filter(docketNumber = docketNumber).first()
+    if rctiDocket:
+        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
+        rctiDocket.docketNumber = int(rctiDocket.docketNumber)
+    if driverDocket:
+        driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
+        
     params = {
         'rctiDocket' : rctiDocket,
         'driverDocket' : driverDocket
     }
     
     return render(request, 'Reconciliation/reconciliation-docket.html',params)
-
-
 
 def publicHoliday(request):
     data = PublicHoliday.objects.all()

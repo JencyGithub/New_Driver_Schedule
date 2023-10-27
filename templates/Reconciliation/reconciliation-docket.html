@@ -40,7 +40,7 @@
 										<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
 											Number : </label>
 										<div class="col-md-9 col-sm-9 ">
-											<input type="number" class="form-control" name="RCTIdocketNumber"
+											<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="RCTIdocketNumber"
 												id="RCTIdocketNumber" readonly value={{rctiDocket.docketNumber}} required>
 										</div>
 									</div>
@@ -54,7 +54,7 @@
 										</div>
 									</div>
 									<div class="form-group row">
-										<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">BasePlant</label>
+										<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading site:</label>
 										<div class="col-md-9 col-sm-9 ">
 											<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="RCTIbasePlant"
 												id="RCTIbasePlant" readonly value={{rctiDocket.docketYard}} required>
@@ -120,7 +120,8 @@
 						<div class="x_panel">
 							<div class="x_title">
 								<h2>Driver</h2>
-								<a href="#" class="btn btn-sm btn-default float-right">View driver docket</a>
+								<a href="{% url 'Account:docketView' ids=driverDocket.tripId.id driverDocketNumber=driverDocket.docketNumber %}" class="btn btn-sm btn-default float-right">View driver docket</a>
+								<a href="{% url 'Account:DriverTripEdit' id=driverDocket.tripId.id%}" class="btn btn-sm btn-default float-right">View Trip</a>
 
 								<div class="clearfix"></div>
 
@@ -132,7 +133,7 @@
 										<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
 											Number : </label>
 										<div class="col-md-9 col-sm-9 ">
-											<input type="number" class="form-control" name="DriverdocketNumber"
+											<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="DriverdocketNumber"
 												id="DriverdocketNumber" required readonly value={{driverDocket.docketNumber}}>
 										</div>
 									</div>
@@ -146,7 +147,7 @@
 										</div>
 									</div>
 									<div class="form-group row">
-										<label for="DriverbasePlant" class="control-label col-md-3 col-sm-3 ">BasePlant</label>
+										<label for="DriverbasePlant" class="control-label col-md-3 col-sm-3 ">Loading site:</label>
 										<div class="col-md-9 col-sm-9 ">
 											<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="DriverbasePlant"
 											id="DriverbasePlant" readonly value={{driverDocket.basePlant}} required>
