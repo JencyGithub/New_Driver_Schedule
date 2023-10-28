@@ -98,5 +98,10 @@ urlpatterns = [
     
     
     
-
+    # Base plant routes
+    path('SurchargeTable/', views.surchargeTable, name='surchargeTable'),
+    path('Surcharge/add/', views.surchargeForm, name='surchargeAdd'),
+    path('Surcharge/add/save/', views.surchargeSave, name='surchargeAddSave'),   
+    path('Surcharge/edit/<int:id>/', views.surchargeForm, name='surchargeEdit'),      
+    path('Surcharge/edit/save/<int:id>/', views.surchargeSave, name='surchargeEditSave'),
 ]

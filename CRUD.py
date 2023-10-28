@@ -19,11 +19,11 @@ model_mapping = {
     'BasePlant' : BasePlant,
     'DriverTrip' : DriverTrip,
     'DriverDocket' : DriverDocket,
-    'PastTrip' : PastTrip,
     'RCTI' : RCTI,
     'RCTIDocketAdjustment' : RCTIDocketAdjustment,
     'PublicHoliday':PublicHoliday,
-    'User' : User 
+    'User' : User ,
+    'Surcharge' : Surcharge
 }
 
 def insertIntoTable(tableName:str,dataSet:dict,model_mapping=model_mapping):

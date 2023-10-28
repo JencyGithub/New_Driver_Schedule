@@ -43,10 +43,17 @@ request {% endblock %} {% block headStyle %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Driver Docket Entry Form </h2>
-                            <label for="returnToYard" class="float-right ml-2"
-                                style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
-                            <input type="checkbox" id="returnToYard" onclick="returnToYard_()" name="returnToYard" class="float-right "
-                                style="margin-top: .8rem;">
+                                <div class="float-right">
+                                    <input type="radio" id="tippingToYard" name="returnToYard" 
+                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)" value="returnToYard">
+                                    <label for="tippingToYard" class=" ml-2"
+                                    style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
+                                    <input type="radio" id="returnToYard" name="returnToYard" value="tippingToYard"
+                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)">
+                                    <label for="returnToYard" class=" ml-2"
+                                        style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+                                    <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio"></i>
+                                </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -84,7 +91,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <select name="basePlant" class="form-control">
                                             {% for basePlant_ in basePlants %}
-                                            <option " {% if item.basePlant.basePlant == basePlant_.basePlant %}selected="selected" {% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
+                                            <option {% if item.basePlant.basePlant == basePlant_.basePlant %}selected{% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -156,13 +163,9 @@ request {% endblock %} {% block headStyle %}
                                     <label for="surcharge_type">Surcharge Type:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select name="surcharge_type" class="form-control" >
-                                            <option value="fixed normal" {% if item.surcharge_type == 'fixednormal' %}selected="selected" {% endif %}>fixed normal</option>
-                                            <option value="fixed sunday" {% if item.surcharge_type == 'fixed sunday'%}selected="selected" {% endif %}>fixed sunday</option>
-                                            <option value="fixed public holiday" {% if item.surcharge_type == 'fixed public holiday' %}selected="selected" {% endif %}>fixed public holiday</option>
-                                            <option value="per cubic meters normal" {% if item.surcharge_type == 'per cubic meters normal' %}selected="selected" {% endif %}>per cubic meters normal</option>
-                                            <option value="per cubic meters sunday" {% if item.surcharge_type == 'per cubic meters sunday' %}selected="selected" {% endif %}>per cubic meters sunday</option>
-                                            <option value="per cubic meters public holiday" {% if driverTrip.surcharge_type == 'per cubic meters public holiday'%}selected="selected" {% endif %}>per cubic meters public holiday
-                                            </option>
+                                            {% for surcharge in surcharges %}
+                                            <option value="{{surcharge.id}}">{{surcharge.surcharge_Name}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -242,16 +245,7 @@ request {% endblock %} {% block headStyle %}
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 
-    function returnToYard_(){
-        let selected = $(('#returnToYard')).is(':checked')
-        if(selected){
-            $('#returnQty').removeAttr('disabled')
-            $('#returnKm').removeAttr('disabled')
-        }else{
-            $('#returnQty').attr('disabled',true)
-            $('#returnKm').attr('disabled',true)
-        }
-    }
+
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
     var validator = new FormValidator(
@@ -278,6 +272,22 @@ request {% endblock %} {% block headStyle %}
             $('form .alert').remove();
     }).prop('checked', false);
     
+    function returnToYard_(data){
+        let selected = $(`#${data.id}`).is(':checked')
+        if(selected){
+            $('#returnQty').removeAttr('disabled')
+            $('#returnKm').removeAttr('disabled')
+        }else{
+            $('#returnQty').attr('disabled',true)
+            $('#returnKm').attr('disabled',true)
+        }
+    }
+
+    $("#resetRadio").click(function(){
+        $("input[type='radio']").removeAttr('checked')
+        $('#returnQty').attr('disabled',true)
+        $('#returnKm').attr('disabled',true)
+    });
     
 </script>
 {% endblock %} {% endblock %}

@@ -32,17 +32,19 @@ class RateCard(models.Model):
     
     def __str__(self) -> str:
         return str(self.rate_card_name)
+
+class Surcharge(models.Model):
+    surcharge_Name = models.CharField(max_length=255)
+    
+    def __str__(self) -> str:
+        return str(self.surcharge_Name)
     
 class CostParameters(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     loading_cost_per_cubic_meter = models.FloatField(default=0)
     km_cost = models.FloatField(default=0)
-    surcharge_fixed_normal_cost = models.FloatField(default=0)
-    surcharge_fixed_sunday_cost = models.FloatField(default=0)
-    surcharge_fixed_public_holiday_cost = models.FloatField(default=0)
-    surcharge_per_cubic_meters_normal_cost = models.FloatField(default=0)
-    surcharge_per_cubic_meters_sunday_cost = models.FloatField(default=0)
-    surcharge_per_cubic_meters_public_holiday_cost = models.FloatField(default=0)
+    surcharge_type = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
+    surcharge_cost = models.FloatField(default=0)
     transfer_cost = models.FloatField(default=0)
     return_load_cost = models.FloatField(default=0)# change name added
     return_km_cost = models.FloatField(default=0) # new added
@@ -51,8 +53,8 @@ class CostParameters(models.Model):
     waiting_cost_per_minute = models.FloatField(default=0)
     call_out_fees = models.FloatField(default=0)
     demurrage_fees = models.FloatField(default=0)
+    cancellation_fees = models.FloatField(default=0) 
     start_date = models.DateField(default=timezone.now())
-    # end_date = models.DateField(default=timezone.now() + timezone.timedelta(weeks=520))
     end_date = models.DateField(null=True, blank=True)
 
 class ThresholdDayShift(models.Model):
@@ -60,23 +62,24 @@ class ThresholdDayShift(models.Model):
     threshold_amount_per_day_shift = models.FloatField(default=0)
     loading_cost_per_cubic_meter_included = models.BooleanField(default=True)
     km_cost_included = models.BooleanField(default=True)
+    surcharge_included  = models.BooleanField(default=True)
 
-    surcharge_fixed_normal_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_public_holiday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
+    # surcharge_fixed_normal_cost_included = models.BooleanField(default=False)
+    # surcharge_fixed_sunday_cost_included = models.BooleanField(default=False)
+    # surcharge_fixed_public_holiday_cost_included = models.BooleanField(default=False)
+    # surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
+    # surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
+    # surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
     transfer_cost_included = models.BooleanField(default=True)
     return_cost_included = models.BooleanField(default=True)
     standby_cost_included = models.BooleanField(default=True)
     waiting_cost_included = models.BooleanField(default=True)
     call_out_fees_included = models.BooleanField(default=True)
-    demurrage_fees_included = models.BooleanField(default=True)
+    # demurrage_fees_included = models.BooleanField(default=True)
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
-    min_load_in_cubic_meters_trip = models.FloatField(default=0)
+    # min_load_in_cubic_meters_trip = models.FloatField(default=0)
      
     return_load_grace = models.FloatField(default=1)# new added
 
@@ -88,22 +91,15 @@ class ThresholdNightShift(models.Model):
     threshold_amount_per_night_shift = models.FloatField(default=0)
     loading_cost_per_cubic_meter_included = models.BooleanField(default=True)
     km_cost_included = models.BooleanField(default=True)
-    surcharge_fixed_normal_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_public_holiday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
+    surcharge_included  = models.BooleanField(default=True)
     transfer_cost_included = models.BooleanField(default=True)
     return_cost_included = models.BooleanField(default=True)
     standby_cost_included = models.BooleanField(default=True)
     waiting_cost_included = models.BooleanField(default=True)
     call_out_fees_included = models.BooleanField(default=True)
-    demurrage_fees_included = models.BooleanField(default=True)
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
-    min_load_in_cubic_meters_trip = models.FloatField(default=0)
 
     return_load_grace = models.FloatField(default=1)# new added
 
@@ -127,14 +123,10 @@ class OnLease(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     hourly_subscription_charge = models.FloatField(default=0)
     daily_subscription_charge = models.FloatField(default=0)
-    monthly_subscription_charge = models.FloatField(default=0)
-    quarterly_subscription_charge = models.FloatField(default=0)
-    surcharge_fixed_normal_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_fixed_public_holiday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
-    surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
+    weekly_subscription_charge = models.FloatField(default=0)
+    # quarterly_subscription_charge = models.FloatField(default=0)
+    over_time_charge = models.FloatField(default=0) 
+    surcharge_included  = models.BooleanField(default=True)
     transfer_cost_applicable = models.BooleanField(default=True)
     return_cost_applicable = models.BooleanField(default=True)
     standby_cost_per_slot_applicable = models.BooleanField(default=True)

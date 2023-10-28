@@ -45,12 +45,10 @@ def insertIntoDatabase(data,key):
             tripObj.endTime = str(data[7])
             
         tripObj.save()
-        try:
-            basePlant = BasePlant.objects.get(pk=1) 
-        except:
-            basePlant = BasePlant.objects.create(basePlant = "Not selected")
+
+        basePlant = BasePlant.objects.get_or_create(basePlant = "Not selected")[0] 
+        surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'Nosurcharge')[0]
             
-        
         docketObj = DriverDocket(
             shiftDate = ' ' if str(data[0]) == 'nan' else data[0],
             tripId = tripObj,
@@ -68,7 +66,7 @@ def insertIntoDatabase(data,key):
             standByEndTime = ' ' if str(data[21]) == 'nan' else data[21],
             comment = data[17],
             basePlant = basePlant,
-            # surcharge_type = ,
+            surcharge_type = surCharge,
             # surcharge_duration = ,
             # others = ,
         )

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil, json
+import shutil
+import json
 import os
 import tabula
 import requests
@@ -24,6 +25,7 @@ from .models import RCTI
 from django.http import Http404
 from django.core.serializers.json import DjangoJSONEncoder
 from Account_app.reconciliationUtils import *
+
 
 def index(request):
     return render(request, 'Account/dashboard.html')
@@ -89,10 +91,12 @@ def createFormSession(request):
 
         load_sheet_folder_path = 'Temp_Load_Sheet'
         fileName = loadSheet.name
-        time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
         time = time[0]
 
-        load_sheet_new_filename = 'Load_Sheet' + time +  '!_@' + fileName.replace(" ", "").replace("\t", "")
+        load_sheet_new_filename = 'Load_Sheet' + time + \
+            '!_@' + fileName.replace(" ", "").replace("\t", "")
 
         lfs = FileSystemStorage(location=load_sheet_folder_path)
         lfs.save(load_sheet_new_filename, loadSheet)
@@ -136,7 +140,8 @@ def formsSave(request):
     temp_loadSheet = ''
     Docket_no = []
     Docket_file = []
-    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+    time = (str(timezone.now())).replace(':', '').replace(
+        '-', '').replace(' ', '').split('.')
     time = time[0]
 
     if not request.session['data']['docketGiven']:
@@ -152,12 +157,14 @@ def formsSave(request):
             temp_loadSheet = temp_loadSheet + '-' + docket_number
 
             if docket_files:
-                fileName = docketFileSave(docket_files,docket_number,returnVal='file_name')
-                
+                fileName = docketFileSave(
+                    docket_files, docket_number, returnVal='file_name')
+
                 Docket_file.append(fileName)
 
     if not os.path.exists('static/img/finalloadSheet/' + loadSheet):
-        shutil.move('Temp_Load_Sheet/' + loadSheet,'static/img/finalloadSheet/' + loadSheet)
+        shutil.move('Temp_Load_Sheet/' + loadSheet,
+                    'static/img/finalloadSheet/' + loadSheet)
 
     driver = Driver.objects.get(driverId=driverId)
 
@@ -193,6 +200,7 @@ def formsSave(request):
                 docketFile='static/img/docketFiles/' + Docket_file[i],
                 basePlant=BasePlantVal
             )
+            docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'Nosurcharge')[0]
             docket_.save()
 
     del request.session['data']
@@ -228,6 +236,7 @@ def rctiForm(request, id):
         'rcti': rcti,
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
+
 
 @csrf_protect
 def rctiSave(request):
@@ -270,7 +279,8 @@ def driverEntrySave(request):
     if not Driver_csv_file:
         return HttpResponse("No file uploaded")
     try:
-        time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(Driver_csv_file.name)
 
@@ -292,18 +302,21 @@ def driverEntrySave(request):
 
 
 def driverDocketEntry(request, ids, driverDocketNumber=None):
+    surcharges = Surcharge.objects.all()
+
     docketData = None
     if driverDocketNumber:
-        docketData = DriverDocket.objects.filter(docketNumber = driverDocketNumber).first()
+        docketData = DriverDocket.objects.filter(
+            docketNumber=driverDocketNumber).first()
 
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
-        
         base_plant = BasePlant.objects.all()
         params = {
             'basePlants': base_plant,
             'id': ids,
-            'docketData' :docketData
+            'docketData': docketData,
+            'surcharges': surcharges
         }
         return render(request, 'Account/driverDocketEntry.html', params)
     else:
@@ -312,13 +325,13 @@ def driverDocketEntry(request, ids, driverDocketNumber=None):
 
 
 def driverDocketEntrySave(request, ids):
-
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     shiftDate_ = request.POST.get('shiftDate')
-
+    surchargeObj = Surcharge.objects.get(pk=request.POST.get('surcharge_type'))
     try:
-        docketNumber = DriverDocket.objects.get(docketNumber=docketNumber_,shiftDate=shiftDate_,tripId = driver_trip_id)
+        docketNumber = DriverDocket.objects.get(
+            docketNumber=docketNumber_, shiftDate=shiftDate_, tripId=driver_trip_id)
         messages.error(request, "This docket number and date already exists!")
         return redirect(request.META.get('HTTP_REFERER'))
     except:
@@ -327,22 +340,28 @@ def driverDocketEntrySave(request, ids):
             shiftDate=shiftDate_,
             tripId=driver_trip_id,
             docketNumber=docketNumber_,
-            docketFile=docketFileSave(docketFile,docketNumber_),
+            docketFile=docketFileSave(docketFile, docketNumber_),
             basePlant=BasePlant.objects.get(pk=request.POST.get('basePlant')),
             noOfKm=request.POST.get('noOfKm'),
             transferKM=request.POST.get('transferKM'),
-            returnToYard = True if request.POST.get('returnToYard') == 'on' else False,
-            surcharge_type=request.POST.get('surcharge_type'),
+            surcharge_type=surchargeObj,
             surcharge_duration=request.POST.get('surcharge_duration'),
             cubicMl=request.POST.get('cubicMl'),
             others=request.POST.get('others')
         )
-        if DriverDocketObj.returnToYard:
-                DriverDocketObj.returnQty = request.POST.get('returnQty')
-                DriverDocketObj.returnKm = request.POST.get('returnKm')
-        DriverDocketObj.waitingTimeStart = request.POST.get('waitingTimeStart')        
+
+        if request.POST.get('returnToYard') == 'returnToYard':
+            DriverDocketObj.returnQty = request.POST.get('returnQty')
+            DriverDocketObj.returnKm = request.POST.get('returnKm')
+            DriverDocketObj.returnToYard = True
+        elif request.POST.get('returnToYard') == 'tippingToYard':
+            DriverDocketObj.returnQty = request.POST.get('returnQty')
+            DriverDocketObj.returnKm = request.POST.get('returnKm')
+            DriverDocketObj.tippingToYard = True
+
+        DriverDocketObj.waitingTimeStart = request.POST.get('waitingTimeStart')
         DriverDocketObj.waitingTimeEnd = request.POST.get('waitingTimeEnd')
-        DriverDocketObj.totalWaitingInMinute = getTimeDifference(DriverDocketObj.waitingTimeStart,DriverDocketObj.waitingTimeEnd,'minutes')
+        DriverDocketObj.totalWaitingInMinute = getTimeDifference(DriverDocketObj.waitingTimeStart, DriverDocketObj.waitingTimeEnd)
         DriverDocketObj.standByStartTime = request.POST.get('standByStartTime')
         DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
         DriverDocketObj.comment = request.POST.get('comment')
@@ -353,7 +372,8 @@ def driverDocketEntrySave(request, ids):
 
 def rctiCsvForm(request):
     BasePlant_ = BasePlant.objects.all()
-    return render(request,'Account/rctiCsvForm.html',{'basePlants':BasePlant_})
+    return render(request, 'Account/rctiCsvForm.html', {'basePlants': BasePlant_})
+
 
 def driverSampleCsv(request):
     return FileResponse(open(f'static/Account/sampleDriverEntry.xlsx', 'rb'), as_attachment=True)
@@ -368,14 +388,16 @@ def rctiTable(request):
 
     if startDate_:
         if endDate_:
-            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+            rctiData = RCTI.objects.filter(
+                docketDate__range=(startDate_, endDate_)).values()
         else:
-            messages.error(request,"Please enter End Date.")
+            messages.error(request, "Please enter End Date.")
             return redirect(request.META.get('HTTP_REFERER'))
     elif basePlant_:
         rctiData = RCTI.objects.filter(docketYard=basePlant_.upper()).values()
     else:
-        messages.error(request,"Please select either Start Date or Base Plant.")
+        messages.error(
+            request, "Please select either Start Date or Base Plant.")
         return redirect(request.META.get('HTTP_REFERER'))
     # return HttpResponse(request.session['user_type'])
     params = {
@@ -388,32 +410,34 @@ def basePlantTable(request):
     basePlant_ = BasePlant.objects.all()
     return render(request, 'Account/Tables/basePlantTable.html', {'BP_': basePlant_})
 
-def basePlantForm(request,id=None):
+
+def basePlantForm(request, id=None):
     basePlant = None
     if id:
         basePlant = BasePlant.objects.get(pk=id)
 
     params = {
-        'data' : basePlant  
+        'data': basePlant
     }
 
     return render(request, "Account/basePlantForm.html", params)
+
 
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
     dataList = {
-        'basePlant' : request.POST.get('basePlant')
-    }   
+        'basePlant': request.POST.get('basePlant')
+    }
     if id is not None:
-        updateIntoTable(record_id=id,tableName='BasePlant',dataSet=dataList)
+        updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant updated successfully')
     else:
-        insertIntoTable(tableName='BasePlant',dataSet=dataList)
+        insertIntoTable(tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant added successfully')
 
     return redirect('Account:basePlantTable')
-    
+
 
 def driverTripsTable(request):
     driver_trip = DriverTrip.objects.all()
@@ -423,7 +447,6 @@ def driverTripsTable(request):
         'clientName': clientName
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
-
 
 
 def foreignKeySet(dataset):
@@ -454,10 +477,13 @@ def driverTripCsv(request):
     elif ClientId:
         driver_trip = DriverTrip.objects.filter(clientName=ClientId).values()
         foreignKeySet(driver_trip)
-    elif request.POST.get('startDate')  and request.POST.get('endDate'):
-        startDate = date(int(startDate_values[0]),int(startDate_values[1]),int(startDate_values[2]))
-        endDate = date(int(endDate_values[0]), int(endDate_values[1]), int(endDate_values[2]))
-        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    elif request.POST.get('startDate') and request.POST.get('endDate'):
+        startDate = date(int(startDate_values[0]), int(
+            startDate_values[1]), int(startDate_values[2]))
+        endDate = date(int(endDate_values[0]), int(
+            endDate_values[1]), int(endDate_values[2]))
+        driver_trip = DriverTrip.objects.filter(
+            shiftDate__range=(startDate, endDate)).values()
         foreignKeySet(driver_trip)
     else:
         driver_trip = DriverTrip.objects.all().values()
@@ -465,19 +491,20 @@ def driverTripCsv(request):
     try:
         for trip in driver_trip:
             temp_trip_data_list.append([
-                    trip['verified'],
-                    trip['driverId_id'],
-                    trip['clientName_id'],
-                    trip['shiftType'],
-                    trip['numberOfLoads'],
-                    trip['truckNo'],
-                    trip['shiftDate'],
-                    trip['startTime'],
-                    trip['endTime'],
-                    trip['loadSheet'],
-                    trip['comment'],
-                ])
-            related_dockets = DriverDocket.objects.filter(tripId=trip['id']).values_list()
+                trip['verified'],
+                trip['driverId_id'],
+                trip['clientName_id'],
+                trip['shiftType'],
+                trip['numberOfLoads'],
+                trip['truckNo'],
+                trip['shiftDate'],
+                trip['startTime'],
+                trip['endTime'],
+                trip['loadSheet'],
+                trip['comment'],
+            ])
+            related_dockets = DriverDocket.objects.filter(
+                tripId=trip['id']).values_list()
             if related_dockets:
                 for docket in related_dockets:
                     temp_docket_data_list.append(list(docket))
@@ -489,10 +516,11 @@ def driverTripCsv(request):
             else:
                 data_list.extend(temp_trip_data_list)
                 temp_trip_data_list.clear()
-    except Exception as e :
+    except Exception as e:
         print(e)
-        
-    time = str(timezone.now()).replace(':', '').replace('-', '').replace(' ', '').split('.')
+
+    time = str(timezone.now()).replace(':', '').replace(
+        '-', '').replace(' ', '').split('.')
     newFileName = time[0]
     location = 'static/Account/DriverTripCsvDownload/'
     lfs = FileSystemStorage(location=location)
@@ -512,8 +540,6 @@ def driverTripCsv(request):
     return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
 
 
-
-    
 @csrf_protect
 @api_view(['POST'])
 def verifiedFilter(request):
@@ -533,7 +559,6 @@ def clientFilter(request):
         clientName=request.POST.get('id')).values()
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
-
 
 
 @api_view(['POST'])
@@ -557,8 +582,10 @@ def DriverTripEditForm(request, id):
     driver = Driver.objects.all()
     clientName = Client.objects.all()
     AdminTrucks = AdminTruck.objects.all()
-    driver_trip.shiftDate = dateConverterFromTableToPageFormate( driver_trip.shiftDate)
+    driver_trip.shiftDate = dateConverterFromTableToPageFormate(
+        driver_trip.shiftDate)
     driver_docket = DriverDocket.objects.filter(tripId=id)
+    surcharges = Surcharge.objects.all()
     count_ = 0
     for i in driver_docket:
         i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
@@ -572,7 +599,8 @@ def DriverTripEditForm(request, id):
         'basePlants': base_plant,
         'Driver': driver,
         'Client': clientName,
-        'trucks': AdminTrucks
+        'trucks': AdminTrucks,
+        'surcharges' : surcharges
     }
     return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
 
@@ -582,15 +610,17 @@ def driverEntryUpdate(request, ids):
     # Update Trip Save
     driver_trip = DriverTrip.objects.get(id=ids)
 
-    driver_trip.verified = True if request.POST.get('verified') == 'on' else False
+    driver_trip.verified = True if request.POST.get(
+        'verified') == 'on' else False
     driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
-    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
+    driver_trip.clientName = Client.objects.get(
+        pk=request.POST.get('clientName'))
     driver_trip.shiftType = request.POST.get('shiftType')
     driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
     driver_trip.truckNo = request.POST.get('truckNo')
     driver_trip.shiftDate = request.POST.get('shiftDate')
     driver_trip.startTime = request.POST.get('startTime')
-    driver_trip.endTime = request.POST.get('endTime') 
+    driver_trip.endTime = request.POST.get('endTime')
     if request.FILES.get('loadSheet'):
         loadSheet = request.FILES.get('loadSheet')
         driver_trip.loadSheet = loadFileSave(loadSheet)
@@ -598,12 +628,12 @@ def driverEntryUpdate(request, ids):
     driver_trip.comment = request.POST.get('comment')
     driver_trip.save()
 
-    
     driver_docket = DriverDocket.objects.filter(tripId=ids).values()
     count_ = 0
     for i in driver_docket:
         try:
-            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))),shiftDate=request.POST.get(f'shiftDate{count_}'))
+            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(
+                f'docketNumber{count_}'))), shiftDate=request.POST.get(f'shiftDate{count_}'))
             if docketNumberVal.docketId != i['docketId']:
                 messages.error(request, "Docket must be unique.")
                 return redirect(request.META.get('HTTP_REFERER'))
@@ -611,27 +641,37 @@ def driverEntryUpdate(request, ids):
             pass
         docketObj = DriverDocket.objects.get(pk=i['docketId'])
         docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
-        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
+        docketObj.docketNumber = int(
+            float(request.POST.get(f'docketNumber{count_}')))
         if request.FILES.get(f'docketFile{count_}'):
             docketFiles = request.FILES.get(f'docketFile{count_}')
-            docketObj.docketFile = docketFileSave(docketFiles,docketObj.docketNumber)
-        docketObj.basePlant = BasePlant.objects.get(pk=request.POST.get(f'basePlant{count_}'))
+            docketObj.docketFile = docketFileSave(
+                docketFiles, docketObj.docketNumber)
+        docketObj.basePlant = BasePlant.objects.get(
+            pk=request.POST.get(f'basePlant{count_}'))
         docketObj.noOfKm = request.POST.get(f'noOfKm{count_}')
         docketObj.transferKM = request.POST.get(f'transferKM{count_}')
-        docketObj.returnToYard = True if request.POST.get(f'returnToYard{count_}') == 'on' else False
-        if docketObj.returnToYard:
+        surchargeObj = Surcharge.objects.get(pk = request.POST.get(f'surcharge_type{count_}'))
+        docketObj.surcharge_type = surchargeObj
+        if request.POST.get(f'returnToYard{count_}') == f'returnToYard{count_}':
             docketObj.returnQty = request.POST.get(f'returnQty{count_}')
             docketObj.returnKm = request.POST.get(f'returnKm{count_}')
-        # return HttpResponse(docketObj.returnToYard)
-        docketObj.waitingTimeStart = request.POST.get(f'waitingTimeStart{count_}')     
+            docketObj.returnToYard = True
+        elif request.POST.get(f'returnToYard{count_}') == f'tippingToYard{count_}':
+            docketObj.returnQty = request.POST.get(f'returnQty{count_}')
+            docketObj.returnKm = request.POST.get(f'returnKm{count_}')
+            docketObj.tippingToYard = True
+        
+        docketObj.waitingTimeStart = request.POST.get(
+            f'waitingTimeStart{count_}')
         docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
-        print(docketObj.waitingTimeEnd)
-        # return HttpResponse(docketObj.waitingTimeStart)   
-        docketObj.totalWaitingInMinute = getTimeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
-        docketObj.surcharge_type = request.POST.get(f'surcharge_type{count_}')
-        docketObj.surcharge_duration = request.POST.get(f'surcharge_duration{count_}')
+        docketObj.totalWaitingInMinute = getTimeDifference(
+            docketObj.waitingTimeStart, docketObj.waitingTimeEnd)
+        docketObj.surcharge_duration = request.POST.get(
+            f'surcharge_duration{count_}')
         docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
-        docketObj.standByStartTime = request.POST.get(f'standByStartTime{count_}')
+        docketObj.standByStartTime = request.POST.get(
+            f'standByStartTime{count_}')
         docketObj.standByEndTime = request.POST.get(f'standByEndTime{count_}')
         docketObj.others = request.POST.get(f'others{count_}')
         docketObj.comment = request.POST.get(f'comment{count_}')
@@ -649,30 +689,35 @@ def reconciliationForm(request):
     trucks = AdminTruck.objects.all()
     return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
 
+
 def reconciliationResult(request):
     serialized_data = request.session.get('reconciliationResultData', "[]")
     dataList = json.loads(serialized_data)
-    
+
     for entry in dataList:
         if 'docketDate' in entry:
-            entry['docketDate'] = datetime.datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
+            entry['docketDate'] = datetime.datetime.strptime(
+                entry['docketDate'], '%Y-%m-%d').date()
 
-    basePlants = BasePlant.objects.all() 
+    basePlants = BasePlant.objects.all()
     params = {
         'dataList': dataList,
-        'basePlants' : basePlants
+        'basePlants': basePlants
     }
     return render(request, 'Reconciliation/reconciliation-result.html', params)
+
 
 @csrf_protect
 @api_view(['POST'])
 def reconciliationAnalysis(request):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-    
-    rcti_data = RCTI.objects.filter(docketDate__range=(startDate, endDate)).values()
 
-    driver_docket_data = DriverDocket.objects.filter(shiftDate__range=(startDate, endDate)).values()
+    rcti_data = RCTI.objects.filter(
+        docketDate__range=(startDate, endDate)).values()
+
+    driver_docket_data = DriverDocket.objects.filter(
+        shiftDate__range=(startDate, endDate)).values()
 
     unique_RCTI = {int(item['docketNumber']) for item in rcti_data}
     unique_driverDocket = {item['docketNumber'] for item in driver_docket_data}
@@ -689,17 +734,18 @@ def reconciliationAnalysis(request):
     dataList = []
 
     for rcti_entry in rcti_data:
+        # return HttpResponse(rcti_entry)
         docket_number = int(rcti_entry['docketNumber'])
         data_entry = {
             'docketNumber': docket_number,
             'class': 'text-danger' if docket_number not in common_docket else 'text-success',
-            'loadAndKmCost': checkLoadAndKmCost(rcti_entry['cartageTotalExGST'],rcti_entry['docketNumber'],rcti_entry['docketDate']),
-            'waitingTimeTotal': rcti_entry['waitingTimeTotal'],
-            'surchargeTotal': rcti_entry['surchargeTotal'],
+            'loadAndKmCost': checkLoadAndKmCost(rcti_entry['cartageTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
+            'calculatedSurcharge': checkSurcharge(rcti_entry['surchargeTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
+            'calculatedWaitingTimeTotal': checkWaitingTime(rcti_entry['waitingTimeInMinutes'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
             'returnKM': rcti_entry['returnKm'],
             'standByTotal': rcti_entry['standByTotal'],
             'othersTotal': rcti_entry['othersTotal'],
-            **rcti_entry  
+            **rcti_entry
         }
         dataList.append(data_entry)
 
@@ -708,7 +754,7 @@ def reconciliationAnalysis(request):
         data_entry = {
             'docketNumber': docket_number,
             'class': 'text-danger' if docket_number not in common_docket else 'text-success',
-            **driver_docket_entry 
+            **driver_docket_entry
         }
         if data_entry['docketNumber'] not in common_docket:
             dataList.append(data_entry)
@@ -719,255 +765,308 @@ def reconciliationAnalysis(request):
     return redirect('Account:reconciliationResult')
 
 
-def reconciliationDocketView(request,docketNumber):
+def reconciliationDocketView(request, docketNumber):
     # try:
-    rctiDocket = RCTI.objects.filter(docketNumber = docketNumber).first()
-    driverDocket = DriverDocket.objects.filter(docketNumber = docketNumber).first()
+    rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
+    driverDocket = DriverDocket.objects.filter(
+        docketNumber=docketNumber).first()
     if rctiDocket:
-        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
+        rctiDocket.docketDate = dateConverterFromTableToPageFormate(
+            rctiDocket.docketDate)
         rctiDocket.docketNumber = int(rctiDocket.docketNumber)
     if driverDocket:
-        driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
-        
+        driverDocket.shiftDate = dateConverterFromTableToPageFormate(
+            driverDocket.shiftDate)
+
     params = {
-        'rctiDocket' : rctiDocket,
-        'driverDocket' : driverDocket
+        'rctiDocket': rctiDocket,
+        'driverDocket': driverDocket
     }
-    
-    return render(request, 'Reconciliation/reconciliation-docket.html',params)
+
+    return render(request, 'Reconciliation/reconciliation-docket.html', params)
+
 
 def publicHoliday(request):
     data = PublicHoliday.objects.all()
     params = {
-        'data' : data
+        'data': data
     }
-    return render(request,'Account/Tables/PublicHoliday.html',params) 
+    return render(request, 'Account/Tables/PublicHoliday.html', params)
 
-def publicHolidayForm(request,id=None):
+
+def publicHolidayForm(request, id=None):
     data = None
     if id:
         data = PublicHoliday.objects.get(pk=id)
         data.date = dateConverterFromTableToPageFormate(data.date)
     params = {
-        'data' : data
+        'data': data
     }
-    return render(request,'Account/PublicHolidayForm.html',params)
+    return render(request, 'Account/PublicHolidayForm.html', params)
+
 
 @csrf_protect
 @api_view(['POST'])
-def publicHolidaySave(request,id=None):
+def publicHolidaySave(request, id=None):
     dataList = {
-        'date' : request.POST.get('date'),
-        'stateName' : request.POST.get('state'),
-        'description' :request.POST.get('description') 
+        'date': request.POST.get('date'),
+        'stateName': request.POST.get('state'),
+        'description': request.POST.get('description')
     }
     if id:
-        updateIntoTable(record_id=id,tableName='PublicHoliday',dataSet=dataList)
+        updateIntoTable(
+            record_id=id, tableName='PublicHoliday', dataSet=dataList)
         messages.success(request, 'Holiday updated successfully')
     else:
-        insertIntoTable(tableName='PublicHoliday',dataSet=dataList)
+        insertIntoTable(tableName='PublicHoliday', dataSet=dataList)
         messages.success(request, 'Holiday added successfully')
 
     return redirect('Account:publicHoliday')
 
 
 # ````````````````````````````````````
-# Rate Card 
+# Rate Card
 
 # ```````````````````````````````````
 
 def rateCardTable(request):
     RateCards = RateCard.objects.all()
     params = {
-        'rateCard' : RateCards
+        'rateCard': RateCards
     }
-    return render(request , 'Account/Tables/rateCardTable.html',params)
+    return render(request, 'Account/Tables/rateCardTable.html', params)
 
-def rateCardForm(request,id = None):
+
+def rateCardForm(request, id=None):
 
     rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = None
+    surcharges = Surcharge.objects.all()
     if id:
         rateCard = RateCard.objects.get(pk=id)
-        costParameters = CostParameters.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
-        thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first() 
-        thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
-        grace = Grace.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
-        onLease = OnLease.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
-        
-        costParameters['start_date'] = dateConverterFromTableToPageFormate(costParameters['start_date'])
-        thresholdDayShift['start_date'] = dateConverterFromTableToPageFormate(thresholdDayShift['start_date'])
-        thresholdNightShift['start_date'] = dateConverterFromTableToPageFormate(thresholdNightShift['start_date'])
-        grace['start_date'] = dateConverterFromTableToPageFormate(grace['start_date'])
-        onLease['start_date'] = dateConverterFromTableToPageFormate(onLease['start_date'])
-        
-        
+        print(rateCard.id)
+        costParameters = CostParameters.objects.filter(
+            rate_card_name=rateCard.id, end_date=None).values().first()
+        thresholdDayShift = ThresholdDayShift.objects.filter(
+            rate_card_name=rateCard.id, end_date=None).values().first()
+        thresholdNightShift = ThresholdNightShift.objects.filter(
+            rate_card_name=rateCard.id, end_date=None).values().first()
+        grace = Grace.objects.filter(
+            rate_card_name=rateCard.id, end_date=None).values().first()
+        # onLease = OnLease.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
+
+        costParameters['start_date'] = dateConverterFromTableToPageFormate(
+            costParameters['start_date'])
+        thresholdDayShift['start_date'] = dateConverterFromTableToPageFormate(
+            thresholdDayShift['start_date'])
+        thresholdNightShift['start_date'] = dateConverterFromTableToPageFormate(
+            thresholdNightShift['start_date'])
+        grace['start_date'] = dateConverterFromTableToPageFormate(
+            grace['start_date'])
+        # onLease['start_date'] = dateConverterFromTableToPageFormate(onLease['start_date'])
+
     params = {
-        'rateCard' : rateCard,
-        'costParameters' : costParameters,
-        'thresholdDayShift' : thresholdDayShift,
-        'thresholdNightShift' : thresholdNightShift,
-        'grace' : grace,    
-        'onLease' : onLease
+        'rateCard': rateCard,
+        'costParameters': costParameters,
+        'thresholdDayShift': thresholdDayShift,
+        'thresholdNightShift': thresholdNightShift,
+        'grace': grace,
+        # 'onLease' : onLease,
+        'surcharges': surcharges
     }
-    return render(request, 'Account/rateCardForm.html',params)
+    return render(request, 'Account/rateCardForm.html', params)
+
 
 @csrf_protect
 @api_view(['POST'])
 def rateCardSave(request, id=None):
     # print(type(request.POST.get('costParameters_start_date')))
     # return HttpResponse('work')
-    # Rate Card 
+    # Rate Card
     rateCardID = None
     if not id:
         rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
         rateCard.save()
-        rateCardID = RateCard.objects.get(rate_card_name=request.POST.get('rate_card_name'))
+        rateCardID = RateCard.objects.get(
+            rate_card_name=request.POST.get('rate_card_name'))
     else:
         rateCardID = RateCard.objects.get(pk=id)
 
-        oldCostParameters = CostParameters.objects.get(rate_card_name = rateCardID.id, end_date = None)
-        oldCostParameters.end_date = getYesterdayDate(request.POST.get('costParameters_start_date'))
+        oldCostParameters = CostParameters.objects.get(
+            rate_card_name=rateCardID.id, end_date=None)
+        oldCostParameters.end_date = getYesterdayDate(
+            request.POST.get('costParameters_start_date'))
         print(oldCostParameters.end_date)
         oldCostParameters.save()
 
-        oldThresholdDayShift = ThresholdDayShift.objects.get(rate_card_name = rateCardID.id, end_date = None)
-        oldThresholdDayShift.end_date = getYesterdayDate(request.POST.get('thresholdDayShift_start_date'))
+        oldThresholdDayShift = ThresholdDayShift.objects.get(
+            rate_card_name=rateCardID.id, end_date=None)
+        oldThresholdDayShift.end_date = getYesterdayDate(
+            request.POST.get('thresholdDayShift_start_date'))
         oldThresholdDayShift.save()
-        
-        oldThresholdNightShift = ThresholdNightShift.objects.get(rate_card_name = rateCardID.id, end_date = None)
-        oldThresholdNightShift.end_date = getYesterdayDate(request.POST.get('thresholdNightShift_start_date'))
+
+        oldThresholdNightShift = ThresholdNightShift.objects.get(
+            rate_card_name=rateCardID.id, end_date=None)
+        oldThresholdNightShift.end_date = getYesterdayDate(
+            request.POST.get('thresholdNightShift_start_date'))
         oldThresholdNightShift.save()
-        
-        oldGrace = Grace.objects.get(rate_card_name = rateCardID.id, end_date = None)
-        oldGrace.end_date = getYesterdayDate(request.POST.get('grace_start_date'))
+
+        oldGrace = Grace.objects.get(
+            rate_card_name=rateCardID.id, end_date=None)
+        oldGrace.end_date = getYesterdayDate(
+            request.POST.get('grace_start_date'))
         oldGrace.save()
-        
-        oldOnLease = OnLease.objects.get(rate_card_name = rateCardID.id, end_date = None)
-        oldOnLease.end_date = getYesterdayDate(request.POST.get('onLease_start_date'))
+
+        oldOnLease = OnLease.objects.get(
+            rate_card_name=rateCardID.id, end_date=None)
+        oldOnLease.end_date = getYesterdayDate(
+            request.POST.get('onLease_start_date'))
         oldOnLease.save()
-        
-    
-    # CostParameters 
+
+    surchargeObj = Surcharge.objects.get(
+        pk=request.POST.get('costParameters_surcharge_type'))
+    # CostParameters
     costParameters = CostParameters(
-        rate_card_name = rateCardID,
-        loading_cost_per_cubic_meter = float(request.POST.get('costParameters_loading_cost_per_cubic_meter')),
-        km_cost = float(request.POST.get('costParameters_km_cost')),
-        surcharge_fixed_normal_cost = float(request.POST.get('costParameters_surcharge_fixed_normal_cost')),
-        surcharge_fixed_sunday_cost = float(request.POST.get('costParameters_surcharge_fixed_sunday_cost')),
-        surcharge_fixed_public_holiday_cost = float(request.POST.get('costParameters_surcharge_fixed_public_holiday_cost')),
-        surcharge_per_cubic_meters_normal_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_normal_cost')),
-        surcharge_per_cubic_meters_sunday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_sunday_cost')),
-        surcharge_per_cubic_meters_public_holiday_cost = float(request.POST.get('costParameters_surcharge_per_cubic_meters_public_holiday_cost')),
-        transfer_cost = float(request.POST.get('costParameters_transfer_cost')),
-        return_load_cost = float(request.POST.get('costParameters_return_load_cost')),
-        return_km_cost = float(request.POST.get('costParameters_return_km_cost')),
-        standby_time_slot_size = float(request.POST.get('costParameters_standby_time_slot_size')),
-        standby_cost_per_slot = float(request.POST.get('costParameters_standby_cost_per_slot')),
-        waiting_cost_per_minute = float(request.POST.get('costParameters_waiting_cost_per_minute')),
-        call_out_fees = float(request.POST.get('costParameters_call_out_fees')),
-        demurrage_fees = float(request.POST.get('costParameters_demurrage_fees')),
-        start_date = request.POST.get('costParameters_start_date')
+        rate_card_name=rateCardID,
+        loading_cost_per_cubic_meter=float(request.POST.get(
+            'costParameters_loading_cost_per_cubic_meter')),
+        km_cost=float(request.POST.get('costParameters_km_cost')),
+        surcharge_type=surchargeObj,
+        surcharge_cost=float(request.POST.get(
+            'costParameters_surcharge_cost')),
+        transfer_cost=float(request.POST.get('costParameters_transfer_cost')),
+        return_load_cost=float(request.POST.get(
+            'costParameters_return_load_cost')),
+        return_km_cost=float(request.POST.get(
+            'costParameters_return_km_cost')),
+        standby_time_slot_size=float(request.POST.get(
+            'costParameters_standby_time_slot_size')),
+        standby_cost_per_slot=float(request.POST.get(
+            'costParameters_standby_cost_per_slot')),
+        waiting_cost_per_minute=float(request.POST.get(
+            'costParameters_waiting_cost_per_minute')),
+        call_out_fees=float(request.POST.get('costParameters_call_out_fees')),
+        demurrage_fees=float(request.POST.get(
+            'costParameters_demurrage_fees')),
+        cancellation_fees=float(request.POST.get(
+            'costParameters_cancellation_fees')),
+        start_date=request.POST.get('costParameters_start_date')
     )
     costParameters.save()
-    
+
     # ThresholdDayShift
-    
-    thresholdDayShifts  = ThresholdDayShift(
-        rate_card_name = rateCardID,
-        threshold_amount_per_day_shift = float(request.POST.get('thresholdDayShift_threshold_amount_per_day_shift')),
-        loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdDayShift_loading_cost_per_cubic_meter_included') == 'on' else False,
-        km_cost_included = True if request.POST.get('thresholdDayShift_km_cost_included') == 'on' else False,
-        surcharge_fixed_normal_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_normal_cost_included') == 'on' else False ,
-        surcharge_fixed_sunday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_sunday_cost_included') == 'on' else False ,
-        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_sunday_cost_included  = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('thresholdDayShift_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
-        transfer_cost_included = True if request.POST.get('thresholdDayShift_transfer_cost_included') == 'on' else False,
-        return_cost_included = True if request.POST.get('thresholdDayShift_return_cost_included') == 'on' else False,
-        standby_cost_included = True if request.POST.get('thresholdDayShift_standby_cost_included') == 'on' else False,
-        waiting_cost_included = True if request.POST.get('thresholdDayShift_waiting_cost_included') == 'on' else False,
-        call_out_fees_included = True if request.POST.get('thresholdDayShift_call_out_fees_included') == 'on' else False,
-        demurrage_fees_included = True if request.POST.get('thresholdDayShift_demurrage_fees_included') == 'on' else False,
-        min_load_in_cubic_meters = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters')),
-        min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
-        min_load_in_cubic_meters_trip = float(request.POST.get('thresholdDayShift_min_load_in_cubic_meters_trip')),
-        return_load_grace = float(request.POST.get('thresholdDayShift_return_load_grace')),
-        start_date = request.POST.get('thresholdDayShift_start_date')
+
+    thresholdDayShifts = ThresholdDayShift(
+        rate_card_name=rateCardID,
+        threshold_amount_per_day_shift=float(request.POST.get(
+            'thresholdDayShift_threshold_amount_per_day_shift')),
+        loading_cost_per_cubic_meter_included=True if request.POST.get(
+            'thresholdDayShift_loading_cost_per_cubic_meter_included') == 'on' else False,
+        km_cost_included=True if request.POST.get(
+            'thresholdDayShift_km_cost_included') == 'on' else False,
+        surcharge_included=True if request.POST.get(
+            'thresholdDayShift_surcharge_included') == 'on' else False,
+        transfer_cost_included=True if request.POST.get(
+            'thresholdDayShift_transfer_cost_included') == 'on' else False,
+        return_cost_included=True if request.POST.get(
+            'thresholdDayShift_return_cost_included') == 'on' else False,
+        standby_cost_included=True if request.POST.get(
+            'thresholdDayShift_standby_cost_included') == 'on' else False,
+        waiting_cost_included=True if request.POST.get(
+            'thresholdDayShift_waiting_cost_included') == 'on' else False,
+        call_out_fees_included=True if request.POST.get(
+            'thresholdDayShift_call_out_fees_included') == 'on' else False,
+        min_load_in_cubic_meters=float(request.POST.get(
+            'thresholdDayShift_min_load_in_cubic_meters')),
+        min_load_in_cubic_meters_return_to_yard=float(request.POST.get(
+            'thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
+        return_load_grace=float(request.POST.get(
+            'thresholdDayShift_return_load_grace')),
+        start_date=request.POST.get('thresholdDayShift_start_date')
     )
     thresholdDayShifts.save()
-    
-    # ThresholdNightShift 
+
+    # ThresholdNightShift
     thresholdNightShifts = ThresholdNightShift(
-        rate_card_name = rateCardID,
-        threshold_amount_per_night_shift = request.POST.get('thresholdNightShift_threshold_amount_per_night_shift'),
-        loading_cost_per_cubic_meter_included = True if request.POST.get('thresholdNightShift_loading_cost_per_cubic_meter_included') == 'on' else False,
-        km_cost_included = True if request.POST.get('thresholdNightShift_km_cost_included') == 'on' else False,
-        surcharge_fixed_normal_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_normal_cost_included') == 'on' else False,
-        surcharge_fixed_sunday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_sunday_cost_included') == 'on' else False,
-        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_sunday_cost_included  = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('thresholdNightShift_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
-        transfer_cost_included = True if request.POST.get('thresholdNightShift_transfer_cost_included') == 'on' else False,
-        return_cost_included = True if request.POST.get('thresholdNightShift_return_cost_included') == 'on' else False,
-        standby_cost_included = True if request.POST.get('thresholdNightShift_standby_cost_included') == 'on' else False,
-        waiting_cost_included = True if request.POST.get('thresholdNightShift_waiting_cost_included') == 'on' else False,
-        call_out_fees_included = True if request.POST.get('thresholdNightShift_call_out_fees_included') == 'on' else False,
-        demurrage_fees_included = True if request.POST.get('thresholdNightShift_demurrage_fees_included') == 'on' else False,
-        min_load_in_cubic_meters = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters')),
-        min_load_in_cubic_meters_return_to_yard = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
-        min_load_in_cubic_meters_trip = float(request.POST.get('thresholdNightShift_min_load_in_cubic_meters_trip')),
-        return_load_grace = float(request.POST.get('thresholdNightShift_return_load_grace')),
-        start_date = request.POST.get('thresholdNightShift_start_date')
+        rate_card_name=rateCardID,
+        threshold_amount_per_night_shift=request.POST.get(
+            'thresholdNightShift_threshold_amount_per_night_shift'),
+        loading_cost_per_cubic_meter_included=True if request.POST.get(
+            'thresholdNightShift_loading_cost_per_cubic_meter_included') == 'on' else False,
+        km_cost_included=True if request.POST.get(
+            'thresholdNightShift_km_cost_included') == 'on' else False,
+        surcharge_included=True if request.POST.get(
+            'thresholdNightShift_surcharge_included') == 'on' else False,
+        transfer_cost_included=True if request.POST.get(
+            'thresholdNightShift_transfer_cost_included') == 'on' else False,
+        return_cost_included=True if request.POST.get(
+            'thresholdNightShift_return_cost_included') == 'on' else False,
+        standby_cost_included=True if request.POST.get(
+            'thresholdNightShift_standby_cost_included') == 'on' else False,
+        waiting_cost_included=True if request.POST.get(
+            'thresholdNightShift_waiting_cost_included') == 'on' else False,
+        call_out_fees_included=True if request.POST.get(
+            'thresholdNightShift_call_out_fees_included') == 'on' else False,
+        min_load_in_cubic_meters=float(request.POST.get(
+            'thresholdNightShift_min_load_in_cubic_meters')),
+        min_load_in_cubic_meters_return_to_yard=float(request.POST.get(
+            'thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
+        return_load_grace=float(request.POST.get(
+            'thresholdNightShift_return_load_grace')),
+        start_date=request.POST.get('thresholdNightShift_start_date')
     )
     thresholdNightShifts.save()
-    
-    # Grace 
+
+    # Grace
     grace = Grace(
-        rate_card_name = rateCardID,
-        load_km_grace = request.POST.get('grace_load_km_grace'),
-        transfer_km_grace = float(request.POST.get('grace_transfer_km_grace')),
-        return_km_grace = float(request.POST.get('grace_return_km_grace')),
-        standby_time_grace_in_minutes = float(request.POST.get('grace_standby_time_grace_in_minutes')),
-        chargeable_standby_time_starts_after = float(request.POST.get('grace_chargeable_standby_time_starts_after')),
-        waiting_time_grace_in_minutes = float(request.POST.get('grace_waiting_time_grace_in_minutes')),
-        chargeable_waiting_time_starts_after = float(request.POST.get('grace_chargeable_waiting_time_starts_after')),
-        start_date = request.POST.get('grace_start_date')
+        rate_card_name=rateCardID,
+        load_km_grace=request.POST.get('grace_load_km_grace'),
+        transfer_km_grace=float(request.POST.get('grace_transfer_km_grace')),
+        return_km_grace=float(request.POST.get('grace_return_km_grace')),
+        standby_time_grace_in_minutes=float(
+            request.POST.get('grace_standby_time_grace_in_minutes')),
+        chargeable_standby_time_starts_after=float(
+            request.POST.get('grace_chargeable_standby_time_starts_after')),
+        waiting_time_grace_in_minutes=float(
+            request.POST.get('grace_waiting_time_grace_in_minutes')),
+        chargeable_waiting_time_starts_after=float(
+            request.POST.get('grace_chargeable_waiting_time_starts_after')),
+        start_date=request.POST.get('grace_start_date')
     )
     grace.save()
-    
-    onLease = OnLease(
-        rate_card_name=rateCardID,
-        hourly_subscription_charge = float(request.POST.get('onLease_hourly_subscription_charge')),
-        daily_subscription_charge = float(request.POST.get('onLease_daily_subscription_charge')),
-        monthly_subscription_charge = float(request.POST.get('onLease_monthly_subscription_charge')),
-        quarterly_subscription_charge = float(request.POST.get('onLease_quarterly_subscription_charge')),
-        surcharge_fixed_normal_cost_included = True if request.POST.get('onLease_surcharge_fixed_normal_cost_included') == 'on' else False,
-        surcharge_fixed_sunday_cost_included = True if request.POST.get('onLease_surcharge_fixed_sunday_cost_included') == 'on' else False,
-        surcharge_fixed_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_sunday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
-        surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
-        transfer_cost_applicable = True if request.POST.get('onLease_transfer_cost_applicable') == 'on' else False,
-        return_cost_applicable = True if request.POST.get('onLease_return_cost_applicable') == 'on' else False,
-        standby_cost_per_slot_applicable = True if request.POST.get('onLease_standby_cost_per_slot_applicable') == 'on' else False,
-        waiting_cost_per_minute_applicable = True if request.POST.get('onLease_waiting_cost_per_minute_applicable') == 'on' else False,
-        call_out_fees_applicable = True if request.POST.get('onLease_call_out_fees_applicable') == 'on' else False,
-        start_date = request.POST.get('onLease_start_date')
-        
-    )
-    onLease.save()
-    
-    messages.success(request , 'Data successfully add ')
+
+    # onLease = OnLease(
+    #     rate_card_name=rateCardID,
+    #     hourly_subscription_charge = float(request.POST.get('onLease_hourly_subscription_charge')),
+    #     daily_subscription_charge = float(request.POST.get('onLease_daily_subscription_charge')),
+    #     monthly_subscription_charge = float(request.POST.get('onLease_monthly_subscription_charge')),
+    #     quarterly_subscription_charge = float(request.POST.get('onLease_quarterly_subscription_charge')),
+    #     surcharge_fixed_normal_cost_included = True if request.POST.get('onLease_surcharge_fixed_normal_cost_included') == 'on' else False,
+    #     surcharge_fixed_sunday_cost_included = True if request.POST.get('onLease_surcharge_fixed_sunday_cost_included') == 'on' else False,
+    #     surcharge_fixed_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_fixed_public_holiday_cost_included') == 'on' else False,
+    #     surcharge_per_cubic_meters_normal_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_normal_cost_included') == 'on' else False,
+    #     surcharge_per_cubic_meters_sunday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_sunday_cost_included') == 'on' else False,
+    #     surcharge_per_cubic_meters_public_holiday_cost_included = True if request.POST.get('onLease_surcharge_per_cubic_meters_public_holiday_cost_included') == 'on' else False,
+    #     transfer_cost_applicable = True if request.POST.get('onLease_transfer_cost_applicable') == 'on' else False,
+    #     return_cost_applicable = True if request.POST.get('onLease_return_cost_applicable') == 'on' else False,
+    #     standby_cost_per_slot_applicable = True if request.POST.get('onLease_standby_cost_per_slot_applicable') == 'on' else False,
+    #     waiting_cost_per_minute_applicable = True if request.POST.get('onLease_waiting_cost_per_minute_applicable') == 'on' else False,
+    #     call_out_fees_applicable = True if request.POST.get('onLease_call_out_fees_applicable') == 'on' else False,
+    #     start_date = request.POST.get('onLease_start_date')
+
+    # )
+    # onLease.save()
+
+    messages.success(request, 'Data successfully add ')
     return redirect('Account:rateCardTable')
 
 # ```````````````````````````````````
 # Past trip
 # ```````````````````````````````````
 
+
 def PastTripForm(request):
     return render(request, 'Account/pastTrip.html')
+
 
 @csrf_protect
 @api_view(['POST'])
@@ -976,7 +1075,8 @@ def pastTripSave(request):
     if not pastTrip_csv_file:
         return HttpResponse("No file uploaded")
     try:
-        time = (str(timezone.now())).replace(':', '').replace( '-', '').replace(' ', '').split('.')
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
         time = time[0]
         newFileName = time + "@_!" + str(pastTrip_csv_file.name)
 
@@ -986,7 +1086,7 @@ def pastTripSave(request):
         with open("pastTrip_entry.txt", 'w') as f:
             f.write(newFileName)
             f.close()
-            
+
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
         cmd = ["python", "manage.py", "runscript", 'PastDataSave.py']
@@ -997,4 +1097,40 @@ def pastTripSave(request):
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
-    
+# --------------------------------------------
+# Surcharge 
+# ---------------------------------------------
+
+def surchargeTable(request):
+    surcharges = Surcharge.objects.all()
+    # return HttpResponse(surcharge_)
+    return render(request, 'Account/Tables/surchargeTable.html', {'surcharges': surcharges})
+
+
+def surchargeForm(request, id=None):
+    surcharge = None
+    if id:
+        surcharge = Surcharge.objects.get(pk=id)
+
+    params = {
+        'data': surcharge
+    }
+    # return HttpResponse(params['data'])
+    return render(request, "Account/surchargeForm.html", params)
+
+
+@csrf_protect
+@api_view(['POST'])
+def surchargeSave(request, id=None):
+    dataList = {
+        'surcharge_Name': request.POST.get('surcharge_Name')
+    }
+    if id is not None:
+        updateIntoTable(record_id=id, tableName='Surcharge', dataSet=dataList)
+        messages.success(request, 'Surcharge updated successfully')
+    else:
+        # return HttpResponse(dataList['surcharge_Name'])
+        insertIntoTable(tableName='Surcharge', dataSet=dataList)
+        messages.success(request, 'Surcharge added successfully')
+
+    return redirect('Account:surchargeTable')

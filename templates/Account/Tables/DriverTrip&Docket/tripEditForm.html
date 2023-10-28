@@ -65,14 +65,9 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="driverId">Driver Id:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <!-- <input class="form-control" value="{{driverTrip.driverId.driverId}}" type="text"
-                                            name="driverId" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="driverId"> -->
                                         <select name="driverId" class="form-control">
                                             {% for D_id in Driver %}
-                                            <option value="{{ D_id.driverId }}" {% if
-                                                driverTrip.driverId.driverId==D_id.driverId %}selected="selected" {%
-                                                endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
+                                            <option value="{{D_id.driverId}}" {% if driverTrip.driverId.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -168,11 +163,23 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Driver Docket Edit Form </h2>
-                            <label for="returnToYard{{item.count_}}" class="float-right ml-2"
+                            <div class="float-right">
+                                <input type="radio" id="tippingToYard{{item.count_}}" name="returnToYard{{item.count_}}" value="tippingToYard{{item.count_}}"
+                                style="margin-top: .8rem;"  onclick="returnToYard_({{item.count_}},this)" {% if item.tippingToYard %} checked {% endif %}>
+                                <label for="tippingToYard{{item.count_}}" class="ml-2"
+                                style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
+                                <input type="radio" id="returnToYard{{item.count_}}" name="returnToYard{{item.count_}}" value="returnToYard{{item.count_}}"
+                                style="margin-top: .8rem;"  onclick="returnToYard_({{item.count_}},this)" {% if item.returnToYard %} checked {% endif %}>
+                                <label for="returnToYard{{item.count_}}" class="ml-2"
+                                    style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+
+                                <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{item.count_}}" onclick="resetRadio({{item.count_}})"></i>
+                            </div>
+                            {% comment %} <label for="returnToYard{{item.count_}}" class="float-right ml-2"
                                 style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
                             <input type="checkbox" id="returnToYard{{item.count_}}" onclick="returnToYard({{item.count_}},this)" name="returnToYard{{item.count_}}"
                                  class="float-right "
-                                style="margin-top: .8rem;">
+                                style="margin-top: .8rem;"> {% endcomment %}
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -238,7 +245,7 @@
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{item.returnQty}}" type="number"
                                             name="returnQty{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="returnQty{{item.count_}}" disabled>
+                                            style="padding: 0.25rem 0.2rem;" id="returnQty{{item.count_}}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -246,7 +253,7 @@
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{item.returnKm}}" type="number"
                                             name="returnKm{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="returnKm{{item.count_}}" disabled>
+                                            style="padding: 0.25rem 0.2rem;" id="returnKm{{item.count_}}" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -283,13 +290,9 @@
                                     <label for="surcharge_type{{item.count_}}">Surcharge Type:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select name="surcharge_type{{item.count_}}" class="form-control" >
-                                            <option value="fixed normal" {% if item.surcharge_type == 'fixednormal' %}selected="selected" {% endif %}>fixed normal</option>
-                                            <option value="fixed sunday" {% if item.surcharge_type == 'fixed sunday'%}selected="selected" {% endif %}>fixed sunday</option>
-                                            <option value="fixed public holiday" {% if item.surcharge_type == 'fixed public holiday' %}selected="selected" {% endif %}>fixed public holiday</option>
-                                            <option value="per cubic meters normal" {% if item.surcharge_type == 'per cubic meters normal' %}selected="selected" {% endif %}>per cubic meters normal</option>
-                                            <option value="per cubic meters sunday" {% if item.surcharge_type == 'per cubic meters sunday' %}selected="selected" {% endif %}>per cubic meters sunday</option>
-                                            <option value="per cubic meters public holiday" {% if driverTrip.surcharge_type == 'per cubic meters public holiday'%}selected="selected" {% endif %}>per cubic meters public holiday
-                                            </option>
+                                            {% for surcharge in surcharges %}
+                                            <option value="{{surcharge.id}}" {% if item.surcharge_type.id == surcharge.id %} selected {% endif %} >{{surcharge.surcharge_Name}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -407,15 +410,23 @@
             $('form .alert').remove();
     }).prop('checked', false);
 
-    function returnToYard(id,tag){
+   function returnToYard_(id,tag){
         let selected = $(`#${tag.id}`).is(':checked')
+
         if(selected){
-            $(`#returnQty${id}`).removeAttr('disabled')
-            $(`#returnKm${id}`).removeAttr('disabled')
+            $(`#returnQty${id}`).removeAttr('readonly')
+            $(`#returnKm${id}`).removeAttr('readonly')
         }else{
-            $(`#returnQty${id}`).attr('disabled',true)
-            $(`#returnKm${id}`).attr('disabled',true)
+            $(`#returnQty${id}`).attr('readonly',true)
+            $(`#returnKm${id}`).attr('readonly',true)
         }
+    }
+
+    function resetRadio(id){
+        $(`#tippingToYard${id}`).removeAttr('checked')
+        $(`#returnToYard${id}`).removeAttr('checked')
+        $(`#returnQty${id}`).attr('readonly',true)
+        $(`#returnKm${id}`).attr('readonly',true)
     }
 
 </script>

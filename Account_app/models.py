@@ -54,12 +54,13 @@ class DriverDocket(models.Model):
     noOfKm = models.FloatField(default=0)
     transferKM = models.FloatField(default=0)
     returnToYard = models.BooleanField(default=False)
+    tippingToYard = models.BooleanField(default=False)
     returnQty = models.FloatField(default=0)
     returnKm = models.FloatField(default=0)
     waitingTimeStart = models.CharField(max_length=200)
     waitingTimeEnd = models.CharField(max_length=200)
     totalWaitingInMinute = models.FloatField(default=0)
-    surcharge_type = models.CharField(max_length=31, choices=SURCHARGE_NATURE_CHOICES, default='fixed normal')
+    surcharge_type = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
     surcharge_duration = models.FloatField(default=0)
     cubicMl = models.FloatField(default=0)
     standByStartTime = models.CharField(max_length=200)
@@ -73,41 +74,6 @@ class DriverDocket(models.Model):
     class Meta:
         unique_together = (('docketNumber', 'shiftDate'),)
 
-
-class PastTrip(models.Model):
-    SHIFT_CHOICES = (
-        ('Day', 'Day'),
-        ('Night', 'Night'),
-    )
-
-    Date = models.DateField(null=True, default=None)
-    Truck_No = models.CharField(max_length=255, null=True, default=None)
-    Truck_Type = models.CharField(max_length=255, null=True, default=None)
-    Replacement = models.CharField(max_length=255, null=True, default=None)
-    Driver_Name = models.CharField(max_length=255, null=True, default=None)
-    Docket_NO = models.CharField(max_length=255, null=True, default=None)
-    Load_Time = models.TimeField(null=True, default=None)
-    Return_time = models.TimeField(null=True, default=None)
-    Load_qty = models.PositiveIntegerField(null=True, default=None)
-    Doc_KMs = models.FloatField(null=True, default=None)
-    Actual_KMs = models.FloatField(null=True, default=None)
-    waiting_time_starts_Onsite = models.PositiveIntegerField(null=True, default=None)
-    waiting_time_end_offsite = models.PositiveIntegerField(null=True, default=None)
-    Total_minutes = models.IntegerField(null=True, default=None)
-    Returned_Qty = models.PositiveIntegerField(null=True, default=None)
-    Returned_KM = models.FloatField(null=True, default=None)
-    Returned_to_Yard = models.BooleanField(null=True, default=None)
-    Comment = models.TextField(null=True, default=None)
-    Transfer_KM = models.FloatField(null=True, default=None)
-    stand_by_Start_Time = models.PositiveIntegerField(null=True, default=None)
-    stand_by_end_time = models.PositiveIntegerField(null=True, default=None)
-    stand_by_total_minute = models.IntegerField(null=True, default=None)
-    Stand_by_slot = models.CharField(max_length=255, null=True, default=None)
-    category = models.CharField(max_length=255, null=True, default=None)
-    call_out = models.CharField(max_length=255, null=True, default=None)
-    standby_minute = models.IntegerField(null=True, default=None)
-    ShiftType = models.CharField(
-        max_length=5, choices=SHIFT_CHOICES, null=True, default=None)
 
 
 class RCTI(models.Model):

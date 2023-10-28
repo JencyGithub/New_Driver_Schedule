@@ -78,9 +78,10 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                         class="{{ item.class }}">{{ item.docketNumber }}
                                                     </a>
                                                 </td>
-                                                <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td>
-                                                <td>{{ item.waitingTimeTotal }}</td>
-                                                <td>{{ item.surchargeTotal }}</td>
+                                                {% comment %} <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td> {% endcomment %}
+                                                <td>{{ item.loadAndKmCost }}</td>
+                                                <td>{{ item.calculatedSurcharge }}</td>
+                                                <td>{{ item.calculatedWaitingTimeTotal }}</td>
                                                 <td>{{ item.returnKM }}</td>
                                                 <td>{{ item.standByTotal }}</td>
                                                 <td>{{ item.othersTotal }}</td>

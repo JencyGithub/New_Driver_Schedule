@@ -79,7 +79,7 @@ request {% endblock %} {% block headStyle %}
                             <div class="custom-continer">
                                 <!-- loading_cost_per_cubic_meter,km_cost,surcharge_fixed_normal_cost,surcharge_fixed_sunday_cost -->
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="loading_cost_per_cubic_meter">loading cost per cubic meter :<span
+                                    <label for="loading_cost_per_cubic_meter">Load Fee ($/m<sup>3</sup>):<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" required type="number"
@@ -92,7 +92,7 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="km_cost">Km cost :<span class="required">*</span></label>
+                                    <label for="km_cost">Run Rate($/m<sup>3</sup>/km) :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_km_cost" required='required'
                                         value="{% if costParameters %}{{costParameters.km_cost}}{% else %} {% endif %}" 
@@ -101,75 +101,32 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_fixed_normal_cost">Surcharge fixed normal cost :<span
+                                    <label for="costParameters_surcharge_type">Surcharge Type :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="costParameters_surcharge_fixed_normal_cost"
+                                        <select name="costParameters_surcharge_type" class="form-control" id="costParameters_surcharge_type">
+
+                                            {%for surcharge in surcharges %}
+                                            <option value="{{surcharge.id}}">{{surcharge.surcharge_Name}}</option>
+                                            {% endfor%}
+                                        </select>
+
+                                        {% comment %} <input class="form-control" type="number" name="costParameters_surcharge_fixed_normal_cost"
                                         value="{% if costParameters %}{{costParameters.surcharge_fixed_normal_cost}}{% else %} {% endif %}" 
                                             {% if costParameters %} readonly {% else %} {% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_fixed_normal_cost">
+                                            id="surcharge_fixed_normal_cost"> {% endcomment %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_fixed_sunday_cost">Surcharge fixed sunday cost :<span
+                                    <label for="surcharge_cost">Surcharge  cost :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="number" name="costParameters_surcharge_fixed_sunday_cost"
-                                        value="{% if costParameters %}{{costParameters.surcharge_fixed_sunday_cost}}{% else %} {% endif %}" 
+                                        <input class="form-control" type="number" name="costParameters_surcharge_cost"
+                                        value="{% if costParameters %}{{costParameters.surcharge_cost}}{% else %} {% endif %}" 
                                             {% if costParameters %} readonly {% else %} {% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_fixed_sunday_cost">
-                                    </div>
-                                </div>
-
-                                <!-- surcharge_fixed_public_holiday_cost,surcharge_per_cubic_meters_normal_cost,surcharge_per_cubic_meters_sunday_cost,surcharge_per_cubic_meters_public_holiday_cost -->
-
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_fixed_public_holiday_cost">Surcharge fixed public holiday cost
-                                        :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="number"
-                                            name="costParameters_surcharge_fixed_public_holiday_cost" required='required'
-                                            value="{% if costParameters %}{{costParameters.surcharge_fixed_public_holiday_cost}}{% else %} {% endif %}" 
-                                            {% if costParameters %} readonly {% else %} {% endif %}
-                                            style="padding: 0.25rem 0.2rem;" id="surcharge_fixed_public_holiday_cost">
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_per_cubic_meters_normal_cost">Surcharge per cubic meters
-                                        normal cost:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="number"
-                                            name="costParameters_surcharge_per_cubic_meters_normal_cost" required='required'
-                                            value="{% if costParameters %}{{costParameters.surcharge_per_cubic_meters_normal_cost}}{% else %} {% endif %}" 
-                                            {% if costParameters %} readonly {% else %} {% endif %}
-                                            style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_per_cubic_meters_normal_cost">
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_per_cubic_meters_sunday_cost">Surcharge per cubic meters
-                                        sunday cost:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="number"
-                                            name="costParameters_surcharge_per_cubic_meters_sunday_cost" required='required'
-                                            value="{% if costParameters %}{{costParameters.surcharge_per_cubic_meters_sunday_cost}}{% else %} {% endif %}" 
-                                            {% if costParameters %} readonly {% else %} {% endif %}
-                                            style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_per_cubic_meters_sunday_cost">
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="surcharge_per_cubic_meters_public_holiday_cost">Surcharge per cubic
-                                        meters public holiday cost :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="number"
-                                            name="costParameters_surcharge_per_cubic_meters_public_holiday_cost" required='required'
-                                            value="{% if costParameters %}{{costParameters.surcharge_per_cubic_meters_public_holiday_cost}}{% else %} {% endif %}" 
-                                            {% if costParameters %} readonly {% else %} {% endif %}
-                                            style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_per_cubic_meters_public_holiday_cost">
+                                            id="surcharge_cost">
                                     </div>
                                 </div>
 
@@ -177,7 +134,7 @@ request {% endblock %} {% block headStyle %}
 
 
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="transfer_cost">Transfer cost :<span class="required">*</span></label>
+                                    <label for="transfer_cost">Unloaded Kms($/m<sup>3</sup>) :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_transfer_cost"
                                         value="{% if costParameters %}{{costParameters.transfer_cost}}{% else %} {% endif %}" 
@@ -215,7 +172,7 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="standby_cost_per_slot">Standby cost per slot :<span
+                                    <label for="standby_cost_per_slot">Standby Cost ($/slot)  :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_standby_cost_per_slot"
@@ -228,7 +185,7 @@ request {% endblock %} {% block headStyle %}
 
                                 <!-- ,waiting_cost_per_minute,call_out_fees,demurrage_fees,start_date -->
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="waiting_cost_per_minute">Waiting cost per minute :<span
+                                    <label for="waiting_cost_per_minute">Waiting Time($/min) :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_waiting_cost_per_minute"
@@ -255,6 +212,16 @@ request {% endblock %} {% block headStyle %}
                                             {% if costParameters %} readonly {% else %} {% endif %}
                                             required='required' data-valid-length-range="0"
                                             style="padding: 0.25rem 0.2rem;" id="demurrage_fees">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="costParameters_cancellation_fees">Cancellation fees :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" type="number" min="0" name="costParameters_cancellation_fees"
+                                        value="{% if costParameters %}{{costParameters.cancellation_fees}}{% else %} {% endif %}" 
+                                            {% if costParameters %} readonly {% else %} {% endif %}
+                                            required='required' data-valid-length-range="0"
+                                            style="padding: 0.25rem 0.2rem;" id="costParameters_cancellation_fees">
                                     </div>
                                 </div>
                                 <!-- {{costParameters.start_date}} -->
@@ -323,15 +290,6 @@ request {% endblock %} {% block headStyle %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdDayShift_min_load_in_cubic_meters_trip">Min load in cubic meters trip :<span class="required">*</span></label>
-                                                <div class="field item form-group">
-                                                    <input class="form-control"  type="number" name="thresholdDayShift_min_load_in_cubic_meters_trip" required='required'
-                                                    value="{% if thresholdDayShift %}{{thresholdDayShift.min_load_in_cubic_meters_trip}}{% else %} {% endif %}" 
-                                                            {% if thresholdDayShift %} readonly {% else %} {% endif %}
-                                                        style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_min_load_in_cubic_meters_trip">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-sm-6">
                                                 <label for="thresholdDayShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_return_load_grace" required='required'
@@ -352,44 +310,14 @@ request {% endblock %} {% block headStyle %}
                                                 <input  type="checkbox" name="thresholdDayShift_loading_cost_per_cubic_meter_included" 
                                                 {% if thresholdDayShift.loading_cost_per_cubic_meter_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="loading_cost_per_cubic_meter_included">
-                                                <label for="loading_cost_per_cubic_meter_included" >Loading cost / CUMI included</label>
+                                                <label for="loading_cost_per_cubic_meter_included" >Load Fee /m<sup>3</sup> </label>
                                             </div>
                                             
                                             <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_fixed_normal_cost_included"
-                                                {% if thresholdDayShift.surcharge_fixed_normal_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="surcharge_fixed_normal_cost_included">
-                                                <label for="surcharge_fixed_normal_cost_included" >Surcharge fixed normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_fixed_sunday_cost_included"
-                                                {% if thresholdDayShift.surcharge_fixed_sunday_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="surcharge_fixed_sunday_cost_included">
-                                                <label for="surcharge_fixed_sunday_cost_included" >Surcharge fixed sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_fixed_public_holiday_cost_included"
-                                                {% if thresholdDayShift.surcharge_fixed_public_holiday_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %}  id="surcharge_fixed_public_holiday_cost_included">
-                                                <label for="surcharge_fixed_public_holiday_cost_included" >Surcharge fixed public holiday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_per_cubic_meters_normal_cost_included"
-                                                {% if thresholdDayShift.surcharge_per_cubic_meters_normal_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="surcharge_per_cubic_meters_normal_cost_included">
-                                                <label for="surcharge_per_cubic_meters_normal_cost_included" >Surcharge / CUMI normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_per_cubic_meters_sunday_cost_included"
-                                                {% if thresholdDayShift.surcharge_per_cubic_meters_sunday_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="surcharge_per_cubic_meters_sunday_cost_included">
-                                                <label for="surcharge_per_cubic_meters_sunday_cost_included" >Surcharge / CUMI sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_surcharge_per_cubic_meters_public_holiday_cost_included"
-                                                {% if thresholdDayShift.surcharge_per_cubic_meters_public_holiday_cost_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="surcharge_per_cubic_meters_public_holiday_cost_included">
-                                                <label for="surcharge_per_cubic_meters_public_holiday_cost_included" >Surcharge / CUMI public holiday cost included</label>
+                                                <input   type="checkbox" name="thresholdDayShift_surcharge_included"
+                                                {% if thresholdDayShift.surcharge_included %}checked{% endif %}
+                                                {% if thresholdDayShift %}disabled{% endif %} id="thresholdDayShift_surcharge_included">
+                                                <label for="thresholdDayShift_surcharge_included" >Surcharge Included</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
@@ -398,43 +326,37 @@ request {% endblock %} {% block headStyle %}
                                                 <input   type="checkbox" name="thresholdDayShift_km_cost_included"
                                                 {% if thresholdDayShift.km_cost_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="km_cost_included">
-                                                <label for="km_cost_included" >Km cost included</label>
+                                                <label for="km_cost_included" >Run Rate Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdDayShift_transfer_cost_included"
                                                 {% if thresholdDayShift.transfer_cost_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %}  id="transfer_cost_included">
-                                                <label for="transfer_cost_included" >Transfer cost included </label>
+                                                <label for="transfer_cost_included"> Unloaded Kms Included </label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdDayShift_return_cost_included"
                                                 {% if thresholdDayShift.return_cost_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="return_cost_included">
-                                                <label for="return_cost_included" >Return cost included</label>
+                                                <label for="return_cost_included" >Return Concrete Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdDayShift_standby_cost_included"
                                                 {% if thresholdDayShift.standby_cost_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="standby_cost_included">
-                                                <label for="standby_cost_included" >Standby cost included</label>
+                                                <label for="standby_cost_included" >Standby Fees Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdDayShift_waiting_cost_included"
                                                 {% if thresholdDayShift.waiting_cost_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="waiting_cost_included">
-                                                <label for="waiting_cost_included" >Waiting cost included</label>
+                                                <label for="waiting_cost_included" >Waiting Time Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdDayShift_call_out_fees_included"
                                                 {% if thresholdDayShift.call_out_fees_included %}checked{% endif %}
                                                 {% if thresholdDayShift %}disabled{% endif %} id="call_out_fees_included">
-                                                <label for="call_out_fees_included" >Call out fees included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdDayShift_demurrage_fees_included"
-                                                {% if thresholdDayShift.demurrage_fees_included %}checked{% endif %}
-                                                {% if thresholdDayShift %}disabled{% endif %} id="demurrage_fees_included">
-                                                <label for="demurrage_fees_included" >Demurrage fees included</label>
+                                                <label for="call_out_fees_included" >Call Out Fees Included</label>
                                             </div>
                                         </div>
                                     </div>
@@ -496,15 +418,6 @@ request {% endblock %} {% block headStyle %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdNightShift_min_load_in_cubic_meters_trip">Min load in cubic meters trip :<span class="required">*</span></label>
-                                                <div class="field item form-group">
-                                                    <input class="form-control"  type="number" name="thresholdNightShift_min_load_in_cubic_meters_trip" required='required'
-                                                    value="{% if thresholdNightShift %}{{thresholdNightShift.min_load_in_cubic_meters_trip}}{% else %} {% endif %}" 
-                                                            {% if thresholdNightShift %} readonly {% else %} {% endif %}
-                                                        style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_min_load_in_cubic_meters_trip">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-sm-6">
                                                 <label for="thresholdNightShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_return_load_grace" required='required'
@@ -519,50 +432,20 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-6 col-sm-6">
                                     <div class="row">
                                         <div class="col-md-8 col-sm-8">
-                                            <!-- loading_cost_per_cubic_meter_included,surcharge_fixed_normal_cost_included,surcharge_fixed_sunday_cost_included,surcharge_fixed_public_holiday_cost_included,surcharge_per_cubic_meters_normal_cost_included,surcharge_per_cubic_meters_sunday_cost_included,surcharge_per_cubic_meters_public_holiday_cost_included, -->
+                                            <!-- loading_cost_per_cubic_meter_included,surcharge_included,surcharge_fixed_sunday_cost_included,surcharge_fixed_public_holiday_cost_included,surcharge_per_cubic_meters_normal_cost_included,surcharge_per_cubic_meters_sunday_cost_included,surcharge_per_cubic_meters_public_holiday_cost_included, -->
                                            
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_loading_cost_per_cubic_meter_included" 
                                                 {% if thresholdNightShift.loading_cost_per_cubic_meter_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_loading_cost_per_cubic_meter_included">
-                                                <label for="thresholdNightShift_loading_cost_per_cubic_meter_included" >Loading cost / CUMI included</label>
+                                                <label for="thresholdNightShift_loading_cost_per_cubic_meter_included" >Load Fee /m<sup>3</sup> </label>
                                             </div>
                                             
                                             <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_fixed_normal_cost_included"
-                                                {% if thresholdNightShift.surcharge_fixed_normal_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_fixed_normal_cost_included">
-                                                <label for="thresholdNightShift_surcharge_fixed_normal_cost_included" >Surcharge fixed normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_fixed_sunday_cost_included"
-                                                {% if thresholdNightShift.surcharge_fixed_sunday_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_fixed_sunday_cost_included">
-                                                <label for="thresholdNightShift_surcharge_fixed_sunday_cost_included" >Surcharge fixed sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_fixed_public_holiday_cost_included" 
-                                                {% if thresholdNightShift.surcharge_fixed_public_holiday_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_fixed_public_holiday_cost_included">
-                                                <label for="thresholdNightShift_surcharge_fixed_public_holiday_cost_included" >Surcharge fixed public holiday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_per_cubic_meters_normal_cost_included"
-                                                {% if thresholdNightShift.surcharge_per_cubic_meters_normal_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_per_cubic_meters_normal_cost_included">
-                                                <label for="thresholdNightShift_surcharge_per_cubic_meters_normal_cost_included" >Surcharge / CUMI normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_per_cubic_meters_sunday_cost_included"
-                                                {% if thresholdNightShift.surcharge_per_cubic_meters_sunday_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_per_cubic_meters_sunday_cost_included">
-                                                <label for="thresholdNightShift_surcharge_per_cubic_meters_sunday_cost_included" >Surcharge / CUMI sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_surcharge_per_cubic_meters_public_holiday_cost_included"
-                                                {% if thresholdNightShift.surcharge_per_cubic_meters_public_holiday_cost_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_per_cubic_meters_public_holiday_cost_included">
-                                                <label for="thresholdNightShift_surcharge_per_cubic_meters_public_holiday_cost_included" >Surcharge / CUMI public holiday cost included</label>
+                                                <input   type="checkbox" name="thresholdNightShift_surcharge_included"
+                                                {% if thresholdNightShift.surcharge_included %}checked{% endif %}
+                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_surcharge_included">
+                                                <label for="thresholdNightShift_surcharge_included" >Surcharge Included</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
@@ -571,43 +454,37 @@ request {% endblock %} {% block headStyle %}
                                                 <input   type="checkbox" name="thresholdNightShift_km_cost_included"
                                                 {% if thresholdNightShift.km_cost_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_km_cost_included">
-                                                <label for="thresholdNightShift_km_cost_included" >Km cost included</label>
+                                                <label for="thresholdNightShift_km_cost_included" >Run Rate Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_transfer_cost_included" 
                                                 {% if thresholdNightShift.transfer_cost_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_transfer_cost_included">
-                                                <label for="thresholdNightShift_transfer_cost_included" >Transfer cost included </label>
+                                                <label for="thresholdNightShift_transfer_cost_included" > Unloaded Kms Included </label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_return_cost_included"
                                                 {% if thresholdNightShift.return_cost_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_return_cost_included">
-                                                <label for="thresholdNightShift_return_cost_included" >Return cost included</label>
+                                                <label for="thresholdNightShift_return_cost_included" >Return Concrete Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_standby_cost_included"
                                                 {% if thresholdNightShift.standby_cost_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_standby_cost_included">
-                                                <label for="thresholdNightShift_standby_cost_included" >Standby cost included</label>
+                                                <label for="thresholdNightShift_standby_cost_included" >Standby Fees Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_waiting_cost_included"
                                                 {% if thresholdNightShift.waiting_cost_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_waiting_cost_included">
-                                                <label for="thresholdNightShift_waiting_cost_included" >Waiting cost included</label>
+                                                <label for="thresholdNightShift_waiting_cost_included" >Waiting Time Included</label>
                                             </div>
                                             <div class="field item form-group">
                                                 <input   type="checkbox" name="thresholdNightShift_call_out_fees_included"
                                                 {% if thresholdNightShift.call_out_fees_included %}checked{% endif %}
                                                 {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_call_out_fees_included">
-                                                <label for="thresholdNightShift_call_out_fees_included" >Call out fees included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="thresholdNightShift_demurrage_fees_included"
-                                                {% if thresholdNightShift.demurrage_fees_included %}checked{% endif %}
-                                                {% if thresholdNightShift %}disabled{% endif %} id="thresholdNightShift_demurrage_fees_included">
-                                                <label for="thresholdNightShift_demurrage_fees_included" >Demurrage fees included</label>
+                                                <label for="thresholdNightShift_call_out_fees_included" >Call Out Fees Included</label>
                                             </div>
                                         </div>
                                     </div>
@@ -714,7 +591,7 @@ request {% endblock %} {% block headStyle %}
                     <!--Start OnLease Name  -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> OnLease Form :-</h2>
+                            <h2> Wet Hire Rates :-</h2>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -723,7 +600,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="row">
                                         <div class="col-md-12">
                                             <!-- hourly_subscription_charge,daily_subscription_charge,monthly_subscription_charge,quarterly_subscription_charge, -->
-                                            <div class="col-md-6 col-sm-6">
+                                            <!-- <div class="col-md-6 col-sm-6">
                                                 <label for="onLease_qstart_date">Start date :<span class="required">*</span></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="date" name="onLease_start_date"
@@ -751,23 +628,23 @@ request {% endblock %} {% block headStyle %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="monthly_subscription_charge">Monthly subscription charge :<span class="required">*</span></label>
+                                                <label for="weekly_subscription_charge">Weekly subscription charge :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control"  type="number"  name="onLease_monthly_subscription_charge"
-                                                     value="{% if onLease %}{{onLease.monthly_subscription_charge}}{% else %} {% endif %}" 
+                                                    <input class="form-control"  type="number"  name="onLease_weekly_subscription_charge"
+                                                     value="{% if onLease %}{{onLease.weekly_subscription_charge}}{% else %} {% endif %}" 
                                                             {% if onLease %} readonly {% else %} {% endif %}  required='required'
-                                                        style="padding: 0.25rem 0.2rem;" id="monthly_subscription_charge">
+                                                        style="padding: 0.25rem 0.2rem;" id="weekly_subscription_charge">
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="quarterly_subscription_charge">Quarterly subscription charge :<span class="required">*</span></label>
+                                                <label for="over_time_charge">Over Time Charge :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control"  type="number"  name="onLease_quarterly_subscription_charge"
-                                                     value="{% if onLease %}{{onLease.quarterly_subscription_charge}}{% else %} {% endif %}" 
+                                                    <input class="form-control"  type="number"  name="onLease_over_time_charge"
+                                                     value="{% if onLease %}{{onLease.over_time_charge}}{% else %} {% endif %}" 
                                                             {% if onLease %} readonly {% else %} {% endif %}  required='required'
-                                                        style="padding: 0.25rem 0.2rem;" id="quarterly_subscription_charge">
+                                                        style="padding: 0.25rem 0.2rem;" id="over_time_charge">
                                                 </div>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -776,47 +653,12 @@ request {% endblock %} {% block headStyle %}
                                         <div class="col-md-7 col-sm-7">
                                             <!-- surcharge_fixed_normal_cost_included,surcharge_fixed_sunday_cost_included,surcharge_fixed_public_holiday_cost_included,surcharge_per_cubic_meters_normal_cost_included,surcharge_per_cubic_meters_sunday_cost_included,surcharge_per_cubic_meters_public_holiday_cost_included, -->
                                                                                        
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_fixed_normal_cost_included"
-                                                {% if onLease.surcharge_fixed_normal_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_fixed_normal_cost_included">
-                                                <label for="onLease_surcharge_fixed_normal_cost_included" >Surcharge fixed normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_fixed_sunday_cost_included"
-                                                {% if onLease.surcharge_fixed_sunday_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_fixed_sunday_cost_included">
-                                                <label for="onLease_surcharge_fixed_sunday_cost_included" >Surcharge fixed sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_fixed_public_holiday_cost_included" 
-                                                {% if onLease.surcharge_fixed_public_holiday_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_fixed_public_holiday_cost_included">
-                                                <label for="onLease_surcharge_fixed_public_holiday_cost_included" >Surcharge fixed public holiday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_per_cubic_meters_normal_cost_included"
-                                                {% if onLease.surcharge_per_cubic_meters_normal_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_per_cubic_meters_normal_cost_included">
-                                                <label for="onLease_surcharge_per_cubic_meters_normal_cost_included" >Surcharge / CUMI normal cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_per_cubic_meters_sunday_cost_included"
-                                                {% if onLease.surcharge_per_cubic_meters_sunday_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_per_cubic_meters_sunday_cost_included">
-                                                <label for="onLease_surcharge_per_cubic_meters_sunday_cost_included" >Surcharge / CUMI sunday cost included</label>
-                                            </div>
-                                            <div class="field item form-group">
-                                                <input   type="checkbox" name="onLease_surcharge_per_cubic_meters_public_holiday_cost_included"
-                                                {% if onLease.surcharge_per_cubic_meters_public_holiday_cost_included %}checked{% endif %}
-                                                {% if onLease %}disabled{% endif %} id="onLease_surcharge_per_cubic_meters_public_holiday_cost_included">
-                                                <label for="onLease_surcharge_per_cubic_meters_public_holiday_cost_included" >Surcharge / CUMI public holiday cost included</label>
-                                            </div>
+
                                             
                                         </div>
                                         <div class="col-md-5 col-sm-5">
                                             <!-- ,transfer_cost_applicable,return_cost_applicable,standby_cost_per_slot_applicable,waiting_cost_per_minute_applicable,call_out_fees_applicable_included, -->
-                                            <div class="field item form-group">
+                                            <!-- <div class="field item form-group">
                                                 <input   type="checkbox" name="onLease_transfer_cost_applicable"
                                                 {% if onLease.transfer_cost_applicable %}checked{% endif %}
                                                 {% if onLease %}disabled{% endif %} id="transfer_cost_applicable">
@@ -845,7 +687,7 @@ request {% endblock %} {% block headStyle %}
                                                 {% if onLease.call_out_fees_applicable_included %}checked{% endif %}
                                                 {% if onLease %}disabled{% endif %} id="call_out_fees_applicable_included">
                                                 <label for="call_out_fees_applicable_included" >Call out fees applicable included</label>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>
