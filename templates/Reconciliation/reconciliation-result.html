@@ -84,7 +84,7 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                 <td class="{% if True in item.calculatedStandByTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedStandByTotal }}</td>
                                                 <td class="{% if True in item.calculatedTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedTotalCost }}</td>
                                                 <td>{{ item.missingComponents }}</td>
-                                                <td><a href="" class="btn btn-sm btn-default">Escalation</a></td>
+                                                <td><a href="{% url 'Account:reconciliationEscalationForm' %}" class="btn btn-sm btn-default">Escalation</a></td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>

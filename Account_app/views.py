@@ -681,7 +681,10 @@ def driverEntryUpdate(request, ids):
     return redirect('Account:driverTripsTable')
 
 
+# ````````````````````````````````````
 # Reconciliation
+
+# ```````````````````````````````````
 
 def reconciliationForm(request):
     drivers = Driver.objects.all()
@@ -786,6 +789,14 @@ def reconciliationDocketView(request, docketNumber):
 
     return render(request, 'Reconciliation/reconciliation-docket.html', params)
 
+def reconciliationEscalationForm(request):
+    return render(request, 'Reconciliation/escalation-form.html')
+
+
+# ````````````````````````````````````
+# Public holiday
+
+# ```````````````````````````````````
 
 def publicHoliday(request):
     data = PublicHoliday.objects.all()
