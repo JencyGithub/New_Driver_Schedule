@@ -54,6 +54,7 @@ class CostParameters(models.Model):
     call_out_fees = models.FloatField(default=0)
     demurrage_fees = models.FloatField(default=0)
     cancellation_fees = models.FloatField(default=0) 
+    clientPayableGst = models.FloatField(default=10.0)
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(null=True, blank=True)
 

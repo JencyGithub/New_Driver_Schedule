@@ -218,9 +218,9 @@ class BasePlantAdmin(admin.ModelAdmin):
 
 admin.site.register(BasePlant, BasePlantAdmin)
 
-class ClientTruckInline(admin.TabularInline):
-    model = ClientTruckConnection
-    extra = 0
+# class ClientTruckInline(admin.TabularInline):
+#     model = ClientTruckConnection
+#     extra = 0
   
 # class CostInline_(admin.TabularInline):
 #     model =  Cost
@@ -276,8 +276,9 @@ class AdminTruckAdmin(admin.ModelAdmin):
     search_fields = ["adminTruckNumber"]
     actions = [admin_truck_download_csv]
 
-    inlines = [ClientTruckInline]
+    # inlines = [ClientTruckInline]
 
+admin.site.register(ClientTruckConnection)
 admin.site.register(AdminTruck, AdminTruckAdmin)
 
 

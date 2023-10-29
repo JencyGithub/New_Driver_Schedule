@@ -94,11 +94,14 @@ def getYesterdayDate(curDate):
 
     
 def getTimeDifference(startDate,endDate):
-    print(startDate,endDate)
-    startDate = int(startDate[0:2])*60 + int(startDate[3:5])
-    endDate = int(endDate[0:2])*60 + int(endDate[3:5])
-    print(startDate,endDate)
-    return abs(endDate-startDate)
+    try:
+        # print(startDate,endDate)
+        startDate = int(startDate[0:2])*60 + int(startDate[3:5])
+        endDate = int(endDate[0:2])*60 + int(endDate[3:5])
+        print(startDate,endDate)
+        return abs(endDate-startDate)
+    except Exception as e:
+        return e
 
 
 def getMaxTimeFromTwoTime(time1, time2, type=None):

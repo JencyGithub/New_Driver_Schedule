@@ -696,8 +696,7 @@ def reconciliationResult(request):
 
     for entry in dataList:
         if 'docketDate' in entry:
-            entry['docketDate'] = datetime.datetime.strptime(
-                entry['docketDate'], '%Y-%m-%d').date()
+            entry['docketDate'] = datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
 
     basePlants = BasePlant.objects.all()
     params = {
@@ -736,15 +735,17 @@ def reconciliationAnalysis(request):
     for rcti_entry in rcti_data:
         # return HttpResponse(rcti_entry)
         docket_number = int(rcti_entry['docketNumber'])
+        calculatedTotalCost = checkTotalCost(rcti_entry['docketNumber'], rcti_entry['docketDate'])
         data_entry = {
             'docketNumber': docket_number,
             'class': 'text-danger' if docket_number not in common_docket else 'text-success',
             'loadAndKmCost': checkLoadAndKmCost(rcti_entry['cartageTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
             'calculatedSurcharge': checkSurcharge(rcti_entry['surchargeTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
-            'calculatedWaitingTimeTotal': checkWaitingTime(rcti_entry['waitingTimeInMinutes'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
+            'calculatedWaitingTimeTotal': checkWaitingTime(rcti_entry['waitingTimeTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
             'returnKM': rcti_entry['returnKm'],
-            'standByTotal': rcti_entry['standByTotal'],
-            'othersTotal': rcti_entry['othersTotal'],
+            'calculatedStandByTotal':checkStandByTotal(rcti_entry['standByTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
+            'calculatedTotalCost': calculatedTotalCost[:-1],
+            'missingComponents': calculatedTotalCost[-1] if len(calculatedTotalCost[-1]) > 0 else 'No missing component',
             **rcti_entry
         }
         dataList.append(data_entry)
@@ -844,14 +845,13 @@ def rateCardForm(request, id=None):
     if id:
         rateCard = RateCard.objects.get(pk=id)
         print(rateCard.id)
-        costParameters = CostParameters.objects.filter(
-            rate_card_name=rateCard.id, end_date=None).values().first()
+        costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).values().last()
         thresholdDayShift = ThresholdDayShift.objects.filter(
-            rate_card_name=rateCard.id, end_date=None).values().first()
+            rate_card_name=rateCard.id).values().last()
         thresholdNightShift = ThresholdNightShift.objects.filter(
-            rate_card_name=rateCard.id, end_date=None).values().first()
+            rate_card_name=rateCard.id).values().last()
         grace = Grace.objects.filter(
-            rate_card_name=rateCard.id, end_date=None).values().first()
+            rate_card_name=rateCard.id).values().last()
         # onLease = OnLease.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
 
         costParameters['start_date'] = dateConverterFromTableToPageFormate(

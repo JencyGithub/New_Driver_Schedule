@@ -59,12 +59,11 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                             
                                             <th>Docket number</th>
                                             <th>Load & Km cost</th>
-                                            {% comment %} <th>Km cost</th> {% endcomment %}
                                             <th>Surcharge </th>
-                                            <th>Waiting cost</th>
+                                            <th>Waiting cost</th> 
                                             <th>Stand by cost</th>
                                             <th>Total cost</th>
-                                            <th></th>
+                                            <th>Missing components</th>
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
@@ -79,12 +78,12 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                     </a>
                                                 </td>
                                                 {% comment %} <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td> {% endcomment %}
-                                                <td>{{ item.loadAndKmCost }}</td>
-                                                <td>{{ item.calculatedSurcharge }}</td>
-                                                <td>{{ item.calculatedWaitingTimeTotal }}</td>
-                                                <td>{{ item.returnKM }}</td>
-                                                <td>{{ item.standByTotal }}</td>
-                                                <td>{{ item.othersTotal }}</td>
+                                                 <td class="{% if True in item.loadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.loadAndKmCost }} </td>
+                                                 <td class="{% if True in item.calculatedSurcharge %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedSurcharge }}</td>
+                                                 <td class="{% if True in item.calculatedWaitingTimeTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedWaitingTimeTotal }}</td> 
+                                                <td class="{% if True in item.calculatedStandByTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedStandByTotal }}</td>
+                                                <td class="{% if True in item.calculatedTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedTotalCost }}</td>
+                                                <td>{{ item.missingComponents }}</td>
                                                 <td><a href="" class="btn btn-sm btn-default">Escalation</a></td>
                                             </tr>
                                             {% endfor %}
