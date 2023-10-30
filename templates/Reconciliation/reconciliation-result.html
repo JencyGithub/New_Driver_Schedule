@@ -78,12 +78,12 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                     </a>
                                                 </td>
                                                 {% comment %} <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td> {% endcomment %}
-                                                 <td class="{% if True in item.loadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.loadAndKmCost }} </td>
-                                                 <td class="{% if True in item.calculatedSurcharge %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedSurcharge }}</td>
-                                                 <td class="{% if True in item.calculatedWaitingTimeTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedWaitingTimeTotal }}</td> 
-                                                <td class="{% if True in item.calculatedStandByTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedStandByTotal }}</td>
-                                                <td class="{% if True in item.calculatedTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedTotalCost }}</td>
-                                                <td>{{ item.missingComponents }}</td>
+                                                 <td class="{% if True in item.loadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.loadAndKmCost.0 }} / {{ item.loadAndKmCost.1 }} </td>
+                                                 <td class="{% if True in item.calculatedSurcharge %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedSurcharge.0 }} / {{ item.calculatedSurcharge.1 }}</td>
+                                                 <td class="{% if True in item.calculatedWaitingTimeTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedWaitingTimeTotal.0 }} / {{ item.calculatedWaitingTimeTotal.1 }}</td> 
+                                                <td class="{% if True in item.calculatedStandByTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedStandByTotal.0 }} / {{ item.calculatedStandByTotal.1 }}</td>
+                                                <td class="{% if True in item.calculatedTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedTotalCost.0 }} / {{ item.calculatedTotalCost.1 }}</td>
+                                                <td class="{% if 'No missing component' in item.missingComponents %} text-success {% else %} text-danger {% endif %}">{{ item.missingComponents }}</td>
                                                 <td><a href="{% url 'Account:reconciliationEscalationForm' %}" class="btn btn-sm btn-default">Escalation</a></td>
                                             </tr>
                                             {% endfor %}

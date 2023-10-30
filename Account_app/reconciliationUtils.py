@@ -21,11 +21,8 @@ costDict = {
     }
 }
 def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=costDict):
-    # print(docketDate)
-    # return docketDate
     try:
         date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
-        # print(rctiTotalExGst ,driverDocketNumber ,docketDate)
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         driverDocketLoadSize = driverDocketObj.cubicMl 
 
@@ -53,15 +50,14 @@ def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=cos
         costDict['rctiCosts']['loadAndKmCost'] = round(rctiTotalExGst,2)
         costDict['driverDocketCosts']['loadAndKmCost'] = round(driverLoadKmCostTotal,2)
         if  round(rctiTotalExGst,2) == round(driverLoadKmCostTotal,2):
-            # return True
             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),True] 
 
         else:
             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),False] 
  
     except Exception as e :
-        print(f'{driverDocketNumber}Load And Km Cost : {e}')
-        return False
+        # print(f'{driverDocketNumber}Load And Km Cost : {e}')
+        return ['','',False]
 
 def checkSurcharge(rctiSurchargeExGst,driverDocketNumber,docketDate, costDict = costDict):
     try:
@@ -72,7 +68,7 @@ def checkSurcharge(rctiSurchargeExGst,driverDocketNumber,docketDate, costDict = 
         if 'nosurcharge' in driverDocketObj.surcharge_type.surcharge_Name.lower():
             costDict['rctiCosts']['surchargeCost'] = round(rctiSurchargeExGst,2)
             costDict['driverDocketCosts']['surchargeCost'] = 0
-            return ['No surcharge',True]
+            return ['No surcharge','',True]
         
         if 'fixed' in  driverDocketObj.surcharge_type.surcharge_Name.lower():
             tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
@@ -93,8 +89,8 @@ def checkSurcharge(rctiSurchargeExGst,driverDocketNumber,docketDate, costDict = 
             
 
     except Exception as e :
-        print(f'{driverDocketNumber}Surcharge : {e}')
-        return False
+        # print(f'{driverDocketNumber}Surcharge : {e}')
+        return ['','',False]
         
 def checkWaitingTime(rctiWaitingTimeTotalExGST,driverDocketNumber,docketDate , costDict= costDict):
     try:
@@ -128,8 +124,8 @@ def checkWaitingTime(rctiWaitingTimeTotalExGST,driverDocketNumber,docketDate , c
             return True
         
     except Exception as e :
-        print(f'{driverDocketNumber}Waiting Time : {e}')
-        return False
+        # print(f'{driverDocketNumber}Waiting Time : {e}')
+        return ['','',False]
     
 def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costDict = costDict):
     try:
@@ -139,7 +135,7 @@ def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costD
         finalStandByCost = 0
         
         if rctiStandByTotalExGST == 0 and driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
-            return [f'No stand by component.', True]
+            return [f'No stand by component.','', True]
         
         elif driverDocketObj.standByStartTime.strip() != '' and driverDocketObj.standByEndTime.strip() != '':
             tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
@@ -175,8 +171,8 @@ def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costD
             return [round(rctiStandByTotalExGST,2), round(finalStandByCost,2),False] 
         
     except Exception as e :
-        print(f'{driverDocketNumber}Standby time : {e}')
-        return False
+        # print(f'{driverDocketNumber}Standby time : {e}')
+        return ['','',False]
       
 def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
     try:
@@ -270,10 +266,11 @@ def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
             missingComponents.append('Minimum Load Cost')
             
         if finalDriverCost == rctiTotalCost:
-            return [round(finalDriverCost,2),round(rctiTotalCost,2), True, missingComponents]
+            return [round(finalDriverCost,2),round(rctiTotalCost,2), True , missingComponents]
         else:
-            return [round(finalDriverCost,2),round(rctiTotalCost,2), False, missingComponents]
+            return [round(finalDriverCost,2),round(rctiTotalCost,2), False , missingComponents]
             
     except Exception as e :
-        print(f'{driverDocketNumber}Total cost : {e}')
-        return [False,'Missing Components not calculated']
+        # print(f'{driverDocketNumber}Total cost : {e}')
+        # return ['',False,'Missing Components not calculated']
+        return ['','Missing Components not calculated']
