@@ -12,6 +12,9 @@ from django.contrib import messages
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django import template
+from django.contrib.auth.models import User , Group
+from GearBox_app.models import *
+from django.core.mail import send_mail
 
 register = template.Library()
 
@@ -75,3 +78,28 @@ def CustomLogOut(request):
     }
 
     return render(request, 'your_template.html', context)
+
+def CustomForgetPassword(request):
+    return render(request , 'forgetPassword.html')
+
+@csrf_protect
+@api_view(['POST'])
+def ForgetMail(request):
+    driverEmail = request.POST['email']
+    try:
+        
+        userObj = User.objects.filter(email=driverEmail).first()
+        driverObj = Driver.objects.filter(email = userObj.email).first()
+        subject = 'Forget Password  Request'
+        message = f'Your old password is  {driverObj.password} '
+        from_email = 'your@email.com'  # Replace with your email
+
+        # Send the email
+        send_mail(subject, message, from_email, [driverEmail])
+        messages.success(request, "Password reset email sent successfully.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    
+    except:
+        messages.error(request, "This email is not valid !")
+        return redirect(request.META.get('HTTP_REFERER'))
+    # return HttpResponse(driverObj.password)
