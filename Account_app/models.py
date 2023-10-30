@@ -75,7 +75,6 @@ class DriverDocket(models.Model):
         unique_together = (('docketNumber', 'shiftDate'),)
 
 
-
 class RCTI(models.Model):
     
     UNIT_CHOICES = (
@@ -203,6 +202,7 @@ class RCTIDocketAdjustment(models.Model):
 # -----------------------------------
 # Holiday section
 # -----------------------------------
+
 class PublicHoliday(models.Model):
     date = models.DateField()
     stateName = models.CharField(max_length=100)
@@ -211,6 +211,41 @@ class PublicHoliday(models.Model):
     def __str__(self) -> str:
         return str(self.description)
     
+    
+# -----------------------------------
+# Past trip errors model
+# -----------------------------------
+
+class PastTripError(models.Model):
+    truckNo = models.CharField(max_length=255, default=None, null=True, blank=True)
+    truckType = models.CharField(max_length=255, default=None, null=True, blank=True)
+    category = models.CharField(max_length=255, default=None, null=True, blank=True)
+    driverName = models.CharField(max_length=255, default=None, null=True, blank=True)
+    docketNumber = models.CharField(max_length=255, default=None, null=True, blank=True)
+    loadTime = models.CharField(max_length=255, default=None, null=True, blank=True)
+    returnTime = models.CharField(max_length=255, default=None, null=True, blank=True)
+    loadQty = models.CharField(max_length=255, default=None, null=True, blank=True)
+    docKm = models.CharField(max_length=255, default=None, null=True, blank=True)
+    actualKm = models.CharField(max_length=255, default=None, null=True, blank=True)
+    waitingTimeStart = models.CharField(max_length=255, default=None, null=True, blank=True)
+    waitingTimeEnd = models.CharField(max_length=255, default=None, null=True, blank=True)
+    totalMinute = models.CharField(max_length=255, default=None, null=True, blank=True)
+    returnQty = models.CharField(max_length=255, default=None, null=True, blank=True)
+    returnKm = models.CharField(max_length=255, default=None, null=True, blank=True)
+    returnToYard = models.CharField(max_length=255, default=None, null=True, blank=True)
+    comment = models.CharField(max_length=255, default=None, null=True, blank=True)
+    transferKm = models.CharField(max_length=255, default=None, null=True, blank=True)
+    blowBack = models.CharField(max_length=255, default=None, null=True, blank=True)
+    standByTimeStart = models.CharField(max_length=255, default=None, null=True, blank=True)
+    standByTimeEnd = models.CharField(max_length=255, default=None, null=True, blank=True)
+    standByTimeTotal = models.CharField(max_length=255, default=None, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.docketNumber)
+    
+    
+
+
     
  
 

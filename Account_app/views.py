@@ -772,15 +772,13 @@ def reconciliationAnalysis(request):
 def reconciliationDocketView(request, docketNumber):
     # try:
     rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
-    driverDocket = DriverDocket.objects.filter(
-        docketNumber=docketNumber).first()
+    driverDocket = DriverDocket.objects.filter(docketNumber=docketNumber).first()
+    
     if rctiDocket:
-        rctiDocket.docketDate = dateConverterFromTableToPageFormate(
-            rctiDocket.docketDate)
-        rctiDocket.docketNumber = int(rctiDocket.docketNumber)
+        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
     if driverDocket:
-        driverDocket.shiftDate = dateConverterFromTableToPageFormate(
-            driverDocket.shiftDate)
+        driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
+        driverDocket.docketNumber = str(driverDocket.docketNumber)
 
     params = {
         'rctiDocket': rctiDocket,
@@ -793,9 +791,8 @@ def reconciliationEscalationForm(request):
     return render(request, 'Reconciliation/escalation-form.html')
 
 
-# ````````````````````````````````````
+# ```````````````````````````````````
 # Public holiday
-
 # ```````````````````````````````````
 
 def publicHoliday(request):

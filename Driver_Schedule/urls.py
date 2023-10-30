@@ -28,6 +28,10 @@ urlpatterns = [
     path('loginCheck',views.loginCheck, name='login-check'),
     path('logout',views.CustomLogOut, name='logout'),
 
+    path('changePassword/',views.changePasswordView, name='changePasswordView'),
+    path('changePassword/change/',views.changePasswordChange, name='changePasswordChange'),
+
+
     # Account routes
     path('account/',include('Account_app.urls')),
 

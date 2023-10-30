@@ -1,17 +1,12 @@
 from django.shortcuts import render,redirect
-from rest_framework.response import Response
-from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil, os,tabula, requests, colorama, subprocess
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from django.utils import timezone
 from django.contrib import messages
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django import template
+from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 register = template.Library()
 
@@ -75,3 +70,27 @@ def CustomLogOut(request):
     }
 
     return render(request, 'your_template.html', context)
+
+def changePasswordView(request):
+    return render(request, 'change-password.html')
+
+@csrf_protect
+@api_view(['POST'])
+def changePasswordChange(request):
+    oldPassword = request.POST.get('oldPassword')
+    newPassword = request.POST.get('newPassword')
+    reEnterPassword = request.POST.get('reEnterNewPassword')
+    
+    if newPassword != reEnterPassword:
+        messages.error(request, "Both new password must be same.")
+        return redirect(request.META.get('HTTP_REFERER')) 
+    if request.user.is_authenticated:
+        user_email = request.user.email
+        print(user_email)
+        return HttpResponse(user_email)
+        userData = User.objects.filter(username=logInUser.username).first()
+        
+        stored_password = user.password  # Get the hashed password from the User model
+        is_password_match = check_password(provided_password, stored_password)
+    else:
+        return HttpResponse('user not login')
