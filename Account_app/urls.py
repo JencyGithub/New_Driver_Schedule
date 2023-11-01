@@ -33,6 +33,8 @@ urlpatterns = [
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     
     path('Rcti/', views.rcti, name='rcti'), 
+    path('Rcti/Error/Solve/<int:id>', views.rctiErrorSolve, name='rctiErrorSolve'), 
+    path('Rcti/Error/View/<str:id>', views.rctiErrorView, name='rctiErrorView'), 
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('DriverEntry/', views.driverEntry, name='driverentry'), 

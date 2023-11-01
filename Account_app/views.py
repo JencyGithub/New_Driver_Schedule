@@ -227,7 +227,28 @@ def getTrucks(request):
 
 
 def rcti(request):
-    return render(request, 'Account/rctiForm.html')
+    rctiErrors = RctiErrors.objects.filter(status = False).values()
+    params = {
+        'rctiErrors' : rctiErrors
+    }
+    
+    return render(request, 'Account/rctiForm.html',params)
+
+def rctiErrorSolve(request ,id):        
+    rctiErrorsObj = RctiErrors.objects.get(id = id)
+    rctiErrorsObj.status = True
+    rctiErrorsObj.save()
+    messages.success(request, "Docket status change ")
+    return redirect(request.META.get('HTTP_REFERER'))
+    
+def rctiErrorView(request ,id):
+
+    rctiErrors = RctiErrors.objects.filter(status = id).values()
+    params = {
+        'rctiErrors' : rctiErrors
+    }
+    
+    return render(request, 'Account/rctiForm.html',params)
 
 
 def rctiForm(request, id):
@@ -262,9 +283,9 @@ def rctiSave(request):
             os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
             cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        messages.success(
-            request, "Please wait 5 minutes. The data conversion process continues")
-        return redirect('Account:index')
+        messages.success( request, "Please wait 5 minutes. The data conversion process continues")
+        return redirect(request.META.get('HTTP_REFERER'))
+
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 

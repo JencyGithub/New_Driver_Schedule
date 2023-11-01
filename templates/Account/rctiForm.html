@@ -1,137 +1,145 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | RCTI form {% endblock %}
+{% block title %} | BasePlant Table{% endblock %}
 {% block headStyle %}
-<link rel="stylesheet" href="{% static 'css/form.css' %}" />
-<style>
-    .cuatom-continer {
-        margin: 0 5rem;
-    }
 
-    .errorMsg {
-        font-size: 0.7rem;
-        color: rgb(255, 0, 0);
-        margin-top: 0.3rem;
-        list-style-type: none;
-    }
+ <!-- Datatables -->
+ <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
 
-    .isInvalid {
-        border: 1px solid rgb(255, 0, 0) !important;
-        border-radius: 7px !important;
-    }
+ <style>
 
-    @media (max-width: 576px) {
-        .cuatom-continer {
-            margin: 0;
-        }
-    }
+  .dt-buttons.btn-group {
+    float: right ! important;
+  }
 
-    @media (max-width: 768px) {
+  /* Hide all buttons (copy,csv,excel,pdf,print) */
+  .dt-buttons.btn-group>a {
+    display: none !important;
+  }
 
-        .cuatom-continer {
-            margin: 0;
-        }
-    }
-    
-</style>
+  /* Show CSV button */
+  .dt-buttons.btn-group>a:nth-child(2) {
+    display: block !important;
+  }
+ </style>
 {% endblock %}
 {% block content %}
-<!-- page content -->
+
 <div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
+  <div class="">
 
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>RCTI csv upload</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form class="" method="POST" action="{% url 'Account:rctiSave'%}" novalidate  enctype="multipart/form-data">
-                                {% csrf_token %}
-                                {% comment %} <span class="section">Trip details</span> {% endcomment %}
+    <div class="clearfix"></div>
+
+    <div class="row">
+
+      <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>RCTI csv upload</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="cuatom-continer">
+                    <form class="" method="POST" action="{% url 'Account:rctiSave'%}"   enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% comment %} <span class="section">Trip details</span> {% endcomment %}
 
 
 
 
-                                <div class="col-md-6 col-sm-6">
-                                    <label for="Rcti">Upload RCTI Invoice:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control"  type="file" name="RctiFile"
-                                             required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="Rcti" accept=" .csv">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-sm-6">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="save" style="margin-top: 2.5rem;" value="1"> Save Data In Database
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 text-right">
-                                    <button type='submit' class="btn btn-primary px-4">Submit</button>
-                                </div>
-                            </form>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="Rcti">Upload RCTI Invoice:<span class="required">*</span></label>
+                            <div class="field item form-group">
+                                <input class="form-control"  type="file" name="RctiFile"  required style="padding: 0.25rem 0.2rem;"
+                                    id="Rcti" accept=" .csv">
+                            </div>
                         </div>
-                    </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="save" style="margin-top: 2.5rem;" value="1"> Save Data In Database
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-right">
+                            <button type='submit' class="btn btn-primary px-4">Submit</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Error</h2>
+            <a href="{% url 'Account:rctiErrorView' id='True' %}" class="btn btn-primary float-right">Solve</a>
+            <a href="{% url 'Account:rctiErrorView' id='False' %}" class="btn btn-danger float-right">error</a>
+
+
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="card-box table-responsive">
+                  <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th >Status</th>
+                        <th >DocketNumber</th>
+                        <th >DocketDate</th>
+                        <th class="w-50">ErrorDescription</th>
+                        <th >FileName</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for data in rctiErrors %}
+                      <tr>
+                        <td><i class="fa {% if data.status %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td>
+                        <td> {{ data.docketNumber }}</td>
+                        <td>{{data.docketDate}}</td>
+                        <td>{{data.errorDescription}}</td>
+                        <td>{{data.fileName}}</td>
+                        <td>  {% if data.status is False  %} <a href="{% url 'Account:rctiErrorSolve' id=data.id%}" class="btn btn-primary"> solved</i></a>{% endif%}</td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-<!-- /page content -->
-
-{% block footerStyle %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-<script>
-
-    function hideshow() {
-        var password = document.getElementById("password1");
-        var slash = document.getElementById("slash");
-        var eye = document.getElementById("eye");
-
-        if (password.type === 'password') {
-            password.type = "text";
-            slash.style.display = "block";
-            eye.style.display = "none";
-        }
-        else {
-            password.type = "password";
-            slash.style.display = "none";
-            eye.style.display = "block";
-        }
-
-    }
-
-    // initialize a validator instance from the "FormValidator" constructor.
-    // A "<form>" element is optionally passed as an argument, but is not a must
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-
-</script>
 {% endblock %}
+{% block footerStyleEnd %}
+<script>
+  $(document).ready(function () {
+    $('#datatable-buttons').DataTable();
+  });
+</script>
+  <!-- Datatables -->
+  <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+  <script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
 {% endblock %}

@@ -121,11 +121,7 @@
                     <tbody>
                       {% for driverTtips in driverTrip %}
                       <tr>
-                        {% if driverTtips.verified %}
-                        <td><i class="fa fa-check text-success"></td>
-                        {% else %}
-                        <td><i class="fa fa-close text-danger"></td>
-                        {% endif %}
+                        <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td>
                         <td>{{ driverTtips.truckNo }}</td>
                         <td>{{ driverTtips.clientName.name }}</td>
                         <td>{{ driverTtips.driverId.name }}</td>
