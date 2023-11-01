@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'Account_app',
     'GearBox_app',   
+    'Appointment_app',
 ]
 
 MIDDLEWARE = [

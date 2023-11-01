@@ -18,23 +18,10 @@ from django.contrib import admin
 from django.urls import path , include
 from . import views
 
+app_name = 'Appointment'
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    # main index page
-    path('index', views.index, name='index'),
-    path('',views.loginCall, name='login'),
-    path('loginCheck',views.loginCheck, name='login-check'),
-    path('logout',views.CustomLogOut, name='logout'),
-
-    # Account routes
-    path('account/',include('Account_app.urls')),
-
-    # GearBox routes
-    path('gearBox/',include('GearBox_app.urls')),
-
-    # Appointment routes 
-    path('appointment/',include('Appointment_app.urls')),
     
+    # Appointment
+    path('appointmentForm/', views.appointmentForm,name="appointmentForm"),
 ]

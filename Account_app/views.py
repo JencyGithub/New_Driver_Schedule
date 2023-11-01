@@ -268,10 +268,8 @@ def rctiSave(request):
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
-
 def driverEntry(request):
     return render(request, 'Account/driverEntryForm.html')
-
 
 @csrf_protect
 def driverEntrySave(request):
