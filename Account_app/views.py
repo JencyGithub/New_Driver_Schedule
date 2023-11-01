@@ -228,6 +228,7 @@ def getTrucks(request):
 
 def rcti(request):
     rctiErrors = RctiErrors.objects.filter(status = False).values()
+    # return HttpResponse(rctiErrors)
     params = {
         'rctiErrors' : rctiErrors
     }
@@ -726,6 +727,7 @@ def driverEntryUpdate(request, ids):
             reconciliationDocketObj.save()
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
+    # return HttpResponse('Work')
     messages.success(request, "Data updated successfully")
     return redirect('Account:driverTripsTable')
 
