@@ -49,7 +49,7 @@
                 <input type="password" class="form-control" name="password" placeholder="Password" required="" />
               </div>
               <div>
-                <button type="submit" class="btn submit">Log in</button>
+                <button type="submit" class="btn btn-sm btn-default submit">Log in</button>
                 {% comment %} <a class="btn btn-default submit" href="index.html">Log in</a> {% endcomment %}
                 <a class="reset_pass" href="{% url 'forget-password' %}">Lost your password?</a>
               </div>
@@ -57,9 +57,9 @@
               <div class="clearfix"></div>
 
               <div class="separator">
-                <p class="change_link">New to site?
+                {% comment %} <p class="change_link">New to site?
                   <a href="#signup" class="to_register"> Create Account </a>
-                </p>
+                </p> {% endcomment %}
 
                 <div class="clearfix"></div>
                 <br />

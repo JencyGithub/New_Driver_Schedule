@@ -36,7 +36,7 @@
     <div class="row">
 
       <div class="col-md-12 col-sm-12 ">
-        <div class="x_panel">
+        <div class="x_panel" style="max-height: 150vh; overflow-y: auto;">
           <div class="x_title">
             <h2>RCTI</h2>
             <div class="clearfix"></div>
@@ -57,19 +57,19 @@
                     </thead>
                     <tbody>
                       {% for rcti in RCTIs %}
-                      <tr>
-                        <td>{{ rcti.truckNo }}</td>
-                        <td>{{ rcti.docketNumber }}</td>
-                        <td>{{ rcti.docketDate }}</td>
-                        <td>{{ rcti.docketYard }}</td>
-                        <td>
-                          <label type="button" class="btn" id="redirectButton">
-                            <a href="{% url 'Account:rctiForm' id=rcti.id %}">
-                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                            </a>
-                          </label>
-                        </td>                       
-                      </tr>
+                        <tr>
+                          <td>{{ rcti.truckNo }}</td>
+                          <td>{{ rcti.docketNumber }}</td>
+                          <td>{{ rcti.docketDate }}</td>
+                          <td>{{ rcti.docketYard }}</td>
+                          <td>
+                            <label type="button" class="btn" id="redirectButton">
+                              <a href="{% url 'Account:rctiForm' id=rcti.id %}">
+                                <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                              </a>
+                            </label>
+                          </td>                       
+                        </tr>
                       {% endfor %}
                     </tbody>
                   </table>
@@ -84,11 +84,7 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
-<script>
-  $(document).ready(function () {
-    $('#datatable-buttons').DataTable();
-  });
-</script>
+
   <!-- Datatables -->
   <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
@@ -105,5 +101,9 @@
   <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
   <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
   <script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
-
+  <script>
+    $(document).ready(function () {
+      $('#datatable-buttons').DataTable();
+    });
+  </script>
 {% endblock %}

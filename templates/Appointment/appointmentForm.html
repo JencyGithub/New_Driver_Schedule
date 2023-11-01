@@ -1,0 +1,172 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Appointment form {% endblock %}
+
+{% block headStyle %}
+
+{% endblock %}
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <form class="" method="POST" action="" novalidate enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Appointment Form</h2>
+                            <!-- <a href="" class="float-right btn btn-dark">Add Docket</a> -->
+                            <!-- <label for="verified" class="float-right ml-2"
+                                style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
+                            <input type="checkbox" id="verified" name="verified" class="float-right "
+                                style="margin-top: .8rem;">  -->
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="custom-continer">
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="tripStatus">Trip status :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select name="tripStatus" class="form-select form-control" id="tripStatus">
+                                            <option value="" disabled selected>Select trip status</option>
+                                            <option value="unassigned">unassigned</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="scheduled">Scheduled :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="number" name="scheduled"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="scheduled">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="title">Title :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="title"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="title">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="startDateTime">Start date time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="startDateTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="startDateTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endDateTime">End date time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="endDateTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="endDateTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="reportToOrigin">Report to origin :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="reportToOrigin"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="reportToOrigin">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="status">Status :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="status"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="status">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="origin">Origin :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="origin"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="origin">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="recurring">Recurring :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="recurring"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="recurring">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="staffNotes">Staff notes :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="staffNotes"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="staffNotes">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="createdBy">Created by :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="createdBy"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="createdBy">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="Created_time">Created time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="Created_time"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="Created_time">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="reportTime">Report time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="reportTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="reportTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="dwellTime">Dwell time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="dwellTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="dwellTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="blockTime">Block time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="blockTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="blockTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="totalTime">Total time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="time" name="totalTime"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="totalTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="driverName">Driver name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="driverName"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="driverName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="stopName">Stop name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="" type="text" name="stopName"
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="stopName">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right p-0">
+                        <button type='reset' style="margin: 0px;" class="btn btn-success px-4">Reset</button>
+                        <button type='submit' style="margin: 0px;" class="btn btn-primary px-4">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+{% endblock %}

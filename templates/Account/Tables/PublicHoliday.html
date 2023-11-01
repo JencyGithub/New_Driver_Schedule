@@ -82,15 +82,6 @@
 {% endblock %}
 {% block footerStyleEnd %}
 <script>
-  const redirectButton = document.getElementById('redirectButton');
-
-  redirectButton.addEventListener('click', function () {
-    const djangoURL = redirectButton.getAttribute('data-url');
-
-    window.location.href = djangoURL;
-  });
-</script>
-<script>
   $(document).ready(function () {
     $('#datatable-buttons').DataTable();
   });

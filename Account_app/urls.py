@@ -96,6 +96,7 @@ urlpatterns = [
     # Past trip
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
+    path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
     
     
     
@@ -105,4 +106,5 @@ urlpatterns = [
     path('Surcharge/add/save/', views.surchargeSave, name='surchargeAddSave'),   
     path('Surcharge/edit/<int:id>/', views.surchargeForm, name='surchargeEdit'),      
     path('Surcharge/edit/save/<int:id>/', views.surchargeSave, name='surchargeEditSave'),
+
 ]

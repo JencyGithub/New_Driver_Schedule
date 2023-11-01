@@ -30,10 +30,17 @@ urlpatterns = [
     path('forget/password',views.CustomForgetPassword, name='forget-password'),
     path('forget/password/mail',views.ForgetMail, name='send-mail'),
 
+    path('changePassword/',views.changePasswordView, name='changePasswordView'),
+    path('changePassword/change/',views.changePasswordChange, name='changePasswordChange'),
+
+
     # Account routes
     path('account/',include('Account_app.urls')),
 
     # GearBox routes
     path('gearBox/',include('GearBox_app.urls')),
+
+    # Appointment routes 
+    path('appointment/',include('Appointment_app.urls')),
     
 ]

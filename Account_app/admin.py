@@ -389,3 +389,8 @@ admin.site.register(Surcharge)
 admin.site.register(PublicHoliday)
 
 admin.site.register(RctiErrors)
+admin.site.register(PastTripError)
+
+admin.site.register(ReconciliationReport)
+
+admin.site.register(RctiErrors)

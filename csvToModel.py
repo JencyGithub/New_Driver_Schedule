@@ -1,5 +1,7 @@
 import csv
 from Account_app.models import *
+from Account_app.reconciliationUtils import *
+
 
 
 def dateConvert(date_):
@@ -120,6 +122,29 @@ def insertIntoModel(dataList,file_name):
 
             dataList = dataList[10:]
         RCTIobj.save()
+        
+        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+        
+        rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
+        
+        if not  reconciliationDocketObj :
+            reconciliationDocketObj = ReconciliationReport()
+        
+        reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
+        reconciliationDocketObj.docketDate =  RCTIobj.docketDate
+        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotal
+        # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotal  
+        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotal 
+        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotal
+        # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotal
+        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotal
+        reconciliationDocketObj.rctiTotalCost =  rctiTotalCost
+        reconciliationDocketObj.save()
+        checkMissingComponents(reconciliationDocketObj)
+        
+        
         # exit()
 
     except Exception as e:
