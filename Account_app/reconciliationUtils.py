@@ -20,9 +20,11 @@ costDict = {
         'standByTotalCost':0
     }
 }
-def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=costDict):
+def checkLoadAndKmCost(driverDocketNumber,docketDate):
     try:
-        date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         driverDocketLoadSize = driverDocketObj.cubicMl 
 
@@ -43,32 +45,65 @@ def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=cos
             shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             
         if  driverDocketLoadSize < shiftType.min_load_in_cubic_meters :
-            driverDocketObj.others = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
-            driverDocketObj.others = driverDocketObj.others +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
+            driverDocketObj.minimumLoad = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
+            driverDocketObj.minimumLoad = driverDocketObj.minimumLoad +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
             driverDocketObj.save()
             
-        costDict['rctiCosts']['loadAndKmCost'] = round(rctiTotalExGst,2)
-        costDict['driverDocketCosts']['loadAndKmCost'] = round(driverLoadKmCostTotal,2)
-        if  round(rctiTotalExGst,2) == round(driverLoadKmCostTotal,2):
-            return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),True] 
-
-        else:
-            return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),False] 
+        
+        return round(driverLoadKmCostTotal,2)
+ 
  
     except Exception as e :
         # print(f'{driverDocketNumber}Load And Km Cost : {e}')
-        return ['','',False]
+        return -404.0
 
-def checkSurcharge(rctiSurchargeExGst,driverDocketNumber,docketDate, costDict = costDict):
+def checkMinLoadCost(driverDocketNumber,docketDate):
     try:
         
-        date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
+        driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+        driverDocketLoadSize = driverDocketObj.cubicMl 
+
+        tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+        
+        rateCard = clientTruckConnectionObj.rate_card_name
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        
+        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        driverDocketKm = 0 if driverDocketObj.noOfKm <= graceObj.load_km_grace else driverDocketObj.noOfKm - graceObj.load_km_grace
+        if tripObj.shiftType == 'Day':
+            shiftType = ThresholdDayShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        else:
+            shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        
+        # minLoad Cost 
+        if  driverDocketLoadSize < shiftType.min_load_in_cubic_meters :
+            driverDocketObj.minimumLoad = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
+            driverDocketObj.minimumLoad = driverDocketObj.minimumLoad +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
+            driverDocketObj.save()
+            
+            return round(driverDocketObj.minimumLoad,2)
+        return 0
+        
+    except Exception as e : 
+        # print(f'{driverDocketNumber}Load And Km Cost : {e}')
+        
+        return -404.0 
+
+def checkSurcharge(driverDocketNumber,docketDate, costDict = costDict):
+    try:
+        
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         
         if 'nosurcharge' in driverDocketObj.surcharge_type.surcharge_Name.lower():
-            costDict['rctiCosts']['surchargeCost'] = round(rctiSurchargeExGst,2)
-            costDict['driverDocketCosts']['surchargeCost'] = 0
-            return ['No surcharge','',True]
+            return 0
         
         if 'fixed' in  driverDocketObj.surcharge_type.surcharge_Name.lower():
             tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
@@ -78,23 +113,24 @@ def checkSurcharge(rctiSurchargeExGst,driverDocketNumber,docketDate, costDict = 
             rateCard = clientTruckConnectionObj.rate_card_name
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
           
-            costDict['rctiCosts']['surchargeCost'] = round(rctiSurchargeExGst,2)
-            costDict['driverDocketCosts']['surchargeCost'] = round(costParameterObj.surcharge_cost,2)
-            
-            if round(costParameterObj.surcharge_cost,2) == round(rctiSurchargeExGst,2):
-                return [round(rctiSurchargeExGst,2), round(costParameterObj.surcharge_cost,2) ,True ]
-            else:
-                return [round(rctiSurchargeExGst,2) ,round(costParameterObj.surcharge_cost,2),False ]
-
+            surchargeAmount = round(costParameterObj.surcharge_cost,2)
+            if surchargeAmount is None:
+                return 0
+            else :
+                return surchargeAmount
+        else:
+            return 0
             
 
     except Exception as e :
         # print(f'{driverDocketNumber}Surcharge : {e}')
-        return ['','',False]
+        return -404.0
         
-def checkWaitingTime(rctiWaitingTimeTotalExGST,driverDocketNumber,docketDate , costDict= costDict):
+def checkWaitingTime(driverDocketNumber,docketDate , costDict= costDict):
     try:
-        date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
@@ -111,31 +147,27 @@ def checkWaitingTime(rctiWaitingTimeTotalExGST,driverDocketNumber,docketDate , c
             else:
                 totalWaitingCost = 0
                 
-            costDict['rctiCosts']['waitingTimeCost'] = round(rctiWaitingTimeTotalExGST,2)
-            costDict['driverDocketCosts']['waitingTimeCost'] = round(totalWaitingCost,2)
-            
-            if round(totalWaitingCost,2) == round(rctiWaitingTimeTotalExGST,2):
-                return [ round(rctiWaitingTimeTotalExGST,2), round(totalWaitingCost,2) ,True]
-            else:
-                
-                return [round(rctiWaitingTimeTotalExGST,2), round(totalWaitingCost,2) , False]
+            return round(totalWaitingCost,2) 
+
 
         else:
-            return True
+            return 0
         
     except Exception as e :
         # print(f'{driverDocketNumber}Waiting Time : {e}')
-        return ['','',False]
+        return -404.0
     
-def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costDict = costDict):
+def checkStandByTotal(driverDocketNumber,docketDate, costDict = costDict):
     try:
         
-        date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         finalStandByCost = 0
         
-        if rctiStandByTotalExGST == 0 and driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
-            return [f'No stand by component.','', True]
+        if  driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
+            return 0
         
         elif driverDocketObj.standByStartTime.strip() != '' and driverDocketObj.standByEndTime.strip() != '':
             tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
@@ -146,8 +178,8 @@ def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costD
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             
-            start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M:%S')
-            end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M:%S')
+            start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M')
+            end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M')
             DriverStandByTime = ((end-start).total_seconds())/60
             
             if DriverStandByTime > graceObj.chargeable_standby_time_starts_after:
@@ -159,25 +191,68 @@ def checkStandByTotal(rctiStandByTotalExGST,driverDocketNumber,docketDate, costD
                 # elif standBySlot > 0:
                 #     finalStandByCost = 0.5 * costParameterObj.standby_cost_per_slot
                 
-            else:
-                return [finalStandByCost,rctiStandByTotalExGST,False]   
+
             
-        costDict['rctiCosts']['standByTotalCost'] = round(rctiStandByTotalExGST,2)
-        costDict['driverDocketCosts']['standByTotalCost'] = round(finalStandByCost,2)
-        
-        if round(finalStandByCost,2) == round(rctiStandByTotalExGST,2):
-            return [round(rctiStandByTotalExGST,2), round(finalStandByCost,2), True]
-        else:
-            return [round(rctiStandByTotalExGST,2), round(finalStandByCost,2),False] 
+        return round(finalStandByCost,2)  
+
         
     except Exception as e :
         # print(f'{driverDocketNumber}Standby time : {e}')
-        return ['','',False]
+        return -404.0
       
+def checkTransferCost(driverDocketNumber,docketDate):
+    try:
+        
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
+        driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+        tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+        
+        rateCard = clientTruckConnectionObj.rate_card_name
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        
+        # Transfer Km 
+        driverDocketTransferKm = 0 if driverDocketObj.transferKM <= graceObj.transfer_km_grace else driverDocketObj.transferKM - graceObj.transfer_km_grace
+        driverDocketTransferKmCostTotal = driverDocketTransferKm * costParameterObj.transfer_cost
+        
+        return round(driverDocketTransferKmCostTotal,2)
+    except Exception as e : 
+        # print(f'{driverDocketNumber} Transfer : {e}')
+        return -404.0
+
+def checkReturnCost(driverDocketNumber,docketDate):
+    try:
+        
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
+        driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+        tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+        
+        rateCard = clientTruckConnectionObj.rate_card_name
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        
+        # return Cost 
+        driverReturnCostTotal = (driverDocketObj.returnKm -  graceObj.return_km_grace) * driverDocketObj.returnQty 
+        
+        return round(driverReturnCostTotal,2)
+    except Exception as e : 
+        # print(f'{driverDocketNumber}Return  : {e}')
+        return -404.0
+    
 def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
     try:
         missingComponents = []
-        date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+        date_= docketDate
+
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
@@ -274,3 +349,26 @@ def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
         # print(f'{driverDocketNumber}Total cost : {e}')
         # return ['',False,'Missing Components not calculated']
         return ['','Missing Components not calculated']
+    
+def checkMissingComponents(reconciliationReportObj):
+
+    components = ''
+    if reconciliationReportObj.driverLoadAndKmCost > 0 and reconciliationReportObj.rctiLoadAndKmCost == 0:
+        components += 'Load Km Cost' + ', '
+    if reconciliationReportObj.driverSurchargeCost > 0 and reconciliationReportObj.rctiSurchargeCost == 0:
+        components += 'Surcharge Cost' + ', '
+    if reconciliationReportObj.driverWaitingTimeCost > 0 and reconciliationReportObj.rctiWaitingTimeCost == 0:
+        components += 'Waiting Time Cost' + ', '
+    if reconciliationReportObj.driverTransferKmCost > 0 and reconciliationReportObj.rctiTransferKmCost == 0:
+        components += 'Transfer Km Cost' + ', '
+    if reconciliationReportObj.driverReturnKmCost > 0 and reconciliationReportObj.rctiReturnKmCost == 0:
+        components += 'Return Km Cost' + ', '
+    if reconciliationReportObj.driverStandByCost > 0 and reconciliationReportObj.rctiStandByCost == 0:
+        components += 'Stand By Cost' + ', '
+    if reconciliationReportObj.driverLoadDeficit > 0 and reconciliationReportObj.rctiLoadDeficit == 0:
+        components += 'Load Deficit Cost' + ', '
+    reconciliationReportObj.missingComponent = components
+    reconciliationReportObj.save()
+
+    
+    
