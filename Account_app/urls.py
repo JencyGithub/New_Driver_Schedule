@@ -94,6 +94,7 @@ urlpatterns = [
     # Past trip
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
+    path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
     
     
     

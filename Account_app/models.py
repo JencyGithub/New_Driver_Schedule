@@ -37,14 +37,6 @@ class DriverTrip(models.Model):
 
 
 class DriverDocket(models.Model):
-    SURCHARGE_NATURE_CHOICES = (
-        ('fixed normal', 'FIXED NORMAL'),
-        ('fixed sunday', 'FIXED SUNDAY'),
-        ('fixed public holiday', 'FIXED PUBLIC HOLIDAY'),
-        ('per cubic meters normal', 'PER CUBIC METERS NORMAL'),
-        ('per cubic meters sunday', 'PER CUBIC METERS SUNDAY'),
-        ('per cubic meters public holiday', 'PER CUBIC METERS PUBLIC HOLIDAY'),
-    )
     docketId = models.AutoField(primary_key=True)
     shiftDate = models.DateField(null=True, default=timezone.now())
     tripId = models.ForeignKey(DriverTrip, on_delete=models.CASCADE)
@@ -65,6 +57,7 @@ class DriverDocket(models.Model):
     cubicMl = models.FloatField(default=0)
     standByStartTime = models.CharField(max_length=200)
     standByEndTime = models.CharField(max_length=200)
+    minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
     comment = models.CharField(max_length=255, null=True, default='None')
     
@@ -73,7 +66,6 @@ class DriverDocket(models.Model):
 
     class Meta:
         unique_together = (('docketNumber', 'shiftDate'),)
-
 
 
 class RCTI(models.Model):
@@ -203,6 +195,7 @@ class RCTIDocketAdjustment(models.Model):
 # -----------------------------------
 # Holiday section
 # -----------------------------------
+
 class PublicHoliday(models.Model):
     date = models.DateField()
     stateName = models.CharField(max_length=100)
@@ -212,5 +205,71 @@ class PublicHoliday(models.Model):
         return str(self.description)
     
     
- 
+# -----------------------------------
+# Past trip errors model
+# -----------------------------------
+
+class PastTripError(models.Model):
+    tripDate = models.CharField(max_length=255, default=None, null=True, blank=True) 
+    docketNumber = models.CharField(max_length=255, default=None, null=True, blank=True)
+    lineNumber =  models.CharField(max_length=255, default=None, null=True, blank=True)   
+    errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)
+    fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.docketNumber)
+    
+    
+    
+# -----------------------------------
+# Reconciliation model
+# -----------------------------------
+    
+class ReconciliationReport(models.Model):
+    docketNumber = models.CharField( max_length=10,default='')
+    docketDate = models.DateField(default=None, null= True, blank=True)
+    missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
+    
+    # loadKmcost 
+    driverLoadAndKmCost = models.FloatField(default=0)
+    rctiLoadAndKmCost = models.FloatField(default=0)
+    
+    # SurchargeCost
+    driverSurchargeCost = models.FloatField(default=0)
+    rctiSurchargeCost = models.FloatField(default=0)
+
+    # WaitingTimeCost 
+    driverWaitingTimeCost = models.FloatField(default=0)
+    rctiWaitingTimeCost = models.FloatField(default=0)
+
+    # TransferCost
+    driverTransferKmCost = models.FloatField(default=0)
+    rctiTransferKmCost = models.FloatField(default=0)
+    
+    # returnKmCost
+    driverReturnKmCost = models.FloatField(default=0)
+    rctiReturnKmCost = models.FloatField(default=0)
+    
+    # otherCost 
+    driverOtherCost = models.FloatField(default=0)
+    rctiOtherCost = models.FloatField(default=0)    
+    
+    # standByCost 
+    driverStandByCost = models.FloatField(default=0)
+    rctiStandByCost = models.FloatField(default=0)
+    
+    # minimum load
+    driverLoadDeficit = models.FloatField(default=0)
+    rctiLoadDeficit = models.FloatField(default=0)
+
+    # Total 
+    driverTotalCost = models.FloatField(default=0)
+    rctiTotalCost = models.FloatField(default=0)
+    
+    def __str__(self):
+        return str(self.docketNumber)
+    
+
+    
 

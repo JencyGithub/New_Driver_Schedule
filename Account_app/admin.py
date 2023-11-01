@@ -387,3 +387,7 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 admin.site.register(Surcharge)
 
 admin.site.register(PublicHoliday)
+
+admin.site.register(PastTripError)
+
+admin.site.register(ReconciliationReport)

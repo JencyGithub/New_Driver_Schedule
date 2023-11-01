@@ -608,8 +608,7 @@ def driverEntryUpdate(request, ids):
     # Update Trip Save
     driver_trip = DriverTrip.objects.get(id=ids)
 
-    driver_trip.verified = True if request.POST.get(
-        'verified') == 'on' else False
+    driver_trip.verified = True if request.POST.get('verified') == 'on' else False
     driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
     driver_trip.clientName = Client.objects.get(
         pk=request.POST.get('clientName'))
@@ -630,8 +629,7 @@ def driverEntryUpdate(request, ids):
     count_ = 0
     for i in driver_docket:
         try:
-            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(
-                f'docketNumber{count_}'))), shiftDate=request.POST.get(f'shiftDate{count_}'))
+            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))), shiftDate=request.POST.get(f'shiftDate{count_}'))
             if docketNumberVal.docketId != i['docketId']:
                 messages.error(request, "Docket must be unique.")
                 return redirect(request.META.get('HTTP_REFERER'))
@@ -639,8 +637,7 @@ def driverEntryUpdate(request, ids):
             pass
         docketObj = DriverDocket.objects.get(pk=i['docketId'])
         docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
-        docketObj.docketNumber = int(
-            float(request.POST.get(f'docketNumber{count_}')))
+        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
         if request.FILES.get(f'docketFile{count_}'):
             docketFiles = request.FILES.get(f'docketFile{count_}')
             docketObj.docketFile = docketFileSave(
@@ -675,6 +672,39 @@ def driverEntryUpdate(request, ids):
         docketObj.comment = request.POST.get(f'comment{count_}')
         count_ += 1
         docketObj.save()
+        
+        if driver_trip.verified:
+            docketObj.shiftDate= datetime.strptime(docketObj.shiftDate, "%Y-%m-%d").date()
+            driverDocketNumber = docketObj.docketNumber
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = docketObj.shiftDate ).first()
+                    
+            if not  reconciliationDocketObj :
+                reconciliationDocketObj = ReconciliationReport()
+            
+            driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,docketObj.shiftDate)
+            driverSurchargeCost = checkSurcharge(driverDocketNumber,docketObj.shiftDate)
+            # return HttpResponse(driverSurchargeCost)
+            driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,docketObj.shiftDate)
+            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate)
+            driverTransferKmCost = checkTransferCost(driverDocketNumber,docketObj.shiftDate)
+            driverReturnKmCost = checkReturnCost(driverDocketNumber,docketObj.shiftDate)
+            # minLoad 
+            driverLoadDeficit = checkMinLoadCost(driverDocketNumber,docketObj.shiftDate)
+            # TotalCost 
+            driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+            reconciliationDocketObj.docketNumber = driverDocketNumber  
+            reconciliationDocketObj.docketDate = docketObj.shiftDate  
+            reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
+            reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
+            reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
+            reconciliationDocketObj.driverStandByCost = driverStandByCost 
+            reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
+            reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
+            reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
+            reconciliationDocketObj.driverTotalCost = driverTotalCost 
+            reconciliationDocketObj.save()
+            # missingComponents 
+            checkMissingComponents(reconciliationDocketObj)
     messages.success(request, "Data updated successfully")
     return redirect('Account:driverTripsTable')
 
@@ -770,15 +800,13 @@ def reconciliationAnalysis(request):
 def reconciliationDocketView(request, docketNumber):
     # try:
     rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
-    driverDocket = DriverDocket.objects.filter(
-        docketNumber=docketNumber).first()
+    driverDocket = DriverDocket.objects.filter(docketNumber=docketNumber).first()
+    
     if rctiDocket:
-        rctiDocket.docketDate = dateConverterFromTableToPageFormate(
-            rctiDocket.docketDate)
-        rctiDocket.docketNumber = int(rctiDocket.docketNumber)
+        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
     if driverDocket:
-        driverDocket.shiftDate = dateConverterFromTableToPageFormate(
-            driverDocket.shiftDate)
+        driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
+        driverDocket.docketNumber = str(driverDocket.docketNumber)
 
     params = {
         'rctiDocket': rctiDocket,
@@ -791,9 +819,8 @@ def reconciliationEscalationForm(request):
     return render(request, 'Reconciliation/escalation-form.html')
 
 
-# ````````````````````````````````````
+# ```````````````````````````````````
 # Public holiday
-
 # ```````````````````````````````````
 
 def publicHoliday(request):
@@ -1074,8 +1101,20 @@ def rateCardSave(request, id=None):
 
 
 def PastTripForm(request):
-    return render(request, 'Account/pastTrip.html')
+    pastTripErrors = PastTripError.objects.filter(status = True).values()
+    params = {
+       'pastTripErrors' : pastTripErrors 
+    }
+    return render(request, 'Account/pastTrip.html', params)
 
+def pastTripErrorSolve(request,id):
+    errorObj = PastTripError.objects.filter(pk=id).first()
+    if errorObj is not None:
+        errorObj.status = False
+        errorObj.save()
+    messages.success(request, "Error Solved")
+    return redirect('Account:pastTripForm')
+    
 
 @csrf_protect
 @api_view(['POST'])
@@ -1100,9 +1139,8 @@ def pastTripSave(request):
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
         cmd = ["python", "manage.py", "runscript", 'PastDataSave.py']
         subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        messages.success(
-            request, "Please wait for some time, it takes some time to update the data.")
-        return redirect('Account:index')
+        messages.success(request, "Please wait for some time, it takes some time to update the data.")
+        return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
