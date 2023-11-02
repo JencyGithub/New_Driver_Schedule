@@ -408,7 +408,7 @@ def driverSampleCsv(request):
 
 
 @csrf_protect
-@api_view(['POST'])
+# @api_view(['POST'])
 def rctiTable(request):
     startDate_ = request.POST.get('startDate')
     endDate_ = request.POST.get('endDate')
