@@ -272,4 +272,16 @@ class ReconciliationReport(models.Model):
     
 
     
-
+# -----------------------------------
+# Rcti Error section
+# -----------------------------------
+class RctiErrors(models.Model):
+    docketNumber = models.CharField(default=None ,blank=True,null=True ,max_length=255)
+    docketDate = models.CharField(default=None, blank=True,null=True, max_length=255)
+    errorDescription = models.CharField(default=None ,blank=True,null=True ,max_length=255)
+    fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
+    status = models.BooleanField(default=False)
+    
+    
+    def __str__(self) -> str:
+        return str(self.docketNumber)

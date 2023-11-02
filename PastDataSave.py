@@ -70,7 +70,7 @@ def insertIntoDatabase(data,key,fileName):
         # others = 
         docketObj.save()
             
-        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber , docketDate = docketObj.shiftDate ).first()
+        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = int(docketObj.docketNumber) , docketDate = docketObj.shiftDate ).first()
         # print(reconciliationDocketObj)
                 
         if not  reconciliationDocketObj :

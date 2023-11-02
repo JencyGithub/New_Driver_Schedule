@@ -227,8 +227,23 @@ def getTrucks(request):
 
 
 def rcti(request):
-    return render(request, 'Account/rctiForm.html')
+    rctiErrors = RctiErrors.objects.filter(status = False).values()
+    rctiSolve = RctiErrors.objects.filter(status = True).values()
+    # return HttpResponse(rctiErrors)
+    params = {
+        'rctiErrors' : rctiErrors ,
+        'rctiSolve' :rctiSolve
+    }
+    
+    return render(request, 'Account/rctiForm.html',params)
 
+def rctiErrorSolve(request ,id):        
+    rctiErrorsObj = RctiErrors.objects.get(id = id)
+    rctiErrorsObj.status = True
+    rctiErrorsObj.save()
+    messages.success(request, "Docket status change ")
+    return redirect(request.META.get('HTTP_REFERER'))
+    
 
 def rctiForm(request, id):
     rcti = RCTI.objects.get(id=id)
@@ -262,9 +277,9 @@ def rctiSave(request):
             os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
             cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        messages.success(
-            request, "Please wait 5 minutes. The data conversion process continues")
-        return redirect('Account:index')
+        messages.success( request, "Please wait 5 minutes. The data conversion process continues")
+        return redirect(request.META.get('HTTP_REFERER'))
+
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
@@ -705,6 +720,7 @@ def driverEntryUpdate(request, ids):
             reconciliationDocketObj.save()
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
+    # return HttpResponse('Work')
     messages.success(request, "Data updated successfully")
     return redirect('Account:driverTripsTable')
 
@@ -1102,8 +1118,10 @@ def rateCardSave(request, id=None):
 
 def PastTripForm(request):
     pastTripErrors = PastTripError.objects.filter(status = True).values()
+    pastTripSolved = PastTripError.objects.filter(status = False).values()
     params = {
-       'pastTripErrors' : pastTripErrors 
+       'pastTripErrors' : pastTripErrors ,
+       'pastTripSolved' :pastTripSolved
     }
     return render(request, 'Account/pastTrip.html', params)
 

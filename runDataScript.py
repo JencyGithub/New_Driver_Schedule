@@ -28,7 +28,7 @@ def truckConnectionInsert(data):
     try:
         print(data['id'])
         adminTruckObj = AdminTruck.objects.get(pk = data['truckNumber'])
-        rateCardObj = RateCard.objects.get(pk = data['rate_card_name'])
+        rateCardObj = RateCard.objects.filter().first()
         clientObj = Client.objects.get(pk = data['clientId'])
         
         clientTruckConnectionObj = ClientTruckConnection(
@@ -84,7 +84,6 @@ connections = [
     {'id': 35, 'truckNumber': 6, 'truckType': 'Embedded', 'rate_card_name': 2, 'clientId': 1, 'clientTruckId': 786, 'startDate': datetime.date(2023, 4, 1), 'endDate': datetime.date(2023, 4, 15)},
     {'id': 36, 'truckNumber': 7, 'truckType': 'Embedded', 'rate_card_name': 2, 'clientId': 1, 'clientTruckId': 784, 'startDate': datetime.date(2023, 4, 1), 'endDate': datetime.date(2023, 4, 15)},
     {'id': 37, 'truckNumber': 9, 'truckType': 'Embedded', 'rate_card_name': 2, 'clientId': 1, 'clientTruckId': 789, 'startDate': datetime.date(2023, 4, 1), 'endDate': datetime.date(2023, 4, 15)},
-    {'id': 38, 'truckNumber': 38, 'truckType': 'Embedded', 'rate_card_name': 2, 'clientId': 1, 'clientTruckId': 650, 'startDate': datetime.date(2023, 4, 1), 'endDate': datetime.date(2023, 4, 15)}
 ]
 
 for connection in connections:

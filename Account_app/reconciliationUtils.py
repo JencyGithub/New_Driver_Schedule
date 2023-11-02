@@ -34,6 +34,7 @@ def checkLoadAndKmCost(driverDocketNumber,docketDate):
         
         rateCard = clientTruckConnectionObj.rate_card_name
         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        print(costParameterObj)
         
         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         driverDocketKm = 0 if driverDocketObj.noOfKm <= graceObj.load_km_grace else driverDocketObj.noOfKm - graceObj.load_km_grace

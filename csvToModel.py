@@ -23,13 +23,12 @@ def insertTopUpRecord(list_):
 
     return
 
-def insertIntoModel(dataList):
+def insertIntoModel(dataList,file_name):
     
     try:
         RCTIobj = None
         try:
-            existingDocket = RCTI.objects.get(
-                docketNumber=int(dataList[1]))
+            existingDocket = RCTI.objects.get( docketNumber=int(dataList[1]))
             if str(existingDocket.docketDate) == dateConvert(dataList[2]):
                 RCTIobj = existingDocket
         except:
@@ -150,6 +149,15 @@ def insertIntoModel(dataList):
 
     except Exception as e:
         # print(f"Error : {e}")
+        rctiErrorObj = RctiErrors( 
+                            docketNumber = RCTIobj.docketNumber,
+                            docketDate = RCTIobj.docketDate,
+                            errorDescription = e,
+                            fileName = file_name
+        )
+        rctiErrorObj.save()
+        # print(f' Docket No :{RCTIobj.docketNumber}. Docket Date : {RCTIobj.docketDate}  , Error : {e} \n {dataList} \n\n\n')
+        # exit()
         pass
 
 
@@ -157,10 +165,16 @@ def insertIntoModel(dataList):
         
 f = open("File_name_file.txt", 'r')
 file_name = f.read()
-# file_name = 'converted_20231012112909@_!pdf.csv'
+# file_name = 'converted_20231030113104@_!pdf1.csv'
+convertFileName = file_name.split('@_!')[1]
 
 files = open(f'static/Account/RCTI/RCTIInvoice/{file_name}', 'r')
 reader = csv.reader(files)
 next(reader)
+# for key,row in reader.iterrows():
+#     try:
+#         insertIntoModel(row,key)
+#     except Exception as e:
+#         print(f" ! Error : {e}")
 for row in reader:
-    insertIntoModel(row)
+    insertIntoModel(row,convertFileName)
