@@ -28,7 +28,22 @@ from Account_app.reconciliationUtils import *
 
 
 def index(request):
-    return render(request, 'Account/dashboard.html')
+    rctiInvoiceFile = os.listdir('static/Account/RCTI/RCTIInvoice')
+    rctiFileNameList = []
+    for file in rctiInvoiceFile:
+        rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+    
+
+    pastTripFile = os.listdir('static/Account/PastTripsEntry')
+    pasrTripFileNameList = []
+    for file in pastTripFile:
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        
+    params = {
+        'rctiFileNameLists' : rctiFileNameList,
+        'pasrTripFileNameLists' : pasrTripFileNameList,
+    }
+    return render(request, 'Account/dashboard.html',params)
 
 
 def getForm1(request):
