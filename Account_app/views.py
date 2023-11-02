@@ -228,9 +228,11 @@ def getTrucks(request):
 
 def rcti(request):
     rctiErrors = RctiErrors.objects.filter(status = False).values()
+    rctiSolve = RctiErrors.objects.filter(status = True).values()
     # return HttpResponse(rctiErrors)
     params = {
-        'rctiErrors' : rctiErrors
+        'rctiErrors' : rctiErrors ,
+        'rctiSolve' :rctiSolve
     }
     
     return render(request, 'Account/rctiForm.html',params)
@@ -242,15 +244,6 @@ def rctiErrorSolve(request ,id):
     messages.success(request, "Docket status change ")
     return redirect(request.META.get('HTTP_REFERER'))
     
-def rctiErrorView(request ,id):
-
-    rctiErrors = RctiErrors.objects.filter(status = id).values()
-    params = {
-        'rctiErrors' : rctiErrors
-    }
-    
-    return render(request, 'Account/rctiForm.html',params)
-
 
 def rctiForm(request, id):
     rcti = RCTI.objects.get(id=id)
@@ -1125,8 +1118,10 @@ def rateCardSave(request, id=None):
 
 def PastTripForm(request):
     pastTripErrors = PastTripError.objects.filter(status = True).values()
+    pastTripSolved = PastTripError.objects.filter(status = False).values()
     params = {
-       'pastTripErrors' : pastTripErrors 
+       'pastTripErrors' : pastTripErrors ,
+       'pastTripSolved' :pastTripSolved
     }
     return render(request, 'Account/pastTrip.html', params)
 
