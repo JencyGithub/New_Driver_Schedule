@@ -22,20 +22,17 @@
     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
       <div class="menu_section">
         {% if user.is_active and user.is_staff %}
-        {% if request.session.user_type == 'Driver' %}
         <ul class="nav side-menu">
-          <li class=""><a href="{% url 'index'%}"><i class="fa fa-laptop"></i> Dashboard</a></li>
-          <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li>
+          {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
+
+          <li class=""><a href="{% url 'index'%}"><i class="fa fa-desktop"></i> Dashboard</a></li>
+          {% endif %}
+          <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-truck"></i> DriverTrip</a></li>
         </ul>
-        {%else%}
         {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
         <ul class="nav side-menu">
-          <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-laptop"></i> Dashboard</a></li>
-          {% if request.session.user_type == 'SuperUser' %}
-          <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-laptop"></i> DriverTrip</a></li>
-          {% endif %}
           <li>
-            <a><i class="fa fa-home"></i> Account <span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-book"></i> Account <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li class=""><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
               <li class=""><a href="{% url 'Account:basePlantTable'%}">Base Plant </a></li>
@@ -47,7 +44,7 @@
             </ul>
           </li>
           <li>
-            <a><i class="fa fa-home"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-wrench"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li><a href="{% url 'gearBox:clientTable'%}">Clients</a></li>
               <li><a href="{% url 'Account:driverentry'%}">Driver Entry</a></li>
@@ -58,19 +55,18 @@
             </ul>
           </li>
           <li>
-            <a><i class="fa fa-home"></i> Appointments <span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-list"></i> Appointments <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li class=""><a href="{% url 'Appointment:appointmentForm'%}"> Appointments </a></li>
             </ul>
           </li>
           <li>
-            <a><i class="fa fa-home"></i> Report <span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-bar-chart"></i> Report <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li class=""><a href="{% url 'Account:reconciliationForm'%}"> Reconciliation </a></li>
             </ul>
           </li>
         </ul>
-        {% endif %}
         {% endif %}
         {% endif %}
         </ul>
