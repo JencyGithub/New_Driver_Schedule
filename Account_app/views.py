@@ -28,7 +28,22 @@ from Account_app.reconciliationUtils import *
 
 
 def index(request):
-    return render(request, 'Account/dashboard.html')
+    rctiInvoiceFile = os.listdir('static/Account/RCTI/RCTIInvoice')
+    rctiFileNameList = []
+    for file in rctiInvoiceFile:
+        rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+    
+
+    pastTripFile = os.listdir('static/Account/PastTripsEntry')
+    pasrTripFileNameList = []
+    for file in pastTripFile:
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        
+    params = {
+        'rctiFileNameLists' : rctiFileNameList,
+        'pasrTripFileNameLists' : pasrTripFileNameList,
+    }
+    return render(request, 'Account/dashboard.html',params)
 
 
 def getForm1(request):
@@ -228,9 +243,11 @@ def getTrucks(request):
 
 def rcti(request):
     rctiErrors = RctiErrors.objects.filter(status = False).values()
+    rctiSolve = RctiErrors.objects.filter(status = True).values()
     # return HttpResponse(rctiErrors)
     params = {
-        'rctiErrors' : rctiErrors
+        'rctiErrors' : rctiErrors ,
+        'rctiSolve' :rctiSolve
     }
     
     return render(request, 'Account/rctiForm.html',params)
@@ -242,15 +259,6 @@ def rctiErrorSolve(request ,id):
     messages.success(request, "Docket status change ")
     return redirect(request.META.get('HTTP_REFERER'))
     
-def rctiErrorView(request ,id):
-
-    rctiErrors = RctiErrors.objects.filter(status = id).values()
-    params = {
-        'rctiErrors' : rctiErrors
-    }
-    
-    return render(request, 'Account/rctiForm.html',params)
-
 
 def rctiForm(request, id):
     rcti = RCTI.objects.get(id=id)
@@ -400,7 +408,7 @@ def driverSampleCsv(request):
 
 
 @csrf_protect
-@api_view(['POST'])
+# @api_view(['POST'])
 def rctiTable(request):
     startDate_ = request.POST.get('startDate')
     endDate_ = request.POST.get('endDate')
@@ -1066,8 +1074,10 @@ def rateCardSave(request, id=None):
 
 def PastTripForm(request):
     pastTripErrors = PastTripError.objects.filter(status = True).values()
+    pastTripSolved = PastTripError.objects.filter(status = False).values()
     params = {
-       'pastTripErrors' : pastTripErrors 
+       'pastTripErrors' : pastTripErrors ,
+       'pastTripSolved' :pastTripSolved
     }
     return render(request, 'Account/pastTrip.html', params)
 
