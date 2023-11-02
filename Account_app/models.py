@@ -229,7 +229,15 @@ class PastTripError(models.Model):
 class ReconciliationReport(models.Model):
     docketNumber = models.CharField( max_length=10,default='')
     docketDate = models.DateField(default=None, null= True, blank=True)
+    
+    driverId = models.PositiveIntegerField(default=0)
+    clientId = models.PositiveIntegerField(default=0)
+    truckId = models.PositiveIntegerField(default=0)
+    
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
+    
+    fromDriver = models.BooleanField(default=False)
+    fromRcti = models.BooleanField(default=False)
     
     # loadKmcost 
     driverLoadAndKmCost = models.FloatField(default=0)

@@ -1,16 +1,7 @@
 {% extends "main/main.html" %} {% load static %} {% block title %} |
 Reconciliation docket {% endblock %} {% block headStyle %}
 
-<!-- Datatables -->
-<link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet" />
-<link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}"
-    rel="stylesheet" />
-<link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"
-    rel="stylesheet" />
-<link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"
-    rel="stylesheet" />
-<link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
-    rel="stylesheet" />
+
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link type="text/css"
     href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
@@ -59,29 +50,28 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                             <th>Waiting cost</th> 
                                             <th>Stand by cost</th>
                                             <th>Total cost</th>
-                                            <th>Missing components</th>
+                                            <th style="width:17%">Missing components</th>
                                             <th>Action</th>
                                         </thead>
                                         <tbody>
+                                            <!-- Driver / RCTI -->
                                             {% for item in dataList %}
-                                            <tr>
-                                                <td>
-                                                    {{ item.docketNumber }}
-                                                </td>
-                                                <td>
-                                                    <a href="{% url 'Account:reconciliationDocketView' docketNumber=item.docketNumber %}" target=""
-                                                        class="{{ item.class }}">{{ item.docketNumber }}
-                                                    </a>
-                                                </td>
-                                                {% comment %} <td><i class="fa {% if item.loadAndKmCost %}fa-check text-success{% else %}fa-close text-danger{% endif %}"></i>{% if not item.loadAndKmCost %} Missing {% endif %}</td> {% endcomment %}
-                                                 <td class="{% if True in item.loadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.loadAndKmCost.0 }} / {{ item.loadAndKmCost.1 }} </td>
-                                                 <td class="{% if True in item.calculatedSurcharge %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedSurcharge.0 }} / {{ item.calculatedSurcharge.1 }}</td>
-                                                 <td class="{% if True in item.calculatedWaitingTimeTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedWaitingTimeTotal.0 }} / {{ item.calculatedWaitingTimeTotal.1 }}</td> 
-                                                <td class="{% if True in item.calculatedStandByTotal %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedStandByTotal.0 }} / {{ item.calculatedStandByTotal.1 }}</td>
-                                                <td class="{% if True in item.calculatedTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.calculatedTotalCost.0 }} / {{ item.calculatedTotalCost.1 }}</td>
-                                                <td class="{% if 'No missing component' in item.missingComponents %} text-success {% else %} text-danger {% endif %}">{{ item.missingComponents }}</td>
-                                                <td><a href="{% url 'Account:reconciliationEscalationForm' %}" class="btn btn-sm btn-default">Escalation</a></td>
-                                            </tr>
+                                                <tr>
+                                                    <td>{{ item.docketNumber }}</td>
+                                                    <td>
+                                                        <a href="{% url 'Account:reconciliationDocketView' docketNumber=item.docketNumber %}" target="_blank" 
+                                                            class="{% if item.fromDriver and item.fromRcti %} text-success {% else %} text-danger {% endif %}">{{ item.docketNumber }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="{% if item.driverLoadAndKmCost == item.rctiLoadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverLoadAndKmCost}} / {{ item.rctiLoadAndKmCost }} </td>
+                                                    <td class="{% if item.driverSurchargeCost == item.rctiSurchargeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverSurchargeCost}} / {{ item.rctiSurchargeCost }} </td>
+                                                    <td class="{% if item.driverWaitingTimeCost == item.rctiWaitingTimeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverWaitingTimeCost}} / {{ item.rctiWaitingTimeCost }} </td>
+                                                    <td class="{% if item.driverStandByCost == item.rctiStandByCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverStandByCost}} / {{ item.rctiStandByCost }} </td>
+                                                    <td class="{% if item.driverTotalCost == item.rctiTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverTotalCost}} / {{ item.rctiTotalCost }} </td>
+                                                    <td class="text-danger">{{ item.missingComponent }} </td>
+                                                    
+                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' %}" class="btn btn-sm btn-default">Escalation</a></td>
+                                                </tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
@@ -90,31 +80,18 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                         </div>
                     </div>
                 </div>
+               
             </div>
         </div>
     </div>
 </div>
 {% endblock %} 
 {% block footerStyleEnd %}
-<!-- Datatables -->
-<script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
     $(document).ready(function () {
+
         var table = $("#dataTable").DataTable({
             'columnDefs': [{
                 'targets': 0,
@@ -129,6 +106,7 @@ Reconciliation docket {% endblock %} {% block headStyle %}
         });
     });
 </script>
+
 <script type="text/javascript"
     src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
 

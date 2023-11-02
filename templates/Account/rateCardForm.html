@@ -290,12 +290,21 @@ request {% endblock %} {% block headStyle %}
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdDayShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
+                                                <label for="thresholdDayShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control"  type="number" name="thresholdDayShift_return_load_grace" required='required'
-                                                    value="{% if thresholdDayShift %}{{thresholdDayShift.return_load_grace}}{% else %} {% endif %}" 
+                                                    <input class="form-control"  type="number" name="thresholdDayShift_return_to_yard_grace" required='required'
+                                                    value="{% if thresholdDayShift %}{{thresholdDayShift.return_to_yard_grace}}{% else %} {% endif %}" 
                                                             {% if thresholdDayShift %} readonly {% else %} {% endif %}
-                                                        style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_return_load_grace">
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_return_to_yard_grace">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="thresholdDayShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control"  type="number" name="thresholdDayShift_return_to_tipping_grace" required='required'
+                                                    value="{% if thresholdDayShift %}{{thresholdDayShift.return_to_tipping_grace}}{% else %} {% endif %}" 
+                                                            {% if thresholdDayShift %} readonly {% else %} {% endif %}
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdDayShift_return_to_tipping_grace">
                                                 </div>
                                             </div>
                                         </div>
@@ -417,13 +426,23 @@ request {% endblock %} {% block headStyle %}
                                                         style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_min_load_in_cubic_meters_return_to_yard">
                                                 </div>
                                             </div>
+
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdNightShift_return_load_grace">Return Load Grace :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control"  type="number" name="thresholdNightShift_return_load_grace" required='required'
-                                                    value="{% if thresholdNightShift %}{{thresholdNightShift.return_load_grace}}{% else %} {% endif %}" 
+                                                    <input class="form-control"  type="number" name="thresholdNightShift_return_to_yard_grace" required='required'
+                                                    value="{% if thresholdNightShift %}{{thresholdNightShift.return_to_yard_grace}}{% else %} {% endif %}" 
                                                             {% if thresholdNightShift %} readonly {% else %} {% endif %}
-                                                        style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_return_load_grace">
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_return_to_yard_grace">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="thresholdNightShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control"  type="number" name="thresholdNightShift_return_to_tipping_grace" required='required'
+                                                    value="{% if thresholdNightShift %}{{thresholdNightShift.return_to_tipping_grace}}{% else %} {% endif %}" 
+                                                            {% if thresholdNightShift %} readonly {% else %} {% endif %}
+                                                        style="padding: 0.25rem 0.2rem;" id="thresholdNightShift_return_to_tipping_grace">
                                                 </div>
                                             </div>
                                         </div>

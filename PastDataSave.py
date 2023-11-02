@@ -84,7 +84,7 @@ def insertIntoDatabase(data,key,fileName):
         driverReturnKmCost = checkReturnCost(int(docketObj.docketNumber),docketObj.shiftDate)
              
         # minLoad 
-        driverLoadDeficit = checkMinLoadCost(docketObj.docketNumber,docketObj.shiftDate)
+        driverLoadDeficit = checkMinLoadCost(int(docketObj.docketNumber),docketObj.shiftDate)
         # TotalCost 
         driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
 
@@ -97,7 +97,8 @@ def insertIntoDatabase(data,key,fileName):
         reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
         reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
         reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
-        reconciliationDocketObj.driverTotalCost = driverTotalCost 
+        reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2) 
+        reconciliationDocketObj.fromDriver = True 
         reconciliationDocketObj.save()
         # missingComponents 
         checkMissingComponents(reconciliationDocketObj)
@@ -132,7 +133,8 @@ for key,row in pastData.iterrows():
     try:
         insertIntoDatabase(row,key,fileName)
     except Exception as e:
-        print(f" ! Error : {e}")
+        pass
+        # print(f" ! Error : {e}")
 
 
         

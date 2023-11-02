@@ -46,8 +46,8 @@ class CostParameters(models.Model):
     surcharge_type = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
     surcharge_cost = models.FloatField(default=0)
     transfer_cost = models.FloatField(default=0)
-    return_load_cost = models.FloatField(default=0)# change name added
-    return_km_cost = models.FloatField(default=0) # new added
+    return_load_cost = models.FloatField(default=0)     # change name added
+    return_km_cost = models.FloatField(default=0)       # new added
     standby_time_slot_size = models.PositiveIntegerField(default=0)
     standby_cost_per_slot = models.FloatField(default=0)
     waiting_cost_per_minute = models.FloatField(default=0)
@@ -61,9 +61,9 @@ class CostParameters(models.Model):
 class ThresholdDayShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     threshold_amount_per_day_shift = models.FloatField(default=0)
-    loading_cost_per_cubic_meter_included = models.BooleanField(default=True)
-    km_cost_included = models.BooleanField(default=True)
-    surcharge_included  = models.BooleanField(default=True)
+    loading_cost_per_cubic_meter_included = models.BooleanField(default=False)
+    km_cost_included = models.BooleanField(default=False)
+    surcharge_included  = models.BooleanField(default=False)
 
     # surcharge_fixed_normal_cost_included = models.BooleanField(default=False)
     # surcharge_fixed_sunday_cost_included = models.BooleanField(default=False)
@@ -71,18 +71,19 @@ class ThresholdDayShift(models.Model):
     # surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
     # surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
     # surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
-    transfer_cost_included = models.BooleanField(default=True)
-    return_cost_included = models.BooleanField(default=True)
-    standby_cost_included = models.BooleanField(default=True)
-    waiting_cost_included = models.BooleanField(default=True)
-    call_out_fees_included = models.BooleanField(default=True)
-    # demurrage_fees_included = models.BooleanField(default=True)
+    transfer_cost_included = models.BooleanField(default=False)
+    return_cost_included = models.BooleanField(default=False)
+    standby_cost_included = models.BooleanField(default=False)
+    waiting_cost_included = models.BooleanField(default=False)
+    call_out_fees_included = models.BooleanField(default=False)
+    # demurrage_fees_included = models.BooleanField(default=False)
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
     # min_load_in_cubic_meters_trip = models.FloatField(default=0)
      
-    return_load_grace = models.FloatField(default=1)# new added
+    return_to_yard_grace = models.FloatField(default=0)         # new added
+    return_to_tipping_grace = models.FloatField(default=0)      # new added
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(null=True, blank=True)
@@ -90,19 +91,20 @@ class ThresholdDayShift(models.Model):
 class ThresholdNightShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     threshold_amount_per_night_shift = models.FloatField(default=0)
-    loading_cost_per_cubic_meter_included = models.BooleanField(default=True)
-    km_cost_included = models.BooleanField(default=True)
-    surcharge_included  = models.BooleanField(default=True)
-    transfer_cost_included = models.BooleanField(default=True)
-    return_cost_included = models.BooleanField(default=True)
-    standby_cost_included = models.BooleanField(default=True)
-    waiting_cost_included = models.BooleanField(default=True)
-    call_out_fees_included = models.BooleanField(default=True)
+    loading_cost_per_cubic_meter_included = models.BooleanField(default=False)
+    km_cost_included = models.BooleanField(default=False)
+    surcharge_included  = models.BooleanField(default=False)
+    transfer_cost_included = models.BooleanField(default=False)
+    return_cost_included = models.BooleanField(default=False)
+    standby_cost_included = models.BooleanField(default=False)
+    waiting_cost_included = models.BooleanField(default=False)
+    call_out_fees_included = models.BooleanField(default=False)
 
     min_load_in_cubic_meters = models.FloatField(default=0)
     min_load_in_cubic_meters_return_to_yard = models.FloatField(default=0)
 
-    return_load_grace = models.FloatField(default=1)# new added
+    return_to_yard_grace = models.FloatField(default=0)         # new added
+    return_to_tipping_grace = models.FloatField(default=0)      # new added
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(null=True, blank=True)

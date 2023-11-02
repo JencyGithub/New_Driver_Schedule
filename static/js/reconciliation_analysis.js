@@ -1,3 +1,5 @@
+const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
 $(document).ready(function () {
   function checkDateValid() {
     var startDate = $("#startDate").val();
@@ -51,4 +53,5 @@ $(document).ready(function () {
         $("#signUpForm").submit();
       }
     });
+
 });

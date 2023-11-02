@@ -140,7 +140,9 @@ def insertIntoModel(dataList,file_name):
         # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
         reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotal
         reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotal
-        reconciliationDocketObj.rctiTotalCost =  rctiTotalCost
+        reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+        reconciliationDocketObj.fromRcti = True 
+        
         reconciliationDocketObj.save()
         checkMissingComponents(reconciliationDocketObj)
         

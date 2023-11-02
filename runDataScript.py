@@ -12,7 +12,6 @@ import datetime
 
 # for truck in trucks:
 #     try:
-        
 #         obj = AdminTruck(adminTruckNumber = truck)
 #         obj.save()
 #     except Exception as e:

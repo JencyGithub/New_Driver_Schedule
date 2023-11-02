@@ -4,7 +4,7 @@ from django.utils import timezone
 import datetime
 from django.shortcuts import get_object_or_404
 from CRUD import *
-# from datetime import strptime
+from datetime import datetime
 
 costDict = {
     'rctiCosts': {
@@ -20,6 +20,46 @@ costDict = {
         'standByTotalCost':0
     }
 }
+
+# def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=costDict):
+#     try:
+#         date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+#         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+#         driverDocketLoadSize = driverDocketObj.cubicMl 
+
+#         tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+#         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+#         clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+        
+#         rateCard = clientTruckConnectionObj.rate_card_name
+#         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+        
+#         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+#         driverDocketKm = 0 if driverDocketObj.noOfKm <= graceObj.load_km_grace else driverDocketObj.noOfKm - graceObj.load_km_grace
+#         driverLoadKmCostTotal = (driverDocketLoadSize * costParameterObj.loading_cost_per_cubic_meter) + (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
+
+#         if tripObj.shiftType == 'Day':
+#             shiftType = ThresholdDayShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+#         else:
+#             shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+            
+#         if  driverDocketLoadSize < shiftType.min_load_in_cubic_meters :
+#             driverDocketObj.others = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
+#             driverDocketObj.others = driverDocketObj.others +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
+#             driverDocketObj.save()
+            
+#         costDict['rctiCosts']['loadAndKmCost'] = round(rctiTotalExGst,2)
+#         costDict['driverDocketCosts']['loadAndKmCost'] = round(driverLoadKmCostTotal,2)
+#         if  round(rctiTotalExGst,2) == round(driverLoadKmCostTotal,2):
+#             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),True] 
+
+#         else:
+#             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),False] 
+ 
+#     except Exception as e :
+#         # print(f'{driverDocketNumber}Load And Km Cost : {e}')
+#         return ['','',False]
+
 def checkLoadAndKmCost(driverDocketNumber,docketDate):
     try:
         
@@ -34,7 +74,6 @@ def checkLoadAndKmCost(driverDocketNumber,docketDate):
         
         rateCard = clientTruckConnectionObj.rate_card_name
         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-        print(costParameterObj)
         
         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         driverDocketKm = 0 if driverDocketObj.noOfKm <= graceObj.load_km_grace else driverDocketObj.noOfKm - graceObj.load_km_grace
@@ -167,11 +206,12 @@ def checkStandByTotal(driverDocketNumber,docketDate, costDict = costDict):
         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         finalStandByCost = 0
         
-        if  driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
+        if driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
             return 0
         
         elif driverDocketObj.standByStartTime.strip() != '' and driverDocketObj.standByEndTime.strip() != '':
             tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+            
             adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
             clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
             
@@ -179,8 +219,8 @@ def checkStandByTotal(driverDocketNumber,docketDate, costDict = costDict):
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             
-            start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M')
-            end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M')
+            start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M:%S')
+            end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M:%S')
             DriverStandByTime = ((end-start).total_seconds())/60
             
             if DriverStandByTime > graceObj.chargeable_standby_time_starts_after:

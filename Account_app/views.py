@@ -723,7 +723,8 @@ def driverEntryUpdate(request, ids):
             reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
             reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
             reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
-            reconciliationDocketObj.driverTotalCost = driverTotalCost 
+            reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
+            reconciliationDocketObj.fromDriver = True 
             reconciliationDocketObj.save()
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
@@ -743,81 +744,17 @@ def reconciliationForm(request):
     trucks = AdminTruck.objects.all()
     return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
 
-
-def reconciliationResult(request):
-    serialized_data = request.session.get('reconciliationResultData', "[]")
-    dataList = json.loads(serialized_data)
-
-    for entry in dataList:
-        if 'docketDate' in entry:
-            entry['docketDate'] = datetime.strptime(entry['docketDate'], '%Y-%m-%d').date()
-
-    basePlants = BasePlant.objects.all()
-    params = {
-        'dataList': dataList,
-        'basePlants': basePlants
-    }
-    return render(request, 'Reconciliation/reconciliation-result.html', params)
-
-
 @csrf_protect
-@api_view(['POST'])
 def reconciliationAnalysis(request):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-
-    rcti_data = RCTI.objects.filter(
-        docketDate__range=(startDate, endDate)).values()
-
-    driver_docket_data = DriverDocket.objects.filter(
-        shiftDate__range=(startDate, endDate)).values()
-
-    unique_RCTI = {int(item['docketNumber']) for item in rcti_data}
-    unique_driverDocket = {item['docketNumber'] for item in driver_docket_data}
-    common_docket = unique_RCTI.intersection(unique_driverDocket)
-
-    rcti_data = list(rcti_data)
-    for entry in rcti_data:
-        entry['docketDate'] = entry['docketDate'].strftime('%Y-%m-%d')
-
-    driver_docket_data = list(driver_docket_data)
-    for entry in driver_docket_data:
-        entry['shiftDate'] = entry['shiftDate'].strftime('%Y-%m-%d')
-
-    dataList = []
-
-    for rcti_entry in rcti_data:
-        # return HttpResponse(rcti_entry)
-        docket_number = int(rcti_entry['docketNumber'])
-        calculatedTotalCost = checkTotalCost(rcti_entry['docketNumber'], rcti_entry['docketDate'])
-        data_entry = {
-            'docketNumber': docket_number,
-            'class': 'text-danger' if docket_number not in common_docket else 'text-success',
-            'loadAndKmCost': checkLoadAndKmCost(rcti_entry['cartageTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
-            'calculatedSurcharge': checkSurcharge(rcti_entry['surchargeTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
-            'calculatedWaitingTimeTotal': checkWaitingTime(rcti_entry['waitingTimeTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
-            'returnKM': rcti_entry['returnKm'],
-            'calculatedStandByTotal':checkStandByTotal(rcti_entry['standByTotalExGST'], rcti_entry['docketNumber'], rcti_entry['docketDate']),
-            'calculatedTotalCost': calculatedTotalCost[:-1],
-            'missingComponents': calculatedTotalCost[-1] if len(calculatedTotalCost[-1]) > 0 else 'No missing component',
-            **rcti_entry
-        }
-        dataList.append(data_entry)
-
-    for driver_docket_entry in driver_docket_data:
-        docket_number = driver_docket_entry['docketNumber']
-        data_entry = {
-            'docketNumber': docket_number,
-            'class': 'text-danger' if docket_number not in common_docket else 'text-success',
-            **driver_docket_entry
-        }
-        if data_entry['docketNumber'] not in common_docket:
-            dataList.append(data_entry)
-
-    serialized_data = json.dumps(dataList, cls=DjangoJSONEncoder)
-    request.session['reconciliationResultData'] = serialized_data
-
-    return redirect('Account:reconciliationResult')
+    
+    dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
+    params = {
+        'dataList': dataList,
+    }
+    return render(request, 'Reconciliation/reconciliation-result.html', params)
+     
 
 
 def reconciliationDocketView(request, docketNumber):
@@ -1038,8 +975,10 @@ def rateCardSave(request, id=None):
             'thresholdDayShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard=float(request.POST.get(
             'thresholdDayShift_min_load_in_cubic_meters_return_to_yard')),
-        return_load_grace=float(request.POST.get(
-            'thresholdDayShift_return_load_grace')),
+        return_to_yard_grace=float(request.POST.get(
+            'thresholdDayShift_return_to_yard_grace')),
+        return_to_tipping_grace=float(request.POST.get(
+            'thresholdDayShift_return_to_tipping_grace')),
         start_date=request.POST.get('thresholdDayShift_start_date')
     )
     thresholdDayShifts.save()
@@ -1069,8 +1008,10 @@ def rateCardSave(request, id=None):
             'thresholdNightShift_min_load_in_cubic_meters')),
         min_load_in_cubic_meters_return_to_yard=float(request.POST.get(
             'thresholdNightShift_min_load_in_cubic_meters_return_to_yard')),
-        return_load_grace=float(request.POST.get(
-            'thresholdNightShift_return_load_grace')),
+         return_to_yard_grace=float(request.POST.get(
+            'thresholdNightShift_return_to_yard_grace')),
+        return_to_tipping_grace=float(request.POST.get(
+            'thresholdNightShift_return_to_tipping_grace')),
         start_date=request.POST.get('thresholdNightShift_start_date')
     )
     thresholdNightShifts.save()
