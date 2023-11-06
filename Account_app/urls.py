@@ -34,8 +34,17 @@ urlpatterns = [
     
     path('Rcti/', views.rcti, name='rcti'), 
     path('Rcti/Error/Solve/<int:id>', views.rctiErrorSolve, name='rctiErrorSolve'), 
+    # Add RCTI manually
+    path('rctiForm/', views.rctiForm, name='rctiFormAdd'), 
+    path('rctiForm/save/', views.rctiFormSave, name='rctiFormSave'), 
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
+    
+    # Expanse entry manually
+    path('expanse/', views.expanseForm, name='expanseForm'), 
+    path('expanse/save/', views.expanseSave, name='expanseFormSave'), 
+    
+    
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),           
     path('DriverDocketEntry/<int:ids>/', views.driverDocketEntry, name='driverDocketEntry'),      

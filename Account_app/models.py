@@ -146,7 +146,6 @@ class RCTI(models.Model):
     def _str_(self) -> str:
         return str(self.docketNumber) + str(self.truckNo)
 
-
 class RCTIDocketAdjustment(models.Model):
     DocketNo = models.ForeignKey(RCTI, on_delete=models.CASCADE)
     noOfKm = models.FloatField(default=0)

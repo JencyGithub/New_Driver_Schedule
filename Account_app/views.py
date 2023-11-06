@@ -260,13 +260,108 @@ def rctiErrorSolve(request ,id):
     return redirect(request.META.get('HTTP_REFERER'))
     
 
-def rctiForm(request, id):
-    rcti = RCTI.objects.get(id=id)
+def rctiForm(request, id= None):
+    rcti = None
+    if id:
+        rcti = RCTI.objects.get(id=id)
     params = {
         'rcti': rcti,
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
 
+def convertIntoFloat(str):
+    cleaned_string = str.strip('()')
+    return float(cleaned_string)
+
+@csrf_protect
+def rctiFormSave(request):
+    RCTIobj = RCTI()
+    RCTIobj.truckNo = request.POST.get('truckNo')
+    RCTIobj.docketNumber = request.POST.get('docketNumber')
+    RCTIobj.docketDate = request.POST.get('docketDate')
+    RCTIobj.docketYard = request.POST.get('docketYard')
+    RCTIobj.noOfKm = request.POST.get('noOfKm')
+    RCTIobj.cubicMl = request.POST.get('cubicMl')
+    RCTIobj.cubicMiAndKmsCost = request.POST.get('cubicMiAndKmsCost')
+    RCTIobj.destination = request.POST.get('destination')
+    RCTIobj.cartageGSTPayable = request.POST.get('cartageGSTPayable')
+    RCTIobj.cartageTotalExGST = request.POST.get('cartageTotalExGST')
+    RCTIobj.cartageTotal = request.POST.get('cartageTotal')
+    RCTIobj.transferKM = request.POST.get('transferKM')
+    RCTIobj.transferKMCost = request.POST.get('transferKMCost')
+    RCTIobj.transferKMGSTPayable = request.POST.get('transferKMGSTPayable')
+    RCTIobj.transferKMTotalExGST = request.POST.get('transferKMTotalExGST')
+    RCTIobj.transferKMTotal = request.POST.get('transferKMTotal')
+    RCTIobj.returnKm = request.POST.get('returnKm')
+    RCTIobj.returnPerKmPerCubicMeterCost = request.POST.get('returnPerKmPerCubicMeterCost')
+    RCTIobj.returnKmGSTPayable = request.POST.get('returnKmGSTPayable')
+    RCTIobj.returnKmTotalExGST = request.POST.get('returnKmTotalExGST')
+    RCTIobj.returnKmTotal = request.POST.get('returnKmTotal')
+    RCTIobj.waitingTimeSCHED = request.POST.get('waitingTimeSCHED')
+    RCTIobj.waitingTimeSCHEDCost = request.POST.get('waitingTimeSCHEDCost')
+    RCTIobj.waitingTimeSCHEDGSTPayable = request.POST.get('waitingTimeSCHEDGSTPayable')
+    RCTIobj.waitingTimeSCHEDTotalExGST = request.POST.get('waitingTimeSCHEDTotalExGST')
+    RCTIobj.waitingTimeSCHEDTotal = request.POST.get('waitingTimeSCHEDTotal')
+    RCTIobj.waitingTimeInMinutes = request.POST.get('waitingTimeInMinutes')
+    RCTIobj.waitingTimeCost = request.POST.get('waitingTimeCost')
+    RCTIobj.waitingTimeGSTPayable = request.POST.get('waitingTimeGSTPayable')
+    RCTIobj.waitingTimeTotalExGST = request.POST.get('waitingTimeTotalExGST')
+    RCTIobj.waitingTimeTotal = request.POST.get('waitingTimeTotal')
+    RCTIobj.standByPerHalfHourCost = request.POST.get('standByPerHalfHourCost')
+    RCTIobj.standByPerHalfHourDuration = request.POST.get('standByPerHalfHourDuration')
+    RCTIobj.standByUnit = request.POST.get('standByUnit')
+    RCTIobj.standByGSTPayable = request.POST.get('standByGSTPayable')
+    RCTIobj.standByTotalExGST = request.POST.get('standByTotalExGST')
+    RCTIobj.standByTotal = request.POST.get('standByTotal')
+    RCTIobj.minimumLoad = request.POST.get('minimumLoad')
+    RCTIobj.loadCost = request.POST.get('loadCost')
+    RCTIobj.minimumLoadGSTPayable = request.POST.get('minimumLoadGSTPayable')
+    RCTIobj.minimumLoadTotalExGST = request.POST.get('minimumLoadTotalExGST')
+    RCTIobj.minimumLoadTotal = request.POST.get('minimumLoadTotal')
+    RCTIobj.surcharge_fixed_normal = request.POST.get('surcharge_fixed_normal')
+    RCTIobj.surcharge_fixed_sunday = request.POST.get('surcharge_fixed_sunday')
+    RCTIobj.surcharge_fixed_public_holiday = request.POST.get('surcharge_fixed_public_holiday')
+    RCTIobj.surcharge_per_cubic_meters_normal = request.POST.get('surcharge_per_cubic_meters_normal')
+    RCTIobj.surcharge_per_cubic_meters_sunday = request.POST.get('surcharge_per_cubic_meters_sunday')
+    RCTIobj.surcharge_per_cubic_meters_public_holiday = request.POST.get('surcharge_per_cubic_meters_public_holiday')
+    RCTIobj.surcharge_duration = request.POST.get('surcharge_duration')
+    RCTIobj.surchargeUnit = request.POST.get('surchargeUnit')
+    RCTIobj.surchargeGSTPayable = request.POST.get('surchargeGSTPayable')
+    RCTIobj.surchargeTotalExGST = request.POST.get('surchargeTotalExGST')
+    RCTIobj.surchargeTotal = request.POST.get('surchargeTotal')
+    RCTIobj.others = request.POST.get('others')
+    RCTIobj.othersCost = request.POST.get('othersCost')
+    RCTIobj.othersGSTPayable = request.POST.get('othersGSTPayable')
+    RCTIobj.othersTotalExGST = request.POST.get('othersTotalExGST')
+    RCTIobj.othersTotal = request.POST.get('othersTotal')
+    
+    RCTIobj.save()
+    
+    reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+
+    rctiTotalCost =   convertIntoFloat(RCTIobj.cartageTotal) + convertIntoFloat(RCTIobj.waitingTimeTotal) + convertIntoFloat(RCTIobj.transferKMTotal)  +  convertIntoFloat(RCTIobj.returnKmTotal) + convertIntoFloat(RCTIobj.standByTotal) + convertIntoFloat(RCTIobj.minimumLoadTotal)
+    
+    if not reconciliationDocketObj :
+        reconciliationDocketObj = ReconciliationReport()
+    
+    reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
+    reconciliationDocketObj.docketDate =  RCTIobj.docketDate
+    reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotal
+    # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+    reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotal  
+    reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotal 
+    reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotal
+    # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+    reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotal
+    reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotal
+    reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+    reconciliationDocketObj.fromRcti = True 
+    
+    reconciliationDocketObj.save()
+    checkMissingComponents(reconciliationDocketObj)
+    
+    messages.success( request, "RCTI entry successfully done.")
+    return redirect('Account:rcti')
 
 @csrf_protect
 def rctiSave(request):
@@ -278,14 +373,14 @@ def rctiSave(request):
         time = (str(timezone.now())).replace(':', '').replace(
             '-', '').replace(' ', '').split('.')
         time = time[0]
-        newFileName = time + "@_!" + str(invoiceFile.name)
+        newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
         location = 'static/Account/RCTI/tempRCTIInvoice'
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
 
-        cmd = ["python", "Account_app/utils.py", newFileName]
-        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        # cmd = ["python", "Account_app/utils.py", newFileName]
+        # subprocess.Popen(cmd, stdout=subprocess.PIPE)
         # return HttpResponse('work')
         if save_data == '1':
             colorama.AnsiToWin32.stream = None
@@ -297,6 +392,13 @@ def rctiSave(request):
 
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+def expanseForm(request):
+    return render(request, 'Account/expanseForm.html')
+
+@csrf_protect
+def expanseSave(request):
+    return HttpResponse("Expanse save form call.")
 
 def driverEntry(request):
     return render(request, 'Account/driverEntryForm.html')
@@ -1100,7 +1202,8 @@ def pastTripSave(request):
         time = (str(timezone.now())).replace(':', '').replace(
             '-', '').replace(' ', '').split('.')
         time = time[0]
-        newFileName = time + "@_!" + str(pastTrip_csv_file.name)
+        
+        newFileName = time + "@_!" + (str(pastTrip_csv_file.name)).replace(' ','')
 
         location = 'static/Account/PastTripsEntry'
         lfs = FileSystemStorage(location=location)
