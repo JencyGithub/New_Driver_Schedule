@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User , Group
 from GearBox_app.models import *
 from django.core.mail import send_mail
+from django.contrib.auth.hashers import check_password
 
 register = template.Library()
 
@@ -102,23 +103,37 @@ def ForgetMail(request):
 def changePasswordView(request):
     return render(request, 'change-password.html')
 
+# @api_view(['POST'])
 @csrf_protect
-@api_view(['POST'])
 def changePasswordChange(request):
-    oldPassword = request.POST.get('oldPassword')
-    newPassword = request.POST.get('newPassword')
-    reEnterPassword = request.POST.get('reEnterNewPassword')
-    
-    if newPassword != reEnterPassword:
-        messages.error(request, "Both new password must be same.")
-        return redirect(request.META.get('HTTP_REFERER')) 
     if request.user.is_authenticated:
-        user_email = request.user.email
-        print(user_email)
-        return HttpResponse(user_email)
-        userData = User.objects.filter(username=logInUser.username).first()
+        oldPassword = request.POST.get('oldPassword')
+        newPassword = request.POST.get('newPassword')
+        reEnterPassword = request.POST.get('reEnterNewPassword')
+         
+        curUser = request.user
+        stored_password = curUser.password  # Get the hashed password from the User model
+
+        if check_password(oldPassword, stored_password):
+            if newPassword != reEnterPassword:
+                messages.error(request, "Both new password must be same.")
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                curUser.set_password(newPassword)
+                curUser.save()
+
+                if curUser.groups.filter(name='Driver').exists():
+                    driver = Driver.objects.get(email = curUser.email)
+                    driver.password = newPassword
+                    driver.save()
+                    
+                messages.success(request, "Password changed, Please logIn again.")
+                return redirect('login')
+        else:
+            messages.error(request, "Your old password is incorrect.")
+            return redirect(request.META.get('HTTP_REFERER'))  
+
         
-        stored_password = user.password  # Get the hashed password from the User model
-        is_password_match = check_password(provided_password, stored_password)
     else:
-        return HttpResponse('user not login')
+        messages.error(request, "User not logged In.")
+        return redirect(request.META.get('HTTP_REFERER')) 

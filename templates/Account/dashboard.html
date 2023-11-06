@@ -43,15 +43,13 @@
 
   <!--`````````````````````````````````````````````````` file ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''  -->
 
-
-
   <div class="clearfix"></div>
 
   <div class="">
-    <div class="col-md-12 col-sm-12  ">
-      <div class="x_panel">
+    <div class="col-md-6 col-sm-6">
+      <div class="x_panel" style="max-height: 65vh; overflow-y: auto;">
         <div class="x_title">
-          <h2><i class="fa fa-bars"></i> Folder </h2>
+          <h2><i class="fa fa-bars"></i> Uploded files: </h2>
           <ul class="nav navbar-right panel_toolbox">
             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
             </li>
@@ -71,15 +69,30 @@
             </li>
           </ul>
           <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-              {%for rctiFileNameList in rctiFileNameLists%}
-              <a href="/static/Account/RCTI/RCTIInvoice/{{rctiFileNameList.0}}@_!{{rctiFileNameList.1}}">{{rctiFileNameList.1}}</a> <br>
-              {%endfor %}
+            <div class="tab-pane fade  show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+              <div class="container">
+
+                <div class="row">
+                  {% for rctiFileNameList in rctiFileNameLists %}
+                    <div class="col-md-2 mt-4">
+                      <a href="/static/Account/RCTI/RCTIInvoice/{{rctiFileNameList.0}}@_!{{rctiFileNameList.1}}">
+                        <i class="fa fa-file d-block w-100 m-auto text-info" style="font-size: 3rem;"></i>
+                        {{rctiFileNameList.1}}
+                      </a> <br>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-              <!-- {%for pasrTripFileNameList in pasrTripFileNameLists%}
-              <a href="/static/Account/PastTripsEntry/{{rctiFileNameList.0}}@_!{{pasrTripFileNameList.1}}">{{pasrTripFileNameList.1}}</a> <br>
-              {%endfor %} -->
+              {%for pasrTripFileNameList in pasrTripFileNameLists%}
+              <div class="col-md-2 mt-2">
+                <a href="/static/Account/PastTripsEntry/{{pasrTripFileNameList.0}}@_!{{pasrTripFileNameList.1}}">
+                  <i class="fa fa-file d-block w-100 m-auto text-info" style="font-size: 3rem;"></i>
+                  {{pasrTripFileNameList.1}}
+                </a> <br>
+              </div>
+              {%endfor %} 
             </div>
           </div>
         </div>

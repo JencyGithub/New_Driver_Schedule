@@ -136,7 +136,7 @@ def insertIntoModel(dataList,file_name):
         
         rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
         
-        if not  reconciliationDocketObj :
+        if not reconciliationDocketObj :
             reconciliationDocketObj = ReconciliationReport()
         
         reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
