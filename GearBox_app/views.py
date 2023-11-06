@@ -107,34 +107,75 @@ def driverForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def driverFormSave(request, id= None):
-    group = Group.objects.get(name='Driver')
-    driver = Driver.objects.get(pk=id)
-    userId = User.objects.get(email = driver.email)
-    
-    dataList = {
-        'driverId' : request.POST.get('driverId'),
-        'name' : request.POST.get('name'),
-        'phone' : request.POST.get('phone'),
-        'email' : request.POST.get('email'),
-        'password' : request.POST.get('password'),
-    }
-    
-    user_ = {
-        'username' : dataList['name'],
-        'email' : dataList['email'],
-        'is_staff' : True,
-    }
-      
-    if id:
-        updateIntoTable(record_id=id,tableName='Driver',dataSet=dataList)
-        updateIntoTable(record_id=userId.id,tableName='User',dataSet=user_)
-        messages.success(request,'Updated successfully')
+    users = User.objects.all()
+    drivers = Driver.objects.all()
+
+    usernames = [user.username for user in users]
+    email_addresses = [user.email for user in users]
+    driver_Id = [driver.driverId for driver in drivers]
+
+    # Update 
+    if id :
+        driverObj = Driver.objects.get(pk=id)
+        user = User.objects.get(email = driverObj.email)
+        if driverObj.name != request.POST.get('name'):
+            if request.POST.get('name') in usernames:
+                messages.error( request, "Driver Name  already Exist")
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                driverObj.name = request.POST.get('name')
+                user.username = driverObj.name
+            
+        if driverObj.email != request.POST.get('email'):
+            if request.POST.get('email') in email_addresses:
+                messages.error( request, "Email Address already Exist")
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                driverObj.email = request.POST.get('email')
+                user.email = driverObj.email        
+        
+        if driverObj.phone != request.POST.get('phone'):
+            driverObj.phone = request.POST.get('phone') 
+            
+        user.save()
+        driverObj.save()
+        messages.success(request,'Updating successfully')
+        
+        # return redirect('gearBox:driversTable')
+
+
     else:
-        insertIntoTable(tableName='Driver',dataSet=dataList)
-        user_.groups.add(group)
-        user_.set_password(dataList['password'])
-        insertIntoTable(tableName='User',dataSet=user_)
-        messages.success(request,'Adding successfully')
+        
+        if int(request.POST.get('driverId')) in driver_Id :
+            messages.error( request, "Driver ID already Exist")
+            return redirect(request.META.get('HTTP_REFERER'))
+        elif request.POST.get('name') in usernames:
+            messages.error( request, "Driver Name  already Exist")
+            return redirect(request.META.get('HTTP_REFERER'))
+        elif request.POST.get('email') in email_addresses:
+            messages.error( request, "Email Address already Exist")
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            DriverObj = Driver()
+            DriverObj.driverId = int(request.POST.get('driverId'))
+            DriverObj.name =request.POST.get('name')
+            DriverObj.phone = request.POST.get('phone') 
+            DriverObj.email = request.POST.get('email')
+            DriverObj.password = request.POST.get('password')
+            
+            user_ = User.objects.create(
+                username=DriverObj.name,
+                email=DriverObj.email,
+                password=DriverObj.password,
+                is_staff=True,
+            )  
+            group = Group.objects.get(name='Driver')
+            user_.groups.add(group)
+            
+            user_.set_password(DriverObj.password)
+            user_.save()
+            DriverObj.save()
+            messages.success(request,'Adding successfully')
 
     return redirect('gearBox:driversTable')
 

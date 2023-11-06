@@ -1,10 +1,9 @@
-import re,sys,os, shutil
-import pandas as pd
+import re,sys,os, shutil , csv
+# import pandas as pd
 from datetime import datetime
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 
-print("here")
 
 def getFileName():
     if getattr(sys,'frozen',False):
@@ -16,7 +15,7 @@ def checkDate(date_):
     pattern = r'\d{2}/\d{2}/\d{2}'
     return True if re.fullmatch(pattern,date_) else False
 
-def setLine(given_line,previous_line):
+def setLine(given_line, previous_line):
     custom_row =[]
     
     if re.match(docket_pattern, given_line[0]):
@@ -45,6 +44,47 @@ def setLine(given_line,previous_line):
     else:
         return custom_row
 
+def setLineExpense(given_line, previous_line, truckNo , filePath):
+    custom_row =[]
+    
+    # if re.match(docket_pattern, given_line[0]):
+    #     None
+    if checkDate(given_line[0]):
+        given_line.insert(0,previous_line[1])
+    elif checkDate(given_line[1]):
+        pass
+    else:     
+        given_line.insert(0,previous_line[2])
+        given_line.insert(0,previous_line[1])
+               
+    if len(given_line) == 10:
+        custom_row.extend(given_line[:5]) 
+    else:
+        custom_row.extend(given_line[:4]) 
+        
+    numeric_part, *character_parts = given_line[-5].split()
+    custom_row.extend([numeric_part, ' '.join(character_parts)]) 
+    custom_row.extend(given_line[-4:])
+    if len(custom_row) == 10:
+        custom_row.insert(4,'')
+    
+    custom_row.insert(0,truckNo) 
+    
+    if len(custom_row) < 11:
+        return previous_line
+    
+    with open(filePath , 'a') as file:
+        writer = csv.writer(file)
+        writer.writerow(custom_row)
+        
+    return custom_row
+        # if previous_line:
+    # if previous_line and custom_row[0] == previous_line[0][0]:
+    #     res =   previous_line[0] + custom_row[1:]
+    #     return res
+    # else:
+    #     return custom_row
+
 
 def appendToCsv(given_list,file_name,folder_name,truckNo):
     if not os.path.exists(folder_name):
@@ -63,6 +103,7 @@ def appendToCsv(given_list,file_name,folder_name,truckNo):
 
 # file_path = getFileName()
 args = sys.argv[-1]
+# args = '20231105044804@_!pdf1.csv'
 
 # args ='20231009125409@_!pdf.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
@@ -73,9 +114,10 @@ while(file_path[-4:] != '.csv'):
 
 # File name
 converted_file = "converted_" + args
+converted_file_expenses = "expenses_converted_" + args
 
 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
-    f.write(converted_file)
+    f.write(f'{converted_file} <> {converted_file_expenses}')
     f.close()
     
 folderName =  'static/Account/RCTI/RCTIInvoice'
@@ -88,6 +130,10 @@ with open(folderName+'/'+converted_file,'a') as f:
 
 
 earnings_carter_list, earnings_temp, earnings_flag, expense_flag, key, earnings_carter_dic = [], [], False, False, None, {}
+
+expense_carter_list = []
+expense_carter_dic = {}
+expense_temp = []
 
 carter_no = r'(\d+)\s+Truck\s+(\w+)'
 docket_pattern = r'^\d{8}$|^\d{6}$'
@@ -147,13 +193,31 @@ with open(file_path, 'r') as file:
                             earnings_carter_list = []
                             earnings_flag = False 
                             key = None
-                        elif len(line_split_temp_) >= 7 and line_split_temp_[0].lower() != 'earnings':
-                            if earnings_flag == True:
-                                line_split_temp_ = setLine(line_split_temp_,earnings_temp)
-                                
-                                if  earnings_temp and earnings_temp[-1][0] == line_split_temp_[0]:
-                                    del earnings_temp[0]
-                                earnings_temp.append(line_split_temp_)
+                        elif earnings_flag == True and len(line_split_temp_) >= 7 and line_split_temp_[0].lower() != 'earnings':
+                            
+                            line_split_temp_ = setLine(line_split_temp_,earnings_temp)
+                            
+                            if  earnings_temp and earnings_temp[-1][0] == line_split_temp_[0]:
+                                del earnings_temp[0]
+                            earnings_temp.append(line_split_temp_)
+
+                        elif expense_flag is True and line_split_temp_[0].lower() == 'total expenses':
+                            expense_carter_list.append(expense_temp)
+                            expense_temp = []
+                            expense_carter_dic[truckNo] = expense_carter_list
+                            # Appending into csv
+                            appendToCsv(expense_carter_list,converted_file_expenses,folderName, truckNo )
+                               
+                            expense_carter_list = []
+                            expense_flag = False 
+                            key = None
+                        elif expense_flag is True and len(line_split_temp_) >= 7 and 'expense' not in line_split_temp_[0].lower():
+                            line_split_temp_ = setLineExpense(line_split_temp_,expense_temp,truckNo , folderName+'/'+converted_file_expenses)
+                            expense_temp = line_split_temp_
+                            # if expense_temp and expense_temp[-1][0] == line_split_temp_[0]:
+                            #     del expense_temp[0]
+                            # expense_temp.append(line_split_temp_)
+
             except Exception as e:
                 print(f'{e} at {line}')
                 pass
@@ -161,22 +225,22 @@ with open(file_path, 'r') as file:
 
 # -------------------------------------------------------------------------------------------------
 
-try:
-    directory_path = 'static/Account/RCTI/tempRCTIInvoice'
-    # Iterate over all items in the directory
-    for item in os.listdir(directory_path):
-        item_path = os.path.join(directory_path, item)
+# try:
+#     directory_path = 'static/Account/RCTI/tempRCTIInvoice'
+#     # Iterate over all items in the directory
+#     for item in os.listdir(directory_path):
+#         item_path = os.path.join(directory_path, item)
 
-        # Check if it's a file and delete it
-        if os.path.isfile(item_path):
-            os.remove(item_path)
-            # print(f"Deleted file: {item_path}")
+#         # Check if it's a file and delete it
+#         if os.path.isfile(item_path):
+#             os.remove(item_path)
+#             # print(f"Deleted file: {item_path}")
 
-        # Check if it's a directory and delete it recursively
-        elif os.path.isdir(item_path):
-            shutil.rmtree(item_path)
-            # print(f"Deleted directory: {item_path}")
+#         # Check if it's a directory and delete it recursively
+#         elif os.path.isdir(item_path):
+#             shutil.rmtree(item_path)
+#             # print(f"Deleted directory: {item_path}")
 
-    # print(f"All files and folders in '{directory_path}' have been deleted.")
-except Exception as e:
-    print(f"An error occurred: {str(e)}")
+#     # print(f"All files and folders in '{directory_path}' have been deleted.")
+# except Exception as e:
+#     print(f"An error occurred: {str(e)}")

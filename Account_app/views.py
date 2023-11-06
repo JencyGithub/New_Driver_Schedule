@@ -198,14 +198,7 @@ def formsSave(request):
     trip.save()
 
     if not request.session['data']['docketGiven']:
-        try:
-            BasePlantVal = BasePlant.objects.get(basePlant="Not selected")
-        except:
-            BasePlantObj = BasePlant(
-                basePlant="Not selected"
-            )
-            BasePlantObj.save()
-            BasePlantVal = BasePlant.objects.get(basePlant="Not selected")
+        BasePlantVal = BasePlant.objects.get_or_create(basePlant="NOT SELECTED")[0]
         for i in range(len(Docket_no)):
             docket_ = DriverDocket(
                 tripId=trip,
@@ -293,6 +286,8 @@ def rctiSave(request):
             cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success( request, "Please wait 5 minutes. The data conversion process continues")
+        
+        
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
@@ -410,28 +405,43 @@ def driverSampleCsv(request):
 @csrf_protect
 # @api_view(['POST'])
 def rctiTable(request):
+    # return HttpResponse(id)
+    
     startDate_ = request.POST.get('startDate')
     endDate_ = request.POST.get('endDate')
     basePlant_ = request.POST.get('basePlant')
+    docketYard = BasePlant.objects.filter(id = basePlant_).first()
+    rctiType = request.POST.get('RCTI')
 
-    if startDate_:
-        if endDate_:
-            rctiData = RCTI.objects.filter(
-                docketDate__range=(startDate_, endDate_)).values()
+
+    try:
+        if startDate_:
+            if endDate_:
+                if rctiType== 'rctiDocket':
+                    rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+                elif rctiType == 'rctiExpense':
+                    rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+            else:
+                messages.error(request, "Please enter End Date.")
+                return redirect(request.META.get('HTTP_REFERER'))
+        elif basePlant_:
+
+            if rctiType =='rctiDocket':
+                rctiData = RCTI.objects.filter(docketYard=docketYard).values()
+            elif rctiType  == 'rctiExpense':
+                rctiData = RctiExpense.objects.filter(docketYard=docketYard).values()
         else:
-            messages.error(request, "Please enter End Date.")
+            messages.error(request, "Please select either Start Date or Docket Yard.")
             return redirect(request.META.get('HTTP_REFERER'))
-    elif basePlant_:
-        rctiData = RCTI.objects.filter(docketYard=basePlant_.upper()).values()
-    else:
-        messages.error(
-            request, "Please select either Start Date or Base Plant.")
-        return redirect(request.META.get('HTTP_REFERER'))
-    # return HttpResponse(request.session['user_type'])
-    params = {
-        'RCTIs': rctiData,
-    }
-    return render(request, 'Account/Tables/rctiTable.html', params)
+        params = {
+            'RCTIs': rctiData,
+        }
+        return render(request, 'Account/Tables/rctiTable.html', params)
+        # elif id ==2 :
+        #     return HttpResponse('work')
+    except:
+        messages.warning(request, "Invalid Request ")
+        return redirect('Account:rctiCsvForm')
 
 
 def basePlantTable(request):
@@ -468,7 +478,7 @@ def basePlantSave(request, id=None):
 
 
 def driverTripsTable(request):
-    driver_trip = DriverTrip.objects.all()
+    driver_trip = DriverTrip.objects.all()  
     clientName = Client.objects.all()
     params = {
         'driverTrip': driver_trip,

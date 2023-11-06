@@ -1,4 +1,3 @@
-import csv, re
 from GearBox_app.models import *
 from django.contrib.auth.models import User , Group
 import pandas as pd

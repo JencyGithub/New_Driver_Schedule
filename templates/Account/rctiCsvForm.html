@@ -49,13 +49,20 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
+                    <form action="{% url 'Account:rctiTable' %}" method="POST" novalidate id="reconciliationForm">
                     <div class="x_title">
-                        <h2>RCTI Csv  Form</h2>
+                        <h2>RCTI | Expenses  Form</h2>
+                        <div class="float-right">
+                            <input type="radio" checked id="rctiDocket"value="rctiDocket" name="RCTI" style="margin-top: .8rem;">
+                            <label for="rctiDocket" class=" ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Rcti Docket</label>
+                            <input type="radio" id="rctiExpense" value="rctiExpense"name="RCTI"style="margin-top: .8rem;" >
+                            <label for="rctiExpense" class=" ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Rcti Expenses</label>
+                            
+                        </div>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form action="{% url 'Account:rctiTable' %}" method="POST" novalidate id="reconciliationForm">
                                 {% csrf_token %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="startDate">Start Date:</label>
@@ -73,9 +80,9 @@
                                     <label for="clientId">Docket Yard</label>
                                     <div class="field item form-group">
                                         <select class="form-control"  id="basePlant" name="basePlant">
-                                            <option value="" disabled selected>Select Client Name</option>
+                                            <option value="" disabled selected>Select Yard Name</option>
                                             {% for basePlant in basePlants %}
-                                            <option value="{{ basePlant.basePlant }}">{{ basePlant.basePlant }}</option>
+                                            <option value="{{ basePlant.id }}">{{ basePlant.id }} . {{ basePlant.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -83,9 +90,9 @@
                                 <div class="col-md-12 text-right">
                                     <button type='submit' class="btn btn-primary px-4">Submit</button>
                                 </div>
-                            </form>
                         </div>
                     </div>
+                    </form>
                     
                 </div>
             </div>

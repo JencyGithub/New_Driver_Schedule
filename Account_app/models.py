@@ -147,51 +147,6 @@ class RCTI(models.Model):
         return str(self.docketNumber) + str(self.truckNo)
 
 
-class RCTIDocketAdjustment(models.Model):
-    DocketNo = models.ForeignKey(RCTI, on_delete=models.CASCADE)
-    noOfKm = models.FloatField(default=0)
-    noOfKmCost = models.FloatField(default=0)
-
-    transferKM = models.PositiveIntegerField(default=0)
-    transferKMCost = models.FloatField(default=0)
-
-    returnKm = models.FloatField(default=0)
-    returnPerKmPerCubicMeterCost = models.FloatField(default=0)
-
-    waitingTimeInMinutes = models.CharField(max_length=255)
-    waitingTimeCost = models.FloatField(default=0)
-
-    minimumLoad = models.FloatField(default=0)
-    loadCost = models.FloatField(default=0)
-
-    surcharge_fixed_normal = models.FloatField(default=0)
-    surcharge_fixed_sunday = models.FloatField(default=0)
-    surcharge_fixed_public_holiday = models.FloatField(default=0)
-    surcharge_per_cubic_meters_normal = models.FloatField(default=0)
-    surcharge_per_cubic_meters_sunday = models.FloatField(default=0)
-    surcharge_per_cubic_meters_public_holiday = models.FloatField(default=0)
-    surcharge_duration = models.FloatField(default=0)
-
-    cubicMl = models.PositiveIntegerField(default=0)
-    cubicMlCost = models.FloatField(default=0)
-
-    minLoad = models.PositiveIntegerField(default=0)
-    loadCost = models.FloatField(default=0)
-
-    standByPerHalfHourCost = models.FloatField(default=0)
-    standByPerHalfHourDuration = models.FloatField(default=0)
-
-    others = models.PositiveIntegerField(default=0)
-    othersCost = models.FloatField(default=0)
-
-    GSTPayable = models.FloatField(default=0)
-    TotalExGST = models.FloatField(default=0)
-    Total = models.FloatField(default=0)
-
-    @property
-    def total_cost(self):
-        return self.waitingTimeCost + self.transferKMSCost + self.cubicMlCost + self.minLoadCost + self.othersCost
-
 # -----------------------------------
 # Holiday section
 # -----------------------------------
@@ -293,3 +248,24 @@ class RctiErrors(models.Model):
     
     def __str__(self) -> str:
         return str(self.docketNumber)
+
+# -----------------------------------
+# Rcti Expense section
+# -----------------------------------
+class RctiExpense(models.Model):
+    truckNo = models.CharField(max_length=10, default='')
+    docketNumber = models.CharField( max_length=10,default='')
+    docketDate = models.DateField()
+    docketYard = models.CharField(default='', max_length=255)
+    description = models.CharField(max_length=255)
+    paidKm = models.FloatField(default=0)
+    invoiceQuantity = models.FloatField(default=0)
+    unit = models.CharField(max_length=100 , default= '')
+    unitPrice = models.FloatField(default=0)
+    gstPayable = models.FloatField(default=0)
+    totalExGST = models.FloatField(default=0)
+    total = models.FloatField(default=0)
+    
+    def __str__(self):
+        return str(self.docketNumber)
+    

@@ -71,7 +71,7 @@
                                         <label for="password" class="col-form-label col-md-3 col-sm-3 label-align">Password :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="password" required="required" id="password"
-                                                type="password" data-validate-length-range="10,10"
+                                                type="password" {% if data %}disabled{% endif %}    
                                                 value="{% if data %}{{data.password}}{% else %}{% endif %}" autocomplete="off"/>
                                         </div>
                                     </div>

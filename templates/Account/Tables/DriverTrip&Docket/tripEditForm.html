@@ -48,14 +48,17 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Driver Trip Edit Form</h2>
+                            {% if driverTrip.verified is  False  %}
                             <a href="{% url 'Account:driverDocketEntry' ids=driverTrip.id%}"
                                 class="float-right btn btn-dark">Add Docket</a>
-
+                                
+                            
                             <label for="verified" class="float-right ml-2"
                                 style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
                             <input type="checkbox" id="verified" name="verified"
                                 {% if driverTrip.verified %}checked{% endif %} class="float-right "
                                 style="margin-top: .8rem;">
+                            {% endif %}
 
                             <div class="clearfix"></div>
                         </div>
@@ -353,9 +356,12 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% if driverTrip.verified is  False  %}
                     <div class="col-md-12 text-right p-0">
                         <button type='submit' style="margin: 0px;" class="btn btn-primary px-4">Save</button>
                     </div>
+                    {% endif%}
+
                 </form>
             </div>
         </div>
@@ -369,6 +375,13 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script>
 
+      $(document).ready(function() {
+        if (!$('#verified').val()) {
+            
+            $(':input').prop('disabled', true);
+            $('#verified').css('display', 'none');
+        }
+    });
     function hideshow() {
         var password = document.getElementById("password1");
         var slash = document.getElementById("slash");
