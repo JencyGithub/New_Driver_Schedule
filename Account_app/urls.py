@@ -58,9 +58,13 @@ urlpatterns = [
     path('BasePlant/edit/<int:id>/', views.basePlantForm, name='basePlantEdit'),      
     path('BasePlant/edit/save/<int:id>/', views.basePlantSave, name='basePlantEditSave'),   
 
+    path('location/save/', views.locationSave, name='locationSave'), 
+    path('BasePlant/edit/<int:locationId>/', views.basePlantForm, name='locationEdit'),   
+    path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
+
     path('RctiTable/', views.rctiTable, name='rctiTable'),
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
-    
+
     # Rate Card 
     path('RateCardTable', views.rateCardTable, name='rateCardTable'),
     path('RateCardForm', views.rateCardForm, name='rateCardForm'),
@@ -113,5 +117,7 @@ urlpatterns = [
     path('Surcharge/add/save/', views.surchargeSave, name='surchargeAddSave'),   
     path('Surcharge/edit/<int:id>/', views.surchargeForm, name='surchargeEdit'),      
     path('Surcharge/edit/save/<int:id>/', views.surchargeSave, name='surchargeEditSave'),
+
+
 
 ]

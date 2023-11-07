@@ -14,6 +14,16 @@ class BasePlant(models.Model):
 
     def __str__(self) -> str:
         return str(self.basePlant)
+    
+# -----------------------------------
+# Location 
+# -----------------------------------
+
+class Location(models.Model):
+    location = models.CharField(max_length=200)
+
+    def __str__(self) -> str:
+        return str(self.location)
 
 # -----------------------------------
 # Trips section

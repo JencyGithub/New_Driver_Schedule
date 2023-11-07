@@ -212,11 +212,13 @@ def insertIntoExpenseModel(dataList , file_name):
             
 f = open("File_name_file.txt", 'r')
 file_name = f.read()
+# file_name = file_name.strip()
 file_name = file_name.split('<>')
 
 # file_name = 'converted_20231030113104@_!pdf1.csv'
 convertFileName = file_name[0].split('@_!')[1]
 
+file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
 file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
 reader = csv.reader(file)
 next(reader)
@@ -227,6 +229,7 @@ for row in reader:
 # Expense 
 
 
+fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
 fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
 reader = csv.reader(fileExpense)
 next(reader)

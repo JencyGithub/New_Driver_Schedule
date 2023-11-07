@@ -66,7 +66,38 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
-                                        <button type='reset' class="btn btn-success px-4 ">Reset</button>
+                                        <button type='submit' class="btn btn-primary px-4">Submit</button>
+                                    </div>
+                                </div>
+                            </form> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{% if data %}Edit{% else %}Add{% endif %} Location</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    {{ location }}
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <form class="" action="{% if location %} {% url 'Account:locationEditSave' id=location.id %} {% else %} {% url 'Account:locationSave' %} {% endif %}" method="POST" novalidate>
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="location"
+                                            class="col-form-label col-md-3 col-sm-3 label-align">Location :<span
+                                                class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <input class="form-control" name="location" required="required"
+                                                id="location" type="text" value="{% if location %} {{ location.location }} {% else %}  {% endif %}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9 col-sm-9 text-right">
                                         <button type='submit' class="btn btn-primary px-4">Submit</button>
                                     </div>
                                 </div>

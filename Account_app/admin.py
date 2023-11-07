@@ -394,3 +394,4 @@ admin.site.register(PastTripError)
 admin.site.register(ReconciliationReport)
 
 admin.site.register(RctiExpense)
+admin.site.register(Location)

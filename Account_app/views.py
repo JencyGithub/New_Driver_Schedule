@@ -28,7 +28,7 @@ from Account_app.reconciliationUtils import *
 
 
 def index(request):
-    rctiInvoiceFile = os.listdir('static/Account/RCTI/RCTIInvoice')
+    rctiInvoiceFile = os.listdir('static\Account\RCTI\RCTIInvoice')
     rctiFileNameList = []
     for file in rctiInvoiceFile:
         rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
@@ -547,21 +547,27 @@ def rctiTable(request):
 
 
 def basePlantTable(request):
-    basePlant_ = BasePlant.objects.all()
-    return render(request, 'Account/Tables/basePlantTable.html', {'BP_': basePlant_})
+    basePlants = BasePlant.objects.all()
+    locations = Location.objects.all()
+    return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants, 'locations':locations})
 
-
-def basePlantForm(request, id=None):
-    basePlant = None
+def basePlantForm(request, id=None, locationId=None):
+    basePlant = location = None
     if id:
         basePlant = BasePlant.objects.get(pk=id)
+    if locationId:
+        location = Location.objects.get(pk=locationId)
 
     params = {
-        'data': basePlant
+        'data': basePlant,
+        'location': location,
     }
 
     return render(request, "Account/basePlantForm.html", params)
 
+def locationTable(request):
+    locations = Location.objects.all()
+    return render(request, 'GearBox/truckForm.html', {'locations': locations})
 
 @csrf_protect
 @api_view(['POST'])
@@ -569,12 +575,27 @@ def basePlantSave(request, id=None):
     dataList = {
         'basePlant': request.POST.get('basePlant')
     }
-    if id is not None:
+    if id:
         updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant updated successfully')
     else:
         insertIntoTable(tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant added successfully')
+
+    return redirect('Account:basePlantTable')
+
+@csrf_protect
+@api_view(['POST'])
+def locationSave(request, id=None):
+    dataList = {
+        'location': request.POST.get('location')
+    }
+    if id:
+        updateIntoTable(record_id=id, tableName='Location', dataSet=dataList)
+        messages.success(request, 'Location updated successfully')
+    else:
+        insertIntoTable(tableName='Location', dataSet=dataList)
+        messages.success(request, 'Location added successfully')
 
     return redirect('Account:basePlantTable')
 
@@ -949,7 +970,7 @@ def publicHolidaySave(request, id=None):
 def rateCardTable(request):
     RateCards = RateCard.objects.all()
     params = {
-        'rateCard': RateCards
+        'rateCard': RateCards,
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
