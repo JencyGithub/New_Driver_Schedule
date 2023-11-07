@@ -551,18 +551,24 @@ def basePlantTable(request):
     locations = Location.objects.all()
     return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants, 'locations':locations})
 
-def basePlantForm(request, id=None, locationId=None):
+def basePlantForm(request, id=None):
     basePlant = location = None
     if id:
         basePlant = BasePlant.objects.get(pk=id)
-    if locationId:
-        location = Location.objects.get(pk=locationId)
-
     params = {
-        'data': basePlant,
+        'basePlant': basePlant,
         'location': location,
     }
+    return render(request, "Account/basePlantForm.html", params)
 
+def locationEditForm(request, id=None):
+    basePlant = location = None
+    if id:
+        location = Location.objects.get(pk=id)
+    params = {
+        'basePlant': basePlant,
+        'location': location,
+    }
     return render(request, "Account/basePlantForm.html", params)
 
 def locationTable(request):

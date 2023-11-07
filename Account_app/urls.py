@@ -58,8 +58,9 @@ urlpatterns = [
     path('BasePlant/edit/<int:id>/', views.basePlantForm, name='basePlantEdit'),      
     path('BasePlant/edit/save/<int:id>/', views.basePlantSave, name='basePlantEditSave'),   
 
+    # Location
     path('location/save/', views.locationSave, name='locationSave'), 
-    path('BasePlant/edit/<int:locationId>/', views.basePlantForm, name='locationEdit'),   
+    path('location/edit/<int:id>/', views.locationEditForm, name='locationEdit'),   
     path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
 
     path('RctiTable/', views.rctiTable, name='rctiTable'),
@@ -109,15 +110,11 @@ urlpatterns = [
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
     
-    
-    
     # Base plant routes
     path('SurchargeTable/', views.surchargeTable, name='surchargeTable'),
     path('Surcharge/add/', views.surchargeForm, name='surchargeAdd'),
     path('Surcharge/add/save/', views.surchargeSave, name='surchargeAddSave'),   
     path('Surcharge/edit/<int:id>/', views.surchargeForm, name='surchargeEdit'),      
     path('Surcharge/edit/save/<int:id>/', views.surchargeSave, name='surchargeEditSave'),
-
-
 
 ]
