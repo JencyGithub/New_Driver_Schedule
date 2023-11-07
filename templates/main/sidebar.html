@@ -36,10 +36,23 @@
             <ul class="nav child_menu">
               <li class=""><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
               <li class=""><a href="{% url 'Account:basePlantTable'%}">Base Plant </a></li>
-              <li><a href="{% url 'Account:rcti'%}">RCTI Entry</a></li>
-              <li class=""><a href="{% url 'Account:rctiCsvForm'%}"> Existing RCTI </a></li>
-              <li class=""><a href="{% url 'Account:driverTripsTable'%}"> Driver Trip </a></li>
-              <li class=""><a href="{% url 'Account:pastTripForm' %}"> Past Trip </a></li>
+
+              <li><a>RCTI section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
+                  </li>
+                  <li><a href="{% url 'Account:rctiCsvForm'%}">Existing RCTI</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a>Trip section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'Account:driverTripsTable'%}">Driver trip</a>
+                  </li>
+                  <li><a href="{% url 'Account:pastTripForm' %}">Past trip</a>
+                  </li>
+                </ul>
+              </li>
               <li class=""><a href="{% url 'Account:rateCardTable'%}"> Rate Card </a></li>
             </ul>
           </li>
@@ -47,11 +60,35 @@
             <a><i class="fa fa-wrench"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li><a href="{% url 'gearBox:clientTable'%}">Clients</a></li>
-              <li><a href="{% url 'Account:driverentry'%}">Driver Entry</a></li>
-              <li><a href="{% url 'gearBox:driversTable'%}">Existing Drivers</a></li>
-              <li class=""><a href="{% url 'gearBox:leaveReq'%}"> Leave request</a></li>
-              <li class=""><a href="{% url 'gearBox:natureOfLeaves'%}"> Nature of leave</a></li>
-              <li class=""><a href="{% url 'gearBox:truckTable'%}"> Truck</a></li>
+
+              <li><a>Drivers section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'Account:driverentry'%}">Driver Entry</a>
+                  </li>
+                  <li><a href="{% url 'gearBox:driversTable'%}">Existing Drivers</a>
+                  </li>
+                </ul>
+              </li>
+
+              <li><a>Leaves section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'gearBox:leaveReq'%}">Leave request</a>
+                  </li>
+                  <li><a href="{% url 'gearBox:natureOfLeaves'%}">Nature of leave</a>
+                  </li>
+                </ul>
+              </li>
+
+              <li><a> Trucks section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'gearBox:truckTable'%}">Existing trucks</a>
+                  </li>
+                  <li><a href="#">Groups</a>
+                  </li>
+                  <li><a href="#">Sub groups</a>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
           <li>

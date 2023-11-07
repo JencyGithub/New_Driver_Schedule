@@ -372,8 +372,8 @@ def rctiSave(request):
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
 
-        # cmd = ["python", "Account_app/utils.py", newFileName]
-        # subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        cmd = ["python", "Account_app/utils.py", newFileName]
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
         # return HttpResponse('work')
         if save_data == '1':
             colorama.AnsiToWin32.stream = None
