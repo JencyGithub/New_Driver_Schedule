@@ -985,8 +985,10 @@ def rateCardForm(request, id=None):
 
     rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = None
     surcharges = Surcharge.objects.all()
+    tds = None
     if id:
         rateCard = RateCard.objects.get(pk=id)
+        tds = rateCard.tds
         print(rateCard.id)
         costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).values().last()
         thresholdDayShift = ThresholdDayShift.objects.filter(
@@ -1013,6 +1015,7 @@ def rateCardForm(request, id=None):
         'thresholdDayShift': thresholdDayShift,
         'thresholdNightShift': thresholdNightShift,
         'grace': grace,
+        'tds': tds,
         # 'onLease' : onLease,
         'surcharges': surcharges
     }
@@ -1028,11 +1031,17 @@ def rateCardSave(request, id=None):
     rateCardID = None
     if not id:
         rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
+        tds = float(request.POST.get('rate_card_tds'))
+        rateCard.tds = tds
         rateCard.save()
         rateCardID = RateCard.objects.get(
             rate_card_name=request.POST.get('rate_card_name'))
     else:
         rateCardID = RateCard.objects.get(pk=id)
+
+        tds = float(request.POST.get('rate_card_tds'))
+        rateCardID.tds = tds
+        rateCardID.save()
 
         oldCostParameters = CostParameters.objects.get(
             rate_card_name=rateCardID.id, end_date=None)
