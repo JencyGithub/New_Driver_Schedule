@@ -62,7 +62,12 @@ request {% endblock %} {% block headStyle %}
                                         <input class="form-control" value="{% if rateCard %}{{rateCard.rate_card_name}}{% else %} {% endif %}" {% if rateCard %} readonly {% else %} {% endif %} type="text" name="rate_card_name" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
                                     </div>
                                 </div>
-
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="rate_card_tds">Rate Card TDS:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{% if rateCard %}{{ rateCard.tds }}{% endif %}" {% if rateCard %}readonly{% endif %} type="number" name="rate_card_tds" required="required" style="padding: 0.25rem 0.2rem;" id="rate_card_tds">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

@@ -73,9 +73,9 @@ urlpatterns = [
     path('RateCard/revision/<int:id>/', views.rateCardSave, name='rateCardRevision'),
     
     # DriverTrip Csv
-    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
-    path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),  
-    path('DriverSampleCsv/', views.driverSampleCsv, name='driverSampleCsv'),  
+    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),
+    path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),
+    path('DriverSampleCsv/', views.driverSampleCsv, name='driverSampleCsv'),
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
