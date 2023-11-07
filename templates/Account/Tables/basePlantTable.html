@@ -40,7 +40,7 @@
         <div class="x_panel" style="max-height: 100vh; overflow-y: auto;">
           <div class="x_title">
             <h2>Base Plant</h2>
-            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-dark float-right">Add</a>
+            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-sm btn-dark float-right">Add</a>
 
             <div class="clearfix"></div>
           </div>
@@ -80,7 +80,7 @@
         <div class="x_panel" style="max-height: 100vh; overflow-y: auto;">
           <div class="x_title">
             <h2>Location</h2>
-            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-dark float-right">Add</a>
+            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-sm btn-dark float-right">Add</a>
 
             <div class="clearfix"></div>
           </div>
@@ -101,7 +101,7 @@
                         <td>{{location.location}}</td>
                         <td>
                           <label type="button" class="btn" id="redirectButton">
-                            <a href="{% url 'Account:locationEdit' locationId=location.id %}" title="update">
+                            <a href="{% url 'Account:locationEdit' id=location.id %}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                           </label>
