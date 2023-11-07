@@ -219,6 +219,7 @@ file_name = file_name.split('<>')
 convertFileName = file_name[0].split('@_!')[1]
 
 file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
+file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
 reader = csv.reader(file)
 next(reader)
 
@@ -228,6 +229,7 @@ for row in reader:
 # Expense 
 
 
+fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
 fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
 reader = csv.reader(fileExpense)
 next(reader)
