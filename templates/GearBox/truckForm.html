@@ -57,12 +57,36 @@
                         {% csrf_token %}
                         <div class="x_content">
                             <div class="col-md-4 col-sm-4">
-                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Truck number<span class="required">*</span></label>
+                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Fleet : <span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="truckNo" required='required' style="padding: 0.25rem 0.2rem;" id="truckNo">
                                 </div>
                             </div>
-                            <div class="col-md-8 col-am-8 text-right">
+                            <div class="col-md-4 col-sm-4">
+                                <label for="groups" style="margin-bottom: 0.3rem!important;">Groups : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="groups" required='required' style="padding: 0.25rem 0.2rem;" id="groups">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="subGroups" style="margin-bottom: 0.3rem!important;">Sub groups : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="subGroups" required='required' style="padding: 0.25rem 0.2rem;" id="subGroups">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="vehicleType" style="margin-bottom: 0.3rem!important;">Vehicle type : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="vehicleType" required='required' style="padding: 0.25rem 0.2rem;" id="vehicleType">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="serviceGroup" style="margin-bottom: 0.3rem!important;">Service group : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="serviceGroup" required='required' style="padding: 0.25rem 0.2rem;" id="serviceGroup">
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-am-12 text-right">
                                 {% if not data  %}
                                 <button type='submit' class="btn btn-primary w-25 mt-4">Submit</button> 
                                 {% endif %}

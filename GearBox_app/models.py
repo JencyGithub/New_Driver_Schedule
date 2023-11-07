@@ -29,7 +29,8 @@ standby_time_grace_options = (
 
 class RateCard(models.Model):
     rate_card_name = models.CharField(max_length=255 , unique=True)
-    
+    tds = models.FloatField(default=0)
+
     def __str__(self) -> str:
         return str(self.rate_card_name)
 
