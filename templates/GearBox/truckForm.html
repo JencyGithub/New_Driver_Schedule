@@ -22,6 +22,8 @@
         border-radius: 7px !important;
     }
 
+
+
     @media (max-width: 576px) {
         .custom-continer {
             margin: 0;
@@ -53,6 +55,85 @@
                         <div class="clearfix"></div>
                     </div>
                
+                    <div id="wizard" class="form_wizard wizard_horizontal">
+                        <ul class="wizard_steps">
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="History"><i class="fa fa-history"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                        </ul>
+                       
+  
+                    </div> 
+                    
                     <form action="{% url 'gearBox:truckFormAdd' %}" method="post">
                         {% csrf_token %}
                         <div class="x_content">
@@ -88,7 +169,7 @@
                             </div>
                             <div class="col-md-12 col-am-12 text-right">
                                 {% if not data  %}
-                                <button type='submit' class="btn btn-primary w-25 mt-4">Submit</button> 
+                                <button type='submit' class="btn btn-default px-5 mt-4">Next</button> 
                                 {% endif %}
                             </div>                       
                         </div>

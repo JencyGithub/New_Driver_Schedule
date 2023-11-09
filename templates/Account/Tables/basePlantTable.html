@@ -30,7 +30,8 @@
 {% block content %}
 
 <div class="right_col" role="main">
-  <div class="">
+  <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-dark float-right">Add</a>
+
 
     <div class="clearfix"></div>
 
@@ -40,8 +41,6 @@
         <div class="x_panel" style="max-height: 100vh; overflow-y: auto;">
           <div class="x_title">
             <h2>Base Plant</h2>
-            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-sm btn-dark float-right">Add</a>
-
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -80,8 +79,6 @@
         <div class="x_panel" style="max-height: 100vh; overflow-y: auto;">
           <div class="x_title">
             <h2>Location</h2>
-            <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-sm btn-dark float-right">Add</a>
-
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -117,7 +114,6 @@
         </div>
       </div>
     </div>
-  </div>
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
