@@ -71,5 +71,9 @@ urlpatterns = [
     
     path('client/edit/<int:id>/', views.clientForm, name='clientEdit'),
     path('client/edit/save/<int:id>/', views.clientChange, name='clientEditSave'),
+
+    # Groups
+
+    path('groups/add/', views.addGroups, name='addGroups'),
     
 ]

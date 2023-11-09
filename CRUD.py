@@ -20,7 +20,7 @@ model_mapping = {
     'DriverTrip' : DriverTrip,
     'DriverDocket' : DriverDocket,
     'RCTI' : RCTI,
-
+    'Location' : Location,
     'PublicHoliday':PublicHoliday,
     'User' : User ,
     'Surcharge' : Surcharge

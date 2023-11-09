@@ -28,7 +28,7 @@ from Account_app.reconciliationUtils import *
 
 
 def index(request):
-    rctiInvoiceFile = os.listdir('static/Account/RCTI/RCTIInvoice')
+    rctiInvoiceFile = os.listdir('static\Account\RCTI\RCTIInvoice')
     rctiFileNameList = []
     for file in rctiInvoiceFile:
         rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
@@ -371,8 +371,8 @@ def rctiSave(request):
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
 
-        # cmd = ["python", "Account_app/utils.py", newFileName]
-        # subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        cmd = ["python", "Account_app/utils.py", newFileName]
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
         # return HttpResponse('work')
         if save_data == '1':
             colorama.AnsiToWin32.stream = None
@@ -561,21 +561,33 @@ def rctiTable(request):
 
 
 def basePlantTable(request):
-    basePlant_ = BasePlant.objects.all()
-    return render(request, 'Account/Tables/basePlantTable.html', {'BP_': basePlant_})
-
+    basePlants = BasePlant.objects.all()
+    locations = Location.objects.all()
+    return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants, 'locations':locations})
 
 def basePlantForm(request, id=None):
-    basePlant = None
+    basePlant = location = None
     if id:
         basePlant = BasePlant.objects.get(pk=id)
-
     params = {
-        'data': basePlant
+        'basePlant': basePlant,
+        'location': location,
     }
-
     return render(request, "Account/basePlantForm.html", params)
 
+def locationEditForm(request, id=None):
+    basePlant = location = None
+    if id:
+        location = Location.objects.get(pk=id)
+    params = {
+        'basePlant': basePlant,
+        'location': location,
+    }
+    return render(request, "Account/basePlantForm.html", params)
+
+def locationTable(request):
+    locations = Location.objects.all()
+    return render(request, 'GearBox/truckForm.html', {'locations': locations})
 
 @csrf_protect
 @api_view(['POST'])
@@ -583,12 +595,27 @@ def basePlantSave(request, id=None):
     dataList = {
         'basePlant': request.POST.get('basePlant')
     }
-    if id is not None:
+    if id:
         updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant updated successfully')
     else:
         insertIntoTable(tableName='BasePlant', dataSet=dataList)
         messages.success(request, 'BasePlant added successfully')
+
+    return redirect('Account:basePlantTable')
+
+@csrf_protect
+@api_view(['POST'])
+def locationSave(request, id=None):
+    dataList = {
+        'location': request.POST.get('location')
+    }
+    if id:
+        updateIntoTable(record_id=id, tableName='Location', dataSet=dataList)
+        messages.success(request, 'Location updated successfully')
+    else:
+        insertIntoTable(tableName='Location', dataSet=dataList)
+        messages.success(request, 'Location added successfully')
 
     return redirect('Account:basePlantTable')
 
@@ -962,7 +989,7 @@ def publicHolidaySave(request, id=None):
 def rateCardTable(request):
     RateCards = RateCard.objects.all()
     params = {
-        'rateCard': RateCards
+        'rateCard': RateCards,
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
@@ -971,8 +998,11 @@ def rateCardForm(request, id=None):
 
     rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = None
     surcharges = Surcharge.objects.all()
+    tds = None
     if id:
         rateCard = RateCard.objects.get(pk=id)
+        tds = rateCard.tds
+        print(rateCard.id)
         costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).values().last()
         thresholdDayShift = ThresholdDayShift.objects.filter(
             rate_card_name=rateCard.id).values().last()
@@ -998,6 +1028,7 @@ def rateCardForm(request, id=None):
         'thresholdDayShift': thresholdDayShift,
         'thresholdNightShift': thresholdNightShift,
         'grace': grace,
+        'tds': tds,
         # 'onLease' : onLease,
         'surcharges': surcharges
     }
@@ -1013,11 +1044,17 @@ def rateCardSave(request, id=None):
     rateCardID = None
     if not id:
         rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
+        tds = float(request.POST.get('rate_card_tds'))
+        rateCard.tds = tds
         rateCard.save()
         rateCardID = RateCard.objects.get(
             rate_card_name=request.POST.get('rate_card_name'))
     else:
         rateCardID = RateCard.objects.get(pk=id)
+
+        tds = float(request.POST.get('rate_card_tds'))
+        rateCardID.tds = tds
+        rateCardID.save()
 
         oldCostParameters = CostParameters.objects.get(
             rate_card_name=rateCardID.id, end_date=None)

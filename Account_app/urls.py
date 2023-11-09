@@ -59,9 +59,14 @@ urlpatterns = [
     path('BasePlant/edit/<int:id>/', views.basePlantForm, name='basePlantEdit'),      
     path('BasePlant/edit/save/<int:id>/', views.basePlantSave, name='basePlantEditSave'),   
 
+    # Location
+    path('location/save/', views.locationSave, name='locationSave'), 
+    path('location/edit/<int:id>/', views.locationEditForm, name='locationEdit'),   
+    path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
+
     path('RctiTable/', views.rctiTable, name='rctiTable'),
     path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
-    
+
     # Rate Card 
     path('RateCardTable', views.rateCardTable, name='rateCardTable'),
     path('RateCardForm', views.rateCardForm, name='rateCardForm'),
@@ -70,9 +75,9 @@ urlpatterns = [
     path('RateCard/revision/<int:id>/', views.rateCardSave, name='rateCardRevision'),
     
     # DriverTrip Csv
-    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),  
-    path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),  
-    path('DriverSampleCsv/', views.driverSampleCsv, name='driverSampleCsv'),  
+    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),
+    path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),
+    path('DriverSampleCsv/', views.driverSampleCsv, name='driverSampleCsv'),
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
@@ -105,8 +110,6 @@ urlpatterns = [
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
-    
-    
     
     # Base plant routes
     path('SurchargeTable/', views.surchargeTable, name='surchargeTable'),

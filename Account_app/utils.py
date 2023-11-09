@@ -117,7 +117,7 @@ converted_file = "converted_" + args
 converted_file_expenses = "expenses_converted_" + args
 
 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
-    f.write(f'{converted_file} <> {converted_file_expenses}')
+    f.write(f'{converted_file}<>{converted_file_expenses}')
     f.close()
     
 folderName =  'static/Account/RCTI/RCTIInvoice'

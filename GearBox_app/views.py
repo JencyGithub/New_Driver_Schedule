@@ -297,3 +297,6 @@ def clientChange(request, id=None):
         messages.success(request,'Added successfully')
 
     return redirect('gearBox:clientTable')
+
+def addGroups(request):
+    return render(request,'GearBox/groupsForm.html')

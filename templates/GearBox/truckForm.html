@@ -22,6 +22,8 @@
         border-radius: 7px !important;
     }
 
+
+
     @media (max-width: 576px) {
         .custom-continer {
             margin: 0;
@@ -53,18 +55,121 @@
                         <div class="clearfix"></div>
                     </div>
                
+                    <div id="wizard" class="form_wizard wizard_horizontal">
+                        <ul class="wizard_steps">
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="History"><i class="fa fa-history"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                        </ul>
+                       
+  
+                    </div> 
+                    
                     <form action="{% url 'gearBox:truckFormAdd' %}" method="post">
                         {% csrf_token %}
                         <div class="x_content">
                             <div class="col-md-4 col-sm-4">
-                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Truck number<span class="required">*</span></label>
+                                <label for="truckNo" style="margin-bottom: 0.3rem!important;">Fleet : <span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="truckNo" required='required' style="padding: 0.25rem 0.2rem;" id="truckNo">
                                 </div>
                             </div>
-                            <div class="col-md-8 col-am-8 text-right">
+                            <div class="col-md-4 col-sm-4">
+                                <label for="groups" style="margin-bottom: 0.3rem!important;">Groups : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="groups" required='required' style="padding: 0.25rem 0.2rem;" id="groups">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="subGroups" style="margin-bottom: 0.3rem!important;">Sub groups : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="subGroups" required='required' style="padding: 0.25rem 0.2rem;" id="subGroups">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="vehicleType" style="margin-bottom: 0.3rem!important;">Vehicle type : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="vehicleType" required='required' style="padding: 0.25rem 0.2rem;" id="vehicleType">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="serviceGroup" style="margin-bottom: 0.3rem!important;">Service group : <span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="{% if data %}{{data.adminTruckNumber}} {% endif %}" {% if data %}readonly{% endif %} type="text" name="serviceGroup" required='required' style="padding: 0.25rem 0.2rem;" id="serviceGroup">
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-am-12 text-right">
                                 {% if not data  %}
-                                <button type='submit' class="btn btn-primary w-25 mt-4">Submit</button> 
+                                <button type='submit' class="btn btn-default px-5 mt-4">Next</button> 
                                 {% endif %}
                             </div>                       
                         </div>

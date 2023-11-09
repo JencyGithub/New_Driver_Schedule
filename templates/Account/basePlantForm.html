@@ -46,12 +46,12 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>{% if data %}Edit{% else %}Add{% endif %} base plant</h2>
+                        <h2>{% if basePlant %}Edit{% else %}Add{% endif %} base plant</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form class="" action="{% if data %} {% url 'Account:basePlantEditSave' id=data.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST" novalidate>
+                            <form class="" action="{% if basePlant %} {% url 'Account:basePlantEditSave' id=basePlant.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST">
                                 {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
@@ -60,13 +60,12 @@
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="basePlant" required="required"
-                                                id="basePlant" type="text" value="{% if data %} {{ data.basePlant }} {% else %}  {% endif %}"/>
+                                                id="basePlant" type="text" value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" {% if basePlant is none and location is not none %} disabled {% endif %}/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
-                                        <button type='reset' class="btn btn-success px-4 ">Reset</button>
                                         <button type='submit' class="btn btn-primary px-4">Submit</button>
                                     </div>
                                 </div>
@@ -75,6 +74,39 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{% if location %}Edit{% else %}Add{% endif %} Location</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <form class="" action="{% if location %} {% url 'Account:locationEditSave' id=location.id %} {% else %} {% url 'Account:locationSave' %} {% endif %}" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="location"
+                                            class="col-form-label col-md-3 col-sm-3 label-align">Location :<span
+                                                class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <input class="form-control" name="location" required="required"
+                                                id="location" type="text" value="{% if location %} {{ location.location }} {% endif %}" {% if basePlant is not none and location is  none %} disabled {% endif %}/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9 col-sm-9 text-right">
+                                        <button type='submit' class="btn btn-primary px-4">Submit</button>
+                                    </div>
+                                </div>
+                            </form> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -90,31 +122,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>
 
-    // initialize a validator instance from the "FormValidator" constructor.
-    // A "<form>" element is optionally passed as an argument, but is not a must
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-
-</script>
 {% endblock %}
 {% endblock %}
