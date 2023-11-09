@@ -38,7 +38,7 @@
       <div class="col-md-12 col-sm-12 ">
         <div class="x_panel" style="max-height: 150vh; overflow-y: auto;">
           <div class="x_title">
-            <h2>RCTI</h2>
+            <h2>Rcti {% if dataType == 'rctiDocket'%}Docket{%else%} Expenses {%endif%}</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -64,9 +64,15 @@
                           <td>{{ rcti.docketYard }}</td>
                           <td>
                             <label type="button" class="btn" id="redirectButton">
+                              {% if dataType == 'rctiDocket'%}
                               <a href="{% url 'Account:rctiForm' id=rcti.id %}">
                                 <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                               </a>
+                              {%else%}
+                              <a href="{% url 'Account:expanseView' id=rcti.id %}">
+                                <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                              </a>
+                              {%endif%}
                             </label>
                           </td>                       
                         </tr>

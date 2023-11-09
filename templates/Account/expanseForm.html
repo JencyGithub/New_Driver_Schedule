@@ -17,7 +17,7 @@
                             <h2> {% if rcti %} View Expanse {% else %} Add Expanse {% endif  %}:-</h2>
                             <div class="clearfix"></div>
                         </div>
-                        <form action="{% url 'Account:expanseFormSave' %}" method="post" novalidate>
+                        <form action="{% if not rcti %} {% url 'Account:expanseFormSave' %} {%endif %}" method="post" novalidate>
                             {%csrf_token%}
                             <div class="x_content">
                                 <div class="custom-continer">
@@ -28,16 +28,16 @@
                                             <input class="form-control" required type="number" name="truckNo"
                                                 pattern="[0-9]*" required data-validate-length-range="0,5"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.truckNo }}" id="truckNo"
-                                                {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                {% if rcti %}  readonly {% endif  %} >
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
                                         <label for="docketNumber">Docket number :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" required type="number" name="docketNumber"
+                                            <input class="form-control" required type="text" name="docketNumber"
                                                 pattern="[0-9]*" required data-validate-length-range="0,5"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketNumber }}"
-                                                id="docketNumber" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="docketNumber" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
@@ -45,7 +45,7 @@
                                         <div class="field item form-group">
                                             <input class="form-control" required type="date" name="docketDate" 
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketDate }}"
-                                                id="docketDate" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="docketDate" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
@@ -53,7 +53,7 @@
                                         <div class="field item form-group">
                                             <input class="form-control" required type="text" name="docketYard"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketYard }}"
-                                                id="docketYard" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="docketYard" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
 
@@ -62,7 +62,7 @@
                                         <div class="field item form-group">
                                             <textarea class="form-control" required type="text" name="description"
                                                 style="padding: 0.25rem 0.2rem;" 
-                                                id="description" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>{{ rcti.description }}</textarea>
+                                                id="description" {% if rcti %}  readonly {% endif  %}>{{ rcti.description }}</textarea>
                                         </div>
                                     </div>
 
@@ -72,7 +72,7 @@
                                             <input class="form-control" required type="number" name="paidKm"
                                                 pattern="[0-9]*" required data-validate-length-range="0,5"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.paidKm }}" id="paidKm"
-                                                {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
@@ -81,7 +81,7 @@
                                             <input class="form-control" required type="number" name="invoiceQuantity"
                                                 pattern="[0-9]*" required data-validate-length-range="0,5"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.invoiceQuantity }}"
-                                                id="invoiceQuantity" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="invoiceQuantity" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
@@ -89,7 +89,7 @@
                                         <div class="field item form-group">
                                             <input class="form-control" required type="text" name="unit" 
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.unit }}"
-                                                id="unit" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="unit" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-3">
@@ -97,7 +97,7 @@
                                         <div class="field item form-group">
                                             <input class="form-control" required type="number" name="unitPrice"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.unitPrice }}"
-                                                id="unitPrice" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="unitPrice" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     
@@ -107,15 +107,15 @@
                                             <input class="form-control" required type="number" name="gstPayable"
                                                 pattern="[0-9]*" required data-validate-length-range="0,5"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.gstPayable }}"
-                                                id="gstPayable" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="gstPayable" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="totalExGST">Total (Ex.GST) :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" required type="text" name="totalExGST" 
+                                            <input class="form-control" required type="number" name="totalExGST" 
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.totalExGST }}"
-                                                id="totalExGST" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="totalExGST" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -123,12 +123,14 @@
                                         <div class="field item form-group">
                                             <input class="form-control" required type="number" name="total"
                                                 style="padding: 0.25rem 0.2rem;" value="{{ rcti.total }}"
-                                                id="total" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                id="total" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
                                 </div>                                
                             </div>
+                            {% if not rcti %} 
                             <input type="submit" value="Save" class="btn btn-default float-right">
+                            {%endif%}
                         </form>
                     </div>
                 </div>

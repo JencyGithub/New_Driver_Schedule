@@ -26,8 +26,7 @@ urlpatterns = [
     path('Form1/', views.getForm1, name='getForm1'),
     path('Form2/', views.getForm2, name='getForm2'),
     
-    path('createFormSession/',
-         views.createFormSession, name='createFormSession'),
+    path('createFormSession/',views.createFormSession, name='createFormSession'),
     path('formsSave/', views.formsSave, name='formsSave'),
 
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
@@ -43,6 +42,8 @@ urlpatterns = [
     # Expanse entry manually
     path('expanse/', views.expanseForm, name='expanseForm'), 
     path('expanse/save/', views.expanseSave, name='expanseFormSave'), 
+    path('expanse/<int:id>', views.expanseForm, name='expanseView'),  
+    
     
     
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
