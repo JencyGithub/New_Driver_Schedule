@@ -300,3 +300,6 @@ def clientChange(request, id=None):
 
 def addGroups(request):
     return render(request,'GearBox/groupsForm.html')
+
+def addSubGroups(request):
+    return render(request, 'GearBox/subgroupsForm.html')
