@@ -179,12 +179,19 @@ def driverFormSave(request, id= None):
 
     return redirect('gearBox:driversTable')
 
+
+# ````````````````````````````````````````
+
+# Truck Section 
+
+# ````````````````````````````````````````````````
+
 def truckTable(request):
     adminTruck = AdminTruck.objects.all()
     params = {
         'adminTrucks' : adminTruck
     }
-    return render(request , 'GearBox/table/truckTable.html',params)
+    return render(request , 'GearBox/truck/table/truckTable.html',params)
 
 def truckForm(request, id=None):
     clientIds = Client.objects.all()
@@ -208,7 +215,7 @@ def truckForm(request, id=None):
         'data' : data,
         'connections' : connections,
     }
-    return render(request,'GearBox/truckForm.html',params)
+    return render(request,'GearBox/truck/truckForm.html',params)
 
 @csrf_protect
 @api_view(['POST'])
@@ -257,6 +264,13 @@ def truckConnectionSave(request,id):
     messages.success(request,'Added successfully')
     return redirect('gearBox:truckTable')
 
+    # Document 
+
+def documentView(request):
+    return render(request,'GearBox/truck/table/document.html')
+
+def documentForm(request):
+    return render(request,'GearBox/truck/documentForm.html')
 
 # ```````````````````````````````````
 # Client 
@@ -300,3 +314,4 @@ def clientChange(request, id=None):
 
 def addGroups(request):
     return render(request,'GearBox/groupsForm.html')
+

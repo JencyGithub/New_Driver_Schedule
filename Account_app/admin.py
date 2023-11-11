@@ -395,3 +395,5 @@ admin.site.register(ReconciliationReport)
 
 admin.site.register(RctiExpense)
 admin.site.register(Location)
+
+admin.site.register(TruckDocument)
