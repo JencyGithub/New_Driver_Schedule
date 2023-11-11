@@ -77,5 +77,8 @@ urlpatterns = [
     # Groups
 
     path('groups/add/', views.addGroups, name='addGroups'),
+
+    # Sub groups 
+    path('subgroups/add/', views.addSubGroups, name='addSubGroups'),
     
 ]
