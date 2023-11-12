@@ -162,6 +162,7 @@ class Client(models.Model):
 class AdminTruck(models.Model):
     # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     adminTruckNumber = models.PositiveIntegerField(unique=True)
+    truckStatus = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.adminTruckNumber)
@@ -218,3 +219,11 @@ class LeaveRequest(models.Model):
         return f"{self.employee} - {self.start_date} to {self.end_date}"
 
 
+class TruckDocument(models.Model):
+    tags = models.CharField(max_length=300)
+    filePath = models.FileField(upload_to='static/GearBox/document')
+    description = models.TextField()
+    
+    def __str__(self):
+        return str(self.tags)
+    

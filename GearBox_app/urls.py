@@ -61,7 +61,9 @@ urlpatterns = [
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
     
-    
+    # dockument 
+    path('document/', views.documentView, name="documentView"),
+    path('document/form', views.documentForm, name="documentForm"),
     # Client Table
     
     path('clientTable', views.clientTable, name='clientTable'),
@@ -75,5 +77,8 @@ urlpatterns = [
     # Groups
 
     path('groups/add/', views.addGroups, name='addGroups'),
+
+    # Sub groups 
+    path('subgroups/add/', views.addSubGroups, name='addSubGroups'),
     
 ]

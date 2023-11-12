@@ -56,7 +56,6 @@ def getForm1(request):
             # params['client_names'] = str(DriverTruckNum.clientId.name)
 
         except Exception as e:
-            print(e)
             params['driver_ids'] = None
             drivers = Driver.objects.all()
             params['drivers'] = drivers
@@ -379,20 +378,36 @@ def rctiSave(request):
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
-def uplodedRCTI(request):
-    rctiInvoiceFile = os.listdir(r'static\Account\RCTI\uplodedRctiPdf')
-    rctiFileNameList = []
-    for file in rctiInvoiceFile:
-        rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+def expanseForm(request, id = None):
+    rctiExpense = None
+    if id:
+        rctiExpense = RctiExpense.objects.filter(id = id).first()
+        rctiExpense.docketDate = dateConverterFromTableToPageFormate(rctiExpense.docketDate)
+    params = {
+        'rcti' : rctiExpense
+    }
     
-    return render(request, 'Account/uplodedRCTI.html',{'rctiFileNameLists' : rctiFileNameList})
-
-def expanseForm(request):
-    return render(request, 'Account/expanseForm.html')
+    return render(request, 'Account/expanseForm.html',params)
 
 @csrf_protect
 def expanseSave(request):
-    return HttpResponse("Expanse save form call.")
+    RctiExpenseObj = RctiExpense()
+    RctiExpenseObj.truckNo = request.POST.get('truckNo')
+    RctiExpenseObj.docketNumber = request.POST.get('docketNumber')
+    RctiExpenseObj.docketDate = request.POST.get('docketDate')
+    RctiExpenseObj.docketYard = request.POST.get('docketYard')
+    RctiExpenseObj.description = request.POST.get('description')
+    RctiExpenseObj.paidKm = request.POST.get('paidKm')
+    RctiExpenseObj.invoiceQuantity = request.POST.get('invoiceQuantity')
+    RctiExpenseObj.unit = request.POST.get('unit')
+    RctiExpenseObj.unitPrice = request.POST.get('unitPrice')
+    RctiExpenseObj.gstPayable = request.POST.get('gstPayable')
+    RctiExpenseObj.totalExGST = request.POST.get('totalExGST')
+    RctiExpenseObj.total = request.POST.get('total')
+    RctiExpenseObj.save()
+    
+    messages.success( request, "RCTI Expense Entry successfully done.")
+    return redirect('Account:rcti')
 
 def driverEntry(request):
     return render(request, 'Account/driverEntryForm.html')
@@ -514,34 +529,25 @@ def rctiTable(request):
     endDate_ = request.POST.get('endDate')
     basePlant_ = request.POST.get('basePlant')
     docketYard = BasePlant.objects.filter(id = basePlant_).first()
-    rctiType = request.POST.get('RCTI')
+    dataType = request.POST.get('RCTI')
 
 
     try:
-        if startDate_:
-            if endDate_:
-                if rctiType== 'rctiDocket':
-                    rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-                elif rctiType == 'rctiExpense':
-                    rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-            else:
-                messages.error(request, "Please enter End Date.")
-                return redirect(request.META.get('HTTP_REFERER'))
-        elif basePlant_:
-
-            if rctiType =='rctiDocket':
-                rctiData = RCTI.objects.filter(docketYard=docketYard).values()
-            elif rctiType  == 'rctiExpense':
-                rctiData = RctiExpense.objects.filter(docketYard=docketYard).values()
+        if basePlant_:
+            if dataType== 'rctiDocket':
+                rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard).values()
+            elif dataType == 'rctiExpense':
+                rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard).values()
         else:
-            messages.error(request, "Please select either Start Date or Docket Yard.")
-            return redirect(request.META.get('HTTP_REFERER'))
+            if dataType== 'rctiDocket':
+                rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+            elif dataType == 'rctiExpense':
+                rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
         params = {
             'RCTIs': rctiData,
+            'dataType':dataType
         }
         return render(request, 'Account/Tables/rctiTable.html', params)
-        # elif id ==2 :
-        #     return HttpResponse('work')
     except:
         messages.warning(request, "Invalid Request ")
         return redirect('Account:rctiCsvForm')
@@ -685,7 +691,7 @@ def driverTripCsv(request):
                 data_list.extend(temp_trip_data_list)
                 temp_trip_data_list.clear()
     except Exception as e:
-        print(e)
+        return HttpResponse(e)
 
     time = str(timezone.now()).replace(':', '').replace(
         '-', '').replace(' ', '').split('.')
@@ -731,7 +737,6 @@ def clientFilter(request):
 
 @api_view(['POST'])
 def dateRangeFilter(request):
-    print(request.POST)
     startDate_values = request.POST.getlist('startDate[]')
     endDate_values = request.POST.getlist('endDate[]')
     startDate = date(int(startDate_values[0]), int(
@@ -1048,7 +1053,6 @@ def rateCardSave(request, id=None):
             rate_card_name=rateCardID.id, end_date=None)
         oldCostParameters.end_date = getYesterdayDate(
             request.POST.get('costParameters_start_date'))
-        print(oldCostParameters.end_date)
         oldCostParameters.save()
 
         oldThresholdDayShift = ThresholdDayShift.objects.get(
