@@ -46,14 +46,21 @@
             <div class="cuatom-continer">
               <form class="" method="POST" action="{% url 'Account:rctiSave'%}" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="col-md-6 col-sm-6">
-                  <label for="Rcti">Upload RCTI Invoice:<span class="required">*</span></label>
+                <div class="col-md-4 col-sm-4">
+                  <label for="RctiFile">Upload RCTI Invoice csv:<span class="required">*</span></label>
                   <div class="field item form-group">
                     <input class="form-control" type="file" name="RctiFile" required style="padding: 0.25rem 0.2rem;"
-                      id="Rcti" accept=" .csv">
+                      id="RctiFile" accept=" .csv">
                   </div>
                 </div>
-                <div class="col-md-6 col-sm-6">
+                <div class="col-md-4 col-sm-4">
+                  <label for="rctiPdf">Upload RCTI Invoice PDF <small><i>(optional)</i></small>:</label>
+                  <div class="field item form-group">
+                    <input class="form-control" type="file" name="rctiPdf" style="padding: 0.25rem 0.2rem;"
+                      id="rctiPdf" accept=" .pdf">
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-4">
                   <div class="checkbox">
                     <label>
                       <input type="checkbox" name="save" style="margin-top: 2.5rem;" value="1"> Save Data In Database

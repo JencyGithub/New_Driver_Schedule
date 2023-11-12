@@ -1,0 +1,33 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Uploded RCTI files{% endblock %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <div class="">
+      <div class="clearfix"></div>
+      <div class="row">
+        <div class="col-md-12 col-sm-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Uploded RCTI Files</h2>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="cuatom-continer">
+                {% for rctiFileNameList in rctiFileNameLists %}
+                    <div class="col-md-1 mt-2 text-center">
+                    <a href="/static/Account/RCTI/uplodedRctiPdf/{{rctiFileNameList.0}}@_!{{rctiFileNameList.1}}">
+                        <i class="fa fa-file d-block w-100 m-auto text-danger pb-2" style="font-size: 3rem;"></i>
+                        {{rctiFileNameList.1}}
+                    </a> <br>
+                    </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

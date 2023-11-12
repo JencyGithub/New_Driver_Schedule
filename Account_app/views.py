@@ -28,22 +28,7 @@ from Account_app.reconciliationUtils import *
 
 
 def index(request):
-    rctiInvoiceFile = os.listdir('static\Account\RCTI\RCTIInvoice')
-    rctiFileNameList = []
-    for file in rctiInvoiceFile:
-        rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
-    
-
-    pastTripFile = os.listdir('static/Account/PastTripsEntry')
-    pasrTripFileNameList = []
-    for file in pastTripFile:
-        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
-        
-    params = {
-        'rctiFileNameLists' : rctiFileNameList,
-        'pasrTripFileNameLists' : pasrTripFileNameList,
-    }
-    return render(request, 'Account/dashboard.html',params)
+    return render(request, 'Account/dashboard.html')
 
 
 def getForm1(request):
@@ -358,14 +343,20 @@ def rctiFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
+    rctiPdf = request.FILES.get('rctiPdf')
+    time = getCurrentTimeInString()
+    if rctiPdf:
+        rctiPdfName = time + "@_!" + (str(rctiPdf.name)).replace(' ','')
+        pdfLocation = 'static/Account/RCTI/uplodedRctiPdf'
+        savePdfObj = FileSystemStorage(location=pdfLocation)
+        savePdfObj.save(rctiPdfName,rctiPdf)
+        
     invoiceFile = request.FILES.get('RctiFile')
     save_data = request.POST.get('save')
+    
     if not invoiceFile:
         return HttpResponse("No file uploaded")
     try:
-        time = (str(timezone.now())).replace(':', '').replace(
-            '-', '').replace(' ', '').split('.')
-        time = time[0]
         newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
         location = 'static/Account/RCTI/tempRCTIInvoice'
 
@@ -387,6 +378,14 @@ def rctiSave(request):
 
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+def uplodedRCTI(request):
+    rctiInvoiceFile = os.listdir(r'static\Account\RCTI\uplodedRctiPdf')
+    rctiFileNameList = []
+    for file in rctiInvoiceFile:
+        rctiFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+    
+    return render(request, 'Account/uplodedRCTI.html',{'rctiFileNameLists' : rctiFileNameList})
 
 def expanseForm(request):
     return render(request, 'Account/expanseForm.html')
@@ -427,12 +426,14 @@ def driverEntrySave(request):
 
 
 def driverDocketEntry(request, ids, driverDocketNumber=None):
+    
     surcharges = Surcharge.objects.all()
 
     docketData = None
     if driverDocketNumber:
         docketData = DriverDocket.objects.filter(
             docketNumber=driverDocketNumber).first()
+        docketData.shiftDate = dateConverterFromTableToPageFormate(docketData.shiftDate)
 
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
@@ -1267,6 +1268,15 @@ def pastTripSave(request):
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 
+
+def uplodedPastTrip(request):
+   
+    pastTripFile = os.listdir('static/Account/PastTripsEntry')
+    pasrTripFileNameList = []
+    for file in pastTripFile:
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        
+    return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
 # --------------------------------------------
 # Surcharge 
 # ---------------------------------------------

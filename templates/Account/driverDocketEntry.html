@@ -42,17 +42,23 @@ request {% endblock %} {% block headStyle %}
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
+                            {% if not docketData %}
                             <h2> Driver Docket Entry Form </h2>
+                            {% else %}
+                            <h2>Docket View</h2>
+                            {% endif %}
                                 <div class="float-right">
                                     <input type="radio" id="tippingToYard" name="returnToYard" 
-                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)" value="returnToYard">
+                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)" value="returnToYard" {% if docketData %}disabled{% endif %} {% if docketData.returnToYard %}checked{% endif %}>
                                     <label for="tippingToYard" class=" ml-2"
                                     style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
                                     <input type="radio" id="returnToYard" name="returnToYard" value="tippingToYard"
-                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)">
+                                    style="margin-top: .8rem;"  onclick="returnToYard_(this)" {% if docketData %}disabled{% endif %} {% if docketData.tippingToYard %}checked{% endif %}>
                                     <label for="returnToYard" class=" ml-2"
                                         style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+                                    {% if not docketData %}
                                     <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio"></i>
+                                    {% endif %}
                                 </div>
                             <div class="clearfix"></div>
                         </div>
@@ -65,7 +71,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="date"
                                             name="shiftDate" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="shiftDate">
+                                            style="padding: 0.25rem 0.2rem;" id="shiftDate" value={% if docketData %}{{ docketData.shiftDate }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -73,7 +79,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="text"
                                             name="docketNumber" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="docketNumber">
+                                            style="padding: 0.25rem 0.2rem;" id="docketNumber" value={% if docketData %}{{ docketData.docketNumber }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -83,15 +89,14 @@ request {% endblock %} {% block headStyle %}
                                             name="docketFile" style="padding: 0.25rem 0.2rem;" required="required"
                                             id="docketFile">
                                     </div>
-
                                 </div>
                                 <!-- basePlant noOfKm  transferKM  -->
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="basePlant">basePlant :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="basePlant" class="form-control">
+                                        <select name="basePlant" class="form-control" {% if docketData %}disabled{% endif %}>
                                             {% for basePlant_ in basePlants %}
-                                            <option {% if item.basePlant.basePlant == basePlant_.basePlant %}selected{% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
+                                            <option {% if docketData.basePlant.basePlant == basePlant_.basePlant %}selected{% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -101,7 +106,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="noOfKm" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="noOfKm">
+                                            style="padding: 0.25rem 0.2rem;" id="noOfKm"  value={% if docketData %}{{ docketData.noOfKm }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -109,7 +114,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="transferKM" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="transferKM">
+                                            style="padding: 0.25rem 0.2rem;" id="transferKM" value={% if docketData %}{{ docketData.transferKM }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <!--    returnQty  returnKm  waitingTimeStart      -->
@@ -118,7 +123,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="returnQty" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="returnQty" disabled>
+                                            style="padding: 0.25rem 0.2rem;" id="returnQty" disabled value={% if docketData %}{{ docketData.returnQty }}{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -126,7 +131,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="returnKm" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="returnKm" disabled>
+                                            style="padding: 0.25rem 0.2rem;" id="returnKm" disabled value={% if docketData %}{{ docketData.returnKm }}{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -135,7 +140,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"   type="time"
                                             name="waitingTimeStart" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeStart">
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeStart" value={% if docketData %}{{ docketData.waitingTimeStart }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
 
@@ -147,7 +152,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"   type="time"
                                             name="waitingTimeEnd" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd">
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd" value={% if docketData %}{{ docketData.waitingTimeEnd }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -156,15 +161,15 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control" disabled  type="number"
                                             name="totalWaitingInMinute" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute">
+                                            style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute" value={% if docketData %}{{ docketData.totalWaitingInMinute }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="surcharge_type">Surcharge Type:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="surcharge_type" class="form-control" >
+                                        <select name="surcharge_type" class="form-control" {% if docketData %} disabled {% endif %}>
                                             {% for surcharge in surcharges %}
-                                            <option value="{{surcharge.id}}">{{surcharge.surcharge_Name}}</option>
+                                            <option value="{{surcharge.id}}" {% if docketData.surcharge_type.surcharge_Name == surcharge.surcharge_Name %}selected{% endif %}>{{surcharge.surcharge_Name}}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -176,7 +181,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="surcharge_duration" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="surcharge_duration">
+                                            style="padding: 0.25rem 0.2rem;" id="surcharge_duration" value={% if docketData %}{{ docketData.surcharge_duration }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -184,25 +189,24 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="cubicMl" required="required"
-                                            style="padding: 0.25rem 0.2rem;" id="cubicMl">
+                                            style="padding: 0.25rem 0.2rem;" id="cubicMl" value={% if docketData %}{{ docketData.cubicMl }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
-
                                 <div class="col-md-4 col-sm-4">
                                     <label for="standByStartTime">StandBy start Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="time"
+                                        <input class="form-control"  type="time" {% if docketData %}disabled{% endif %}
                                             name="standByStartTime" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByStartTime">
+                                            style="padding: 0.25rem 0.2rem;" id="standByStartTime" value={% if docketData %}{{ docketData.standByStartTime }}{% endif %}>
                                     </div>
                                 </div>
                                 <!--     standByEndTime   others  comment-->
                                 <div class="col-md-4 col-sm-4">
                                     <label for="standByEndTime">StandBy End Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="time"
+                                        <input class="form-control"  type="time" {% if docketData %}disabled{% endif %}
                                             name="standByEndTime" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime">
+                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime" value={% if docketData %}{{ docketData.standByEndTime }}{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -210,20 +214,22 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
                                             name="others" style="padding: 0.25rem 0.2rem;"
-                                            required="required" id="others">
+                                            required="required" id="others" value={% if docketData %}{{ docketData.others }}{% endif %} {% if docketData %}disabled{% endif %}>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-12 col-sm-12">
                                     <label for="comment">Comment :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <textarea placeholder="comment" id="comment" name="comment"
-                                            class="form-control"></textarea>
+                                        <textarea placeholder="comment" id="comment" name="comment" {% if docketData %}disabled{% endif %}
+                                            class="form-control">{% if docketData %}{{ docketData.comment }}{% endif %}</textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-12 text-right p-0">
+                                {% if not docketData %}
                                 <button type='submit' style="margin: 0px;" class="btn btn-primary px-4">Save</button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

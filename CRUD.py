@@ -128,6 +128,9 @@ def getMaxTimeFromTwoTime(time1, time2, type=None):
                 return time2
         else:
             return time2
-        
+  
+def getCurrentTimeInString():
+    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+    return time[0]
     
 

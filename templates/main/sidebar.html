@@ -1,4 +1,4 @@
-<div class="col-md-3 left_col menu_fixed">
+<div class="col-md-3 left_col menu_fixed" style="max-height: 100vh; overflow-y: auto;">
   <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
       <a href="{% url 'Account:index'%}" class="site_title"><i class="fa fa-paw"></i> <span>PNR Group</span></a>
@@ -34,7 +34,6 @@
           <li>
             <a><i class="fa fa-book"></i> Account <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li class=""><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
               <li class=""><a href="{% url 'Account:basePlantTable'%}">Base Plant / Location</a></li>
 
               <li><a>RCTI section<span class="fa fa-chevron-down"></span></a>
@@ -42,6 +41,8 @@
                   <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
                   </li>
                   <li><a href="{% url 'Account:rctiCsvForm'%}">Existing RCTI</a>
+                  </li>
+                  <li><a href="{% url 'Account:UplodedRCTI'%}">Uploded RCTI Files</a>
                   </li>
                 </ul>
               </li>
@@ -51,9 +52,18 @@
                   </li>
                   <li><a href="{% url 'Account:pastTripForm' %}">Past trip</a>
                   </li>
+                  <li><a href="{% url 'Account:uplodedPastTrip'%}">Uploded Past trip Files</a>
+
                 </ul>
               </li>
-              <li class=""><a href="{% url 'Account:rateCardTable'%}"> Rate Card </a></li>
+              <li><a>Rate card section<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
+                  </li>
+                  <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
+
+                </ul>
+              </li>
             </ul>
           </li>
           <li>

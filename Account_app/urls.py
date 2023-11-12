@@ -39,6 +39,8 @@ urlpatterns = [
     path('rctiForm/save/', views.rctiFormSave, name='rctiFormSave'), 
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
+    path('uploded/rcti/', views.uplodedRCTI, name='UplodedRCTI'), 
+    
     
     # Expanse entry manually
     path('expanse/', views.expanseForm, name='expanseForm'), 
@@ -109,6 +111,9 @@ urlpatterns = [
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
+    
+    path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'), 
+    
     
     # Base plant routes
     path('SurchargeTable/', views.surchargeTable, name='surchargeTable'),
