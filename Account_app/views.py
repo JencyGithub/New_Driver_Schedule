@@ -30,7 +30,6 @@ from Account_app.reconciliationUtils import *
 def index(request):
     return render(request, 'Account/dashboard.html')
 
-
 def getForm1(request):
     params = {}
     if request.user.is_authenticated:
@@ -377,6 +376,15 @@ def rctiSave(request):
 
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+def uplodedRCTI(request):
+   
+    rctiFile = os.listdir('static/Account/RCTI/uplodedRctiPdf')
+    rctiFileNameLists = []
+    for file in rctiFile:
+        rctiFileNameLists.append([file.split('@_!')[0],file.split('@_!')[1]])
+        
+    return render(request, 'Account/uplodedRCTI.html', {'rctiFileNameLists' : rctiFileNameLists})
 
 def expanseForm(request, id = None):
     rctiExpense = None
