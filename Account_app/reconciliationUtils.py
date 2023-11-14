@@ -21,45 +21,6 @@ costDict = {
     }
 }
 
-# def checkLoadAndKmCost(rctiTotalExGst,driverDocketNumber,docketDate,costDict=costDict):
-#     try:
-#         date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
-#         driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
-#         driverDocketLoadSize = driverDocketObj.cubicMl 
-
-#         tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
-#         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
-#         clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
-        
-#         rateCard = clientTruckConnectionObj.rate_card_name
-#         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-        
-#         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-#         driverDocketKm = 0 if driverDocketObj.noOfKm <= graceObj.load_km_grace else driverDocketObj.noOfKm - graceObj.load_km_grace
-#         driverLoadKmCostTotal = (driverDocketLoadSize * costParameterObj.loading_cost_per_cubic_meter) + (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
-
-#         if tripObj.shiftType == 'Day':
-#             shiftType = ThresholdDayShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-#         else:
-#             shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-            
-#         if  driverDocketLoadSize < shiftType.min_load_in_cubic_meters :
-#             driverDocketObj.others = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
-#             driverDocketObj.others = driverDocketObj.others +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
-#             driverDocketObj.save()
-            
-#         costDict['rctiCosts']['loadAndKmCost'] = round(rctiTotalExGst,2)
-#         costDict['driverDocketCosts']['loadAndKmCost'] = round(driverLoadKmCostTotal,2)
-#         if  round(rctiTotalExGst,2) == round(driverLoadKmCostTotal,2):
-#             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),True] 
-
-#         else:
-#             return [round(rctiTotalExGst,2) , round(driverLoadKmCostTotal,2),False] 
- 
-#     except Exception as e :
-#         # print(f'{driverDocketNumber}Load And Km Cost : {e}')
-#         return ['','',False]
-
 def checkLoadAndKmCost(driverDocketNumber,docketDate):
     try:
         
@@ -360,25 +321,25 @@ def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
         
         finalDriverCost = driverLoadAndKmCostTotal  + driverDocketTransferKmCostTotal + driverReturnCostTotal + driverWaitingCostTotal + driverStandByTimeCostTotal + driverOtherCostTotal
                            
-        rctiTotalCost = rctiObj.cartageTotal + rctiObj.transferKMTotal + rctiObj.returnKmTotal + rctiObj.waitingTimeSCHEDTotal + rctiObj.waitingTimeTotal + rctiObj.standByTotal + rctiObj.minimumLoadTotal + rctiObj.surchargeTotal + rctiObj.othersTotal
+        rctiTotalCost = rctiObj.cartageTotalExGST + rctiObj.transferKMTotalExGST + rctiObj.returnKmTotalExGST + rctiObj.waitingTimeSCHEDTotalExGST + rctiObj.waitingTimeTotalExGST + rctiObj.standByTotalExGST + rctiObj.minimumLoadTotalExGST + rctiObj.surchargeTotalExGST + rctiObj.othersTotalExGST
 
         # Missing parameters
-        if (driverLoadAndKmCostTotal > 0 and rctiObj.cartageTotal == 0) or (driverLoadAndKmCostTotal == 0 and rctiObj.cartageTotal > 0) :
+        if (driverLoadAndKmCostTotal > 0 and rctiObj.cartageTotalExGST == 0) or (driverLoadAndKmCostTotal == 0 and rctiObj.cartageTotalExGST > 0) :
             missingComponents.append('Load Km Cost')
             
-        if (driverDocketTransferKmCostTotal > 0 and rctiObj.transferKMTotal == 0) or (driverDocketTransferKmCostTotal == 0 and rctiObj.transferKMTotal > 0) :
+        if (driverDocketTransferKmCostTotal > 0 and rctiObj.transferKMTotalExGST == 0) or (driverDocketTransferKmCostTotal == 0 and rctiObj.transferKMTotalExGST > 0) :
             missingComponents.append('Transfer Cost')
             
-        if (driverReturnCostTotal > 0 and rctiObj.returnKmTotal == 0) or (driverReturnCostTotal == 0 and rctiObj.returnKmTotal > 0):
+        if (driverReturnCostTotal > 0 and rctiObj.returnKmTotalExGST == 0) or (driverReturnCostTotal == 0 and rctiObj.returnKmTotalExGST > 0):
             missingComponents.append('Return Cost')
             
-        if (driverStandByTimeCostTotal > 0  and rctiObj.standByTotal == 0) or (driverStandByTimeCostTotal == 0  and rctiObj.standByTotal > 0):
+        if (driverStandByTimeCostTotal > 0  and rctiObj.standByTotalExGST == 0) or (driverStandByTimeCostTotal == 0  and rctiObj.standByTotalExGST > 0):
             missingComponents.append('Waiting Cost')
             
-        if (driverWaitingCostTotal > 0 and rctiObj.waitingTimeTotal == 0) or (driverWaitingCostTotal == 0 and rctiObj.waitingTimeTotal > 0):
+        if (driverWaitingCostTotal > 0 and rctiObj.waitingTimeTotalExGST == 0) or (driverWaitingCostTotal == 0 and rctiObj.waitingTimeTotalExGST > 0):
             missingComponents.append('Standby Cost')
 
-        if (driverOtherCostTotal > 0 and rctiObj.minimumLoadTotal == 0) or (driverOtherCostTotal == 0 and rctiObj.minimumLoadTotal > 0):
+        if (driverOtherCostTotal > 0 and rctiObj.minimumLoadTotalExGST == 0) or (driverOtherCostTotal == 0 and rctiObj.minimumLoadTotalExGST > 0):
             missingComponents.append('Minimum Load Cost')
             
         if finalDriverCost == rctiTotalCost:
