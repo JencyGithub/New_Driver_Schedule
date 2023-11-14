@@ -2,15 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil
-import json
-import os
-import tabula
-import requests
-import colorama
-import subprocess
-import csv
-import io
+import shutil ,json ,os ,tabula ,requests ,colorama ,subprocess ,io ,csv
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from django.conf import settings
@@ -863,7 +855,12 @@ def driverEntryUpdate(request, ids):
                     
             if not  reconciliationDocketObj :
                 reconciliationDocketObj = ReconciliationReport()
-            
+                
+             
+            reconciliationDocketObj.driverId = request.POST.get('driverId')  
+            reconciliationDocketObj.clientId = request.POST.get('clientName') 
+            reconciliationDocketObj.truckId = request.POST.get('truckNo') 
+                
             driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,docketObj.shiftDate)
             driverSurchargeCost = checkSurcharge(driverDocketNumber,docketObj.shiftDate)
             # return HttpResponse(driverSurchargeCost)
@@ -936,8 +933,17 @@ def reconciliationDocketView(request, docketNumber):
 
     return render(request, 'Reconciliation/reconciliation-docket.html', params)
 
-def reconciliationEscalationForm(request):
-    return render(request, 'Reconciliation/escalation-form.html')
+def reconciliationEscalationForm(request,id):
+    data = ReconciliationReport.objects.filter(pk=id).first()
+    data.docketDate = dateConverterFromTableToPageFormate(data.docketDate)
+    clientName = Client.objects.filter(pk=data.clientId).first()
+    driverDocket = DriverDocket.objects.filter(docketNumber = data.docketNumber).first()
+    params = {
+        'data':data, 
+        'client':clientName,
+        'driverDocket' : driverDocket
+    }
+    return render(request, 'Reconciliation/escalation-form.html',params)
 
 
 # ```````````````````````````````````

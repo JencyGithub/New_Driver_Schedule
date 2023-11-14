@@ -70,7 +70,7 @@ Reconciliation docket {% endblock %} {% block headStyle %}
                                                     <td class="{% if item.driverTotalCost == item.rctiTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverTotalCost}} / {{ item.rctiTotalCost }} </td>
                                                     <td class="text-danger">{{ item.missingComponent }} </td>
                                                     
-                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' %}" class="btn btn-sm btn-default">Escalation</a></td>
+                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default">Escalation</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

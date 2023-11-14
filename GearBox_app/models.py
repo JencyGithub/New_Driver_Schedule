@@ -57,7 +57,8 @@ class CostParameters(models.Model):
     cancellation_fees = models.FloatField(default=0) 
     clientPayableGst = models.FloatField(default=10.0)
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+
 
 class ThresholdDayShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -87,7 +88,8 @@ class ThresholdDayShift(models.Model):
     return_to_tipping_grace = models.FloatField(default=0)      # new added
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+
 
 class ThresholdNightShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -108,7 +110,8 @@ class ThresholdNightShift(models.Model):
     return_to_tipping_grace = models.FloatField(default=0)      # new added
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+
 
 class Grace(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -121,7 +124,7 @@ class Grace(models.Model):
     chargeable_waiting_time_starts_after = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
 
 class OnLease(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -137,7 +140,8 @@ class OnLease(models.Model):
     waiting_cost_per_minute_applicable = models.BooleanField(default=True)
     call_out_fees_applicable = models.BooleanField(default=True)
     start_date = models.DateField(default=timezone.now())
-    end_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    
 
 
 
@@ -219,6 +223,47 @@ class LeaveRequest(models.Model):
         return f"{self.employee} - {self.start_date} to {self.end_date}"
 
 
+# -----------------------------------
+# Truck Gearbox section
+# -----------------------------------
+
+# INFORMATION TAB
+class TruckInformation(models.Model):
+    fleet = models.CharField(max_length=100)
+    group = models.PositiveSmallIntegerField(default=0)
+    subGroup = models.PositiveSmallIntegerField(default=0)
+    vehicleType = models.CharField(max_length=100, default='', null=True, blank=True)
+    serviceGroup = models.CharField(max_length=100, default='', null=True, blank=True)
+    truckImg1 = models.FileField(null=True, blank=True)
+    truckImg2 = models.FileField(null=True, blank=True)
+    truckImg3 = models.FileField(null=True, blank=True)
+    informationMake = models.CharField(max_length=100, default='', null=True, blank=True)
+    informationModel = models.CharField(max_length=100, default='', null=True, blank=True)
+    informationConfiguration = models.CharField(max_length=100, default='', null=True, blank=True)
+    informationChassis = models.CharField(max_length=100, default='', null=True, blank=True)
+    informationBuildYear = models.PositiveIntegerField(default=0)
+    informationIcon = models.CharField(max_length=100, default='', null=True, blank=True)
+    customFuelCard = models.CharField(max_length=100, default='', null=True, blank=True)
+    customFuelCard = models.CharField(max_length=100, default='', null=True, blank=True)
+    customFuelOldFleetNumber = models.CharField(max_length=100, default='', null=True, blank=True)
+    customOldRego = models.CharField(max_length=100, default='', null=True, blank=True)
+    customRegisteredOwner = models.CharField(max_length=100, default='', null=True, blank=True)
+    customRoadsideAssistance = models.CharField(max_length=100, default='', null=True, blank=True)
+    customPDDNumber = models.CharField(max_length=100, default='', null=True, blank=True)
+    registered = models.BooleanField(default=True)
+    registration = models.CharField(max_length=100, default='', null=True, blank=True)
+    registrationCode = models.CharField(max_length=100, default='', null=True, blank=True)
+    registrationSate = models.CharField(max_length=100, default='', null=True, blank=True)
+    registrationDueDate = models.DateField(null=True, blank=True)
+    registrationInterval = models.CharField(max_length=100, default='', null=True, blank=True)
+    powered = models.BooleanField(default=False)
+    engine = models.CharField(max_length=100, default='', null=True, blank=True)
+    engineMake = models.CharField(max_length=100, default='', null=True, blank=True)
+    engineModel = models.CharField(max_length=100, default='', null=True, blank=True)
+    engineCapacity = models.CharField(max_length=100, default='', null=True, blank=True)
+    engineGearBox = models.CharField(max_length=100, default='', null=True, blank=True)
+
+# DOCUMENTS TAB
 class TruckDocument(models.Model):
     tags = models.CharField(max_length=300)
     filePath = models.FileField(upload_to='static/GearBox/document')

@@ -1,4 +1,4 @@
-<div class="col-md-3 left_col menu_fixed" style="max-height: 100vh; overflow-y: auto;">
+<div class="col-md-3 left_col menu_fixed">
   <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
       <a href="{% url 'Account:index'%}" class="site_title"><i class="fa fa-paw"></i> <span>PNR Group</span></a>
@@ -31,21 +31,178 @@
         </ul>
         {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
         <ul class="nav side-menu">
+          {% comment %} Fleet/Truck section {% endcomment %}
           <li>
-            <a><i class="fa fa-book"></i> Account <span class="fa fa-chevron-down"></span></a>
+            <a><i class="fa fa-book"></i> Fleet Management <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li class=""><a href="{% url 'Account:basePlantTable'%}">Base Plant / Location</a></li>
-
-              <li><a>RCTI section<span class="fa fa-chevron-down"></span></a>
+              <li><a>Assets<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
+                  <li><a>Register<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{% url "gearBox:addGroups" %}">Groups</a></li>
+                      <li><a href="{% url 'gearBox:addSubGroups' %}">Sub groups</a></li>
+                      <li><a href="{% url 'gearBox:truckTable'%}">Trucks</a></li>
+                    </ul>
                   </li>
-                  <li><a href="{% url 'Account:rctiCsvForm'%}">Existing RCTI</a>
+                  <li><a href="#">Repairs</a></li>
+                  <li><a href="#">Services</a></li>
+                  <li><a href="#">Tyres</a></li>
+                  <li><a href="#">Fuel</a></li>
+                  <li><a href="#">Accidents</a></li>
+                  <li><a href="#">Tolls</a></li>
+                </ul>
+              </li>
+              <li><a>Complince<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li><a href="#">Accredited Vehicles</a></li>
+                  <li><a href="#">Book Register</a></li>
+                  <li><a href="#">Inspection</a></li>
+                  <li><a href="#">Permits</a></li>
+                  <li><a href="#">Risk Assesments</a></li>
+                  <li><a href="#">Non Conformances</a></li>
+                  <li><a href="#">Reviews</a></li>
+                  <li><a href="#">Reminders</a></li>
+                </ul>
+              </li>
+              <li><a>Suppliers<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li><a href="#">Approved</a></li>
+                  <li><a href="#">Archived</a></li>
+                </ul>
+              </li>
+              <li><a>Inventory<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li><a href="#">Purchase Order</a></li>
+                  <li><a href="#">Current Stocks</a></li>
+                  <li><a href="#">Re-Order Stocks</a></li>
+                  <li><a href="#">Stores</a></li>
+                  <li><a href="#">Parts Usage</a></li>
+                </ul>
+              </li>
+              <li><a>Pre Start<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                </ul>
+              </li>
+              
+              <li><a href="#">Settings</a>
+            </ul>
+          </li>
+          {% comment %} Employee section {% endcomment %}
+          <li>
+            <a><i class="fa fa-book"></i> Employee Management <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li><a>Employees<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a>Drivers<span class="fa fa-chevron-down"></span></a>
+                      <ul class="nav child_menu">
+                        <li class="sub_menu"><a href="{% url 'Account:driverentry'%}">Driver Entry</a>
+                        </li>
+                        <li><a href="{% url 'gearBox:driversTable'%}">Existing Drivers</a>
+                        </li>
+                      </ul>
+                    </li>
                   </li>
-                  <li><a href="{% url 'Account:UplodedRCTI'%}">Uploded RCTI Files</a>
+                  <li><a href="#">Admin Staff</a>
                   </li>
                 </ul>
               </li>
+              <li><a>Compliance<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="#">Medicals</a>
+                  </li>
+                  <li><a href="#">Training</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a>Safety<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="#">Vehicle Accident</a>
+                  </li>
+                  <li><a href="#">Incedents</a>
+                  </li>
+                  <li><a href="#">Injury</a>
+                  </li>
+                  <li><a href="#">Equipment Issue</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a>Reminder<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  
+                </ul>
+              </li>
+              <li><a>Availability<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li><a>Leaves section<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li class="sub_menu"><a href="{% url 'gearBox:leaveReq'%}">Leave request</a>
+                      </li>
+                      <li><a href="{% url 'gearBox:natureOfLeaves'%}">Nature of leave</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li><a href="#">Settings</a>
+            </ul>
+          </li>
+          {% comment %} Jobs section {% endcomment %}
+          <li>
+            <a><i class="fa fa-book"></i> Jobs <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li><a>Overview<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'Appointment:appointmentForm'%}">Add Job</a>
+                  </li>
+                  <li><a href="#">Find Job</a>
+                  </li>
+                  {% comment %} Driver Trip form data {% endcomment %}
+                  <li><a href="#">Completed Jobs</a></li>
+                </ul>
+              </li>
+              <li><a>Invoicing<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  {% comment %} Verified trips {% endcomment %}
+                  <li class="sub_menu"><a href="#">Charged Jobs</a>
+                  </li>
+
+                  <li><a>Client RCTI<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
+                      </li>
+                      <li><a href="{% url 'Account:rctiCsvForm'%}">Existing RCTI</a>
+                      </li>
+                      <li><a href="{% url 'Account:UplodedRCTI'%}">Uploded RCTI Files</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li><a>Clients<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="{% url 'gearBox:clientTable'%}">Charge Clients</a>
+                  </li>
+                  <li><a href="{% url 'Account:basePlantTable'%}">Client Depot</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a>Reports<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  <li class="sub_menu"><a href="#">Revenue Report</a>
+                  </li>
+                  <li><a href="{% url 'Account:reconciliationForm'%}">Reconciliation Report</a>
+                  </li>
+                  <li><a href="#">Short Paid Report</a>
+                  </li>
+                  <li><a href="#">Expense Report</a>
+                  </li>
+                  <li><a href="#">Custom Report</a>
+                  </li>
+                </ul>
+              </li>
+              <li><a href="#">Settings</a>
+
+
               <li><a>Trip section<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                   <li class="sub_menu"><a href="{% url 'Account:driverTripsTable'%}">Driver trip</a>
@@ -61,7 +218,6 @@
                   <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
                   </li>
                   <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
-
                 </ul>
               </li>
             </ul>
@@ -69,48 +225,12 @@
           <li>
             <a><i class="fa fa-wrench"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li><a href="{% url 'gearBox:clientTable'%}">Clients</a></li>
-
-              <li><a>Drivers section<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="{% url 'Account:driverentry'%}">Driver Entry</a>
-                  </li>
-                  <li><a href="{% url 'gearBox:driversTable'%}">Existing Drivers</a>
-                  </li>
-                </ul>
-              </li>
-
-              <li><a>Leaves section<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="{% url 'gearBox:leaveReq'%}">Leave request</a>
-                  </li>
-                  <li><a href="{% url 'gearBox:natureOfLeaves'%}">Nature of leave</a>
-                  </li>
-                </ul>
-              </li>
 
               <li><a> Trucks section<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="{% url 'gearBox:truckTable'%}">Existing trucks</a>
-                  </li>
-                  <li><a href="{% url "gearBox:addGroups" %}">Groups</a>
-                  </li>
-                  <li><a href="{% url 'gearBox:addSubGroups' %}">Sub groups</a>
-                  </li>
+                  
                 </ul>
               </li>
-            </ul>
-          </li>
-          <li>
-            <a><i class="fa fa-list"></i> Appointments <span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-              <li class=""><a href="{% url 'Appointment:appointmentForm'%}"> Appointments </a></li>
-            </ul>
-          </li>
-          <li>
-            <a><i class="fa fa-bar-chart"></i> Report <span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-              <li class=""><a href="{% url 'Account:reconciliationForm'%}"> Reconciliation </a></li>
             </ul>
           </li>
         </ul>

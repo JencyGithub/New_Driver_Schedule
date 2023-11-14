@@ -88,6 +88,11 @@ def insertIntoDatabase(data,key,fileName):
         # TotalCost 
         driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
 
+        reconciliationDocketObj.driverId = driver.driverId  
+        reconciliationDocketObj.clientId = client.clientId  
+        reconciliationDocketObj.truckId = data[1]   
+        
+
         reconciliationDocketObj.docketNumber = int(docketObj.docketNumber) 
         reconciliationDocketObj.docketDate = docketObj.shiftDate  
         reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
