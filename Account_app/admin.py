@@ -391,7 +391,11 @@ admin.site.register(PublicHoliday)
 admin.site.register(RctiErrors)
 admin.site.register(PastTripError)
 
-admin.site.register(ReconciliationReport)
+class ReconciliationReportAdmin(admin.ModelAdmin):
+    #  list_display = ["reason"]
+    search_fields = ["docketNumber"]
+
+admin.site.register(ReconciliationReport , ReconciliationReportAdmin)
 
 admin.site.register(RctiExpense)
 admin.site.register(Location)

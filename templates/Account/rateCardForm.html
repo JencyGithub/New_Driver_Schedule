@@ -63,9 +63,10 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="rate_card_tds">Rate Card TDS:<span class="required">*</span></label>
+                                    {% comment %} <label for="rate_card_tds">Rate Card TDS:<span class="required">*</span></label> {% endcomment %}
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if rateCard %}{{ rateCard.tds }}{% endif %}" {% if rateCard %}readonly{% endif %} type="number" name="rate_card_tds" required="required" style="padding: 0.25rem 0.2rem;" id="rate_card_tds">
+                                        {% comment %} <input class="form-control" value="{% if rateCard %}{{ rateCard.tds }}{% endif %}" {% if rateCard %}readonly{% endif %} type="number" name="rate_card_tds" required="required" style="padding: 0.25rem 0.2rem;" id="rate_card_tds"> {% endcomment %}
+                                        <input class="form-control" value="0" hidden type="number" name="rate_card_tds" required="required" style="padding: 0.25rem 0.2rem;" id="rate_card_tds">
                                     </div>
                                 </div>
                             </div>

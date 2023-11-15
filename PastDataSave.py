@@ -59,7 +59,7 @@ def insertIntoDatabase(data,key,fileName):
         docketObj.returnKm = 0 if str(data[15]) == 'nan' else data[15]
         docketObj.waitingTimeStart = 0 if str(data[11]) == 'nan' else data[11]
         docketObj.waitingTimeEnd = 0 if str(data[12]) == 'nan' else data[12]
-        docketObj.totalWaitingInMinute = 0 if str(data[13]) == 'nan' else data[13]
+        docketObj.totalWaitingInMinute = 0 if str(data[13]) == 'nan' else data[13] - 40
         docketObj.cubicMl = 0 if str(data[8]) == 'nan' else data[8]
         docketObj.standByStartTime = ' ' if str(data[20]) == 'nan' else data[20]
         docketObj.standByEndTime = ' ' if str(data[21]) == 'nan' else data[21]

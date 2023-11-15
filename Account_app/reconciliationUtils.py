@@ -84,7 +84,7 @@ def checkMinLoadCost(driverDocketNumber,docketDate):
         # minLoad Cost 
         if  driverDocketLoadSize < shiftType.min_load_in_cubic_meters :
             driverDocketObj.minimumLoad = (shiftType.min_load_in_cubic_meters - driverDocketLoadSize)*costParameterObj.loading_cost_per_cubic_meter
-            driverDocketObj.minimumLoad = driverDocketObj.minimumLoad +  (driverDocketKm * costParameterObj.km_cost * driverDocketLoadSize)
+            driverDocketObj.minimumLoad = driverDocketObj.minimumLoad +  (driverDocketKm * costParameterObj.km_cost * (shiftType.min_load_in_cubic_meters - driverDocketLoadSize))
             driverDocketObj.save()
             
             return round(driverDocketObj.minimumLoad,2)
@@ -141,8 +141,8 @@ def checkWaitingTime(driverDocketNumber,docketDate , costDict= costDict):
         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         
-        if driverDocketObj.totalWaitingInMinute > graceObj.chargeable_waiting_time_starts_after:
-            totalWaitingTime = driverDocketObj.totalWaitingInMinute - graceObj.waiting_time_grace_in_minutes
+        if (driverDocketObj.totalWaitingInMinute + 40) > graceObj.chargeable_waiting_time_starts_after:
+            totalWaitingTime = driverDocketObj.totalWaitingInMinute + 40 - graceObj.waiting_time_grace_in_minutes
             if totalWaitingTime > 0: 
                 totalWaitingCost = totalWaitingTime * costParameterObj.waiting_cost_per_minute        
             else:

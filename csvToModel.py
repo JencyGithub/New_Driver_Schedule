@@ -132,23 +132,26 @@ def insertIntoModel(dataList,file_name):
             dataList = dataList[10:]
         RCTIobj.save()
         
-        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+            
         
-        rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
+        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+        rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
+        
+        # rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
         
         if not reconciliationDocketObj :
             reconciliationDocketObj = ReconciliationReport()
         
         reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
         reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotal
+        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
         # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotal  
-        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotal 
-        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotal
+        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
+        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
+        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
         # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotal
-        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotal
+        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
+        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
         reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
         reconciliationDocketObj.fromRcti = True 
         

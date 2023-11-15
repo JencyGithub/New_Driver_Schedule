@@ -314,7 +314,7 @@ def rctiFormSave(request):
     
     reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
     reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-    reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotal
+    reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
     # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
     reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotal  
     reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotal 
@@ -759,7 +759,7 @@ def DriverTripEditForm(request, id):
         driver_trip.shiftDate)
     driver_docket = DriverDocket.objects.filter(tripId=id)
     surcharges = Surcharge.objects.all()
-    count_ = 0
+    count_ = 1
     for i in driver_docket:
         i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
         i.count_ = count_

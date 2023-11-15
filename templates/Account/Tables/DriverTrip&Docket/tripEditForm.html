@@ -47,7 +47,7 @@
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> Driver Trip Edit Form</h2>
+                            <h2> Driver Shift Details</h2>
                             {% if driverTrip.verified is  False  %}
                             <a href="{% url 'Account:driverDocketEntry' ids=driverTrip.id%}"
                                 class="float-right btn btn-dark">Add Docket</a>
@@ -165,7 +165,7 @@
                     {% for item in driverDocket %}
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> Driver Docket Edit Form </h2>
+                            <h2> Load #{{ item.count_}} </h2>
                             <div class="float-right">
                                 <input type="radio" id="tippingToYard{{item.count_}}" name="returnToYard{{item.count_}}" value="tippingToYard{{item.count_}}"
                                 style="margin-top: .8rem;"  onclick="returnToYard_({{item.count_}},this)" {% if item.tippingToYard %} checked {% endif %}>
