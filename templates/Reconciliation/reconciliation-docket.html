@@ -35,7 +35,7 @@
 								<div class="x_content">
 									<br />
 									<form class="form-horizontal form-label-left">
-										<div class="form-group row">
+										<div class="form-group row hidden-field">
 											<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
 												Number : </label>
 											<div class="col-md-9 col-sm-9 ">
@@ -57,6 +57,13 @@
 											<div class="col-md-9 col-sm-9 ">
 												<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="RCTIbasePlant"
 													id="RCTIbasePlant" readonly value={{rctiDocket.docketYard}} required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="Ratecartkmcost" class="control-label col-md-3 col-sm-3 ">Per KM cost:</label>
+											<div class="col-md-9 col-sm-9 ">
+												<input type="text" class="form-control " name="Ratecartkmcost"
+													id="Ratecartkmcost" readonly value="{{ costParameters.km_cost }}" required>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -139,7 +146,7 @@
 								<div class="x_content">
 									<br />
 									<form class="form-horizontal form-label-left">
-										<div class="form-group row">
+										<div class="form-group row hidden-field">
 											<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
 												Number : </label>
 											<div class="col-md-9 col-sm-9 ">
@@ -161,6 +168,13 @@
 											<div class="col-md-9 col-sm-9 ">
 												<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="DriverbasePlant"
 												id="DriverbasePlant" readonly value={{driverDocket.basePlant}} required>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label for="Ratecartkmcost" class="control-label col-md-3 col-sm-3 ">Per KM cost:</label>
+											<div class="col-md-9 col-sm-9 ">
+												<input type="text" class="form-control " name="Ratecartkmcost"
+													id="Ratecartkmcost" readonly value="{{ costParameters.km_cost }}" required>
 											</div>
 										</div>
 										<div class="form-group row">
@@ -247,4 +261,13 @@
 
 	</div>
 </div>
+<script>
+    $(document).ready(function () {
+        // Show/hide fields based on click
+        $('.hidden-field').hide();
+        $('.docket-number-link').click(function () {
+            $('.hidden-field').show();
+        });
+    });
+</script>
 {% endblock %}
