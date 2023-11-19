@@ -28,6 +28,21 @@
 					<div class="col-md-6 ">
 						<div class="x_panel">
 							{% if rctiDocket %}
+								<div class="x_title">
+									<h2>RCTI</h2>
+									<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}" class="btn btn-sm btn-default float-right">View rcti docket</a>
+									<div class="clearfix"></div>
+								</div>
+								<div class="x_content">
+									<br />
+									<form class="form-horizontal form-label-left">
+										<div class="form-group row hidden-field">
+											<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+												Number : </label>
+											<div class="col-md-9 col-sm-9 ">
+												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="RCTIdocketNumber"
+													id="RCTIdocketNumber" readonly value={{rctiDocket.docketNumber}} required>
+											</div>
 							<div class="x_title">
 								<h2>RCTI</h2>
 								<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}"
@@ -73,11 +88,8 @@
 												name="RCTIbasePlant" id="RCTIbasePlant" readonly
 												value={{rctiDocket.docketYard}} required>
 										</div>
-									</div>
-									{% endif %}
-									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
-									<div class="form-group row">
-										<label for="RCTInoOfKm
+										<div class="form-group row">
+											<label for="RCTInoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
 											: </label>
 										<div class="col-md-9 col-sm-9 ">
@@ -337,24 +349,17 @@
 
 								<div class="clearfix"></div>
 
-							</div>
-							<div class="x_content">
-								<br />
-
-
-								{% comment %} miss matched {% endcomment %}
-
-
-								<form class="form-horizontal form-label-left">
-									{% if rctiDocket.docketNumber != driverDocket.docketNumber %}
-									<div class="form-group row">
-										<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
-											Number : </label>
-										<div class="col-md-9 col-sm-9 ">
-											<input type="number"
-												class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}"
-												name="DriverdocketNumber" id="DriverdocketNumber" required readonly
-												value={{driverDocket.docketNumber}}>
+								</div>
+								<div class="x_content">
+									<br />
+									<form class="form-horizontal form-label-left">
+										<div class="form-group row">
+											<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+												Number : </label>
+											<div class="col-md-9 col-sm-9 ">
+												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="DriverdocketNumber"
+													id="DriverdocketNumber" required readonly value={{driverDocket.docketNumber}}>
+											</div>
 										</div>
 									</div>
 									{% endif %}
@@ -381,11 +386,8 @@
 												name="DriverbasePlant" id="DriverbasePlant" readonly
 												value={{driverDocket.basePlant}} required>
 										</div>
-									</div>
-									{% endif %}
-									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
-									<div class="form-group row">
-										<label for="DrivernoOfKm
+										<div class="form-group row">
+											<label for="DrivernoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
 											: </label>
 										<div class="col-md-9 col-sm-9 ">
@@ -647,4 +649,13 @@
 
 	</div>
 </div>
+<script>
+    $(document).ready(function () {
+        // Show/hide fields based on click
+        $('.hidden-field').hide();
+        $('.docket-number-link').click(function () {
+            $('.hidden-field').show();
+        });
+    });
+</script>
 {% endblock %}
