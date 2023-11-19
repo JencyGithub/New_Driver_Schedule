@@ -176,6 +176,7 @@ class PublicHoliday(models.Model):
 
 class PastTripError(models.Model):
     tripDate = models.CharField(max_length=255, default=None, null=True, blank=True) 
+    truckNo = models.IntegerField(default=0) 
     docketNumber = models.CharField(max_length=255, default=None, null=True, blank=True)
     lineNumber =  models.CharField(max_length=255, default=None, null=True, blank=True)   
     errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)

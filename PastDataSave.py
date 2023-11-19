@@ -8,6 +8,14 @@ from Account_app.reconciliationUtils import  *
 def insertIntoDatabase(data,key,fileName):
     existingTrip = None
     
+    
+    # else condition 
+    driverName = data[4].strip().replace(' ','').lower()
+    client = Client.objects.get_or_create(name = 'Boral')[0]
+    driver = Driver.objects.get(name = driverName)
+
+    
+    
     # Trip save
     try:
         existingTrip = DriverTrip.objects.filter(truckNo = data[1],shiftDate = data[0]).values().first()
@@ -15,12 +23,8 @@ def insertIntoDatabase(data,key,fileName):
         if existingTrip:
             tripObj = DriverTrip.objects.get(pk=existingTrip['id'])
         else:
-            driverName = data[4].strip().replace(' ','').lower()
-            client = Client.objects.get_or_create(name = 'Boral')[0]
-            driver = Driver.objects.get(name = driverName)
             shiftType = 'Day'
             shiftDate =  str(data[0]).split(' ')[0]
-            
             tripObj = DriverTrip(
                 verified = True,
                 driverId = driver,
@@ -39,16 +43,26 @@ def insertIntoDatabase(data,key,fileName):
             tripObj.startTime = getMaxTimeFromTwoTime(str(tripObj.startTime),str(data[6]),'min')
             tripObj.endTime = getMaxTimeFromTwoTime(str(tripObj.endTime),str(data[7]))
         else:
-            tripObj.startTime = str(data[6])
+            tripObj.startTime =str(data[6])
             tripObj.endTime = str(data[7])
             
         tripObj.save()
 
-        basePlant = BasePlant.objects.get_or_create(basePlant = "Not selected")[0] 
-        surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'Nosurcharge')[0]
+        basePlant = BasePlant.objects.get_or_create(basePlant = "Not Selected")[0] 
+        surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
             
         docketObj = DriverDocket()
-
+        
+        
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = tripObj.shiftDate,endDate__gte = tripObj.shiftDate, clientId = tripObj.clientName).first()
+        rateCard = clientTruckConnectionObj.rate_card_name
+        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
+        if int(data[13]) > int(graceObj.waiting_time_grace_in_minutes):
+            totalWaitingTime = int(data[13]) - graceObj.waiting_time_grace_in_minutes
+        else:
+            totalWaitingTime = 0
+        
         docketObj.shiftDate = ' ' if str(data[0]) == 'nan' else data[0]
         docketObj.tripId = tripObj
         docketObj.docketNumber = data[5]
@@ -59,7 +73,8 @@ def insertIntoDatabase(data,key,fileName):
         docketObj.returnKm = 0 if str(data[15]) == 'nan' else data[15]
         docketObj.waitingTimeStart = 0 if str(data[11]) == 'nan' else data[11]
         docketObj.waitingTimeEnd = 0 if str(data[12]) == 'nan' else data[12]
-        docketObj.totalWaitingInMinute = 0 if str(data[13]) == 'nan' else data[13] - 40
+        # docketObj.totalWaitingInMinute = 0 if str(data[13]) == 'nan' else data[13] - 40
+        docketObj.totalWaitingInMinute = totalWaitingTime
         docketObj.cubicMl = 0 if str(data[8]) == 'nan' else data[8]
         docketObj.standByStartTime = ' ' if str(data[20]) == 'nan' else data[20]
         docketObj.standByEndTime = ' ' if str(data[21]) == 'nan' else data[21]
@@ -114,6 +129,7 @@ def insertIntoDatabase(data,key,fileName):
         pastTripErrorObj = PastTripError(
             tripDate = data[0].strftime('%Y-%m-%d'),
             docketNumber = data[5],
+            truckNo = data[1],
             lineNumber = key,
             errorFromPastTrip = e,
             fileName = fileName.split('@_!')[-1]

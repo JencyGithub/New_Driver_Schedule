@@ -93,13 +93,13 @@ def getYesterdayDate(curDate):
         return None
 
     
-def getTimeDifference(startDate,endDate):
+def getTimeDifference(startTime,endTime):
     try:
-        # print(startDate,endDate)
-        startDate = int(startDate[0:2])*60 + int(startDate[3:5])
-        endDate = int(endDate[0:2])*60 + int(endDate[3:5])
-        print(startDate,endDate)
-        return abs(endDate-startDate)
+        # print(startTime,endTime)
+        startTime = int(startTime[0:2])*60 + int(startTime[3:5])
+        endTime = int(endTime[0:2])*60 + int(endTime[3:5])
+        print(startTime,endTime)
+        return abs(endTime-startTime)
     except Exception as e:
         return e
 

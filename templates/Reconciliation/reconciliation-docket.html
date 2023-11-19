@@ -5,11 +5,12 @@
 {% block headStyle %}
 
 <style>
-    .isInvalid {
-        border: 1px solid rgb(255, 0, 0) !important;
-    }
-	input{
-		background-color:white!important;
+	.isInvalid {
+		border: 1px solid rgb(255, 0, 0) !important;
+	}
+
+	input {
+		background-color: white !important;
 	}
 </style>
 {% endblock %}
@@ -27,207 +28,606 @@
 					<div class="col-md-6 ">
 						<div class="x_panel">
 							{% if rctiDocket %}
-								<div class="x_title">
-									<h2>RCTI</h2>
-									<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}" class="btn btn-sm btn-default float-right">View rcti docket</a>
-									<div class="clearfix"></div>
-								</div>
-								<div class="x_content">
-									<br />
-									<form class="form-horizontal form-label-left">
-										<div class="form-group row">
-											<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
-												Number : </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="RCTIdocketNumber"
-													id="RCTIdocketNumber" readonly value={{rctiDocket.docketNumber}} required>
-											</div>
+							<div class="x_title">
+								<h2>RCTI</h2>
+								<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}"
+									class="btn btn-sm btn-default float-right">View rcti docket</a>
+								<div class="clearfix"></div>
+							</div>
+							<div class="x_content">
+								<br />
+								{% comment %} Not Matched {% endcomment %}
+								<form class="form-horizontal form-label-left">
+									{% if rctiDocket.docketNumber != driverDocket.docketNumber %}
+									<div class="form-group row">
+										<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+											Number : </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}"
+												name="RCTIdocketNumber" id="RCTIdocketNumber" readonly
+												value={{rctiDocket.docketNumber}} required>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
-												Date
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="date" class="form-control {% if rctiDocket.docketDate != driverDocket.shiftDate %}isInvalid{% endif %}" name="RCTIdocketDate"
-													id="RCTIdocketDate" readonly value={{rctiDocket.docketDate}} required>
-											</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.docketDate != driverDocket.shiftDate %}
+									<div class="form-group row">
+										<label for="RCTIdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
+											Date
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="date"
+												class="form-control {% if rctiDocket.docketDate != driverDocket.shiftDate %}isInvalid{% endif %}"
+												name="RCTIdocketDate" id="RCTIdocketDate" readonly
+												value={{rctiDocket.docketDate}} required>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading site:</label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="RCTIbasePlant"
-													id="RCTIbasePlant" readonly value={{rctiDocket.docketYard}} required>
-											</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.docketYard != driverDocket.basePlant %}
+									<div class="form-group row">
+										<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
+											site:</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="text"
+												class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}"
+												name="RCTIbasePlant" id="RCTIbasePlant" readonly
+												value={{rctiDocket.docketYard}} required>
 										</div>
-										<div class="form-group row">
-											<label for="RCTInoOfKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
+									<div class="form-group row">
+										<label for="RCTInoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.noOfKm != driverDocket.noOfKm %}isInvalid{% endif %}" name="RCTInoOfKm" id="RCTInoOfKm"
-													required readonly value={{rctiDocket.noOfKm}}>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.noOfKm != driverDocket.noOfKm %}isInvalid{% endif %}"
+												name="RCTInoOfKm" id="RCTInoOfKm" required readonly
+												value={{rctiDocket.noOfKm}}>
 										</div>
-										<div class="form-group row">
-											<label for="RCTItransferKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.transferKM != driverDocket.transferKM %}
+									<div class="form-group row">
+										<label for="RCTItransferKm
 											" class="control-label col-md-3 col-sm-3 "> Transfer KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.transferKM != driverDocket.transferKM %}isInvalid{% endif %}" name="RCTItransferKm"
-													id="RCTItransferKm" required readonly value={{rctiDocket.transferKM}}>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.transferKM != driverDocket.transferKM %}isInvalid{% endif %}"
+												name="RCTItransferKm" id="RCTItransferKm" required readonly
+												value={{rctiDocket.transferKM}}>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIreturnKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.returnKm != driverDocket.returnKm %}
+									<div class="form-group row">
+										<label for="RCTIreturnKm
 											" class="control-label col-md-3 col-sm-3 "> Return KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.returnKm != driverDocket.returnKm %}isInvalid{% endif %}" name="RCTIreturnKm"
-													id="RCTIreturnKm" required readonly value={{rctiDocket.returnKm}}>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.returnKm != driverDocket.returnKm %}isInvalid{% endif %}"
+												name="RCTIreturnKm" id="RCTIreturnKm" required readonly
+												value={{rctiDocket.returnKm}}>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIwaitingTimeMinutes
+									</div>
+									{% endif %}
+									{% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}
+									<div class="form-group row">
+										<label for="RCTIwaitingTimeMinutes
 											" class="control-label col-md-3 col-sm-3 "> Waiting time minute
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}isInvalid{% endif %}" name="RCTIwaitingTimeMinutes"
-													id="RCTIwaitingTimeMinutes" required readonly value={{rctiDocket.waitingTimeInMinutes}}>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}isInvalid{% endif %}"
+												name="RCTIwaitingTimeMinutes" id="RCTIwaitingTimeMinutes" required
+												readonly value={{rctiDocket.waitingTimeInMinutes}}>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIsurchargeDuration
+									</div>
+									{% endif %}
+									{% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}
+									<div class="form-group row">
+										<label for="RCTIsurchargeDuration
 											" class="control-label col-md-3 col-sm-3 "> Surcharge duration
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control  {% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}isInvalid{% endif %}" name="RCTIsurchargeDuration"
-													id="RCTIsurchargeDuration" required readonly value={{rctiDocket.surcharge_duration}}>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control  {% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}isInvalid{% endif %}"
+												name="RCTIsurchargeDuration" id="RCTIsurchargeDuration" required
+												readonly value={{rctiDocket.surcharge_duration}}>
+										</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.cubicMl != driverDocket.cubicMl %}
+									<div class="form-group row">
+										<label for="RCTIcubicMl" class="control-label col-md-3 col-sm-3"> Cubic Ml:
+										</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.cubicMl != driverDocket.cubicMl %}isInvalid{% endif %}"
+												name="RCTIcubicMl" id="RCTIcubicMl" required readonly
+												value={{rctiDocket.cubicMl}}>
+										</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.othersCost != driverDocket.others %}
+									<div class="form-group row">
+										<label for="RCTIotherCost" class="control-label col-md-3 col-sm-3"> Other cost:
+										</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.othersCost != driverDocket.others %}isInvalid{% endif %}"
+												name="RCTIotherCost" id="RCTIotherCost" required readonly
+												value={{rctiDocket.othersCost}}>
+										</div>
+									</div>
+									{% endif %}
+								</form>
+
+								{% comment %} Matched {% endcomment %}
+								 
+
+								<!-- Start to do list -->
+								<div class="col-md-12 col-sm-12  ">
+									<div class="x_panel">
+										<div class="x_title">
+											<h2>RCTI</h2>
+											<ul class="nav navbar-right panel_toolbox">
+												<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+												</li>
+												<li><a class="close-link"><i class="fa fa-close"></i></a>
+												</li>
+											</ul>
+											<div class="clearfix"></div>
+										</div>
+										<div class="x_content">
+
+											<div class="">
+												<form class="form-horizontal form-label-left">
+													{% if rctiDocket.docketNumber != 0 %}
+													<div class="form-group row">
+														<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+															Number : </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTIdocketNumber" id="RCTIdocketNumber" readonly
+																value={{rctiDocket.docketNumber}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.docketDate != 0 %}
+													<div class="form-group row">
+														<label for="RCTIdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
+															Date
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="date"
+																class="form-control "
+																name="RCTIdocketDate" id="RCTIdocketDate" readonly
+																value={{rctiDocket.docketDate}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.docketYard != 0 %}
+													<div class="form-group row">
+														<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
+															site:</label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="text"
+																class="form-control "
+																name="RCTIbasePlant" id="RCTIbasePlant" readonly
+																value={{rctiDocket.docketYard}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.noOfKm != 0 %}
+													<div class="form-group row">
+														<label for="RCTInoOfKm
+															" class="control-label col-md-3 col-sm-3 "> Number of KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTInoOfKm" id="RCTInoOfKm" required readonly
+																value={{rctiDocket.noOfKm}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.transferKM != 0 %}
+													<div class="form-group row">
+														<label for="RCTItransferKm
+															" class="control-label col-md-3 col-sm-3 "> Transfer KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTItransferKm" id="RCTItransferKm" required readonly
+																value={{rctiDocket.transferKM}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.returnKm != 0 %}
+													<div class="form-group row">
+														<label for="RCTIreturnKm
+															" class="control-label col-md-3 col-sm-3 "> Return KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTIreturnKm" id="RCTIreturnKm" required readonly
+																value={{rctiDocket.returnKm}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.waitingTimeInMinutes != 0 %}
+													<div class="form-group row">
+														<label for="RCTIwaitingTimeMinutes
+															" class="control-label col-md-3 col-sm-3 "> Waiting time minute
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTIwaitingTimeMinutes" id="RCTIwaitingTimeMinutes" required
+																readonly value={{rctiDocket.waitingTimeInMinutes}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.surcharge_duration != 0 %}
+													<div class="form-group row">
+														<label for="RCTIsurchargeDuration
+															" class="control-label col-md-3 col-sm-3 "> Surcharge duration
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control  "
+																name="RCTIsurchargeDuration" id="RCTIsurchargeDuration" required
+																readonly value={{rctiDocket.surcharge_duration}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.cubicMl != 0 %}
+													<div class="form-group row">
+														<label for="RCTIcubicMl" class="control-label col-md-3 col-sm-3"> Cubic Ml:
+														</label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTIcubicMl" id="RCTIcubicMl" required readonly
+																value={{rctiDocket.cubicMl}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if rctiDocket.othersCost != 0 %}
+													<div class="form-group row">
+														<label for="RCTIotherCost" class="control-label col-md-3 col-sm-3"> Other cost:
+														</label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number"
+																class="form-control "
+																name="RCTIotherCost" id="RCTIotherCost" required readonly
+																value={{rctiDocket.othersCost}}>
+														</div>
+													</div>
+													{% endif %}
+												</form> 
 											</div>
 										</div>
-										<div class="form-group row">
-											<label for="RCTIcubicMl" class="control-label col-md-3 col-sm-3"> Cubic Ml: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.cubicMl != driverDocket.cubicMl %}isInvalid{% endif %}" name="RCTIcubicMl"
-													id="RCTIcubicMl" required readonly value={{rctiDocket.cubicMl}}>
-											</div>
-										</div>
-										<div class="form-group row">
-											<label for="RCTIotherCost" class="control-label col-md-3 col-sm-3"> Other cost: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.othersCost != driverDocket.others %}isInvalid{% endif %}" name="RCTIotherCost"
-													id="RCTIotherCost" required readonly value={{rctiDocket.othersCost}}>
-											</div>
-										</div>
-									</form>
+									</div>
 								</div>
+								<!-- End to do list -->
+
+							</div>
 							{% else %}
-								<h3 style="text-align:center;">No Record Found From RCTI.</h3>
+							<h3 style="text-align:center;">No Record Found From RCTI.</h3>
 							{% endif %}
 						</div>
 					</div>
 					<div class="col-md-6 ">
 						<div class="x_panel">
 							{% if driverDocket %}
-								<div class="x_title">
-									<h2>Driver</h2>
-									<a href="{% url 'Account:docketView' ids=driverDocket.tripId.id driverDocketNumber=driverDocket.docketNumber %}" class="btn btn-sm btn-default float-right">View driver docket</a>
-									<a href="{% url 'Account:DriverTripEdit' id=driverDocket.tripId.id%}" class="btn btn-sm btn-default float-right">View Trip</a>
+							<div class="x_title">
+								<h2>Driver</h2>
+								<a href="{% url 'Account:docketView' ids=driverDocket.tripId.id driverDocketNumber=driverDocket.docketNumber %}"
+									class="btn btn-sm btn-default float-right">View driver docket</a>
+								<a href="{% url 'Account:DriverTripEdit' id=driverDocket.tripId.id%}"
+									class="btn btn-sm btn-default float-right">Driver Shift Details</a>
 
-									<div class="clearfix"></div>
+								<div class="clearfix"></div>
 
-								</div>
-								<div class="x_content">
-									<br />
-									<form class="form-horizontal form-label-left">
-										<div class="form-group row">
-											<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
-												Number : </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="DriverdocketNumber"
-													id="DriverdocketNumber" required readonly value={{driverDocket.docketNumber}}>
-											</div>
+							</div>
+							<div class="x_content">
+								<br />
+
+
+								{% comment %} miss matched {% endcomment %}
+
+
+								<form class="form-horizontal form-label-left">
+									{% if rctiDocket.docketNumber != driverDocket.docketNumber %}
+									<div class="form-group row">
+										<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+											Number : </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}"
+												name="DriverdocketNumber" id="DriverdocketNumber" required readonly
+												value={{driverDocket.docketNumber}}>
 										</div>
-										<div class="form-group row">
-											<label for="DriverdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
-												Date
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="date" class="form-control {% if rctiDocket.docketDate != driverDocket.shiftDate %}isInvalid{% endif %}" name="DriverdocketDate"
-													id="DriverdocketDate" required readonly value={{driverDocket.shiftDate}}>
-											</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.docketDate != driverDocket.shiftDate %}
+									<div class="form-group row">
+										<label for="DriverdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
+											Date
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="date"
+												class="form-control {% if rctiDocket.docketDate != driverDocket.shiftDate %}isInvalid{% endif %}"
+												name="DriverdocketDate" id="DriverdocketDate" required readonly
+												value={{driverDocket.shiftDate}}>
 										</div>
-										<div class="form-group row">
-											<label for="DriverbasePlant" class="control-label col-md-3 col-sm-3 ">Loading site:</label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="text" class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}" name="DriverbasePlant"
-												id="DriverbasePlant" readonly value={{driverDocket.basePlant}} required>
-											</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.docketYard != driverDocket.basePlant %}
+									<div class="form-group row">
+										<label for="DriverbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
+											site:</label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="text"
+												class="form-control {% if rctiDocket.docketYard != driverDocket.basePlant %}isInvalid{% endif %}"
+												name="DriverbasePlant" id="DriverbasePlant" readonly
+												value={{driverDocket.basePlant}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DrivernoOfKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
+									<div class="form-group row">
+										<label for="DrivernoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control  {% if rctiDocket.noOfKm != driverDocket.noOfKm %}isInvalid{% endif %}" name="DrivernoOfKm"
-													id="DrivernoOfKm" readonly value={{driverDocket.noOfKm}} required> 
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control  {% if rctiDocket.noOfKm != driverDocket.noOfKm %}isInvalid{% endif %}"
+												name="DrivernoOfKm" id="DrivernoOfKm" readonly
+												value={{driverDocket.noOfKm}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DrivertransferKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.transferKM != driverDocket.transferKM %}
+									<div class="form-group row">
+										<label for="DrivertransferKm
 											" class="control-label col-md-3 col-sm-3 "> Transfer KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.transferKM != driverDocket.transferKM %}isInvalid{% endif %}" name="DrivertransferKm"
-													id="DrivertransferKm" readonly value={{driverDocket.transferKM}} required>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.transferKM != driverDocket.transferKM %}isInvalid{% endif %}"
+												name="DrivertransferKm" id="DrivertransferKm" readonly
+												value={{driverDocket.transferKM}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DriverreturnKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.returnKm != driverDocket.returnKm %}
+									<div class="form-group row">
+										<label for="DriverreturnKm
 											" class="control-label col-md-3 col-sm-3 "> Return KM
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.returnKm != driverDocket.returnKm %}isInvalid{% endif %}" name="DriverreturnKm"
-													id="DriverreturnKm" readonly value={{driverDocket.returnKm}}  required>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.returnKm != driverDocket.returnKm %}isInvalid{% endif %}"
+												name="DriverreturnKm" id="DriverreturnKm" readonly
+												value={{driverDocket.returnKm}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DriverwaitingTimeMinutes
+									</div>
+									{% endif %}
+									{% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}
+									<div class="form-group row">
+										<label for="DriverwaitingTimeMinutes
 											" class="control-label col-md-3 col-sm-3 "> Waiting time minute
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}isInvalid{% endif %}" name="DriverwaitingTimeMinutes"
-													id="DriverwaitingTimeMinutes" readonly value={{driverDocket.totalWaitingInMinute}} required>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}isInvalid{% endif %}"
+												name="DriverwaitingTimeMinutes" id="DriverwaitingTimeMinutes" readonly
+												value={{driverDocket.totalWaitingInMinute}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DriversurchargeDuration
+									</div>
+									{% endif %}
+									{% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}
+									<div class="form-group row">
+										<label for="DriversurchargeDuration
 											" class="control-label col-md-3 col-sm-3 "> Surcharge duration
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}isInvalid{% endif %}" name="DriversurchargeDuration"
-													id="DriversurchargeDuration" readonly value={{driverDocket.surcharge_duration}} required>
-											</div>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}isInvalid{% endif %}"
+												name="DriversurchargeDuration" id="DriversurchargeDuration" readonly
+												value={{driverDocket.surcharge_duration}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DrivercubicMl
+									</div>
+									{% endif %}
+									{% if rctiDocket.cubicMl != driverDocket.cubicMl %}
+									<div class="form-group row">
+										<label for="DrivercubicMl
 											" class="control-label col-md-3 col-sm-3 "> Cubic Ml
-												: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.cubicMl != driverDocket.cubicMl %}isInvalid{% endif %}" name="DrivercubicMl"
-													id="DrivercubicMl" readonly value={{driverDocket.cubicMl}} required>
+											: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.cubicMl != driverDocket.cubicMl %}isInvalid{% endif %}"
+												name="DrivercubicMl" id="DrivercubicMl" readonly
+												value={{driverDocket.cubicMl}} required>
+										</div>
+									</div>
+									{% endif %}
+									{% if rctiDocket.othersCost != driverDocket.others %}
+									<div class="form-group row">
+										<label for="DriverOtherCost" class="control-label col-md-3 col-sm-3"> Other
+											cost: </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.othersCost != driverDocket.others %}isInvalid{% endif %}"
+												name="DriverOtherCost" id="DriverOtherCost" required readonly
+												value={{driverDocket.others}}>
+										</div>
+									</div>
+									{% endif %}
+
+								</form>
+
+								{% comment %} matched {% endcomment %}
+								<!-- Start to do list -->
+								<div class="col-md-12 col-sm-12  ">
+									<div class="x_panel">
+										<div class="x_title">
+											<h2>Driver  <small></small></h2>
+											<ul class="nav navbar-right panel_toolbox">
+												<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+												</li>
+												<li><a class="close-link"><i class="fa fa-close"></i></a>
+												</li>
+											</ul>
+											<div class="clearfix"></div>
+										</div>
+										<div class="x_content">
+
+											<div class="">
+												<form class="form-horizontal form-label-left">
+													{% if driverDocket.docketNumber != 0 %}
+													<div class="form-group row">
+														<label for="DriverdocketNumber"
+															class="control-label col-md-3 col-sm-3 "> Docket
+															Number : </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DriverdocketNumber" id="DriverdocketNumber"
+																required readonly value={{driverDocket.docketNumber}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.shiftDate != 0 %}
+													<div class="form-group row">
+														<label for="DriverdocketDate"
+															class="control-label col-md-3 col-sm-3 "> Docket
+															Date
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="date" class="form-control"
+																name="DriverdocketDate" id="DriverdocketDate" required
+																readonly value={{driverDocket.shiftDate}}>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.basePlant != 0 %}
+													<div class="form-group row">
+														<label for="DriverbasePlant"
+															class="control-label col-md-3 col-sm-3 ">Loading
+															site:</label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="text" class="form-control"
+																name="DriverbasePlant" id="DriverbasePlant" readonly
+																value={{driverDocket.basePlant}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.noOfKm != 0 %}
+													<div class="form-group row">
+														<label for="DrivernoOfKm
+														" class="control-label col-md-3 col-sm-3 "> Number of KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control "
+																name="DrivernoOfKm" id="DrivernoOfKm" readonly
+																value={{driverDocket.noOfKm}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.transferKM != 0 %}
+													<div class="form-group row">
+														<label for="DrivertransferKm
+														" class="control-label col-md-3 col-sm-3 "> Transfer KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DrivertransferKm" id="DrivertransferKm" readonly
+																value={{driverDocket.transferKM}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.returnKm != 0 %}
+													<div class="form-group row">
+														<label for="DriverreturnKm
+														" class="control-label col-md-3 col-sm-3 "> Return KM
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DriverreturnKm" id="DriverreturnKm" readonly
+																value={{driverDocket.returnKm}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.totalWaitingInMinute != 0 %}
+													<div class="form-group row">
+														<label for="DriverwaitingTimeMinutes
+														" class="control-label col-md-3 col-sm-3 "> Waiting time minute
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DriverwaitingTimeMinutes"
+																id="DriverwaitingTimeMinutes" readonly
+																value={{driverDocket.totalWaitingInMinute}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.surcharge_duration != 0 %}
+													<div class="form-group row">
+														<label for="DriversurchargeDuration
+														" class="control-label col-md-3 col-sm-3 "> Surcharge duration
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DriversurchargeDuration"
+																id="DriversurchargeDuration" readonly
+																value={{driverDocket.surcharge_duration}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.cubicMl != 0 %}
+													<div class="form-group row">
+														<label for="DrivercubicMl
+														" class="control-label col-md-3 col-sm-3 "> Cubic Ml
+															: </label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DrivercubicMl" id="DrivercubicMl" readonly
+																value={{driverDocket.cubicMl}} required>
+														</div>
+													</div>
+													{% endif %}
+													{% if driverDocket.others != 0 %}
+													<div class="form-group row">
+														<label for="DriverOtherCost"
+															class="control-label col-md-3 col-sm-3"> Other cost:
+														</label>
+														<div class="col-md-9 col-sm-9 ">
+															<input type="number" class="form-control"
+																name="DriverOtherCost" id="DriverOtherCost" required
+																readonly value={{driverDocket.others}}>
+														</div>
+													</div>
+													{% endif %}
+
+												</form>
 											</div>
 										</div>
-										<div class="form-group row">
-											<label for="DriverOtherCost" class="control-label col-md-3 col-sm-3"> Other cost: </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.othersCost != driverDocket.others %}isInvalid{% endif %}" name="DriverOtherCost"
-													id="DriverOtherCost" required readonly value={{driverDocket.others}}>
-											</div>
-										</div>
-									</form>
+									</div>
 								</div>
+								<!-- End to do list -->
+
+							</div>
 							{% else %}
-								<h3 style="text-align:center;">No Record Found From Driver Side.</h3>							
+							<h3 style="text-align:center;">No Record Found From Driver Side.</h3>
 							{% endif %}
 						</div>
 					</div>

@@ -127,7 +127,7 @@ def checkSurcharge(driverDocketNumber,docketDate, costDict = costDict):
         # print(f'{driverDocketNumber}Surcharge : {e}')
         return -404.0
         
-def checkWaitingTime(driverDocketNumber,docketDate , costDict= costDict):
+def checkWaitingTime(driverDocketNumber,docketDate):
     try:
         # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
         date_= docketDate

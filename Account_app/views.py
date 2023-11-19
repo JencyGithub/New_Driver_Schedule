@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 ,reverse
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
@@ -440,8 +440,11 @@ def driverEntrySave(request):
         return HttpResponse(f"Error: {str(e)}")
 
 
-def driverDocketEntry(request, ids, driverDocketNumber=None):
+def driverDocketEntry(request, ids, driverDocketNumber=None , flag = None):
     
+    if flag:
+        
+        return HttpResponse(flag)
     surcharges = Surcharge.objects.all()
 
     docketData = None
@@ -467,6 +470,8 @@ def driverDocketEntry(request, ids, driverDocketNumber=None):
 
 def driverDocketEntrySave(request, ids):
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
+   
+
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     shiftDate_ = request.POST.get('shiftDate')
     surchargeObj = Surcharge.objects.get(pk=request.POST.get('surcharge_type'))
@@ -507,6 +512,21 @@ def driverDocketEntrySave(request, ids):
         DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
         DriverDocketObj.comment = request.POST.get('comment')
         DriverDocketObj.save()
+        driver_dockets = DriverDocket.objects.filter(tripId=driver_trip_id)
+
+        # Count the number of objects in the queryset
+        no_of_loads = driver_dockets.count()
+        driver_trip_id.numberOfLoads = no_of_loads
+
+        driver_trip_id.save()
+        try:
+            errorObj = PastTripError.objects.filter(tripDate=driver_trip_id.shiftDate,truckNo=driver_trip_id.truckNo).first() 
+            errorObj.status =False
+            errorObj.save()
+            # return HttpResponse(errorObj.status)
+        except:
+            pass
+     
         messages.success(request, "Docket Added successfully")
         return redirect('Account:driverTripsTable')
 
@@ -1248,13 +1268,46 @@ def PastTripForm(request):
     }
     return render(request, 'Account/pastTrip.html', params)
 
-def pastTripErrorSolve(request,id):
+def pastTripErrorSolve(request, id):
     errorObj = PastTripError.objects.filter(pk=id).first()
-    if errorObj is not None:
-        errorObj.status = False
-        errorObj.save()
-    messages.success(request, "Error Solved")
-    return redirect('Account:pastTripForm')
+
+    # Try to get the DriverTrip
+    tripObj = DriverTrip.objects.filter(shiftDate=errorObj.tripDate, truckNo=errorObj.truckNo).first()
+
+    if tripObj:
+        # Convert docketNumber to an integer (if needed)
+        docketNumber = round(float(errorObj.docketNumber), 0)
+
+        # Create the parameters dictionary
+        params_dict = {
+            'ids': tripObj.id,
+            'driverDocketNumber': docketNumber,
+            'flag': 'True'  # Convert boolean to string
+        }
+
+        # Redirect to 'pastTripErrorDocketView' with parameters
+        url_name = 'Account:pastTripErrorDocketView'
+        return redirect(url_name, **params_dict)
+    else:
+        # Handle the case where tripObj is None
+        return HttpResponse("Error: Trip not found")
+
+    # return redirect(url_name,ids = tripObj.id , driverDocketNumber = docketNumber , flag = 'error')
+        # # account_url = reverse('Account:driverDocketEntry', kwargs={'ids': tripObj.id})
+        # docketNumber = round(float(errorObj.docketNumber),2)
+        # params = {
+        #     'ids': tripObj.id,
+        #     'driverDocketNumber': docketNumber
+        # }
+        # account_url = reverse('Account:driverDocketEntry', kwargs= params)
+        # # return HttpResponse(account_url)
+
+        # return redirect(account_url)
+    # except Exception as e :
+    #     print(f'{e}')
+    #     return HttpResponse({e})
+        
+    # return HttpResponse(tripObj)
     
 
 @csrf_protect

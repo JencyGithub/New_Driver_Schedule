@@ -213,30 +213,34 @@ def insertIntoExpenseModel(dataList , file_name):
             )
             rctiErrorObj.save()
             
-f = open("File_name_file.txt", 'r')
-file_name = f.read()
-# file_name = file_name.strip()
-file_name = file_name.split('<>')
+try:
+    
+            
+    with open("File_name_file.txt", 'r') as f:
+        file_name = f.read()
+    # file_name = file_name.strip()
+    file_name = file_name.split('<>')
 
-# file_name = 'converted_20231030113104@_!pdf1.csv'
-convertFileName = file_name[0].split('@_!')[1]
+    # file_name = 'converted_20231030113104@_!pdf1.csv'
+    convertFileName = file_name[0].split('@_!')[1]
 
-file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
-file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
-reader = csv.reader(file)
-next(reader)
+    file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
+    reader = csv.reader(file)
+    next(reader)
 
-for row in reader:
-    insertIntoModel(row,convertFileName)
+    for row in reader:
+        insertIntoModel(row,convertFileName)
 
-# Expense 
+    # Expense 
 
 
-fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
-fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
-reader = csv.reader(fileExpense)
-next(reader)
-for row in reader:
-    # print(row)
-    insertIntoExpenseModel(row , convertFileName)
+    fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
+    reader = csv.reader(fileExpense)
+    next(reader)
+    for row in reader:
+        # print(row)
+        insertIntoExpenseModel(row , convertFileName)
         
+except Exception as e:
+    with open ('Expense_error.txt','a') as f:
+        f.write(str(e))

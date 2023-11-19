@@ -112,6 +112,7 @@ urlpatterns = [
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
+    path('pastTrip/error/docketView/<int:ids>/<int:driverDocketNumber>/<str:flag>/', views.driverDocketEntry, name='pastTripErrorDocketView'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'), 
     

@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Public holiday {% endblock %}
+{% block title %} | PAst Trip {% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -64,11 +64,11 @@
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Past trip</h2>
-                        <a href="/static/subprocessFiles/errorFromPastTrip.txt" class="btn float-right"
+                        {% comment %} <a href="/static/subprocessFiles/errorFromPastTrip.txt" class="btn float-right"
                             target="_blanck">
                             <i class="fa fa-download"></i>
                             Get errors
-                        </a>
+                        </a> {% endcomment %}
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -144,6 +144,7 @@
                                                                     <tr>
                                                                         <th>Status</th>
                                                                         <th>Docket Date</th>
+                                                                        <th>Truck No</th>
                                                                         <th>Line number</th>
                                                                         <th>Docket Number</th>
                                                                         <th>Error Description</th>
@@ -157,16 +158,15 @@
                                                                         <td><i class="fa fa-close text-danger ">
                                                                         </td>
                                                                         <td>{{ error.tripDate }}</td>
+                                                                        <td>{{ error.truckNo }}</td>
                                                                         <td>{{ error.lineNumber }}</td>
                                                                         <td>{{ error.docketNumber }}</td>
                                                                         <td>{{ error.errorFromPastTrip }}</td>
                                                                         <td>{{ error.fileName }}</td>
                                                                         <td>
-                                                                            <a href='{% url "Account:pastTripErrorSolve" id=error.id %}'
-                                                                                title="solved"
-                                                                                class="btn btn-sm btn-success">
-                                                                                Solved
-                                                                            </a>
+                                                                        {% if not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                        <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Solve  </a>
+                                                                        {% endif %}
                                                                         </td>
                                                                     </tr>
                                                                     {% endfor %}

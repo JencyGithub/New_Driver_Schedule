@@ -18,7 +18,7 @@ def checkDate(date_):
 def setLine(given_line, previous_line):
     custom_row =[]
     
-    if re.match(docket_pattern, given_line[0]):
+    if re.match(docket_pattern, given_line[0]) or 'ADJUSTMEN' in given_line[0]:
         None
     elif checkDate(given_line[0]):
         given_line.insert(0,previous_line[0][0])
@@ -105,7 +105,7 @@ def appendToCsv(given_list,file_name,folder_name,truckNo):
 args = sys.argv[-1]
 # args = '20231105044804@_!pdf1.csv'
 
-# args ='20231009125409@_!pdf.csv'
+# args ='20231119035249@_!pdf2.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 
 while(file_path[-4:] != '.csv'):
@@ -116,6 +116,9 @@ while(file_path[-4:] != '.csv'):
 converted_file = "converted_" + args
 converted_file_expenses = "expenses_converted_" + args
 
+with open ('static/Account/RCTI/RCTIInvoice/'+converted_file_expenses , 'a') as f:
+    f.close()
+    
 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
     f.write(f'{converted_file}<>{converted_file_expenses}')
     f.close()
@@ -137,9 +140,12 @@ expense_temp = []
 
 carter_no = r'(\d+)\s+Truck\s+(\w+)'
 docket_pattern = r'^\d{8}$|^\d{6}$'
-
+line_no = 0
 with open(file_path, 'r') as file:
-    for line in file:  
+    for line in file: 
+        line_no += 1 
+        if line_no == 3353:
+            pass
         if re.search(carter_no, line.replace(",",'').replace('Carter No:','').replace('"','').strip()):
             if earnings_carter_list != None and key != None and earnings_carter_list != []:
                 earnings_carter_list.append(earnings_temp)
@@ -156,13 +162,19 @@ with open(file_path, 'r') as file:
             truckNo = truckNo.split()[-1]
         else:
             line_split_temp_ = re.split(r'\s{2,}', line)
+            if ' ' in line_split_temp_[0] and (earnings_flag is True or expense_flag is True) and len(line_split_temp_) >= 7:
+                line_split_temp_.insert(1,line_split_temp_[0].split(' ')[-1])
+                line_split_temp_[0] = line_split_temp_[0].split(' ')[0]
+                if 'ADJUSTMEN' not in line_split_temp_[0]:
+                    line_split_temp_[0] = line_split_temp_[0]+ ' ' +line_split_temp_[1]
+                    line_split_temp_.pop(1)
             # if len(line_split_temp_) < 2:
             #     line_split_temp_ = line_split_temp_.split(',')
             line_split_temp_[0],line_split_temp_[-1] = line_split_temp_[0][1:],line_split_temp_[-1][:-2]
             
             try:
                 if line_split_temp_[0].lower() != 'docket' and line_split_temp_[0].lower() != 'no.':
-                    if re.match(docket_pattern, line_split_temp_[0]):
+                    if re.match(docket_pattern, line_split_temp_[0]) and len(line_split_temp_) >= 7:
                         if earnings_temp:
                             earnings_carter_list.append(earnings_temp)
                             earnings_temp = []
@@ -189,6 +201,7 @@ with open(file_path, 'r') as file:
                             earnings_carter_dic[truckNo] = earnings_carter_list
                             # Appending into csv
                             appendToCsv(earnings_carter_list,converted_file,folderName,truckNo)
+                            
                                
                             earnings_carter_list = []
                             earnings_flag = False 
@@ -221,6 +234,17 @@ with open(file_path, 'r') as file:
             except Exception as e:
                 print(f'{e} at {line}')
                 pass
+            
+    if earnings_carter_list:
+        if earnings_temp:
+            earnings_carter_list.append(earnings_temp)
+        appendToCsv(earnings_carter_list,converted_file,folderName,truckNo)
+    if expense_carter_list:
+        if expense_temp:
+            expense_carter_list.append(expense_temp)
+        appendToCsv(expense_carter_list, converted_file_expenses, folderName, truckNo)
+        
+        
 
 
 # -------------------------------------------------------------------------------------------------
