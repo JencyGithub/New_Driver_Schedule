@@ -258,7 +258,7 @@ class RctiErrors(models.Model):
     
     
     def __str__(self) -> str:
-        return str(self.docketNumber)
+        return str(self.docketNumber +' '+ self.errorDescription)
 
 # -----------------------------------
 # Rcti Expense section

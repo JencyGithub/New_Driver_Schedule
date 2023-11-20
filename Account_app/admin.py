@@ -397,7 +397,12 @@ class ReconciliationReportAdmin(admin.ModelAdmin):
 
 admin.site.register(ReconciliationReport , ReconciliationReportAdmin)
 
-admin.site.register(RctiExpense)
+class RctiExpenseAdmin(admin.ModelAdmin):
+    list_display = ["docketNumber","docketDate"]
+    search_fields = ["docketNumber"]
+
+admin.site.register(RctiExpense , RctiExpenseAdmin)
+
 admin.site.register(Location)
 
 admin.site.register(TruckInformation)

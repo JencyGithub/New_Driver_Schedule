@@ -1,0 +1,38 @@
+
+list index out of range ** "06/01/23    Starcard   EG AMPOL 91803 SILVERWATER                                                 151.2400 LITRE       1.6000      (241.98)    (24.20)       (266.18)"
+
+list index out of range ** "10/01/23    Starcard   AMPOL FOODARY CONCORD                                                      207.6700 LITRE       1.6000      (332.27)    (33.23)       (365.50)"
+
+list index out of range ** "13/01/23    Starcard   EG AMPOL 91300 MERRYLANDS                                                  208.7200 LITRE       1.6000      (333.95)    (33.40)       (367.35)"
+
+list index out of range ** "17/01/23    Starcard   AMPOL FOODARY GREENACRE                                                    164.8900 LITRE       1.6000      (263.82)    (26.38)       (290.20)"
+
+list index out of range ** "Starcard   AMPOL FOODARY GREENACRE                                                     57.6900 LITRE       2.0600      (118.84)    (11.88)       (130.72)"
+
+list index out of range ** "19/01/23    Starcard   EG AMPOL 91803 SILVERWATER                                                 174.0600 LITRE       1.6000      (278.50)    (27.85)       (306.35)"
+
+list index out of range ** "24/01/23    Starcard   AMPOL FOODARY EASTERN CREEK WESTBOU                                        179.3000 LITRE       1.6000      (286.88)    (28.69)       (315.57)"
+
+list index out of range ** "25/01/23    Starcard   EG AMPOL 91769 BURWOOD                                                     207.9500 LITRE       1.6000      (332.72)    (33.27)       (365.99)"
+
+list index out of range ** "31/01/23    Starcard   EG AMPOL 91996 GREENACRE                                                   212.7900 LITRE       1.6000      (340.46)    (34.05)       (374.51)"
+
+list index out of range ** "INV-0441      31/08/22               Toll fees of Aug 2022 as per attached summary                            1.0000 EACH       10,204.3400      10,204.34      1,020.43      11,224.77"
+
+list index out of range ** "06/01/23    Starcard   EG AMPOL 91803 SILVERWATER                                                 151.2400 LITRE       1.6000      (241.98)    (24.20)       (266.18)"
+
+list index out of range ** "10/01/23    Starcard   AMPOL FOODARY CONCORD                                                      207.6700 LITRE       1.6000      (332.27)    (33.23)       (365.50)"
+
+list index out of range ** "13/01/23    Starcard   EG AMPOL 91300 MERRYLANDS                                                  208.7200 LITRE       1.6000      (333.95)    (33.40)       (367.35)"
+
+list index out of range ** "17/01/23    Starcard   AMPOL FOODARY GREENACRE                                                    164.8900 LITRE       1.6000      (263.82)    (26.38)       (290.20)"
+
+list index out of range ** "Starcard   AMPOL FOODARY GREENACRE                                                     57.6900 LITRE       2.0600      (118.84)    (11.88)       (130.72)"
+
+list index out of range ** "19/01/23    Starcard   EG AMPOL 91803 SILVERWATER                                                 174.0600 LITRE       1.6000      (278.50)    (27.85)       (306.35)"
+
+list index out of range ** "24/01/23    Starcard   AMPOL FOODARY EASTERN CREEK WESTBOU                                        179.3000 LITRE       1.6000      (286.88)    (28.69)       (315.57)"
+
+list index out of range ** "25/01/23    Starcard   EG AMPOL 91769 BURWOOD                                                     207.9500 LITRE       1.6000      (332.72)    (33.27)       (365.99)"
+
+list index out of range ** "31/01/23    Starcard   EG AMPOL 91996 GREENACRE                                                   212.7900 LITRE       1.6000      (340.46)    (34.05)       (374.51)"

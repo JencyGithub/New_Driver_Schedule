@@ -4,7 +4,6 @@ from datetime import datetime
 # import matplotlib.pyplot as plt
 import numpy as np
 
-
 def getFileName():
     if getattr(sys,'frozen',False):
         return input("Enter your CSV name: ")
@@ -87,25 +86,32 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
 
 
 def appendToCsv(given_list,file_name,folder_name,truckNo):
-    if not os.path.exists(folder_name):
-        os.makedirs(folder_name)
-    for i in given_list:
-        res = truckNo
-        for j in i[0]:
-            j = j.replace(',',' ')
-            res = res + ',' + j
-        res += '\n'
-        # insertIntoModel(res)   
-        with open('static/Account/RCTI/RCTIInvoice/'+file_name,'a') as f:
-            f.write(res)
-            f.close()
-            # res = ''
+    try:
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+        for i in given_list:
+            res = truckNo
+            for j in i[0]:
+                j = j.replace(',',' ')
+                res = res + ',' + j
+            res += '\n'
+            # insertIntoModel(res)   
+            with open('static/Account/RCTI/RCTIInvoice/'+file_name,'a') as f:
+                f.write(res)
+    except Exception as e:
+        pass
+        # rctiErrorObj = RctiErrors( 
+        #                     docketNumber = None,
+        #                     docketDate = None,
+        #                     errorDescription = e,
+        #                     fileName = file_name.split('/')[-1]
+        # )
+        # rctiErrorObj.save()        
 
 # file_path = getFileName()
 args = sys.argv[-1]
-# args = '20231105044804@_!pdf1.csv'
 
-# args ='20231119035249@_!pdf2.csv'
+# args ='20231120042226@_!Boral-15-Jan-2023.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 
 while(file_path[-4:] != '.csv'):
@@ -139,12 +145,12 @@ expense_carter_dic = {}
 expense_temp = []
 
 carter_no = r'(\d+)\s+Truck\s+(\w+)'
-docket_pattern = r'^\d{8}$|^\d{6}$'
+docket_pattern = r'^\d{8}$|^\d{6}$|^INV-\d+$'
 line_no = 0
 with open(file_path, 'r') as file:
     for line in file: 
         line_no += 1 
-        if line_no == 3353:
+        if line_no == 187:
             pass
         if re.search(carter_no, line.replace(",",'').replace('Carter No:','').replace('"','').strip()):
             if earnings_carter_list != None and key != None and earnings_carter_list != []:
@@ -232,7 +238,10 @@ with open(file_path, 'r') as file:
                             # expense_temp.append(line_split_temp_)
 
             except Exception as e:
-                print(f'{e} at {line}')
+                with open("RctiConvertError.txt",'a') as f:
+                    f.write("\n"+str(e) + ' ** ' + line)
+                    
+                # print(f'{e} at {line}')
                 pass
             
     if earnings_carter_list:

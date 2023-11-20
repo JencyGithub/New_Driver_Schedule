@@ -4,6 +4,7 @@ from Account_app.reconciliationUtils import *
 
 def convertIntoFloat(str):
     cleaned_string = str.strip('()')
+    cleaned_string = cleaned_string.replace(' ','')
     return float(cleaned_string)
 
 def checkDate(date_):
@@ -18,7 +19,7 @@ def dateConvert(date_):
 def insertTopUpRecord(list_):
     RCTIobj = RCTI()
     excistingRCTI = RCTI.objects.filter(docketDate = dateConvert(list_[1].split()[-1]) , docketNumber = list_[1].split()[0]).first()
-    if not  excistingRCTI :
+    if not excistingRCTI :
         RCTIobj.docketDate = dateConvert(list_[1].split()[-1])
         RCTIobj.docketNumber = list_[1].split()[0]
         # RCTIobj.docketNumber = 1
@@ -226,7 +227,7 @@ try:
 
     file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
     reader = csv.reader(file)
-    next(reader)
+    # next(reader)
 
     for row in reader:
         insertIntoModel(row,convertFileName)
@@ -236,7 +237,7 @@ try:
 
     fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
     reader = csv.reader(fileExpense)
-    next(reader)
+    # next(reader)
     for row in reader:
         # print(row)
         insertIntoExpenseModel(row , convertFileName)
