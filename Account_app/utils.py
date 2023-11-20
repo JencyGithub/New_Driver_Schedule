@@ -166,6 +166,9 @@ with open(file_path, 'r') as file:
             key = line.replace('Carter No:','').replace('"','').strip()
             truckNo = key.split(',')[1] 
             truckNo = truckNo.split()[-1]
+            if re.match(r"^\d",truckNo) is None:
+                truckNo = 0
+                
         else:
             line_split_temp_ = re.split(r'\s{2,}', line)
             if ' ' in line_split_temp_[0] and (earnings_flag is True or expense_flag is True) and len(line_split_temp_) >= 7:
@@ -180,7 +183,7 @@ with open(file_path, 'r') as file:
             
             try:
                 if line_split_temp_[0].lower() != 'docket' and line_split_temp_[0].lower() != 'no.':
-                    if re.match(docket_pattern, line_split_temp_[0]) and len(line_split_temp_) >= 7:
+                    if re.match(docket_pattern, line_split_temp_[0].replace(' ','')) and len(line_split_temp_) >= 7:
                         if earnings_temp:
                             earnings_carter_list.append(earnings_temp)
                             earnings_temp = []

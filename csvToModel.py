@@ -2,9 +2,10 @@ import csv , re
 from Account_app.models import *
 from Account_app.reconciliationUtils import *
 
-def convertIntoFloat(str):
-    cleaned_string = str.strip('()')
-    cleaned_string = cleaned_string.replace(' ','')
+def convertIntoFloat(str_):
+    if '(' in str_:
+        str_ = '-'+str_.strip('()')
+    cleaned_string = str_.replace(' ','').replace(',','')
     return float(cleaned_string)
 
 def checkDate(date_):
@@ -16,33 +17,36 @@ def dateConvert(date_):
     year_ = '20' + date_[-1]
     return year_ + '-' + date_[1] + '-' + date_[0]
 
-def insertTopUpRecord(list_):
+def insertTopUpRecord(list_, truckNo, docketNumber):
     RCTIobj = RCTI()
-    excistingRCTI = RCTI.objects.filter(docketDate = dateConvert(list_[1].split()[-1]) , docketNumber = list_[1].split()[0]).first()
+    excistingRCTI = RCTI.objects.filter(docketDate = dateConvert(list_[0].split()[-1]) , docketNumber = docketNumber).first()
     if not excistingRCTI :
-        RCTIobj.docketDate = dateConvert(list_[1].split()[-1])
-        RCTIobj.docketNumber = list_[1].split()[0]
-        # RCTIobj.docketNumber = 1
-        RCTIobj.others = list_[2]
-        RCTIobj.othersCost = convertIntoFloat(list_[6].replace(' ',''))
-        RCTIobj.docketYard = ' '
-        RCTIobj.save()
-
-    return
+        RCTIobj.docketNumber = docketNumber
+        RCTIobj.truckNo = truckNo
+    RCTIobj.docketDate = dateConvert(list_[0].split()[-1])
+    RCTIobj.docketYard = list_[1]
+    
+    RCTIobj.others = list_[2]
+    RCTIobj.othersCost = convertIntoFloat(list_[6])
+    RCTIobj.othersGSTPayable = list_[7]
+    RCTIobj.othersTotalExGST = list_[8]
+    RCTIobj.othersTotal = list_[9]
+    # RCTIobj.save()
+    return RCTIobj
 
 def insertIntoModel(dataList,file_name):
     
     try:
         RCTIobj = None
         try:
-            existingDocket = RCTI.objects.get( docketNumber=int(dataList[1]))
+            existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
             if str(existingDocket.docketDate) == dateConvert(dataList[2]):
                 RCTIobj = existingDocket
         except:
             RCTIobj = RCTI()
     
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
-        RCTIobj.docketNumber = int(dataList[1])
+        RCTIobj.docketNumber = str(dataList[1])
         dataList = dataList[2:]
         basePlants = BasePlant.objects.all()
         BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
@@ -51,14 +55,25 @@ def insertIntoModel(dataList,file_name):
             dump = dataList[:10]
             description = dump[2].lower().strip()
             if 'top up' in description:
-                insertTopUpRecord(dataList)
+                # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
+                
+                RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
+                RCTIobj.docketYard = dump[1]
+                
+                RCTIobj.others = dump[2]
+                RCTIobj.othersCost = convertIntoFloat(dump[6])
+                RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
+                RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
+                RCTIobj.othersTotal = convertIntoFloat(dump[9])
                 dataList = dataList[10:]
+
                 continue
                 
             RCTIobj.docketDate = dateConvert(dump[0])
             if dump[1] is not BasePlant_:
                     BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dump[1]).upper())[0]
             RCTIobj.docketYard = dump[1]
+            
             if "truck transfer" in description:
                 RCTIobj.transferKM = convertIntoFloat(dump[4])
                 RCTIobj.transferKMCost = convertIntoFloat(dump[6])
@@ -168,7 +183,8 @@ def insertIntoModel(dataList,file_name):
                             docketNumber = RCTIobj.docketNumber,
                             docketDate = RCTIobj.docketDate,
                             errorDescription = e,
-                            fileName = file_name
+                            fileName = file_name,
+                            data = str(dataList)
         )
         rctiErrorObj.save()
         # print(f' Docket No :{RCTIobj.docketNumber}. Docket Date : {RCTIobj.docketDate}  , Error : {e} \n {dataList} \n\n\n')
@@ -210,7 +226,8 @@ def insertIntoExpenseModel(dataList , file_name):
                             docketNumber = rctiExpenseObj.docketNumber,
                             docketDate = rctiExpenseObj.docketDate,
                             errorDescription = e,
-                            fileName = file_name
+                            fileName = file_name,
+                            data = str(dataList)
             )
             rctiErrorObj.save()
             
@@ -227,7 +244,7 @@ try:
 
     file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
     reader = csv.reader(file)
-    # next(reader)
+    next(reader)
 
     for row in reader:
         insertIntoModel(row,convertFileName)
@@ -237,9 +254,7 @@ try:
 
     fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
     reader = csv.reader(fileExpense)
-    # next(reader)
     for row in reader:
-        # print(row)
         insertIntoExpenseModel(row , convertFileName)
         
 except Exception as e:

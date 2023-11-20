@@ -181,7 +181,7 @@ class PastTripError(models.Model):
     lineNumber =  models.CharField(max_length=255, default=None, null=True, blank=True)   
     errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)
     fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.docketNumber)
@@ -255,7 +255,7 @@ class RctiErrors(models.Model):
     errorDescription = models.CharField(default=None ,blank=True,null=True ,max_length=255)
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)
-    
+    data = models.CharField(max_length=1024,default='')
     
     def __str__(self) -> str:
         return str(self.docketNumber +' '+ self.errorDescription)
