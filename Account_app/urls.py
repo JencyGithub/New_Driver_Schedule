@@ -67,7 +67,7 @@ urlpatterns = [
     path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
 
     path('RctiTable/', views.rctiTable, name='rctiTable'),
-    path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
+    # path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
 
     # Rate Card 
     path('RateCardTable', views.rateCardTable, name='rateCardTable'),
@@ -77,7 +77,7 @@ urlpatterns = [
     path('RateCard/revision/<int:id>/', views.rateCardSave, name='rateCardRevision'),
     
     # DriverTrip Csv
-    path('DriverTripCsv/', views.driverTripCsv, name='driverTripCsv'),
+    path('DriverShiftCsv/', views.driverShiftCsv, name='driverShiftCsv'),
     path('RctiCsvForm/', views.rctiCsvForm, name='rctiCsvForm'),
     path('DriverSampleCsv/', views.driverSampleCsv, name='driverSampleCsv'),
     
@@ -123,5 +123,9 @@ urlpatterns = [
     path('Surcharge/add/save/', views.surchargeSave, name='surchargeAddSave'),   
     path('Surcharge/edit/<int:id>/', views.surchargeForm, name='surchargeEdit'),      
     path('Surcharge/edit/save/<int:id>/', views.surchargeSave, name='surchargeEditSave'),
+    
+    # Trip 
+    path('Driver/Shift/Form/<int:id>', views.DriverShiftForm, name='DriverShiftForm'),
+    path('Driver/Shift/Details/<int:id>', views.ShiftDetails, name='ShiftDetails'),
 
 ]

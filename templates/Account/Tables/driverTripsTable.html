@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | DriverTrip Table{% endblock %}
+{% block title %} | DriverShift Table{% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -42,17 +42,17 @@
   <div class="">
     <div class="page-title">
       <div class="title_left">
-        <h3>Driver Trip</h3>
+        <h3>Driver Shifts</h3>
       </div>
     </div>
     <div class="clearfix"></div>
     <div class="row">
       <div class="col-md-12 col-sm-12 ">
-        <div class="x_panel">
+        <div class="x_panel" >
           <div class="x_title">
             <!-- Filters -->
             <!-- Verified -->
-            <div class="btn-group">
+            {% comment %} <div class="btn-group">
               <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 Verified
@@ -63,9 +63,9 @@
                 <a class="dropdown-item" onclick="verifiedFilter(this,0)"><i class="fa fa-close text-danger"> </i> Not
                   verified </a>
               </div>
-            </div>
+            </div> {% endcomment %}
             <!-- Client name -->
-            <div class="btn-group">
+            {% comment %} <div class="btn-group">
               <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 Client name
@@ -75,18 +75,18 @@
                 <a class="dropdown-item" onclick="clientFilter({{client.clientId}})">{{client.name}} </a>
                 {% endfor %}
               </div>
-            </div>
+            </div> {% endcomment %}
             <!-- Date range -->
-            <div id="reportrange_right" class="pull-right"
+            {% comment %} <div id="reportrange_right" class="pull-right"
               style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
               <i class="fa fa-calendar"></i>
               <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
-            </div>
+            </div> {% endcomment %}
             
 
             <!-- CSV Download -->
             {% comment %} <a class="btn btn-app float-right mr-1" onclick="csvDownloadFilter()"> {% endcomment %}
-            <form action="{% url 'Account:driverTripCsv' %}" class="d-inline" method="POST" id="filterForm">
+            {% comment %} <form action="{% url 'Account:driverTripCsv' %}" class="d-inline" method="POST" id="filterForm">
               {% csrf_token %}
 
               <input type="text" hidden id="verifiedInput" name="verifiedInput" value="">
@@ -98,18 +98,29 @@
                 <i class="fa fa-download" style="font-size:1rem"></i>
               </button>
 
-            </form>
+            </form> {% endcomment %}
+            <form action="{% url 'Account:driverShiftCsv' %}" class="d-inline" method="POST" id="filterForm">
+              {% csrf_token %}
 
+              <input  hidden  name="startDate" value="{{startDate}}">
+              <input  hidden  name="endDate" value="{{endDate}}">
+              <input  hidden  name="id_" value="{{id_}}">
+              
+              <button type="submit" class="btn btn-app float-right mr-1 d-inline">
+                <i class="fa fa-download" style="font-size:1rem"></i>
+              </button>
+
+            </form>
             <div class="clearfix"></div>
           </div>
-          <div class="x_content">
+          <div class="x_content" style="max-height: 120vh; overflow-y: auto;>
             <div class="row">
               <div class="col-sm-12">
                 <div class="card-box table-responsive">
                   <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
                     <thead>
                       <tr>
-                        <th>verified</th>
+                        {% comment %} <th>verified</th> {% endcomment %}
                         <th>truckNo</th>
                         <th>clientName</th>
                         <th>driverName</th>
@@ -121,7 +132,7 @@
                     <tbody>
                       {% for driverTtips in driverTrip %}
                       <tr>
-                        <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td>
+                        {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
                         <td>{{ driverTtips.truckNo }}</td>
                         <td>{{ driverTtips.clientName.name }}</td>
                         <td>{{ driverTtips.driverId.name }}</td>
