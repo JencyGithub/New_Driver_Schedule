@@ -17,7 +17,7 @@
                             <h2> {% if rcti %} View RCTI {% else %} Add RCTI {% endif  %}:-</h2>
 
                         <ul class="nav navbar-right panel_toolbox">
-                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            <li><a class="collapse-link" style="margin-left: 3rem;"><i class="fa fa-chevron-up"></i></a>
                             </li>
                         </ul>
                         <div class="clearfix"></div>
@@ -30,7 +30,8 @@
                             <div class="nav nav-tabs flex-column  bar_tabs" id="v-pills-tab" role="tablist"
                             aria-orientation="vertical">
                             <a class="nav-link active" id="v-pills-docketView-tab" data-toggle="pill" href="#v-pills-docketView"
-                                role="tab" aria-controls="v-pills-docketView" aria-selected="true">Docket view</a>
+                            role="tab" aria-controls="v-pills-docketView" aria-selected="true">{%if rcti %}Docket view{%else%}RCTI{%endif%}</a>
+                            {% if rcti %}
                             <a class="nav-link" id="v-pills-truckNo-tab" data-toggle="pill" href="#v-pills-truckNo" role="tab"
                                 aria-controls="v-pills-truckNo" aria-selected="false">Truck No</a>
                             <a class="nav-link" id="v-pills-noOfKm-tab" data-toggle="pill" href="#v-pills-noOfKm"
@@ -51,6 +52,7 @@
                                 role="tab" aria-controls="v-pills-surcharge_fixed_normal" aria-selected="false">Surcharge fixed normal</a>
                                 <a class="nav-link" id="v-pills-others-tab" data-toggle="pill" href="#v-pills-others"
                                 role="tab" aria-controls="v-pills-others" aria-selected="false">Others</a>
+                                {%endif%}
                             </div>
 
                         </div>
@@ -88,7 +90,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="docketYard">Docket Yard:<span class="required">*</span></label>
-                                                    <input class="form-control" required type="text" name="docketYard" style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketYard }}" id="docketYard" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
+                                                    <input class="form-control" required="required" type="text" name="docketYard" style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketYard }}" id="docketYard" {% if rcti %} {% if rcti %} readonly {% endif  %} {% endif  %}>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -591,6 +593,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                <input class="btn btn-default float-right" type="submit" value="submit" >
                             </form>
                             </div>
                             <div class="tab-pane fade" id="v-pills-truckNo" role="tabpanel"

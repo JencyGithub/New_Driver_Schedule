@@ -28,21 +28,6 @@
 					<div class="col-md-6 ">
 						<div class="x_panel">
 							{% if rctiDocket %}
-								<div class="x_title">
-									<h2>RCTI</h2>
-									<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}" class="btn btn-sm btn-default float-right">View rcti docket</a>
-									<div class="clearfix"></div>
-								</div>
-								<div class="x_content">
-									<br />
-									<form class="form-horizontal form-label-left">
-										<div class="form-group row hidden-field">
-											<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
-												Number : </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="RCTIdocketNumber"
-													id="RCTIdocketNumber" readonly value={{rctiDocket.docketNumber}} required>
-											</div>
 							<div class="x_title">
 								<h2>RCTI</h2>
 								<a href="{% url 'Account:rctiForm' id=rctiDocket.id %}"
@@ -88,8 +73,11 @@
 												name="RCTIbasePlant" id="RCTIbasePlant" readonly
 												value={{rctiDocket.docketYard}} required>
 										</div>
-										<div class="form-group row">
-											<label for="RCTInoOfKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
+									<div class="form-group row">
+										<label for="RCTInoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
 											: </label>
 										<div class="col-md-9 col-sm-9 ">
@@ -187,9 +175,7 @@
 										<div class="x_title">
 											<h2>RCTI</h2>
 											<ul class="nav navbar-right panel_toolbox">
-												<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-												</li>
-												<li><a class="close-link"><i class="fa fa-close"></i></a>
+												<li><a class="collapse-link" style="margin-left:3rem"><i class="fa fa-chevron-up"></i></a>
 												</li>
 											</ul>
 											<div class="clearfix"></div>
@@ -198,7 +184,7 @@
 
 											<div class="">
 												<form class="form-horizontal form-label-left">
-													{% if rctiDocket.docketNumber != 0 %}
+													{% if rctiDocket.docketNumber != 0 or rctiDocket.docketNumber != driverDocket.docketNumber %}
 													<div class="form-group row">
 														<label for="RCTIdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
 															Number : </label>
@@ -210,7 +196,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.docketDate != 0 %}
+													{% if rctiDocket.docketDate != 0 or rctiDocket.docketDate != driverDocket.docketDate %}
 													<div class="form-group row">
 														<label for="RCTIdocketDate" class="control-label col-md-3 col-sm-3 "> Docket
 															Date
@@ -223,7 +209,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.docketYard != 0 %}
+													{% if rctiDocket.docketYard != 0 or rctiDocket.docketYard != driverDocket.docketYard %}
 													<div class="form-group row">
 														<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
 															site:</label>
@@ -235,7 +221,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.noOfKm != 0 %}
+													{% if rctiDocket.noOfKm != 0 or rctiDocket.noOfKm != driverDocket.noOfKm %}
 													<div class="form-group row">
 														<label for="RCTInoOfKm
 															" class="control-label col-md-3 col-sm-3 "> Number of KM
@@ -248,7 +234,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.transferKM != 0 %}
+													{% if rctiDocket.transferKM != 0 or rctiDocket.transferKM != driverDocket.transferKM %}
 													<div class="form-group row">
 														<label for="RCTItransferKm
 															" class="control-label col-md-3 col-sm-3 "> Transfer KM
@@ -261,7 +247,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.returnKm != 0 %}
+													{% if rctiDocket.returnKm != 0 or rctiDocket.returnKm != driverDocket.returnKm %}
 													<div class="form-group row">
 														<label for="RCTIreturnKm
 															" class="control-label col-md-3 col-sm-3 "> Return KM
@@ -274,7 +260,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.waitingTimeInMinutes != 0 %}
+													{% if rctiDocket.waitingTimeInMinutes != 0 or rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute%}
 													<div class="form-group row">
 														<label for="RCTIwaitingTimeMinutes
 															" class="control-label col-md-3 col-sm-3 "> Waiting time minute
@@ -287,7 +273,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.surcharge_duration != 0 %}
+													{% if rctiDocket.surcharge_duration != 0 or rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}
 													<div class="form-group row">
 														<label for="RCTIsurchargeDuration
 															" class="control-label col-md-3 col-sm-3 "> Surcharge duration
@@ -300,7 +286,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.cubicMl != 0 %}
+													{% if rctiDocket.cubicMl != 0 or rctiDocket.cubicMl != driverDocket.cubicMl %}
 													<div class="form-group row">
 														<label for="RCTIcubicMl" class="control-label col-md-3 col-sm-3"> Cubic Ml:
 														</label>
@@ -312,7 +298,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if rctiDocket.othersCost != 0 %}
+													{% if rctiDocket.othersCost != 0 or rctiDocket.othersCost != driverDocket.others %}
 													<div class="form-group row">
 														<label for="RCTIotherCost" class="control-label col-md-3 col-sm-3"> Other cost:
 														</label>
@@ -342,24 +328,245 @@
 							{% if driverDocket %}
 							<div class="x_title">
 								<h2>Driver</h2>
-								<a href="{% url 'Account:docketView' ids=driverDocket.tripId.id driverDocketNumber=driverDocket.docketNumber %}"
-									class="btn btn-sm btn-default float-right">View driver docket</a>
+								<!-- <a href="{% url 'Account:docketView' ids=driverDocket.tripId.id driverDocketNumber=driverDocket.docketNumber %}"
+									class="btn btn-sm btn-default float-right">View driver docket</a> -->
+
+								<!-- Button trigger modal -->
+								<a type="button" class="btn btn-sm btn-default float-right text-light" data-toggle="modal" data-target=".bd-example-modal-lg">View Driver Docket</a>
+
+								
+								<!-- Modal -->
+								<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+									<div class="modal-dialog modal-lg">
+									  <div class="modal-content">
+										<div class="modal-header">
+										<h5 class="modal-title" id="exampleModalScrollableTitle">Docket View</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										</div>
+										<div class="modal-body">
+											<div class="col-md-12 col-sm-12">
+												<div class="x_panel">
+													<div class="x_title">
+														
+															<div class="float-right">
+																<input type="radio" id="tippingToYard" name="returnToYard" 
+																style="margin-top: .8rem;"  onclick="returnToYard_(this)" value="returnToYard" {% if driverDocket %}disabled{% endif %} {% if driverDocket.returnToYard %}checked{% endif %}>
+																<label for="tippingToYard" class=" ml-2"
+																style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
+																<input type="radio" id="returnToYard" name="returnToYard" value="tippingToYard"
+																style="margin-top: .8rem;"  onclick="returnToYard_(this)" {% if driverDocket %}disabled{% endif %} {% if driverDocket.tippingToYard %}checked{% endif %}>
+																<label for="returnToYard" class=" ml-2"
+																	style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+																{% if not driverDocket %}
+																<i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio"></i>
+																{% endif %}
+															</div>
+														<div class="clearfix"></div>
+													</div>
+													<div class="x_content">
+														<div class="custom-continer">
+							
+															<!-- shiftDate docketNumber docketFile  -->
+															<div class="col-md-6 col-sm-6">
+																<label for="shiftDate">ShiftDate :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="date"
+																		name="shiftDate" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="shiftDate" value={{ driverDocket.shiftDate }} {% if driverDocket %}readonly{% endif %}>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="docketNumber">Docket Number :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="text"
+																		name="docketNumber" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="docketNumber" value={{ driverDocket.docketNumber }} {% if driverDocket %}readonly{% endif %}>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="docketFile">DocketFile :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="file"
+																		name="docketFile" style="padding: 0.25rem 0.2rem;" required="required"
+																		id="docketFile">
+																</div>
+															</div>
+															<!-- basePlant noOfKm  transferKM  -->
+															<div class="col-md-6 col-sm-6 ">
+																<label for="basePlant">basePlant :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<select name="basePlant" class="form-control" {% if driverDocket %}readonly{% endif %}>
+																		{% for basePlant_ in basePlants %}
+																		<option {% if driverDocket.basePlant.basePlant == basePlant_.basePlant %}selected{% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
+																		{% endfor %}
+																	</select>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="noOfKm">No Of Km:<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="noOfKm" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="noOfKm"  value={{ driverDocket.noOfKm }} readonly>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="transferKM">Transfer Km :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="transferKM" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="transferKM" value={{ driverDocket.transferKM }} readonly>
+																</div>
+															</div>
+															<!--    returnQty  returnKm  waitingTimeStart      -->
+															<div class="col-md-6 col-sm-6">
+																<label for="returnQty">Return Qty:<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="returnQty" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="returnQty" readonly value={{ driverDocket.returnQty }}>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="returnKm">Return Km:<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="returnKm" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="returnKm" readonly value={{ driverDocket.returnKm }}>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="waitingTimeStart">Waiting Time Start :<span
+																		class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"   type="time"
+																		name="waitingTimeStart" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="waitingTimeStart" value={{ driverDocket.waitingTimeStart }} readonly>
+																</div>
+															</div>
+							
+															{% comment %} totalWaitingInMinute waitingTimeEnd surcharge_type {% endcomment %}
+															
+															<div class="col-md-6 col-sm-6">
+																<label for="waitingTimeEnd">Waiting Time End :<span
+																		class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"   type="time"
+																		name="waitingTimeEnd" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd" value={{ driverDocket.waitingTimeEnd }} readonly>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="totalWaitingInMinute">Total Waiting In Minute :<span
+																		class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control" readonly  type="number"
+																		name="totalWaitingInMinute" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute" value={{ driverDocket.totalWaitingInMinute }} readonly>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="surcharge_type">Surcharge Type:<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<select name="surcharge_type" class="form-control" readonly>
+																		{% for surcharge in surcharges %}
+																		<option value="{{surcharge.id}}" {% if driverDocket.surcharge_type.surcharge_Name == surcharge.surcharge_Name %}selected{% endif %}>{{surcharge.surcharge_Name}}</option>
+																		{% endfor %}
+																	</select>
+																</div>
+															</div>
+															<!--     surcharge_duration    cubicMl standByStartTime -->
+															<div class="col-md-6 col-sm-6">
+																<label for="surcharge_duration">Surcharge Duration :<span
+																		class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="surcharge_duration" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="surcharge_duration" value={{ driverDocket.surcharge_duration }} readonly>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="cubicMl">Cubic Meter :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="cubicMl" required="required"
+																		style="padding: 0.25rem 0.2rem;" id="cubicMl" value={{ driverDocket.cubicMl }} readonly>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="standByStartTime">StandBy start Time :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="time" readonly
+																		name="standByStartTime" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="standByStartTime" value={{ driverDocket.standByStartTime }}>
+																</div>
+															</div>
+															<!--     standByEndTime   others  comment-->
+															<div class="col-md-6 col-sm-6">
+																<label for="standByEndTime">StandBy End Time :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="time" readonly
+																		name="standByEndTime" required='required'
+																		style="padding: 0.25rem 0.2rem;" id="standByEndTime" value={{ driverDocket.standByEndTime }}>
+																</div>
+															</div>
+															<div class="col-md-6 col-sm-6">
+																<label for="others">Others :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<input class="form-control"  type="number"
+																		name="others" style="padding: 0.25rem 0.2rem;"
+																		required="required" id="others" value={{ driverDocket.others }} readonly>
+																</div>
+															</div>
+															
+															<div class="col-md-12 col-sm-12">
+																<label for="comment">Comment :<span class="required">*</span></label>
+																<div class="field item form-group">
+																	<textarea placeholder="comment" id="comment" name="comment" readonly
+																		class="form-control">{% if driverDocket %}{{ driverDocket.comment }}{% endif %}</textarea>
+																</div>
+															</div>
+														</div>
+														
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+										</div>
+									</div>
+									</div>
+								</div>
+
+
+								
 								<a href="{% url 'Account:DriverTripEdit' id=driverDocket.tripId.id%}"
 									class="btn btn-sm btn-default float-right">Driver Shift Details</a>
 
 								<div class="clearfix"></div>
 
-								</div>
-								<div class="x_content">
-									<br />
-									<form class="form-horizontal form-label-left">
-										<div class="form-group row">
-											<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
-												Number : </label>
-											<div class="col-md-9 col-sm-9 ">
-												<input type="number" class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}" name="DriverdocketNumber"
-													id="DriverdocketNumber" required readonly value={{driverDocket.docketNumber}}>
-											</div>
+							</div>
+							<div class="x_content">
+								<br />
+
+
+								{% comment %} miss matched {% endcomment %}
+
+
+								<form class="form-horizontal form-label-left">
+									{% if rctiDocket.docketNumber != driverDocket.docketNumber %}
+									<div class="form-group row">
+										<label for="DriverdocketNumber" class="control-label col-md-3 col-sm-3 "> Docket
+											Number : </label>
+										<div class="col-md-9 col-sm-9 ">
+											<input type="number"
+												class="form-control {% if rctiDocket.docketNumber != driverDocket.docketNumber %}isInvalid{% endif %}"
+												name="DriverdocketNumber" id="DriverdocketNumber" required readonly
+												value={{driverDocket.docketNumber}}>
 										</div>
 									</div>
 									{% endif %}
@@ -386,8 +593,11 @@
 												name="DriverbasePlant" id="DriverbasePlant" readonly
 												value={{driverDocket.basePlant}} required>
 										</div>
-										<div class="form-group row">
-											<label for="DrivernoOfKm
+									</div>
+									{% endif %}
+									{% if rctiDocket.noOfKm != driverDocket.noOfKm %}
+									<div class="form-group row">
+										<label for="DrivernoOfKm
 											" class="control-label col-md-3 col-sm-3 "> Number of KM
 											: </label>
 										<div class="col-md-9 col-sm-9 ">
@@ -485,10 +695,9 @@
 										<div class="x_title">
 											<h2>Driver  <small></small></h2>
 											<ul class="nav navbar-right panel_toolbox">
-												<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+												<li><a class="collapse-link" style="margin-left:3rem"><i class="fa fa-chevron-up"></i></a>
 												</li>
-												<li><a class="close-link"><i class="fa fa-close"></i></a>
-												</li>
+												
 											</ul>
 											<div class="clearfix"></div>
 										</div>
@@ -496,7 +705,7 @@
 
 											<div class="">
 												<form class="form-horizontal form-label-left">
-													{% if driverDocket.docketNumber != 0 %}
+													{% if driverDocket.docketNumber != 0 or rctiDocket.docketNumber != driverDocket.docketNumber %}
 													<div class="form-group row">
 														<label for="DriverdocketNumber"
 															class="control-label col-md-3 col-sm-3 "> Docket
@@ -508,7 +717,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.shiftDate != 0 %}
+													{% if driverDocket.shiftDate != 0 or rctiDocket.shiftDate != driverDocket.shiftDate %}
 													<div class="form-group row">
 														<label for="DriverdocketDate"
 															class="control-label col-md-3 col-sm-3 "> Docket
@@ -521,7 +730,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.basePlant != 0 %}
+													{% if driverDocket.basePlant != 0 or rctiDocket.basePlant != driverDocket.basePlant %}
 													<div class="form-group row">
 														<label for="DriverbasePlant"
 															class="control-label col-md-3 col-sm-3 ">Loading
@@ -533,7 +742,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.noOfKm != 0 %}
+													{% if driverDocket.noOfKm != 0 or rctiDocket.noOfKm != driverDocket.noOfKm %}
 													<div class="form-group row">
 														<label for="DrivernoOfKm
 														" class="control-label col-md-3 col-sm-3 "> Number of KM
@@ -545,7 +754,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.transferKM != 0 %}
+													{% if driverDocket.transferKM != 0 or rctiDocket.transferKM != driverDocket.transferKM %}
 													<div class="form-group row">
 														<label for="DrivertransferKm
 														" class="control-label col-md-3 col-sm-3 "> Transfer KM
@@ -557,7 +766,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.returnKm != 0 %}
+													{% if driverDocket.returnKm != 0 or rctiDocket.returnKm != driverDocket.returnKm %}
 													<div class="form-group row">
 														<label for="DriverreturnKm
 														" class="control-label col-md-3 col-sm-3 "> Return KM
@@ -569,7 +778,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.totalWaitingInMinute != 0 %}
+													{% if driverDocket.totalWaitingInMinute != 0 or rctiDocket.waitingTimeInMinutes != driverDocket.totalWaitingInMinute %}
 													<div class="form-group row">
 														<label for="DriverwaitingTimeMinutes
 														" class="control-label col-md-3 col-sm-3 "> Waiting time minute
@@ -582,7 +791,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.surcharge_duration != 0 %}
+													{% if driverDocket.surcharge_duration != 0 or rctiDocket.surcharge_duration != driverDocket.surcharge_duration %}
 													<div class="form-group row">
 														<label for="DriversurchargeDuration
 														" class="control-label col-md-3 col-sm-3 "> Surcharge duration
@@ -595,7 +804,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.cubicMl != 0 %}
+													{% if driverDocket.cubicMl != 0 or rctiDocket.cubicMl != driverDocket.cubicMl %}
 													<div class="form-group row">
 														<label for="DrivercubicMl
 														" class="control-label col-md-3 col-sm-3 "> Cubic Ml
@@ -607,7 +816,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.others != 0 %}
+													{% if driverDocket.others != 0 or rctiDocket.othersCost != driverDocket.others %}
 													<div class="form-group row">
 														<label for="DriverOtherCost"
 															class="control-label col-md-3 col-sm-3"> Other cost:
@@ -649,13 +858,4 @@
 
 	</div>
 </div>
-<script>
-    $(document).ready(function () {
-        // Show/hide fields based on click
-        $('.hidden-field').hide();
-        $('.docket-number-link').click(function () {
-            $('.hidden-field').show();
-        });
-    });
-</script>
 {% endblock %}

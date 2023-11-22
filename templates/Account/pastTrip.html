@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | PAst Trip {% endblock %}
+{% block title %} | Past Trip {% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -80,12 +80,40 @@
                                     <label for="pastTripFile">Upload past trip Csv:<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" type="file" name="pastTripFile" required
+                                        <input  class="form-control" type="file" name="pastTripFile" required
                                             style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".xlsx">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6">
+                                    <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
+                                    </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6 text-right">
                                     <button type='submit' class="btn btn-default w-25 mt-4">Submit</button>
+                                </div>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="warningModalTitle">Modal title</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body">
+                                        There are still unresolved errors. Do you want to continue?
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" id="no" data-dismiss="modal">No</button>
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                                        </div>
+                                    </div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -142,7 +170,7 @@
                                                                 style="width:100%">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th>Status</th>
+                                                                        <th >Id</th>
                                                                         <th>Docket Date</th>
                                                                         <th>Truck No</th>
                                                                         <th>Line number</th>
@@ -155,8 +183,7 @@
                                                                 <tbody>
                                                                     {% for error in pastTripErrors %}
                                                                     <tr>
-                                                                        <td><i class="fa fa-close text-danger ">
-                                                                        </td>
+                                                                        <td><button type="button" onclick="showModel(this)" id="{{error.id}}"> {{error.id}}</button></td>
                                                                         <td>{{ error.tripDate }}</td>
                                                                         <td>{{ error.truckNo }}</td>
                                                                         <td>{{ error.lineNumber }}</td>
@@ -165,12 +192,13 @@
                                                                         <td>{{ error.fileName }}</td>
                                                                         <td>
                                                                         {% if not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                        <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Solve  </a>
+                                                                        <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Resolve  </a>
                                                                         {% endif %}
                                                                         </td>
                                                                     </tr>
                                                                     {% endfor %}
                                                                 </tbody>
+                                                                
                                                             </table>
                                                         </div>
                                                     </div>
@@ -244,6 +272,10 @@
     $(document).ready(function () {
         $('#datatable-buttons').DataTable();
         $('#solved-datatable-buttons').DataTable();
+
+        $('#no').click(function(){
+            $('#save_').prop('checked', false);
+        })
 
     });
 </script>

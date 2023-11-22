@@ -938,7 +938,17 @@ def reconciliationAnalysis(request):
 def reconciliationDocketView(request, docketNumber):
     # try:
     rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
+    # for driverDocket view 
     driverDocket = DriverDocket.objects.filter(docketNumber=docketNumber).first()
+    surcharges = Surcharge.objects.all()
+    base_plant = BasePlant.objects.all()
+    # trip_ = DriverTrip.objects.filter(id = driverDocket.tripId).first()
+    # return HttpResponse(trip_)
+    # AdminTruckNo = AdminTruck.objects.filter(adminTruckNumber = trip_.truckNo).first()
+    # clientTruck = ClientTruckConnection.objects.filter(truckNumber = AdminTruckNo.adminTruckNumber).first()
+    # return HttpResponse(clientTruck)
+    # rateCard = RateCard.objects.filter(rate_card_name = clientTruck.rate_card_name ).first()
+    # return HttpResponse(rateCard)
     
     if rctiDocket:
         rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
@@ -948,7 +958,9 @@ def reconciliationDocketView(request, docketNumber):
 
     params = {
         'rctiDocket': rctiDocket,
-        'driverDocket': driverDocket
+        'driverDocket': driverDocket,
+        'surcharges': surcharges,
+        'basePlants': base_plant,
     }
 
     return render(request, 'Reconciliation/reconciliation-docket.html', params)
@@ -1260,8 +1272,8 @@ def rateCardSave(request, id=None):
 
 
 def PastTripForm(request):
-    pastTripErrors = PastTripError.objects.filter(status = True).values()
-    pastTripSolved = PastTripError.objects.filter(status = False).values()
+    pastTripErrors = PastTripError.objects.filter(status = False).values()
+    pastTripSolved = PastTripError.objects.filter(status = True).values()
     params = {
        'pastTripErrors' : pastTripErrors ,
        'pastTripSolved' :pastTripSolved

@@ -8,6 +8,7 @@ def convertIntoFloat(str_):
     cleaned_string = str_.replace(' ','').replace(',','')
     return float(cleaned_string)
 
+
 def checkDate(date_):
     pattern = r'\d{2}/\d{2}/\d{2}'
     return True if re.fullmatch(pattern,date_) else False
@@ -34,6 +35,9 @@ def insertTopUpRecord(list_, truckNo, docketNumber):
     # RCTIobj.save()
     return RCTIobj
 
+docket_pattern = r'^\d{8}$|^\d{6}$'
+
+
 def insertIntoModel(dataList,file_name):
     
     try:
@@ -46,136 +50,146 @@ def insertIntoModel(dataList,file_name):
             RCTIobj = RCTI()
     
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
-        RCTIobj.docketNumber = str(dataList[1])
-        dataList = dataList[2:]
-        basePlants = BasePlant.objects.all()
-        BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
-        while dataList:
+        if re.match(docket_pattern ,str(dataList[1])):
+            RCTIobj.docketNumber = str(dataList[1])
+            dataList = dataList[2:]
+            basePlants = BasePlant.objects.all()
+            BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
+            while dataList:
 
-            dump = dataList[:10]
-            description = dump[2].lower().strip()
-            if 'top up' in description:
-                # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
-                
-                RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
+                dump = dataList[:10]
+                description = dump[2].lower().strip()
+                if 'top up' in description:
+                    # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
+                    
+                    RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
+                    RCTIobj.docketYard = dump[1]
+                    
+                    RCTIobj.others = dump[2]
+                    RCTIobj.othersCost = convertIntoFloat(dump[6])
+                    RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
+                    RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
+                    RCTIobj.othersTotal = convertIntoFloat(dump[9])
+                    dataList = dataList[10:]
+
+                    continue
+                    
+                RCTIobj.docketDate = dateConvert(dump[0])
+                if dump[1] is not BasePlant_:
+                        BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dump[1]).upper())[0]
                 RCTIobj.docketYard = dump[1]
                 
-                RCTIobj.others = dump[2]
-                RCTIobj.othersCost = convertIntoFloat(dump[6])
-                RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
-                RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
-                RCTIobj.othersTotal = convertIntoFloat(dump[9])
+                if "truck transfer" in description:
+                    RCTIobj.transferKM = convertIntoFloat(dump[4])
+                    RCTIobj.transferKMCost = convertIntoFloat(dump[6])
+                    RCTIobj.transferKMGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.transferKMTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.transferKMTotal = convertIntoFloat(dump[-1])
+                elif "cartage" in description:
+                    RCTIobj.noOfKm = convertIntoFloat(dump[3])
+                    RCTIobj.cubicMl = convertIntoFloat(dump[4])
+                    RCTIobj.cubicMiAndKmsCost = convertIntoFloat(dump[6])
+                    RCTIobj.destination = description.split('cartage')[0]
+                    RCTIobj.cartageGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.cartageTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.cartageTotal = convertIntoFloat(dump[-1])
+                elif "return" in description:
+                    RCTIobj.returnKm = convertIntoFloat(dump[4])
+                    RCTIobj.returnPerKmPerCubicMeterCost = convertIntoFloat(dump[6])
+                    RCTIobj.returnKmGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.returnKmTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.returnKmTotal = convertIntoFloat(dump[-1])
+                elif "waiting time" in description:
+                    RCTIobj.waitingTimeInMinutes = convertIntoFloat(dump[4])
+                    RCTIobj.waitingTimeCost = convertIntoFloat(dump[6])
+                    RCTIobj.waitingTimeGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.waitingTimeTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.waitingTimeTotal = convertIntoFloat(dump[-1])
+                elif "minimum load" in description:
+                    RCTIobj.minimumLoad = convertIntoFloat(dump[4])
+                    RCTIobj.loadCost = convertIntoFloat(dump[6])
+                    RCTIobj.minimumLoadGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.minimumLoadTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.minimumLoadTotal = convertIntoFloat(dump[-1])
+                elif "standby" in description:
+                    RCTIobj.standByPerHalfHourCost = convertIntoFloat(dump[4])
+                    RCTIobj.standByUnit = 'slot' if str(
+                        dump[5].lower()) == 'each' else 'minute'
+                    RCTIobj.standByPerHalfHourDuration = convertIntoFloat(dump[6])
+                    RCTIobj.standByGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.standByTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.standByTotal = convertIntoFloat(dump[-1])
+                elif "surcharge after hours" in description:
+                    RCTIobj.surcharge_duration = convertIntoFloat(dump[4])
+                    if "mon-fri" in description and "each" in str(dump[5].lower()):
+                        RCTIobj.surcharge_fixed_normal = convertIntoFloat(dump[6])
+                    elif "sat" in description and 'mon' in description and "each" in str(dump[5].lower()):
+                        RCTIobj.surcharge_fixed_sunday = convertIntoFloat(dump[6])
+                    RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])
+                elif "waiting time sched" in description:
+                    RCTIobj.waitingTimeSCHED = convertIntoFloat(dump[4])
+                    RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dump[6])
+                    RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dump[-2])
+                    RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dump[-3])
+                    RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dump[-1])
+                    
+                    
+                # surcharge_fixed_public_holiday
+                # surcharge_per_cubic_meters_normal
+                # surcharge_per_cubic_meters_sunday
+                # surcharge_per_cubic_meters_public_holiday
+
+                # others
+                # othersCost
+
+                # ------------------------------------------
+
+                RCTIobj.GSTPayable = convertIntoFloat(dump[8])
+                RCTIobj.TotalExGST = convertIntoFloat(dump[7])
+                RCTIobj.Total = convertIntoFloat(dump[9])
+
                 dataList = dataList[10:]
-
-                continue
-                
-            RCTIobj.docketDate = dateConvert(dump[0])
-            if dump[1] is not BasePlant_:
-                    BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dump[1]).upper())[0]
-            RCTIobj.docketYard = dump[1]
+            RCTIobj.save()
             
-            if "truck transfer" in description:
-                RCTIobj.transferKM = convertIntoFloat(dump[4])
-                RCTIobj.transferKMCost = convertIntoFloat(dump[6])
-                RCTIobj.transferKMGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.transferKMTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.transferKMTotal = convertIntoFloat(dump[-1])
-            elif "cartage" in description:
-                RCTIobj.noOfKm = convertIntoFloat(dump[3])
-                RCTIobj.cubicMl = convertIntoFloat(dump[4])
-                RCTIobj.cubicMiAndKmsCost = convertIntoFloat(dump[6])
-                RCTIobj.destination = description.split('cartage')[0]
-                RCTIobj.cartageGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.cartageTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.cartageTotal = convertIntoFloat(dump[-1])
-            elif "return" in description:
-                RCTIobj.returnKm = convertIntoFloat(dump[4])
-                RCTIobj.returnPerKmPerCubicMeterCost = convertIntoFloat(dump[6])
-                RCTIobj.returnKmGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.returnKmTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.returnKmTotal = convertIntoFloat(dump[-1])
-            elif "waiting time" in description:
-                RCTIobj.waitingTimeInMinutes = convertIntoFloat(dump[4])
-                RCTIobj.waitingTimeCost = convertIntoFloat(dump[6])
-                RCTIobj.waitingTimeGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.waitingTimeTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.waitingTimeTotal = convertIntoFloat(dump[-1])
-            elif "minimum load" in description:
-                RCTIobj.minimumLoad = convertIntoFloat(dump[4])
-                RCTIobj.loadCost = convertIntoFloat(dump[6])
-                RCTIobj.minimumLoadGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.minimumLoadTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.minimumLoadTotal = convertIntoFloat(dump[-1])
-            elif "standby" in description:
-                RCTIobj.standByPerHalfHourCost = convertIntoFloat(dump[4])
-                RCTIobj.standByUnit = 'slot' if str(
-                    dump[5].lower()) == 'each' else 'minute'
-                RCTIobj.standByPerHalfHourDuration = convertIntoFloat(dump[6])
-                RCTIobj.standByGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.standByTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.standByTotal = convertIntoFloat(dump[-1])
-            elif "surcharge after hours" in description:
-                RCTIobj.surcharge_duration = convertIntoFloat(dump[4])
-                if "mon-fri" in description and "each" in str(dump[5].lower()):
-                    RCTIobj.surcharge_fixed_normal = convertIntoFloat(dump[6])
-                elif "sat" in description and 'mon' in description and "each" in str(dump[5].lower()):
-                    RCTIobj.surcharge_fixed_sunday = convertIntoFloat(dump[6])
-                RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])
-            elif "waiting time sched" in description:
-                RCTIobj.waitingTimeSCHED = convertIntoFloat(dump[4])
-                RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dump[6])
-                RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dump[-2])
-                RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dump[-3])
-                RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dump[-1])
                 
-                
-            # surcharge_fixed_public_holiday
-            # surcharge_per_cubic_meters_normal
-            # surcharge_per_cubic_meters_sunday
-            # surcharge_per_cubic_meters_public_holiday
-
-            # others
-            # othersCost
-
-            # ------------------------------------------
-
-            RCTIobj.GSTPayable = convertIntoFloat(dump[8])
-            RCTIobj.TotalExGST = convertIntoFloat(dump[7])
-            RCTIobj.Total = convertIntoFloat(dump[9])
-
-            dataList = dataList[10:]
-        RCTIobj.save()
-        
             
-        
-        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
-        rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
-        
-        # rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
-        
-        if not reconciliationDocketObj :
-            reconciliationDocketObj = ReconciliationReport()
-        
-        reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
-        reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-        # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
-        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
-        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
-        # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
-        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
-        reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
-        reconciliationDocketObj.fromRcti = True 
-        
-        reconciliationDocketObj.save()
-        checkMissingComponents(reconciliationDocketObj)
-        
-        
-        # exit()
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+            rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
+            
+            # rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
+            
+            if not reconciliationDocketObj :
+                reconciliationDocketObj = ReconciliationReport()
+            
+            reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
+            reconciliationDocketObj.docketDate =  RCTIobj.docketDate
+            reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
+            # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+            reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
+            reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
+            reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
+            # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+            reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
+            reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
+            reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+            reconciliationDocketObj.fromRcti = True 
+            
+            reconciliationDocketObj.save()
+            checkMissingComponents(reconciliationDocketObj)
+            
+            
+        else:
+            rctiErrorObj = RctiErrors( 
+                            docketNumber = dataList[1],
+                            docketDate = RCTIobj.docketDate,
+                            errorDescription = 'To be adjusted manually by admin team',
+                            fileName = file_name,
+                            data = str(dataList)
+        )
+            rctiErrorObj.save()
+    
 
     except Exception as e:
         # print(f"Error : {e}")
@@ -187,8 +201,6 @@ def insertIntoModel(dataList,file_name):
                             data = str(dataList)
         )
         rctiErrorObj.save()
-        # print(f' Docket No :{RCTIobj.docketNumber}. Docket Date : {RCTIobj.docketDate}  , Error : {e} \n {dataList} \n\n\n')
-        # exit()
         pass
 
 

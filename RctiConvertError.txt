@@ -2,3 +2,147 @@
 list index out of range ** "INV-0511 SE 30/09/22                   SEPT 2022 TOLLS                                                            1.0000 EACH       962.2200       962.22     96.22       1,058.44"
 
 list index out of range ** "INV-0511 MA 31/05/23                   MAY 2023 TOLLS                                                             1.0000 EACH       678.2000       678.20     67.82         746.02"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
+
+list index out of range ** "02/03/23    Starcard   EG AMPOL 91769 BURWOOD                       165.9900 LITRE     1.7400      (288.82)    (28.88)        (317.70)"
+
+list index out of range ** "06/03/23    Starcard   EG AMPOL 91803 SILVERWATER                   202.4400 LITRE     1.7400      (352.25)    (35.23)        (387.48)"
+
+list index out of range ** "09/03/23    Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU          200.4800 LITRE     1.7400      (348.84)    (34.88)        (383.72)"
+
+list index out of range ** "Starcard   AMPOL FOODARY EASTERN CREEK EASTBOU           27.5100 LITRE     1.7000       (46.77)      (4.68)        (51.45)"
+
+list index out of range ** "14/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       236.9500 LITRE     1.7400      (412.29)    (41.23)        (453.52)"
+
+list index out of range ** "16/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       136.0400 LITRE     1.7400      (236.71)    (23.67)        (260.38)"
+
+list index out of range ** "21/03/23    Starcard   EG AMPOL 91769 BURWOOD                       214.7000 LITRE     1.7400      (373.58)    (37.36)        (410.94)"
+
+list index out of range ** "25/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       228.2900 LITRE     1.7400      (397.22)    (39.72)        (436.94)"
+
+list index out of range ** "29/03/23    Starcard   AMPOL FOODARY HOMEBUSH                       168.1800 LITRE     1.7400      (292.63)    (29.26)        (321.89)"
