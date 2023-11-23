@@ -172,7 +172,7 @@ class AdminTruck(models.Model):
         return str(self.adminTruckNumber)
 
 
-class   Driver(models.Model):
+class Driver(models.Model):
     # driverId = models.IntegerField(primary_key=True, unique=True, default=generate_4digit_unique_key, editable=False)
     driverId = models.IntegerField(primary_key=True, unique=True)
     name = models.CharField(max_length=200)

@@ -1,11 +1,9 @@
-from django.shortcuts import render, redirect, get_object_or_404 ,reverse
-from rest_framework.response import Response
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil ,json ,os ,tabula ,requests ,colorama ,subprocess ,io ,csv
+import shutil ,os  ,colorama ,subprocess ,csv
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from django.contrib import messages
@@ -14,8 +12,6 @@ from GearBox_app.models import *
 from django.http import FileResponse
 from CRUD import *
 from .models import RCTI
-from django.http import Http404
-from django.core.serializers.json import DjangoJSONEncoder
 from Account_app.reconciliationUtils import *
 
 

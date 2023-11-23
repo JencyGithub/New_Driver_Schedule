@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Appointment form {% endblock %}
+{% block title %} | {% if not data %}Add Job {% else %} View Job{% endif %} {% endblock %}
 
 {% block headStyle %}
 
@@ -13,54 +13,55 @@
         <div class="clearfix"></div>
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="" novalidate enctype="multipart/form-data">
+                <form action="{% if not data %}{% url "Appointment:appointmentFormSave" %}{% endif %}" method="POST" novalidate enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> Appointment Form</h2>
-                            <!-- <a href="" class="float-right btn btn-dark">Add Docket</a> -->
-                            <!-- <label for="verified" class="float-right ml-2"
-                                style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
-                            <input type="checkbox" id="verified" name="verified" class="float-right "
-                                style="margin-top: .8rem;">  -->
+                            <h2>{% if not data %}Add Job {% else %} View Job{% endif %}</h2>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
                             <div class="custom-continer">
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="tripStatus">Trip status :<span class="required">*</span></label>
+                                    <label for="status">Status :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="tripStatus" class="form-select form-control" id="tripStatus">
-                                            <option value="" disabled selected>Select trip status</option>
-                                            <option value="unassigned">unassigned</option>
+                                        <select name="status" class="form-select form-control" id="status" required {% if data %}readonly{% endif %}>
+                                            <option disabled selected> Select status </option>
+                                            <option value="unassigned" {% if data.Status == "unassigned" %}selected{% endif %}>unassigned</option>
+                                            <option value="assigned" {% if data.Status == "assigned" %}selected{% endif %}>assigned</option>
+                                            <option value="dispacted" {% if data.Status == "dispacted" %}selected{% endif %}>dispacted</option>
+                                            <option value="in_progress" {% if data.Status == "in_progress" %}selected{% endif %}>in_progress</option>
+                                            <option value="incomplete" {% if data.Status == "incomplete" %}selected{% endif %}>incomplete</option>
+                                            <option value="complete" {% if data.Status == "complete" %}selected{% endif %}>complete</option>
+                                            <option value="cancelled" {% if data.Status == "cancelled" %}selected{% endif %}>cancelled</option>
                                         </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="scheduled">Scheduled :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="" type="number" name="scheduled"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="scheduled">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="title">Title :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="title"
+                                        <input class="form-control" value="{% if data %}{{ data.Title }}{% endif %}" type="text" name="title" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="title">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="origin">Origin :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{% if data %}{{ data.Origin }}{% endif %}" type="text" name="origin" {% if data %}readonly{% endif %}
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="origin">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="startDateTime">Start date time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="startDateTime"
+                                        <input class="form-control" value="{% if data %}{{ data.Start_Date_Time }}{% endif %}" type="datetime-local" name="startDateTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="startDateTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="endDateTime">End date time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="endDateTime"
+                                        <input class="form-control" value="{% if data %}{{ data.End_Date_Time }}{% endif %}" type="datetime-local" name="endDateTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="endDateTime">
                                     </div>
                                 </div>
@@ -68,105 +69,128 @@
                                     <label for="reportToOrigin">Report to origin :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="reportToOrigin"
+                                        <input class="form-control" value="{% if data %}{{ data.report_to_origin }}{% endif %}" type="datetime-local" name="reportToOrigin" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="reportToOrigin">
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="status">Status :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="status"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="status">
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="origin">Origin :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="origin"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="origin">
-                                    </div>
-                                </div>
+                               
                                 <div class="col-md-4 col-sm-4">
                                     <label for="recurring">Recurring :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="recurring"
+                                        <input class="form-control" value="{% if data %}{{ data.Recurring }}{% endif %}" type="text" name="recurring" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="recurring">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="staffNotes">Staff notes :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="staffNotes"
+                                        <input class="form-control" value="{% if data %}{{ data.Staff_Notes }}{% endif %}" type="text" name="staffNotes" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="staffNotes">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="createdBy">Created by :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="createdBy"
+                                        <input class="form-control" value="{% if data %}{{ data.Created_by }}{% endif %}" type="text" name="createdBy" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="createdBy">
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="Created_time">Created time :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="Created_time"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="Created_time">
-                                    </div>
-                                </div>
+                                {{ data.Report_Time }}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="reportTime">Report time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="reportTime"
+                                        <input class="form-control" value="{% if data %}{{ data.Report_Time }}{% endif %}" type="time" name="reportTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="reportTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="dwellTime">Dwell time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="dwellTime"
+                                        <input class="form-control" value="{% if data %}{{ data.Dwell_Time }}{% endif %}" type="time" name="dwellTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="dwellTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="blockTime">Block time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="blockTime"
+                                        <input class="form-control" value="{% if data %}{{ data.Block_Time }}{% endif %}" type="time" name="blockTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="blockTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="totalTime">Total time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="time" name="totalTime"
+                                        <input class="form-control" value="{% if data %}{{ data.Total_Time }}{% endif %}" type="time" name="totalTime" {% if data %}readonly{% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="totalTime">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="driverName">Driver name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="driverName"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="driverName">
+                                        <select name="driverName" class="form-select form-control" id="driverName" required {% if data %}readonly{% endif %}>
+                                            {% for driver in drivers %}
+                                            <option value="{{driver.driverId}}" {% if data.driver.driverId == driver.driverId %}selected{% endif %} >{{driver.driverId}}-{{driver.name}}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="stopName">Stop name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" type="text" name="stopName"
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="stopName">
+                                        <select name="stopName" class="form-select form-control" id="stopName" required {% if data %}readonly{% endif %}>
+                                            {% for client in clients %}
+                                            <option value="{{client.clientId}}" {% if data.stop.clientId == client.clientId %}selected{% endif %}>{{client.clientId}}-{{client.name}}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% if not data %}
                     <div class="col-md-12 text-right p-0">
                         <button type='reset' style="margin: 0px;" class="btn btn-success px-4">Reset</button>
                         <button type='submit' style="margin: 0px;" class="btn btn-primary px-4">Save</button>
                     </div>
+                    {% endif %}
                 </form>
             </div>
         </div>
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
+
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+<script>
+
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+</script>
+
 {% endblock %}

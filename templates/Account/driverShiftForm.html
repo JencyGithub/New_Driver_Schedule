@@ -53,8 +53,7 @@ Report {% endblock %}
                     <form action="{% url 'Account:ShiftDetails' id=id%}" method="POST" novalidate id="reconciliationForm">
                     {%csrf_token%}
                     <div class="x_title">
-                        <h2>Driver | Shift  Form</h2>
-
+                        <h2>{% if id == 0 %}Completed Jobs {% elif  id == 1 %} Charged Jobs {% endif %} Form </h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -63,13 +62,13 @@ Report {% endblock %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="startDate">Start Date:</label>
                                     <div class="field item form-group">
-                                        <input class="form-control date" type="date" name="startDate" id="startDate">
+                                        <input class="form-control date" type="date" name="startDate" id="startDate" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="endDate">End Date:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control date" type="date" name="endDate" id="endDate" readonly>
+                                        <input class="form-control date" type="date" name="endDate" id="endDate" readonly required>
                                     </div>
                                 </div>
                                  <div class="col-md-4 col-sm-4">

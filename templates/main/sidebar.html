@@ -154,7 +154,7 @@
                 <ul class="nav child_menu">
                   <li class="sub_menu"><a href="{% url 'Appointment:appointmentForm'%}">Add Job</a>
                   </li>
-                  <li><a href="#">Find Job</a>
+                  <li><a href="{% url 'Appointment:findJob'%}">Find Job</a>
                   </li>
                   {% comment %} Driver Trip form data {% endcomment %}
                   <li><a href="{% url 'Account:DriverShiftForm' id=0%}">Completed Jobs</a></li>
@@ -218,17 +218,6 @@
                   <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
                   </li>
                   <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <a><i class="fa fa-wrench"></i> Gear Box<span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">
-
-              <li><a> Trucks section<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  
                 </ul>
               </li>
             </ul>

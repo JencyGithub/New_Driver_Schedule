@@ -31,7 +31,7 @@
                             aria-orientation="vertical">
                             <a class="nav-link active" id="v-pills-docketView-tab" data-toggle="pill" href="#v-pills-docketView"
                             role="tab" aria-controls="v-pills-docketView" aria-selected="true">{%if rcti %}Docket view{%else%}RCTI{%endif%}</a>
-                            {% if rcti %}
+                            {% comment %} {% if rcti %} {% endcomment %}
                             <a class="nav-link" id="v-pills-truckNo-tab" data-toggle="pill" href="#v-pills-truckNo" role="tab"
                                 aria-controls="v-pills-truckNo" aria-selected="false">Truck No</a>
                             <a class="nav-link" id="v-pills-noOfKm-tab" data-toggle="pill" href="#v-pills-noOfKm"
@@ -52,7 +52,7 @@
                                 role="tab" aria-controls="v-pills-surcharge_fixed_normal" aria-selected="false">Surcharge fixed normal</a>
                                 <a class="nav-link" id="v-pills-others-tab" data-toggle="pill" href="#v-pills-others"
                                 role="tab" aria-controls="v-pills-others" aria-selected="false">Others</a>
-                                {%endif%}
+                                {% comment %} {%endif%} {% endcomment %}
                             </div>
 
                         </div>

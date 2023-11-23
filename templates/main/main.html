@@ -81,12 +81,10 @@
       </div>
     </div>
     <!-- footer start scripts  -->
-    <script src='{% static "Dashboard/vendors/jquery/dist/jquery.min.js" %}'></script>
-    <script>
-      const csrftoken = $("[name=csrfmiddlewaretoken]").val();
-    </script>
     {% block footerStyle %} {% endblock %}
+    
     <!-- jQuery -->
+    <script src='{% static "Dashboard/vendors/jquery/dist/jquery.min.js" %}'></script>
     <!-- Bootstrap -->
     <script src='{% static "Dashboard/vendors/bootstrap/dist/js/bootstrap.bundle.min.js" %}'></script>
     <!-- FastClick -->

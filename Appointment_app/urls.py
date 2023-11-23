@@ -21,7 +21,9 @@ from . import views
 app_name = 'Appointment'
 
 urlpatterns = [
-    
     # Appointment
     path('appointmentForm/', views.appointmentForm,name="appointmentForm"),
+    path('appointmentForm/update/view/<int:id>/', views.appointmentForm,name="appointmentFormUpdateView"),
+    path('appointmentForm/save/', views.applicationSave,name="appointmentFormSave"),
+    path('findJob/', views.findJob,name="findJob"),
 ]

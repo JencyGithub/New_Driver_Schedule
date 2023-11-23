@@ -3,6 +3,7 @@ from .models import *
 from Account_app.models import *
 from django.core.mail import send_mail, EmailMessage
 from GearBox_app.models import *
+from Appointment_app.models import *
 from django.http import HttpResponse
 import csv
 
@@ -407,3 +408,29 @@ admin.site.register(Location)
 
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
+
+
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    search_fields = ('driver', 'client',)
+    list_display = ["Title", "Start_Date_Time", "End_Date_Time", "Status", "driver","scheduled"]
+    list_filter = ["Status"]
+    actions = ['send_email_action']
+
+    def send_email_action(self, request, queryset):
+        subject = 'Your job application status'
+        message = 'Your job application status has been updated.'
+        from_email = 'siddhantethansrec@example.com'  # Set your email address
+        recipient_list = [applicant.driver.email for applicant in queryset]
+        print(recipient_list)
+        
+        # Send emails to selected applicants
+        for applicant in queryset:
+            send_mail(subject, message, from_email, [applicant.driver.email])
+            # send_notification_email(applicant.progress_set.latest('date_updated'))
+        
+        self.message_user(request, f'Emails sent to {len(queryset)} applicants.')
+    
+    send_email_action.short_description = 'Send email to selected applicants'
+

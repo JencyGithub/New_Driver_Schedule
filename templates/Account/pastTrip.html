@@ -330,6 +330,8 @@
 {% block footerStyleEnd %}
 
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
     $(document).ready(function () {
         $('#datatable-buttons').DataTable();
         $('#solved-datatable-buttons').DataTable();
