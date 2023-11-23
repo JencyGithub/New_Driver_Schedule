@@ -50,11 +50,11 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Filters</h2>
+                        <h2>{{dataType}}</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-                        <form action="{% url 'Account:reconciliationAnalysis' %}" method="POST" novalidate id="reconciliationForm">
+                        <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
                             {% csrf_token %}
                             <div class="col-md-6 col-sm-6">
                                 <label for="startDate">Start Date:<span class="required">*</span></label>

@@ -182,6 +182,7 @@ class PastTripError(models.Model):
     errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)
     fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
     status = models.BooleanField(default=False)
+    data = models.CharField(max_length=1024, default=' ')
 
     def __str__(self):
         return str(self.docketNumber)
@@ -200,6 +201,8 @@ class ReconciliationReport(models.Model):
     clientId = models.PositiveIntegerField(default=0)
     truckId = models.PositiveIntegerField(default=0)
     
+    # 0:reconciliation, 1:Short Paid
+    reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
     fromDriver = models.BooleanField(default=False)
@@ -240,7 +243,7 @@ class ReconciliationReport(models.Model):
     # Total 
     driverTotalCost = models.FloatField(default=0)
     rctiTotalCost = models.FloatField(default=0)
-    
+        
     def __str__(self):
         return str(self.docketNumber)
     
@@ -256,6 +259,8 @@ class RctiErrors(models.Model):
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)
     data = models.CharField(max_length=1024,default='')
+    # 0:Earning, 1:Expanse
+    errorType = models.PositiveIntegerField(default=0)
     
     def __str__(self) -> str:
         return str(self.docketNumber +' '+ self.errorDescription)

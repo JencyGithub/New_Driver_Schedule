@@ -61,7 +61,6 @@ def insertIntoModel(dataList,file_name):
                 description = dump[2].lower().strip()
                 if 'top up' in description:
                     # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
-                    
                     RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
                     RCTIobj.docketYard = dump[1]
                     
@@ -134,8 +133,7 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dump[-2])
                     RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dump[-3])
                     RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dump[-1])
-                    
-                    
+                     
                 # surcharge_fixed_public_holiday
                 # surcharge_per_cubic_meters_normal
                 # surcharge_per_cubic_meters_sunday
@@ -152,8 +150,6 @@ def insertIntoModel(dataList,file_name):
 
                 dataList = dataList[10:]
             RCTIobj.save()
-            
-                
             
             reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
             rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
@@ -179,7 +175,6 @@ def insertIntoModel(dataList,file_name):
             reconciliationDocketObj.save()
             checkMissingComponents(reconciliationDocketObj)
             
-            
         else:
             rctiErrorObj = RctiErrors( 
                             docketNumber = dataList[1],
@@ -189,7 +184,6 @@ def insertIntoModel(dataList,file_name):
                             data = str(dataList)
         )
             rctiErrorObj.save()
-    
 
     except Exception as e:
         # print(f"Error : {e}")
@@ -203,14 +197,9 @@ def insertIntoModel(dataList,file_name):
         rctiErrorObj.save()
         pass
 
-
-        # exit()
-   
-   
 def insertIntoExpenseModel(dataList , file_name):
     basePlants = BasePlant.objects.all()
     BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
-
     if dataList and len(dataList) > 10:
         try:
             rctiExpenseObj = RctiExpense()
@@ -231,8 +220,6 @@ def insertIntoExpenseModel(dataList , file_name):
                 rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
                 rctiExpenseObj.total =  convertIntoFloat(dataList[11])
                 rctiExpenseObj.save()
-                
-
         except Exception as e:
             rctiErrorObj = RctiErrors( 
                             docketNumber = rctiExpenseObj.docketNumber,
@@ -244,8 +231,6 @@ def insertIntoExpenseModel(dataList , file_name):
             rctiErrorObj.save()
             
 try:
-    
-            
     with open("File_name_file.txt", 'r') as f:
         file_name = f.read()
     # file_name = file_name.strip()

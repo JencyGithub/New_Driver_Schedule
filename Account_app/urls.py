@@ -39,6 +39,7 @@ urlpatterns = [
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('uploded/rcti/', views.uplodedRCTI, name='UplodedRCTI'), 
+    path('rcti/error/get/', views.getRctiError, name='getRctiError'), 
     
     
     # Expanse entry manually
@@ -92,9 +93,10 @@ urlpatterns = [
 
 
     # Reconciliation
-    path('reconciliation/form/', views.reconciliationForm, name='reconciliationForm'),
-    path('reconciliation/analysis/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
+    path('reconciliation/form/<int:dataType>/', views.reconciliationForm, name='reconciliationForm'),
+    path('reconciliation/analysis/<int:dataType>/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
     path('reconciliation/docket/view/<int:docketNumber>/', views.reconciliationDocketView, name='reconciliationDocketView'),
+    path('reconciliation/setMark/', views.reconciliationSetMark, name='reconciliationSetMark'),
 
 
     path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
@@ -113,8 +115,10 @@ urlpatterns = [
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
     path('pastTrip/error/docketView/<int:ids>/<int:driverDocketNumber>/<str:flag>/', views.driverDocketEntry, name='pastTripErrorDocketView'),
+    path('pastTrip/error/get/', views.getSinglePastTripError, name='getSinglePastTripError'),
     
-    path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'), 
+    path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
+     
     
     
     # Base plant routes

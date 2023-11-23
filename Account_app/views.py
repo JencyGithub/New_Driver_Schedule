@@ -378,6 +378,12 @@ def uplodedRCTI(request):
         
     return render(request, 'Account/uplodedRCTI.html', {'rctiFileNameLists' : rctiFileNameLists})
 
+@csrf_protect
+def getRctiError(request):
+    rctiErrorData = RctiErrors.objects.filter(pk=request.POST.get('id')).values().first()
+    return JsonResponse({'status': True,'data': rctiErrorData})
+
+
 def expanseForm(request, id = None):
     rctiExpense = None
     if id:
@@ -467,6 +473,10 @@ def driverDocketEntry(request, ids, driverDocketNumber=None , flag = None):
         messages.warning(request, "Invalid Request ")
         return redirect('Account:driverTripsTable')
 
+@csrf_protect
+def getSinglePastTripError(request):
+    pastTripErrorData = PastTripError.objects.filter(pk=request.POST.get('id')).values().first()
+    return JsonResponse({'status': True,'data':pastTripErrorData})
 
 def driverDocketEntrySave(request, ids):
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
@@ -916,21 +926,45 @@ def driverEntryUpdate(request, ids):
 
 # ```````````````````````````````````
 
-def reconciliationForm(request):
+def reconciliationForm(request, dataType):
+    
     drivers = Driver.objects.all()
     clients = Client.objects.all()
     trucks = AdminTruck.objects.all()
-    return render(request, 'Reconciliation/reconciliation.html', {'drivers': drivers, 'clients': clients, 'trucks': trucks})
+    
+    params = {
+        'drivers': drivers,
+        'clients': clients,
+        'trucks': trucks ,
+    }
+
+    if dataType == 0:
+        params['dataType'] = 'Reconciliation Report'
+        params['dataTypeInt'] = 0
+    elif dataType ==  1:
+        params['dataType'] = 'Short paid Report'
+        params['dataTypeInt'] = 1
+        
+        
+    return render(request, 'Reconciliation/reconciliation.html', params)
 
 @csrf_protect
-def reconciliationAnalysis(request):
+def reconciliationAnalysis(request,dataType):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
     
-    dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
-    params = {
-        'dataList': dataList,
-    }
+    params = {}
+    if dataType == 0:
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
+        params['dataType'] = 'Reconciliation'
+        params['dataTypeInt'] = 0
+    elif dataType == 1:
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 1).values()
+        params['dataType'] = 'Short paid'
+        params['dataTypeInt'] = 1
+        
+    params['dataList'] = dataList
+    
     return render(request, 'Reconciliation/reconciliation-result.html', params)
      
 
@@ -964,6 +998,17 @@ def reconciliationDocketView(request, docketNumber):
     }
 
     return render(request, 'Reconciliation/reconciliation-docket.html', params)
+
+@csrf_protect
+@api_view(['POST'])
+def reconciliationSetMark(request):
+    dockets = request.POST.getlist('dockets[]')
+    for docket in dockets:
+        getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
+        getDocket.reconciliationType = 1
+        getDocket.save()
+    
+    return JsonResponse({'status': True})
 
 def reconciliationEscalationForm(request,id):
     data = ReconciliationReport.objects.filter(pk=id).first()

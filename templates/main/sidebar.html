@@ -1,4 +1,4 @@
-<div class="col-md-3 left_col menu_fixed">
+<div class="col-md-3 left_col ">
   <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
       <a href="{% url 'Account:index'%}" class="site_title"><i class="fa fa-paw"></i> <span>PNR Group</span></a>
@@ -190,9 +190,9 @@
                 <ul class="nav child_menu">
                   <li class="sub_menu"><a href="#">Revenue Report</a>
                   </li>
-                  <li><a href="{% url 'Account:reconciliationForm'%}">Reconciliation Report</a>
+                  <li><a href="{% url 'Account:reconciliationForm' dataType=0 %}">Reconciliation Report</a>
                   </li>
-                  <li><a href="#">Short Paid Report</a>
+                  <li><a href="{% url 'Account:reconciliationForm' dataType=1 %}">Short Paid Report</a>
                   </li>
                   <li><a href="#">Expense Report</a>
                   </li>

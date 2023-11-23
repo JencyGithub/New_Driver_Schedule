@@ -392,7 +392,7 @@ admin.site.register(RctiErrors)
 admin.site.register(PastTripError)
 
 class ReconciliationReportAdmin(admin.ModelAdmin):
-    #  list_display = ["reason"]
+    list_display = ["docketNumber","reconciliationType"]
     search_fields = ["docketNumber"]
 
 admin.site.register(ReconciliationReport , ReconciliationReportAdmin)

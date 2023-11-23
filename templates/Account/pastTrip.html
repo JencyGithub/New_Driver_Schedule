@@ -52,6 +52,10 @@
     .dt-buttons.btn-group>a {
         display: none !important;
     }
+    table button{
+        border:0!important;
+        background-color: transparent;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -170,7 +174,7 @@
                                                                 style="width:100%">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th >Id</th>
+                                                                        <th>Id</th>
                                                                         <th>Docket Date</th>
                                                                         <th>Truck No</th>
                                                                         <th>Line number</th>
@@ -183,7 +187,7 @@
                                                                 <tbody>
                                                                     {% for error in pastTripErrors %}
                                                                     <tr>
-                                                                        <td><button type="button" onclick="showModel(this)" id="{{error.id}}"> {{error.id}}</button></td>
+                                                                        <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                                                         <td>{{ error.tripDate }}</td>
                                                                         <td>{{ error.truckNo }}</td>
                                                                         <td>{{ error.lineNumber }}</td>
@@ -208,6 +212,8 @@
 
                                         <!-- End Error Table  -->
                                     </div>
+                                   
+
                                     <div class="tab-pane fade" id="profile" role="tabpanel"
                                         aria-labelledby="profile-tab">
                                         <!-- Solve Table  -->
@@ -226,6 +232,7 @@
                                                                 style="width:100%">
                                                                 <thead>
                                                                     <tr>
+                                                                        <th>Id</th>
                                                                         <th>Status</th>
                                                                         <th>Docket Date</th>
                                                                         <th>Line number</th>
@@ -237,8 +244,8 @@
                                                                 <tbody>
                                                                     {% for solve in pastTripSolved %}
                                                                     <tr>
-                                                                        <td><i class="fa fa-check text-success ">
-                                                                        </td>
+                                                                        <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                                        <td><i class="fa fa-check text-success "></td>
                                                                         <td>{{ solve.tripDate }}</td>
                                                                         <td>{{ solve.lineNumber }}</td>
                                                                         <td>{{ solve.docketNumber }}</td>
@@ -255,6 +262,60 @@
                                         </div>
                                         <!-- End Solve Table  -->
                                     </div>
+                                     {% comment %} View error Model start {% endcomment %}
+                                     <div class="modal fade" id="errorModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Error details</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                
+                                                <div class="modal-body">
+                                                    <div class="container-fluid">
+                                                        <div class="row mt-2">
+                                                            <div class="col-md-12">
+                                                                <ul>
+                                                                    <li class="mt-1">
+                                                                        <b>Trip Date:-</b>
+                                                                        <span class="d-inline-block" id="tripDate"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Truck Number:-</b>
+                                                                        <span class="d-inline-block" id="truckNo"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Docket Number:-</b>
+                                                                        <span class="d-inline-block" id="docketNumber"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>File Name :-</b>    
+                                                                        <span class="d-inline-block" id="fileName"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Line Number Of File :-</b>    
+                                                                        <span class="d-inline-block" id="lineNumber"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Error :-</b>    
+                                                                        <span class="d-inline-block" id="error"></span>
+                                                                    </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Status :-</b>    
+                                                                        <span class="d-inline-block" id="status"></span>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% comment %} View error Model end {% endcomment %}
                                 </div>
                             </div>
                         </div>
@@ -278,6 +339,34 @@
         })
 
     });
+    function showModel(data) {
+        $("#errorModel").modal("toggle");
+        $.ajax({
+            type: "POST",
+            url: "/account/pastTrip/error/get/",
+            data: {
+              id: data.id,
+            },
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                console.log(data.data)
+              $("#tripDate").text(data.data.tripDate);
+              $("#truckNo").text(data.data.truckNo);
+              $("#docketNumber").text(data.data.docketNumber);
+              $("#fileName").text(data.data.fileName);
+              $("#lineNumber").text(data.data.lineNumber);
+              $("#error").text(data.data.errorFromPastTrip);
+
+              if(data.data.status){
+                $("#status").text("Solved");
+              }else{
+                $("#status").text("Unsolved");
+              }
+            },
+          });
+    }
 </script>
 
 <!-- Datatables -->

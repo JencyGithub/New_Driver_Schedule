@@ -1,5 +1,5 @@
 {% extends "main/main.html" %} {% load static %} {% block title %} |
-Reconciliation docket {% endblock %} {% block headStyle %}
+{{dataType}} docket {% endblock %} {% block headStyle %}
 
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -30,11 +30,13 @@ Reconciliation docket {% endblock %} {% block headStyle %}
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel" style="max-height: 120vh; overflow-y: auto;">
                     <div class="x_title">
-                        <h2>Reconciliation result</h2>
+                        <h2>{{dataType}} result</h2>
+                        {% if dataType == 0 %}
                         <div class="float-right">
                             <button class="btn btn-sm btn-default submit" value="Mark as complete">Mark as
                                 complete</button>
-                        </div>
+                            </div>
+                        {% endif %}
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -102,7 +104,30 @@ Reconciliation docket {% endblock %} {% block headStyle %}
         });
         $('.submit').on('click', function () {
             var selectedRows = table.column(0).checkboxes.selected();
-            console.log(selectedRows)
+        
+            var rowDockets = [];
+            $.each(selectedRows, function(key,docket){
+                rowDockets.push(docket)
+            })
+            console.log(rowDockets)
+        
+            if(rowDockets.length > 0){ // Check if any rows are selected
+                $.ajax({
+                    type: "POST",
+                    url: "/account/reconciliation/setMark/",
+                    data: {
+                        dockets: rowDockets,
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        window.location.reload();
+                        alert('Selected Dockets Marked As Completed Successfully.');
+                    }
+
+                });
+            }
         });
     });
 </script>
