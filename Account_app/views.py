@@ -643,14 +643,14 @@ def locationSave(request, id=None):
     return redirect('Account:basePlantTable')
 
 
-def driverTripsTable(request):
-    driver_trip = DriverTrip.objects.all()  
-    clientName = Client.objects.all()
-    params = {
-        'driverTrip': driver_trip,
-        'clientName': clientName
-    }
-    return render(request, 'Account/Tables/driverTripsTable.html', params)
+# def driverTripsTable(request):
+#     driver_trip = DriverTrip.objects.all()  
+#     clientName = Client.objects.all()
+#     params = {
+#         'driverTrip': driver_trip,
+#         'clientName': clientName
+#     }
+#     return render(request, 'Account/Tables/driverTripsTable.html', params)
 
 
 def foreignKeySet(dataset):
@@ -662,86 +662,6 @@ def foreignKeySet(dataset):
 
     return dataset
 
-
-@csrf_protect
-@api_view(['POST'])
-def driverTripCsv(request):
-    data_list = []
-    temp_trip_data_list = []
-    temp_docket_data_list = []
-    verified_ = request.POST.get('verifiedInput')
-    ClientId = request.POST.get('clientInput')
-    startDate_values = request.POST.get('startDate').split(',')
-    endDate_values = request.POST.get('endDate').split(',')
-
-    if verified_ == '1':
-        driver_trip = DriverTrip.objects.filter(verified=True).values()
-    elif verified_ == '0':
-        driver_trip = DriverTrip.objects.filter(verified=False).values()
-    elif ClientId:
-        driver_trip = DriverTrip.objects.filter(clientName=ClientId).values()
-        foreignKeySet(driver_trip)
-    elif request.POST.get('startDate') and request.POST.get('endDate'):
-        startDate = date(int(startDate_values[0]), int(
-            startDate_values[1]), int(startDate_values[2]))
-        endDate = date(int(endDate_values[0]), int(
-            endDate_values[1]), int(endDate_values[2]))
-        driver_trip = DriverTrip.objects.filter(
-            shiftDate__range=(startDate, endDate)).values()
-        foreignKeySet(driver_trip)
-    else:
-        driver_trip = DriverTrip.objects.all().values()
-
-    try:
-        for trip in driver_trip:
-            temp_trip_data_list.append([
-                trip['verified'],
-                trip['driverId_id'],
-                trip['clientName_id'],
-                trip['shiftType'],
-                trip['numberOfLoads'],
-                trip['truckNo'],
-                trip['shiftDate'],
-                trip['startTime'],
-                trip['endTime'],
-                trip['loadSheet'],
-                trip['comment'],
-            ])
-            related_dockets = DriverDocket.objects.filter(
-                tripId=trip['id']).values_list()
-            if related_dockets:
-                for docket in related_dockets:
-                    temp_docket_data_list.append(list(docket))
-                for i in range(len(temp_docket_data_list)):
-                    data_list.append(
-                        temp_trip_data_list[0] + temp_docket_data_list[i])
-                temp_trip_data_list.clear()
-                temp_docket_data_list.clear()
-            else:
-                data_list.extend(temp_trip_data_list)
-                temp_trip_data_list.clear()
-    except Exception as e:
-        return HttpResponse(e)
-
-    time = str(timezone.now()).replace(':', '').replace(
-        '-', '').replace(' ', '').split('.')
-    newFileName = time[0]
-    location = 'static/Account/DriverTripCsvDownload/'
-    lfs = FileSystemStorage(location=location)
-    csv_filename = newFileName + '.csv'
-
-    header = ['verified', 'driverId', 'clientName', 'shiftType', 'numberOfLoads', 'truckNo', 'shiftDate', 'startTime', 'endTime', 'loadSheet', 'comment', 'docketId', 'shiftDatetripId', 'tripId', 'docketNumber',
-              'docketFile', 'basePlant', 'noOfKm', 'transferKM', 'returnKm', 'waitingTimeInMinutes', 'minimumLoad', 'surcharge_type', 'surcharge_duration', 'cubicMl', 'minLoad', 'standByPerHalfHourDuration', 'others']
-
-    file_name = location + csv_filename
-
-    # Open the CSV file in append mode ('a')
-    myFile = open(file_name, 'a', newline='')
-    writer = csv.writer(myFile)
-    writer.writerow(header)
-    writer.writerows(data_list)
-    myFile.close()
-    return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
 
 
 @csrf_protect
@@ -1442,3 +1362,114 @@ def surchargeSave(request, id=None):
         messages.success(request, 'Surcharge added successfully')
 
     return redirect('Account:surchargeTable')
+
+def DriverShiftForm(request,id):
+    client = Client.objects.all()
+    params ={
+            'clients': client,
+            'id':id,
+        }      
+    return render(request, 'Account/driverShiftForm.html',params)
+
+
+@csrf_protect
+def ShiftDetails(request,id):
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    id_ = id
+    
+    if id ==0:
+        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    elif id ==1:
+        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    else:
+        messages.warning( request, "Invalid Request")
+        return redirect(request.META.get('HTTP_REFERER'))
+    params = {
+        'driverTrip': driver_trip,
+        'startDate': startDate,
+        'endDate': endDate,
+        'id_': id_,
+        }
+    return render(request, 'Account/Tables/driverTripsTable.html', params)
+    
+@csrf_protect
+def driverShiftCsv(request):
+    data_list = []
+    temp_trip_data_list = []
+    temp_docket_data_list = []
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    id_ = request.POST.get('id_')
+    id_ =True if int(id_) == 1 else False
+
+    # if verified_ == '1':
+    #     driver_trip = DriverTrip.objects.filter(verified=True).values()
+    # elif verified_ == '0':
+    #     driver_trip = DriverTrip.objects.filter(verified=False).values()
+    # elif ClientId:
+    #     driver_trip = DriverTrip.objects.filter(clientName=ClientId).values()
+    #     foreignKeySet(driver_trip)
+    if startDate and endDate:
+        
+        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate),verified = True if id_ ==1 else False).values()
+        foreignKeySet(driver_trip)
+    else:
+        driver_trip = DriverTrip.objects.all().values()
+
+    try:
+        for trip in driver_trip:
+            temp_trip_data_list.append([
+                trip['verified'],
+                trip['driverId_id'],
+                trip['clientName_id'],
+                trip['shiftType'],
+                trip['numberOfLoads'],
+                trip['truckNo'],
+                trip['shiftDate'],
+                trip['startTime'],
+                trip['endTime'],
+                trip['loadSheet'],
+                trip['comment'],
+            ])
+            related_dockets = DriverDocket.objects.filter(
+                tripId=trip['id']).values_list()
+            if related_dockets:
+                for docket in related_dockets:
+                    basePlant_ = BasePlant.objects.filter(id = int(docket[5])).first()
+                    docket = list(docket)
+                    docket[5] = basePlant_.basePlant
+                    temp_docket_data_list.append(docket)
+                for i in range(len(temp_docket_data_list)):
+                    data_list.append(
+                        temp_trip_data_list[0] + temp_docket_data_list[i])
+                temp_trip_data_list.clear()
+                temp_docket_data_list.clear()
+            else:
+                data_list.extend(temp_trip_data_list)
+                temp_trip_data_list.clear()
+    except Exception as e:
+        return HttpResponse(e)
+
+    time = str(timezone.now()).replace(':', '').replace(
+        '-', '').replace(' ', '').split('.')
+    newFileName = time[0]
+    location = 'static/Account/DriverTripCsvDownload/'
+    lfs = FileSystemStorage(location=location)
+    csv_filename = newFileName + '.csv'
+
+    header = ['verified', 'driverId', 'clientName', 'shiftType', 'numberOfLoads', 'truckNo', 'shiftDate', 'startTime', 'endTime', 'loadSheet', 'comment', 'docketId', 'shiftDatetripId', 'tripId', 'docketNumber',
+              'docketFile', 'basePlant', 'noOfKm', 'transferKM', 'returnToYard', 'tippingToYard', 'returnQty', 'returnKm', 'waitingTimeStart', 'waitingTimeEnd', 'totalWaitingInMinute', 'surcharge_type', 'surcharge_duration',
+              'cubicMl', 'standByStartTime', 'standByEndTime','minimumLoad', 'others', 'comment'
+            ]
+
+    file_name = location + csv_filename
+
+    # Open the CSV file in append mode ('a')
+    myFile = open(file_name, 'a', newline='')
+    writer = csv.writer(myFile)
+    writer.writerow(header)
+    writer.writerows(data_list)
+    myFile.close()
+    return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
+
