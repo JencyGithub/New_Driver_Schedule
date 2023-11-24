@@ -67,6 +67,7 @@ class DriverDocket(models.Model):
     cubicMl = models.FloatField(default=0)
     standByStartTime = models.CharField(max_length=200)
     standByEndTime = models.CharField(max_length=200)
+    standBySlot = models.PositiveIntegerField(default=0, null=True)
     minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
     comment = models.CharField(max_length=255, null=True, default='None')

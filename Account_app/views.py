@@ -465,6 +465,54 @@ def driverDocketEntry(request, ids , errorId = None):
         messages.warning(request, "Invalid Request ")
         return redirect('Account:driverTripsTable')
 
+
+@csrf_protect
+def countDocketWaitingTime(request):
+    tripId = request.POST.get('tripId')
+    waitingTimeStart = request.POST.get('waitingTimeStart')
+    waitingTimeEnd = request.POST.get('waitingTimeEnd')
+    tripObj = DriverTrip.objects.filter(pk=tripId).first()
+    if tripObj:
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
+        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
+
+        totalWaitingTime = getTimeDifference(waitingTimeStart,waitingTimeEnd)
+        if totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
+            totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
+            if totalWaitingTime < 0:
+                totalWaitingTime = 0
+        else:
+            totalWaitingTime = 0
+                    
+    return JsonResponse({'status': True,'totalWaitingTime':totalWaitingTime})
+
+
+@csrf_protect
+def countDocketStandByTime(request):
+    tripId = request.POST.get('tripId')
+    standByStartTime = request.POST.get('standByStartTime')
+    standByEndTime = request.POST.get('standByEndTime')
+
+    tripObj = DriverTrip.objects.filter(pk=tripId).first()
+    
+    if tripObj:
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
+        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCardObj).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
+
+        totalStandByTime = getTimeDifference(standByStartTime,standByEndTime)
+        print(graceObj.standby_time_grace_in_minutes)
+        if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
+            totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
+            standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+                    
+    return JsonResponse({'status': True,'standBySlot':standBySlot})
+
+    
 @csrf_protect
 def getSinglePastTripError(request):
     pastTripErrorData = PastTripError.objects.filter(pk=request.POST.get('id')).values().first()
@@ -473,8 +521,6 @@ def getSinglePastTripError(request):
 def driverDocketEntrySave(request, ids):
     # return HttpResponse(request.POST.get('docketNumber'))
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
-    
-   
 
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     shiftDate_ = request.POST.get('shiftDate')
@@ -511,9 +557,11 @@ def driverDocketEntrySave(request, ids):
 
         DriverDocketObj.waitingTimeStart = request.POST.get('waitingTimeStart')
         DriverDocketObj.waitingTimeEnd = request.POST.get('waitingTimeEnd')
-        DriverDocketObj.totalWaitingInMinute = getTimeDifference(DriverDocketObj.waitingTimeStart, DriverDocketObj.waitingTimeEnd)
+        # DriverDocketObj.totalWaitingInMinute = getTimeDifference(DriverDocketObj.waitingTimeStart, DriverDocketObj.waitingTimeEnd)
+        DriverDocketObj.totalWaitingInMinute = request.POST.get('totalWaitingInMinute')
         DriverDocketObj.standByStartTime = request.POST.get('standByStartTime')
         DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
+        DriverDocketObj.standBySlot = request.POST.get('standBySlot')
         DriverDocketObj.comment = request.POST.get('comment')
         DriverDocketObj.save()
         driver_dockets = DriverDocket.objects.filter(tripId=driver_trip_id)
@@ -737,7 +785,7 @@ def driverEntryUpdate(request, ids):
     driver_trip.save()
 
     driver_docket = DriverDocket.objects.filter(tripId=ids).values()
-    count_ = 0
+    count_ = 1
     for i in driver_docket:
         try:
             docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))), shiftDate=request.POST.get(f'shiftDate{count_}'))
@@ -771,14 +819,17 @@ def driverEntryUpdate(request, ids):
         docketObj.waitingTimeStart = request.POST.get(
             f'waitingTimeStart{count_}')
         docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
-        docketObj.totalWaitingInMinute = getTimeDifference(
-            docketObj.waitingTimeStart, docketObj.waitingTimeEnd)
+        docketObj.totalWaitingInMinute = request.POST.get(f'totalWaitingInMinute{count_}')
+        
         docketObj.surcharge_duration = request.POST.get(
             f'surcharge_duration{count_}')
         docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
+        
         docketObj.standByStartTime = request.POST.get(
             f'standByStartTime{count_}')
         docketObj.standByEndTime = request.POST.get(f'standByEndTime{count_}')
+        docketObj.standBySlot = request.POST.get(f'standBySlot{count_}')
+        
         docketObj.others = request.POST.get(f'others{count_}')
         docketObj.comment = request.POST.get(f'comment{count_}')
         count_ += 1
@@ -823,8 +874,10 @@ def driverEntryUpdate(request, ids):
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
     # return HttpResponse('Work')
-    messages.success(request, "Data updated successfully")
-    return redirect('Account:driverTripsTable')
+
+    url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
+    messages.success(request, "Docket Updated successfully")
+    return redirect(url)
 
 
 # ````````````````````````````````````

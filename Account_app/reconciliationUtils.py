@@ -141,16 +141,14 @@ def checkWaitingTime(driverDocketNumber,docketDate):
         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
         
-        if (driverDocketObj.totalWaitingInMinute + 40) > graceObj.chargeable_waiting_time_starts_after:
-            totalWaitingTime = driverDocketObj.totalWaitingInMinute + 40 - graceObj.waiting_time_grace_in_minutes
+        totalWaitingTime = driverDocketObj.totalWaitingInMinute + graceObj.waiting_time_grace_in_minutes 
+        if totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
+            totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
             if totalWaitingTime > 0: 
                 totalWaitingCost = totalWaitingTime * costParameterObj.waiting_cost_per_minute        
             else:
                 totalWaitingCost = 0
-                
             return round(totalWaitingCost,2) 
-
-
         else:
             return 0
         
@@ -186,10 +184,12 @@ def checkStandByTotal(driverDocketNumber,docketDate, costDict = costDict):
             
             if DriverStandByTime > graceObj.chargeable_standby_time_starts_after:
                 totalStandByTime = DriverStandByTime - graceObj.standby_time_grace_in_minutes
-                standBySlot = totalStandByTime/costParameterObj.standby_time_slot_size
+                standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
                 
                 if standBySlot >=1:
-                    finalStandByCost = (standBySlot//1) * costParameterObj.standby_cost_per_slot
+                    finalStandByCost =standBySlot * costParameterObj.standby_cost_per_slot
+                    
+                
                 # elif standBySlot > 0:
                 #     finalStandByCost = 0.5 * costParameterObj.standby_cost_per_slot
                 

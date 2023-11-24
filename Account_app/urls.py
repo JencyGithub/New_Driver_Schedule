@@ -51,7 +51,12 @@ urlpatterns = [
     
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),           
-    path('DriverDocketEntry/<int:ids>/', views.driverDocketEntry, name='driverDocketEntry'),      
+    path('DriverDocketEntry/<int:ids>/', views.driverDocketEntry, name='driverDocketEntry'),
+    
+    path('driverDocket/waitingTime/count/', views.countDocketWaitingTime, name='countDocketWaitingTime'),
+    path('driverDocket/standByTime/count/', views.countDocketStandByTime, name='countDocketStandByTime'),
+
+    
     path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'),      
     
     # Account Tables 

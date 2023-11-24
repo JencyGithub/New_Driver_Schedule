@@ -92,7 +92,7 @@ request {% endblock %} {% block headStyle %}
                                             name="costParameters_loading_cost_per_cubic_meter" pattern="[0-9]*" required
                                             data-validate-length-range="0,5" style="padding: 0.25rem 0.2rem;"
                                             value="{% if costParameters %}{{costParameters.loading_cost_per_cubic_meter}}{% else %} {% endif %}" 
-                                            {% if costParameters %} readonly {% else %} {% endif %}
+                                            {% if costParameters %} readonly {% endif %}
                                             id="loading_cost_per_cubic_meter">
                                             
                                     </div>
@@ -110,10 +110,9 @@ request {% endblock %} {% block headStyle %}
                                     <label for="costParameters_surcharge_type">Surcharge Type :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="costParameters_surcharge_type" class="form-control" id="costParameters_surcharge_type">
-
+                                        <select name="costParameters_surcharge_type" class="form-control" id="costParameters_surcharge_type" {% if costParameters %} disabled {% endif %}>
                                             {%for surcharge in surcharges %}
-                                            <option value="{{surcharge.id}}">{{surcharge.surcharge_Name}}</option>
+                                            <option value="{{surcharge.id}}" {% if costParameters.surcharge_type_id == surcharge.id %}selected{% endif %}>{{surcharge.surcharge_Name}}</option>
                                             {% endfor%}
                                         </select>
 
@@ -783,6 +782,10 @@ request {% endblock %} {% block headStyle %}
         $('#myForm').attr("action",`/account/RateCard/revision/${id}/`)
         event.preventDefault();
         $('input').each(function () {
+            $(this).removeAttr('readonly')
+            $(this).removeAttr('disabled')
+        });
+        $('select').each(function () {
             $(this).removeAttr('readonly')
             $(this).removeAttr('disabled')
         });

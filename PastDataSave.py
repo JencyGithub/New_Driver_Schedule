@@ -59,6 +59,7 @@ def insertIntoDatabase(data,key,fileName):
         clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = tripObj.shiftDate,endDate__gte = tripObj.shiftDate, clientId = tripObj.clientName).first()
         rateCard = clientTruckConnectionObj.rate_card_name
         graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
+        
         if int(data[13]) > int(graceObj.waiting_time_grace_in_minutes):
             totalWaitingTime = int(data[13]) - graceObj.waiting_time_grace_in_minutes
         else:

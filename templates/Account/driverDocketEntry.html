@@ -70,7 +70,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="date"
                                             name="shiftDate" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="shiftDate" value={% if docketData %}{{ docketData.tripDate }}{% endif %} {% if docketData.tripDate %}disabled{% endif %}>
+                                            style="padding: 0.25rem 0.2rem;" id="shiftDate" value={% if docketData %}{{ docketData.tripDate }}{% endif %} {% if docketData.tripDate %}readonly{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -78,7 +78,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         <input class="form-control"  type="text"
                                             name="docketNumber" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="docketNumber" value={% if docketData %}{{ docketData.docketNumber }}{% endif %} {% if docketData.docketNumber %}disabled{% endif %}>
+                                            style="padding: 0.25rem 0.2rem;" id="docketNumber" value={% if docketData %}{{ docketData.docketNumber }}{% endif %} {% if docketData.docketNumber %}readonly{% endif %}>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -149,7 +149,7 @@ request {% endblock %} {% block headStyle %}
                                     <label for="waitingTimeEnd">Waiting Time End :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"   type="time"
+                                        <input class="form-control" readonly type="time"
                                             name="waitingTimeEnd" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd" value={% if docketData %}{{ docketData.waitingTimeEnd }}{% endif %} >
                                     </div>
@@ -158,7 +158,7 @@ request {% endblock %} {% block headStyle %}
                                     <label for="totalWaitingInMinute">Total Waiting In Minute :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" disabled  type="number"
+                                        <input class="form-control" readonly  type="number"
                                             name="totalWaitingInMinute" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute" value={% if docketData %}{{ docketData.totalWaitingInMinute }}{% endif %} >
                                     </div>
@@ -203,9 +203,18 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="standByEndTime">StandBy End Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="time" 
+                                        <input class="form-control"  type="time" readonly
                                             name="standByEndTime" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime" value={% if docketData %}{{ docketData.standByEndTime }}{% endif %}>
+                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime" value={% if docketData %}{{ docketData.standByEndTime }}{% endif %} >
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="standBySlot">Stand By Slot :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" readonly  type="number"
+                                            name="standBySlot" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="standBySlot" value={% if docketData %}{{ docketData.standBySlot }}{% endif %} >
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -225,11 +234,8 @@ request {% endblock %} {% block headStyle %}
                                     </div>
                                 </div>
                             </div>
-                            {% comment %} {%endfor%} {% endcomment %}
                             <div class="col-md-12 text-right p-0">
-                                {% comment %} {% if not docketData %} {% endcomment %}
                                 <button type='submit' style="margin: 0px;" id="submit_" class="btn btn-primary px-4">Save</button>
-                                {% comment %} {% endif %} {% endcomment %}
                             </div>
                         </div>
                     </div>
@@ -239,6 +245,7 @@ request {% endblock %} {% block headStyle %}
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -250,10 +257,8 @@ request {% endblock %} {% block headStyle %}
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-
-    // initialize a validator instance from the "FormValidator" constructor.
-    // A "<form>" element is optionally passed as an argument, but is not a must
     var validator = new FormValidator(
         {
             events: ["blur", "input", "change"],
@@ -295,10 +300,63 @@ request {% endblock %} {% block headStyle %}
         $('#returnKm').attr('disabled',true)
     });
     $(document).ready(function(){
-        $('#submit_').click(function(){
-            $('#shiftDate').removeAttr('disabled')
-            $('#docketNumber').removeAttr('disabled')
-        });
+        $("#waitingTimeStart").on('change',function(){
+            let waitingTimeStart = $(this).val()
+            if(waitingTimeStart){
+                $("#waitingTimeEnd").removeAttr('readonly');
+            }
+        })
+        $("#standByStartTime").on('change',function(){
+            let standByStartTime = $(this).val()
+            if(standByStartTime){
+                $("#standByEndTime").removeAttr('readonly');
+            }
+        })
+
+        $("#waitingTimeEnd").on('change',function(){
+            let waitingTimeEnd = $("#waitingTimeEnd").val()
+            let waitingTimeStart = $("#waitingTimeStart").val()
+            if(waitingTimeStart && waitingTimeEnd){
+                $.ajax({
+                    type: "POST",
+                    url: "/account/driverDocket/waitingTime/count/",
+                    data: {
+                        tripId : {{id}},
+                        waitingTimeEnd : waitingTimeEnd,
+                        waitingTimeStart : waitingTimeStart,
+                    },
+                    beforeSend: function (xhr) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        console.log(data.totalWaitingTime)
+                        $("#totalWaitingInMinute").val(data.totalWaitingTime)
+                    },
+                  });
+            }
+        })
+        $("#standByEndTime").on('change',function(){
+            let standByStartTime = $("#standByStartTime").val()
+            let standByEndTime = $("#standByEndTime").val()
+            if(standByStartTime && standByEndTime){
+                $.ajax({
+                    type: "POST",
+                    url: "/account/driverDocket/standByTime/count/",
+                    data: {
+                        tripId : {{id}},
+                        standByStartTime : standByStartTime,
+                        standByEndTime : standByEndTime,
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        console.log(data.totalWaitingTime)
+                        $("#standBySlot").val(data.standBySlot)
+                    },
+                });
+            }
+        })
     });
 </script>
-{% endblock %} {% endblock %}
+{% endblock %} 

@@ -178,11 +178,6 @@
 
                                 <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{item.count_}}" onclick="resetRadio({{item.count_}})"></i>
                             </div>
-                            {% comment %} <label for="returnToYard{{item.count_}}" class="float-right ml-2"
-                                style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
-                            <input type="checkbox" id="returnToYard{{item.count_}}" onclick="returnToYard({{item.count_}},this)" name="returnToYard{{item.count_}}"
-                                 class="float-right "
-                                style="margin-top: .8rem;"> {% endcomment %}
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -265,7 +260,7 @@
                                     <div class="field item form-group">
                                         <input class="form-control"  value="{{item.waitingTimeStart}}" type="time"
                                             name="waitingTimeStart{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{item.count_}}">
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{item.count_}}" onchange="openWaitingTimeEnd(this,{{item.count_}})">
                                     </div>
                                 </div>
 
@@ -277,14 +272,14 @@
                                     <div class="field item form-group">
                                         <input class="form-control"  value="{{item.waitingTimeEnd}}" type="time"
                                             name="waitingTimeEnd{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{item.count_}}">
+                                            style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{item.count_}}" readonly onchange="countTotalWaitingTime(this,{{item.count_}})">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="totalWaitingInMinute{{item.count_}}">Total Waiting In Minute :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" disabled value="{{item.totalWaitingInMinute}}" type="number"
+                                        <input class="form-control" readonly value="{{item.totalWaitingInMinute}}" type="number"
                                             name="totalWaitingInMinute{{item.count_}}" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute{{item.count_}}">
                                     </div>
@@ -323,16 +318,25 @@
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{item.standByStartTime}}" type="time"
                                             name="standByStartTime{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByStartTime{{item.count_}}">
+                                            style="padding: 0.25rem 0.2rem;" id="standByStartTime{{item.count_}}" onchange="openStandByEnd(this,{{item.count_}})">
                                     </div>
                                 </div>
                                 <!--     standByEndTime   others  comment-->
                                 <div class="col-md-4 col-sm-4">
                                     <label for="standByEndTime{{item.count_}}">StandBy End Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{{item.standByEndTime}}" type="time"
+                                        <input class="form-control" value="{{item.standByEndTime}}" type="time" readonly
                                             name="standByEndTime{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime{{item.count_}}">
+                                            style="padding: 0.25rem 0.2rem;" id="standByEndTime{{item.count_}}" onchange="countStandBySlot(this,{{item.count_}})">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="standBySlot{{item.count_}}">Stand By Slot :<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" readonly  type="number"
+                                            name="standBySlot{{item.count_}}" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="standBySlot{{item.count_}}" value="{{ docketData.standBySlot }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -368,14 +372,17 @@
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
+
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-      $(document).ready(function() {
+    $(document).ready(function() {
         if (!$('#verified').val()) {
             
             $(':input').prop('disabled', true);
@@ -399,8 +406,6 @@
         }
 
     }
-
-    // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
     var validator = new FormValidator({
         "events": ['blur', 'input', 'change']
@@ -442,6 +447,66 @@
         $(`#returnKm${id}`).attr('readonly',true)
     }
 
+    function openWaitingTimeEnd(lineData,count_){
+        let waitingTimeStart = lineData.value 
+        if(waitingTimeStart){
+            $(`#waitingTimeEnd${count_}`).removeAttr('readonly');
+        }
+    }
+    function openStandByEnd(lineData,count_){
+        let standByEndTime = lineData.value 
+        if(standByEndTime){
+            $(`#standByEndTime${count_}`).removeAttr('readonly');
+        }
+    }
+
+    function countTotalWaitingTime(lineData, count_){
+        let waitingTimeStart = $(`#waitingTimeStart${count_}`).val()
+        let waitingTimeEnd = lineData.value 
+
+        if(waitingTimeStart && waitingTimeEnd){
+            $.ajax({
+                type: "POST",
+                url: "/account/driverDocket/waitingTime/count/",
+                data: {
+                    tripId : {{driverTrip.id}},
+                    waitingTimeEnd : waitingTimeEnd,
+                    waitingTimeStart : waitingTimeStart,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    console.log(data.totalWaitingTime)
+                    $(`#totalWaitingInMinute${count_}`).val(data.totalWaitingTime)
+                },
+            });
+        }
+    }
+
+    function countStandBySlot(lineData,count_){
+        let standByStartTime = $(`#standByStartTime${count_}`).val()
+        let standByEndTime = $(`#standByEndTime${count_}`).val()
+
+        if(standByStartTime && standByEndTime){
+            $.ajax({
+                type: "POST",
+                url: "/account/driverDocket/standByTime/count/",
+                data: {
+                    tripId : {{driverTrip.id}},
+                    standByStartTime : standByStartTime,
+                    standByEndTime : standByEndTime,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    console.log(data.totalWaitingTime)
+                    $(`#standBySlot${count_}`).val(data.standBySlot)
+                },
+            });
+        }
+    }
+
 </script>
-{% endblock %}
 {% endblock %}
