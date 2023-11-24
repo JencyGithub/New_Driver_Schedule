@@ -220,7 +220,7 @@
 
                                         <div class="x_panel">
                                             <div class="x_title">
-                                                <h2>Error</h2>
+                                                <h2>Solved</h2>
                                                 <div class="clearfix"></div>
                                             </div>
                                             <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
@@ -244,7 +244,7 @@
                                                                 <tbody>
                                                                     {% for solve in pastTripSolved %}
                                                                     <tr>
-                                                                        <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                                        <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                                                         <td><i class="fa fa-check text-success "></td>
                                                                         <td>{{ solve.tripDate }}</td>
                                                                         <td>{{ solve.lineNumber }}</td>
@@ -307,6 +307,10 @@
                                                                         <b>Status :-</b>    
                                                                         <span class="d-inline-block" id="status"></span>
                                                                     </li>
+                                                                    <li class="mt-1">
+                                                                        <b>Data of entry :-</b>    
+                                                                        <span class="d-inline-block" id="data"></span>
+                                                                    </li>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -360,6 +364,7 @@
               $("#fileName").text(data.data.fileName);
               $("#lineNumber").text(data.data.lineNumber);
               $("#error").text(data.data.errorFromPastTrip);
+              $("#data").text(data.data.data);
 
               if(data.data.status){
                 $("#status").text("Solved");

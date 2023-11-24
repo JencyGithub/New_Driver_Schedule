@@ -75,7 +75,7 @@ class DriverDocket(models.Model):
         return str(self.docketNumber)
 
     class Meta:
-        unique_together = (('docketNumber', 'shiftDate'),)
+        unique_together = (('docketNumber', 'shiftDate','tripId'),)
 
 
 class RCTI(models.Model):

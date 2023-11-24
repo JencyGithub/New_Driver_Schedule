@@ -4,6 +4,7 @@ from GearBox_app.models import *
 from CRUD import *
 from datetime import datetime
 from Account_app.reconciliationUtils import  *
+from datetime import time
 
 def insertIntoDatabase(data,key,fileName):
     existingTrip = None
@@ -48,7 +49,7 @@ def insertIntoDatabase(data,key,fileName):
             
         tripObj.save()
 
-        basePlant = BasePlant.objects.get_or_create(basePlant = "Not Selected")[0] 
+        basePlant = BasePlant.objects.get_or_create(basePlant = "NOT SELECTED")[0] 
         surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
             
         docketObj = DriverDocket()
@@ -124,15 +125,23 @@ def insertIntoDatabase(data,key,fileName):
         checkMissingComponents(reconciliationDocketObj)
         
     except Exception as e:
-        # print(f"Error : {e}, Row: {key}")    
-        # print(f"Error : {data}")          
+        # data[0] = data[0].strftime('%Y-%m-%d')
+        # data[6] = data[6].strftime('%H:%M')
+        # data[7] = data[7].strftime('%H:%M')
+        # data[11] = data[11].strftime('%H:%M')
+        # data[12] = data[12].strftime('%H:%M')
+        
+
+        # dataList = [data[0], data[1],data[2],data[3],data[4],data[5],data[6],data[7],data[8],data[9],data[10],data[11],data[12],
+        #             data[13], data[14],data[15],data[16],data[17],data[18],data[19],data[20],data[21]]         
         pastTripErrorObj = PastTripError(
             tripDate = data[0].strftime('%Y-%m-%d'),
             docketNumber = data[5],
             truckNo = data[1],
             lineNumber = key,
             errorFromPastTrip = e,
-            fileName = fileName.split('@_!')[-1]
+            fileName = fileName.split('@_!')[-1],
+            data = data
         )
         pastTripErrorObj.save()
         

@@ -99,7 +99,7 @@ urlpatterns = [
     path('reconciliation/setMark/', views.reconciliationSetMark, name='reconciliationSetMark'),
 
 
-    path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
+    # path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
     path('reconciliationEscalationForm/<int:id>/', views.reconciliationEscalationForm, name='reconciliationEscalationForm'),
 
     # Public holiday
@@ -114,7 +114,7 @@ urlpatterns = [
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
-    path('pastTrip/error/docketView/<int:ids>/<int:driverDocketNumber>/<str:flag>/', views.driverDocketEntry, name='pastTripErrorDocketView'),
+    path('pastTrip/error/resolve/<int:ids>/<int:errorId>/', views.driverDocketEntry, name='pastTripErrorResolve'),
     path('pastTrip/error/get/', views.getSinglePastTripError, name='getSinglePastTripError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),

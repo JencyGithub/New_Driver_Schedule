@@ -13,6 +13,7 @@ from django.http import FileResponse
 from CRUD import *
 from .models import RCTI
 from Account_app.reconciliationUtils import *
+from django.urls import reverse
 
 
 def index(request):
@@ -442,19 +443,14 @@ def driverEntrySave(request):
         return HttpResponse(f"Error: {str(e)}")
 
 
-def driverDocketEntry(request, ids, driverDocketNumber=None , flag = None):
-    
-    if flag:
-        
-        return HttpResponse(flag)
-    surcharges = Surcharge.objects.all()
+def driverDocketEntry(request, ids , errorId = None):
 
+    surcharges = Surcharge.objects.all()   
     docketData = None
-    if driverDocketNumber:
-        docketData = DriverDocket.objects.filter(
-            docketNumber=driverDocketNumber).first()
-        docketData.shiftDate = dateConverterFromTableToPageFormate(docketData.shiftDate)
+    if errorId:
+        docketData = PastTripError.objects.filter(pk = errorId).first()
 
+    # return HttpResponse(docketData.data)
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
         base_plant = BasePlant.objects.all()
@@ -475,18 +471,20 @@ def getSinglePastTripError(request):
     return JsonResponse({'status': True,'data':pastTripErrorData})
 
 def driverDocketEntrySave(request, ids):
+    # return HttpResponse(request.POST.get('docketNumber'))
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
+    
    
 
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     shiftDate_ = request.POST.get('shiftDate')
     surchargeObj = Surcharge.objects.get(pk=request.POST.get('surcharge_type'))
-    try:
-        docketNumber = DriverDocket.objects.get(
-            docketNumber=docketNumber_, shiftDate=shiftDate_, tripId=driver_trip_id)
+    
+    docketNumbers = DriverDocket.objects.filter(docketNumber=docketNumber_, shiftDate=shiftDate_, tripId=driver_trip_id).first()
+    if docketNumbers:
         messages.error(request, "This docket number and date already exists!")
         return redirect(request.META.get('HTTP_REFERER'))
-    except:
+    else:
         docketFile = request.FILES.get('docketFile')
         DriverDocketObj = DriverDocket(
             shiftDate=shiftDate_,
@@ -526,15 +524,16 @@ def driverDocketEntrySave(request, ids):
 
         driver_trip_id.save()
         try:
-            errorObj = PastTripError.objects.filter(tripDate=driver_trip_id.shiftDate,truckNo=driver_trip_id.truckNo).first() 
-            errorObj.status =False
+            errorObj = PastTripError.objects.filter(tripDate=driver_trip_id.shiftDate,truckNo=driver_trip_id.truckNo,docketNumber =float(docketNumber_)).first() 
+            errorObj.status =True
+            # return HttpResponse(errorObj.id)
+            
             errorObj.save()
-            # return HttpResponse(errorObj.status)
         except:
             pass
-     
+        url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
         messages.success(request, "Docket Added successfully")
-        return redirect('Account:driverTripsTable')
+        return redirect(url)
 
 
 def rctiCsvForm(request):
@@ -638,15 +637,6 @@ def locationSave(request, id=None):
 
     return redirect('Account:basePlantTable')
 
-
-# def driverTripsTable(request):
-#     driver_trip = DriverTrip.objects.all()  
-#     clientName = Client.objects.all()
-#     params = {
-#         'driverTrip': driver_trip,
-#         'clientName': clientName
-#     }
-#     return render(request, 'Account/Tables/driverTripsTable.html', params)
 
 
 def foreignKeySet(dataset):
@@ -1244,43 +1234,20 @@ def PastTripForm(request):
 def pastTripErrorSolve(request, id):
     errorObj = PastTripError.objects.filter(pk=id).first()
 
-    # Try to get the DriverTrip
-    tripObj = DriverTrip.objects.filter(shiftDate=errorObj.tripDate, truckNo=errorObj.truckNo).first()
-
-    if tripObj:
-        # Convert docketNumber to an integer (if needed)
-        docketNumber = round(float(errorObj.docketNumber), 0)
-
-        # Create the parameters dictionary
-        params_dict = {
-            'ids': tripObj.id,
-            'driverDocketNumber': docketNumber,
-            'flag': 'True'  # Convert boolean to string
-        }
-
-        # Redirect to 'pastTripErrorDocketView' with parameters
-        url_name = 'Account:pastTripErrorDocketView'
-        return redirect(url_name, **params_dict)
-    else:
-        # Handle the case where tripObj is None
-        return HttpResponse("Error: Trip not found")
-
-    # return redirect(url_name,ids = tripObj.id , driverDocketNumber = docketNumber , flag = 'error')
-        # # account_url = reverse('Account:driverDocketEntry', kwargs={'ids': tripObj.id})
-        # docketNumber = round(float(errorObj.docketNumber),2)
-        # params = {
-        #     'ids': tripObj.id,
-        #     'driverDocketNumber': docketNumber
-        # }
-        # account_url = reverse('Account:driverDocketEntry', kwargs= params)
-        # # return HttpResponse(account_url)
-
-        # return redirect(account_url)
-    # except Exception as e :
-    #     print(f'{e}')
-    #     return HttpResponse({e})
+    # Check if errorObj is not None before proceeding
+    if errorObj:
+        tripObj = DriverTrip.objects.filter(shiftDate=errorObj.tripDate, truckNo=errorObj.truckNo).first()
+        # return HttpResponse(errorObj.truckNo)
         
-    # return HttpResponse(tripObj)
+        if tripObj:
+            url_name = reverse('Account:pastTripErrorResolve', kwargs={'ids': tripObj.id, 'errorId': errorObj.id})
+            return redirect(url_name)
+        else:
+            return HttpResponse("Error: Trip not found")
+    else:
+        return HttpResponse("Error: PastTripError not found")
+
+
     
 
 @csrf_protect

@@ -138,7 +138,7 @@ class DocketInline(admin.StackedInline):
 
 class DriverTrip_(admin.ModelAdmin):
 
-    list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"numberOfLoads", "loadSheet","shiftDate"]
+    list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"shiftDate"]
     # search_fields = ["driverId", 'clientName']
     list_filter = ('shiftType', 'clientName')
     # actions = [driver_trip_download_csv]
@@ -390,7 +390,14 @@ admin.site.register(Surcharge)
 admin.site.register(PublicHoliday)
 
 admin.site.register(RctiErrors)
-admin.site.register(PastTripError)
+class PastTripError_(admin.ModelAdmin):
+
+    list_display = ['docketNumber',"status"]
+    search_fields = ["docketNumber"]
+
+
+admin.site.register(PastTripError,PastTripError_)
+
 
 class ReconciliationReportAdmin(admin.ModelAdmin):
     list_display = ["docketNumber","reconciliationType"]
