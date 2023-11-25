@@ -156,43 +156,45 @@ def checkWaitingTime(driverDocketNumber,docketDate):
         # print(f'{driverDocketNumber}Waiting Time : {e}')
         return -404.0
     
-def checkStandByTotal(driverDocketNumber,docketDate, costDict = costDict):
+def checkStandByTotal(driverDocketNumber,docketDate,standBySlot, costDict = costDict):
     try:
-        
-        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
-        date_= docketDate
+        if standBySlot > 0:
+            date_= docketDate
 
-        driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
-        finalStandByCost = 0
-        
-        if driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
-            return 0
-        
-        elif driverDocketObj.standByStartTime.strip() != '' and driverDocketObj.standByEndTime.strip() != '':
-            tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+            driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+            finalStandByCost = 0
             
-            adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
-            clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+            if driverDocketObj.standByStartTime.strip() == '' and driverDocketObj.standByEndTime.strip() == '':
+                return 0
             
-            rateCard = clientTruckConnectionObj.rate_card_name
-            costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-            graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
-            
-            start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M:%S')
-            end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M:%S')
-            DriverStandByTime = ((end-start).total_seconds())/60
-            
-            if DriverStandByTime > graceObj.chargeable_standby_time_starts_after:
-                totalStandByTime = DriverStandByTime - graceObj.standby_time_grace_in_minutes
-                standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+            elif driverDocketObj.standByStartTime.strip() != '' and driverDocketObj.standByEndTime.strip() != '':
+                tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
                 
-                if standBySlot >=1:
-                    finalStandByCost =standBySlot * costParameterObj.standby_cost_per_slot
+                adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+                clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+                
+                rateCard = clientTruckConnectionObj.rate_card_name
+                costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+                # graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+                
+                finalStandByCost = standBySlot * costParameterObj.standby_cost_per_slot
+                
+                # start = datetime.strptime(driverDocketObj.standByStartTime,'%H:%M:%S')
+                # end = datetime.strptime(driverDocketObj.standByEndTime,'%H:%M:%S')
+                # DriverStandByTime = ((end-start).total_seconds())/60
+                
+                # if DriverStandByTime > graceObj.chargeable_standby_time_starts_after:
+                #     totalStandByTime = DriverStandByTime - graceObj.standby_time_grace_in_minutes
+                #     standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
                     
-                
-                # elif standBySlot > 0:
-                #     finalStandByCost = 0.5 * costParameterObj.standby_cost_per_slot
-                
+                #     if standBySlot >=1:
+                #         finalStandByCost =standBySlot * costParameterObj.standby_cost_per_slot
+                        
+                    
+                    # elif standBySlot > 0:
+                    #     finalStandByCost = 0.5 * costParameterObj.standby_cost_per_slot
+        else:
+            finalStandByCost = 0     
 
             
         return round(finalStandByCost,2)  

@@ -58,13 +58,25 @@ def insertIntoDatabase(data,key,fileName):
         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
         clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = tripObj.shiftDate,endDate__gte = tripObj.shiftDate, clientId = tripObj.clientName).first()
         rateCard = clientTruckConnectionObj.rate_card_name
-        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
         
         if int(data[13]) > int(graceObj.waiting_time_grace_in_minutes):
             totalWaitingTime = int(data[13]) - graceObj.waiting_time_grace_in_minutes
         else:
             totalWaitingTime = 0
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard).first()
         
+        if str(data[20]) != 'nan' or str(data[21]) != 'nan':
+            start = datetime.strptime(str(data[20]),'%H:%M:%S')
+            end = datetime.strptime(str(data[21]),'%H:%M:%S')
+            totalStandByTime = ((end-start).total_seconds())/60
+            # totalStandByTime = getTimeDifference(data[20],data[21])
+            if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
+                totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
+                standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+        else:
+            standBySlot = 0
+            
         docketObj.shiftDate = ' ' if str(data[0]) == 'nan' else data[0]
         docketObj.tripId = tripObj
         docketObj.docketNumber = data[5]
@@ -75,11 +87,11 @@ def insertIntoDatabase(data,key,fileName):
         docketObj.returnKm = 0 if str(data[15]) == 'nan' else data[15]
         docketObj.waitingTimeStart = 0 if str(data[11]) == 'nan' else data[11]
         docketObj.waitingTimeEnd = 0 if str(data[12]) == 'nan' else data[12]
-        # docketObj.totalWaitingInMinute = 0 if str(data[13]) == 'nan' else data[13] - 40
         docketObj.totalWaitingInMinute = totalWaitingTime
         docketObj.cubicMl = 0 if str(data[8]) == 'nan' else data[8]
-        docketObj.standByStartTime = ' ' if str(data[20]) == 'nan' else data[20]
-        docketObj.standByEndTime = ' ' if str(data[21]) == 'nan' else data[21]
+        docketObj.standByStartTime = 0 if str(data[20]) == 'nan' else data[20]
+        docketObj.standByEndTime = 0 if str(data[21]) == 'nan' else data[21]
+        docketObj.standBySlot = standBySlot
         docketObj.comment = data[17]
         docketObj.basePlant = basePlant
         docketObj.surcharge_type = surCharge
@@ -95,8 +107,10 @@ def insertIntoDatabase(data,key,fileName):
         
         driverLoadAndKmCost = checkLoadAndKmCost(int(docketObj.docketNumber),docketObj.shiftDate)
         driverSurchargeCost = checkSurcharge(int(docketObj.docketNumber),docketObj.shiftDate)
-        driverWaitingTimeCost = checkWaitingTime(int(docketObj.docketNumber),docketObj.shiftDate)
-        driverStandByCost = checkStandByTotal(int(docketObj.docketNumber),docketObj.shiftDate)
+        driverWaitingTimeCost = round(docketObj.totalWaitingInMinute * costParameterObj.waiting_cost_per_minute,2) 
+        driverStandByCost = round(costParameterObj.standby_cost_per_slot * docketObj.standBySlot,2)
+        # driverWaitingTimeCost = checkWaitingTime(int(docketObj.docketNumber),docketObj.shiftDate)
+        # driverStandByCost = checkStandByTotal(int(docketObj.docketNumber),docketObj.shiftDate)
         driverTransferKmCost = checkTransferCost(int(docketObj.docketNumber),docketObj.shiftDate)
         driverReturnKmCost = checkReturnCost(int(docketObj.docketNumber),docketObj.shiftDate)
              
@@ -125,16 +139,7 @@ def insertIntoDatabase(data,key,fileName):
         # missingComponents 
         checkMissingComponents(reconciliationDocketObj)
         
-    except Exception as e:
-        # data[0] = data[0].strftime('%Y-%m-%d')
-        # data[6] = data[6].strftime('%H:%M')
-        # data[7] = data[7].strftime('%H:%M')
-        # data[11] = data[11].strftime('%H:%M')
-        # data[12] = data[12].strftime('%H:%M')
-        
-
-        # dataList = [data[0], data[1],data[2],data[3],data[4],data[5],data[6],data[7],data[8],data[9],data[10],data[11],data[12],
-        #             data[13], data[14],data[15],data[16],data[17],data[18],data[19],data[20],data[21]]         
+    except Exception as e:       
         pastTripErrorObj = PastTripError(
             tripDate = data[0].strftime('%Y-%m-%d'),
             docketNumber = data[5],
@@ -145,6 +150,7 @@ def insertIntoDatabase(data,key,fileName):
             data = data
         )
         pastTripErrorObj.save()
+    
         
     return True
 
@@ -165,7 +171,7 @@ for key,row in pastData.iterrows():
         insertIntoDatabase(row,key,fileName)
     except Exception as e:
         pass
-        # print(f" ! Error : {e}")
+
 
 
         

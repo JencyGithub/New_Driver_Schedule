@@ -102,6 +102,7 @@ def getTimeDifference(startTime,endTime):
         return e
 
 
+
 def getMaxTimeFromTwoTime(time1, time2, type=None):
     time1_str = time1.split(':')
     time2_str = time2.split(':')

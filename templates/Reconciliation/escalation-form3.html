@@ -1,0 +1,151 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Escalation form {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block content %}
+<div class="right_col">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Escalation form</h2>
+                        
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <!-- Smart Wizard -->
+                        <div id="wizard" class="form_wizard wizard_horizontal">
+                            <ul class="wizard_steps anchor">
+                                <li>
+                                    <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
+                                        <span class="step_no">1</span>
+                                        <span class="step_descr">
+                                            <br>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" class="selected" isdone="0" rel="2">
+                                        <span class="step_no">2</span>
+                                        <span class="step_descr">
+                                            <br>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" class="selected" isdone="0" rel="3">
+                                        <span class="step_no">3</span>
+                                        <span class="step_descr">
+                                            <br>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" class="disabled" isdone="0" rel="4">
+                                        <span class="step_no">4</span>
+                                        <span class="step_descr">
+                                            <br>
+                                        </span>
+                                    </a>
+                                </li>
+                            </ul>
+                             
+                            <form action="{% url 'Account:reconciliationEscalationForm4' id=id %}" method="POST" novalidate id="reconciliationForm">
+                                {% csrf_token %}
+
+                                <!-- <h5>Internal Escalation</h5> -->
+                             
+                                <div class="field item form-group">
+                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Remark<span class="required">*</span></label>
+                                    <div class="col-md-6 col-sm-6">
+                                        <textarea required="required" name='comment' id="comment" class="form-control" data-validate-length-range="20" placeholder="Minimum 20 characters" rows="3"></textarea></div>
+                                </div>
+                                
+                                <div class="col-md-12 text-right">
+                                    <a href="{% url 'Account:reconciliationEscalationForm2' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
+                                    <button type="submit" class="buttonNext btn btn-success">Next</button>
+                                </div>
+                            </form>
+
+
+                            <!-- <form  action = "{% url 'Account:reconciliationEscalationForm4' id=id %}" method="POST" class="form-horizontal form-label-left" novalidate>
+                                {% csrf_token%}
+
+                                {%if escalationType == 'internal' %}
+                                <div class="form-group row">
+                                    <label class="col-form-label col-md-3 col-sm-3 label-align"
+                                        for="first-name" for="comment">Comment<span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 ">
+                                        <textarea name="comment" class="form-control" id="comment" cols="10" rows="2" required="required"></textarea>
+
+                                    </div>
+                                </div>
+                                {%else%}
+                                <h2>{{escalationType}}</h2>
+                                {%endif%}
+
+
+                                <div class="float-right">
+                                    <a href="{% url 'Account:reconciliationEscalationForm2' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
+                                    <button type="submit" class="buttonNext btn btn-success">Next</button>
+                                </div>
+                            </form> -->
+
+                        </div>
+                        <!-- End SmartWizard Content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+<script>
+
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+    
+
+</script>
+
+{% endblock %}
+
+

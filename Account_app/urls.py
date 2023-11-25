@@ -106,6 +106,9 @@ urlpatterns = [
 
     # path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
     path('reconciliationEscalationForm/<int:id>/', views.reconciliationEscalationForm, name='reconciliationEscalationForm'),
+    path('reconciliationEscalationForm2/<int:id>/', views.reconciliationEscalationForm2, name='reconciliationEscalationForm2'),
+    path('reconciliationEscalationForm3/<int:id>/', views.reconciliationEscalationForm3, name='reconciliationEscalationForm3'),
+    path('reconciliationEscalationForm4/<int:id>/', views.reconciliationEscalationForm4, name='reconciliationEscalationForm4'),
 
     # Public holiday
     path('publicHoliday/', views.publicHoliday, name='publicHoliday'),

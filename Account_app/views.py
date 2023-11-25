@@ -505,7 +505,6 @@ def countDocketStandByTime(request):
         graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
 
         totalStandByTime = getTimeDifference(standByStartTime,standByEndTime)
-        print(graceObj.standby_time_grace_in_minutes)
         if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
             totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
             standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
@@ -977,11 +976,54 @@ def reconciliationEscalationForm(request,id):
     params = {
         'data':data, 
         'client':clientName,
-        'driverDocket' : driverDocket
+        'driverDocket' : driverDocket,
+        'id':id
+        
     }
     return render(request, 'Reconciliation/escalation-form.html',params)
 
+@csrf_protect
+def reconciliationEscalationForm2(request ,id):
+    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
+    loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
+    surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
+    waitingTimeCostDifference= reconciliationData.driverWaitingTimeCost - reconciliationData.rctiWaitingTimeCost
+    transferKmCostDifference= reconciliationData.driverTransferKmCost - reconciliationData.rctiTransferKmCost
+    returnKmCostDifference= reconciliationData.driverReturnKmCost - reconciliationData.rctiReturnKmCost
+    otherCostDifference= reconciliationData.driverOtherCost - reconciliationData.rctiOtherCost
+    standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
+    loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
+    totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
 
+    params = {
+        'id':id,
+        'data': reconciliationData,
+        'loadKmCostDifference':round(loadKmCostDifference,2),
+        'surchargeCostDifference':round(surchargeCostDifference,2),
+        'waitingTimeCostDifference':round(waitingTimeCostDifference,2),
+        'transferKmCostDifference':round(transferKmCostDifference,2),
+        'returnKmCostDifference':round(returnKmCostDifference,2),
+        'otherCostDifference':round(otherCostDifference,2),
+        'standByCostDifference':round(standByCostDifference,2),
+        'loadDeficitDifference':round(loadDeficitDifference,2),
+        'totalCostDifference':round(totalCostDifference,2),
+    }
+    return render(request, 'Reconciliation/escalation-form2.html',params)
+@csrf_protect
+def reconciliationEscalationForm3(request ,id):
+    escalationType = request.POST.get('escalation')
+    params = {
+        'id':id,
+        'escalationType':escalationType
+    }
+    return render(request, 'Reconciliation/escalation-form3.html',params)
+@csrf_protect
+def reconciliationEscalationForm4(request ,id):
+    params = {
+        'id':id
+    }
+    return render(request, 'Reconciliation/escalation-form4.html',params)
+    
 # ```````````````````````````````````
 # Public holiday
 # ```````````````````````````````````

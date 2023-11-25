@@ -42,6 +42,14 @@
                       <li><a href="{% url "gearBox:addGroups" %}">Groups</a></li>
                       <li><a href="{% url 'gearBox:addSubGroups' %}">Sub groups</a></li>
                       <li><a href="{% url 'gearBox:truckTable'%}">Trucks</a></li>
+                      <li><a>Rate cards & Surcharge<span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                          <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
+                          </li>
+                          <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
+                        </ul>
+                      </li>
+                      
                     </ul>
                   </li>
                   <li><a href="#">Repairs</a></li>
@@ -163,9 +171,17 @@
               <li><a>Invoicing<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                   {% comment %} Verified trips {% endcomment %}
-                  <li class="sub_menu"><a href="{% url 'Account:DriverShiftForm' id=1%}">Charged Jobs</a>
+                  
+                  <li><a>Charged Jobs<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li class="sub_menu"><a href="{% url 'Account:DriverShiftForm' id=1%}">Existing Charged Jobs</a>
+                      </li>
+                      <li><a href="{% url 'Account:pastTripForm' %}">Charged Jobs Entry</a>
+                      </li>
+                      <li><a href="{% url 'Account:uplodedPastTrip'%}">Existing Charged Jobs Files</a>
+    
+                    </ul>
                   </li>
-
                   <li><a>Client RCTI<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
@@ -203,23 +219,8 @@
               <li><a href="#">Settings</a>
 
 
-              <li><a>Trip section<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  {% comment %} <li class="sub_menu"><a href="{% url 'Account:driverTripsTable'%}">Driver trip</a>
-                  </li> {% endcomment %}
-                  <li><a href="{% url 'Account:pastTripForm' %}">Past trip</a>
-                  </li>
-                  <li><a href="{% url 'Account:uplodedPastTrip'%}">Uploded Past trip Files</a>
-
-                </ul>
-              </li>
-              <li><a>Rate card section<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
-                  </li>
-                  <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
-                </ul>
-              </li>
+              
+              
             </ul>
           </li>
         </ul>
