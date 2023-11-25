@@ -123,12 +123,13 @@ class RCTI(models.Model):
     waitingTimeTotalExGST = models.FloatField(default=0)
     waitingTimeTotal = models.FloatField(default=0)
     
-    standByPerHalfHourCost = models.FloatField(default=0)
+    standByNoSlot = models.FloatField(default=0)
     standByPerHalfHourDuration = models.FloatField(default=0)
     standByUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=6)
     standByGSTPayable = models.FloatField(default=0)
     standByTotalExGST = models.FloatField(default=0)
     standByTotal = models.FloatField(default=0)
+    
     
     minimumLoad = models.FloatField(default=0)
     loadCost = models.FloatField(default=0)

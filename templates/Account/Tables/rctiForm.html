@@ -44,8 +44,8 @@
                                 role="tab" aria-controls="v-pills-waitingTimeSCHED" aria-selected="false">Waiting time SCHED</a>
                                 <a class="nav-link" id="v-pills-waitingTimeInMinutes-tab" data-toggle="pill" href="#v-pills-waitingTimeInMinutes"
                                 role="tab" aria-controls="v-pills-waitingTimeInMinutes" aria-selected="false">Waiting time in minutes</a>
-                                <a class="nav-link" id="v-pills-standByPerHalfHourCost-tab" data-toggle="pill" href="#v-pills-standByPerHalfHourCost"
-                                role="tab" aria-controls="v-pills-standByPerHalfHourCost" aria-selected="false">Stand by per half hour cost</a>
+                                <a class="nav-link" id="v-pills-standByNoSlot-tab" data-toggle="pill" href="#v-pills-standByNoSlot"
+                                role="tab" aria-controls="v-pills-standByNoSlot" aria-selected="false">Stand by per half hour cost</a>
                                 <a class="nav-link" id="v-pills-minimumLoad-tab" data-toggle="pill" href="#v-pills-minimumLoad"
                                 role="tab" aria-controls="v-pills-minimumLoad" aria-selected="false">Minimum load</a>
                                 <a class="nav-link" id="v-pills-surcharge_fixed_normal-tab" data-toggle="pill" href="#v-pills-surcharge_fixed_normal"
@@ -355,12 +355,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="standByPerHalfHourCost">Stand by per half hour cost :<span
+                                                <label for="standByNoSlot">Stand by per half hour cost :<span
                                                     class="required">*</span></label>
-                                                <input class="form-control" required type="number" name="standByPerHalfHourCost"
+                                                <input class="form-control" required type="number" name="standByNoSlot"
                                                     pattern="[0-9]*" required data-validate-length-range="0,5"
-                                                    style="padding: 0.25rem 0.2rem;" value="{{  rcti.standByPerHalfHourCost  }}"
-                                                    id="standByPerHalfHourCost" {% if rcti %} readonly {% endif  %}>
+                                                    style="padding: 0.25rem 0.2rem;" value="{{  rcti.standByNoSlot  }}"
+                                                    id="standByNoSlot" {% if rcti %} readonly {% endif  %}>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -826,14 +826,14 @@
                                     </div>
                                 </div>
                             </div>
-                                <div class="tab-pane fade" id="v-pills-standByPerHalfHourCost" role="tabpanel"
-                                aria-labelledby="v-pills-standByPerHalfHourCost-tab">
+                                <div class="tab-pane fade" id="v-pills-standByNoSlot" role="tabpanel"
+                                aria-labelledby="v-pills-standByNoSlot-tab">
                                 <div class="x_content">
                                     <div class="custom-container">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="standByPerHalfHourCost">Stand by per half hour cost:<span class="required">*</span></label>
-                                                <input class="form-control" required type="number" name="standByPerHalfHourCost" pattern="[0-9]*" required data-validate-length-range="0,5" value="{{ rcti.standByPerHalfHourCost }}" id="standByPerHalfHourCost" {% if rcti %} {% if rcti %} readonly {% endif %} {% endif %}>
+                                                <label for="standByNoSlot">Stand by per half hour cost:<span class="required">*</span></label>
+                                                <input class="form-control" required type="number" name="standByNoSlot" pattern="[0-9]*" required data-validate-length-range="0,5" value="{{ rcti.standByNoSlot }}" id="standByNoSlot" {% if rcti %} {% if rcti %} readonly {% endif %} {% endif %}>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">

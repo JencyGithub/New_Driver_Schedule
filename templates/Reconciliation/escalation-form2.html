@@ -80,7 +80,7 @@
                                                         <td><b>LoadKm Cost</b></td>
                                                         <td>{{data.driverLoadAndKmCost}}</td>
                                                         <td>{{data.rctiLoadAndKmCost}}</td>
-                                                        <td> {{loadKmCostDifference}}</td>
+                                                        <td class="{% if loadKmCostDifference < 0 %}text-success {%else%} text-danger {% endif%}"> {{loadKmCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -89,7 +89,7 @@
                                                         <td><b>Surcharge Cost</b></td>
                                                         <td>{{data.driverSurchargeCost}}</td>
                                                         <td>{{data.rctiSurchargeCost}}</td>
-                                                        <td>{{surchargeCostDifference}}</td>
+                                                        <td class="{% if surchargeCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{surchargeCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -98,7 +98,7 @@
                                                         <td><b>Waiting Time Cost</b></td>
                                                         <td>{{data.driverWaitingTimeCost}}</td>
                                                         <td>{{data.rctiWaitingTimeCost}}</td>
-                                                        <td>{{waitingTimeCostDifference}}</td>
+                                                        <td class="{% if waitingTimeCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{waitingTimeCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -108,7 +108,7 @@
                                                         <td><b>TransferKm Cost</b></td>
                                                         <td>{{data.driverTransferKmCost}}</td>
                                                         <td>{{data.rctiTransferKmCost}}</td>
-                                                        <td>{{transferKmCostDifference}}</td>
+                                                        <td class="{% if transferKmCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{transferKmCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -118,7 +118,7 @@
                                                         <td><b>ReturnKm Cost</b></td>
                                                         <td>{{data.driverReturnKmCost}}</td>
                                                         <td>{{data.rctiReturnKmCost}}</td>
-                                                        <td>{{returnKmCostDifference}}</td>
+                                                        <td class="{% if returnKmCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{returnKmCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -127,7 +127,7 @@
                                                         <td><b>Other Cost</b></td>
                                                         <td>{{data.driverOtherCost}}</td>
                                                         <td>{{data.rctiOtherCost}}</td>
-                                                        <td>{{otherCostDifference}}</td>
+                                                        <td class="{% if otherCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{otherCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -136,7 +136,7 @@
                                                         <td><b>standByCostDifference</b></td>
                                                         <td>{{data.driverStandByCost}}</td>
                                                         <td>{{data.rctiStandByCost}}</td>
-                                                        <td>{{standByCostDifference}}</td>
+                                                        <td class="{% if standByCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{standByCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -145,7 +145,7 @@
                                                         <td><b> loadDeficitDifference </b></td>
                                                         <td>{{data.driverLoadDeficit}}</td>
                                                         <td>{{data.rctiLoadDeficit}}</td>
-                                                        <td>{{loadDeficitDifference}}</td>
+                                                        <td class="{% if loadDeficitDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{loadDeficitDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 
@@ -154,7 +154,7 @@
                                                         <td><b> totalCostDifference </b></td>
                                                         <td>{{data.driverTotalCost}}</td>
                                                         <td>{{data.rctiTotalCost}}</td>
-                                                        <td>{{totalCostDifference}}</td>
+                                                        <td class="{% if totalCostDifference < 0 %}text-success {%else%} text-danger {% endif%}">{{totalCostDifference}}</td>
                                                     </tr>
                                                     {% endif %}
 

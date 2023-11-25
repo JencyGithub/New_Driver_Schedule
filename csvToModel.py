@@ -111,7 +111,7 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.minimumLoadTotalExGST = convertIntoFloat(dump[-3])
                     RCTIobj.minimumLoadTotal = convertIntoFloat(dump[-1])
                 elif "standby" in description:
-                    RCTIobj.standByPerHalfHourCost = convertIntoFloat(dump[4])
+                    RCTIobj.standByNoSlot = convertIntoFloat(dump[4])
                     RCTIobj.standByUnit = 'slot' if str(
                         dump[5].lower()) == 'each' else 'minute'
                     RCTIobj.standByPerHalfHourDuration = convertIntoFloat(dump[6])

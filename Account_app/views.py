@@ -272,7 +272,7 @@ def rctiFormSave(request):
     RCTIobj.waitingTimeGSTPayable = request.POST.get('waitingTimeGSTPayable')
     RCTIobj.waitingTimeTotalExGST = request.POST.get('waitingTimeTotalExGST')
     RCTIobj.waitingTimeTotal = request.POST.get('waitingTimeTotal')
-    RCTIobj.standByPerHalfHourCost = request.POST.get('standByPerHalfHourCost')
+    RCTIobj.standByNoSlot = request.POST.get('standByNoSlot')
     RCTIobj.standByPerHalfHourDuration = request.POST.get('standByPerHalfHourDuration')
     RCTIobj.standByUnit = request.POST.get('standByUnit')
     RCTIobj.standByGSTPayable = request.POST.get('standByGSTPayable')
