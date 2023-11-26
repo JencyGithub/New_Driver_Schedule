@@ -207,6 +207,11 @@ class ReconciliationReport(models.Model):
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
+    escalationType = models.CharField(max_length=20,default='')
+    # 0:not escalate, 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
+    escalationStep = models.PositiveIntegerField(default=0)
+
+    
     fromDriver = models.BooleanField(default=False)
     fromRcti = models.BooleanField(default=False)
     

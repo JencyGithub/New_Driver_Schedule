@@ -973,12 +973,14 @@ def reconciliationEscalationForm(request,id):
     data.docketDate = dateConverterFromTableToPageFormate(data.docketDate)
     clientName = Client.objects.filter(pk=data.clientId).first()
     driverDocket = DriverDocket.objects.filter(docketNumber = data.docketNumber).first()
+    data.escalationStep = 1
+    data.save()
+
     params = {
         'data':data, 
         'client':clientName,
         'driverDocket' : driverDocket,
         'id':id
-        
     }
     return render(request, 'Reconciliation/escalation-form.html',params)
 
@@ -994,6 +996,8 @@ def reconciliationEscalationForm2(request ,id):
     standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
     loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
     totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
+    reconciliationData.escalationStep = 2
+    reconciliationData.save()
 
     params = {
         'id':id,
@@ -1009,9 +1013,17 @@ def reconciliationEscalationForm2(request ,id):
         'totalCostDifference':round(totalCostDifference,2),
     }
     return render(request, 'Reconciliation/escalation-form2.html',params)
+
+
 @csrf_protect
 def reconciliationEscalationForm3(request ,id):
     escalationType = request.POST.get('escalation')
+    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
+    reconciliationData.escalationStep = 3
+    if escalationType:
+        reconciliationData.escalationType = escalationType
+    reconciliationData.save()
+
     params = {
         'id':id,
         'escalationType':escalationType
@@ -1019,6 +1031,9 @@ def reconciliationEscalationForm3(request ,id):
     return render(request, 'Reconciliation/escalation-form3.html',params)
 @csrf_protect
 def reconciliationEscalationForm4(request ,id):
+    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
+    reconciliationData.escalationStep = 4
+    reconciliationData.save()
     params = {
         'id':id
     }
