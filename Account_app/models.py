@@ -90,6 +90,7 @@ class RCTI(models.Model):
     docketNumber = models.CharField( max_length=10,default='')
     docketDate = models.DateField()
     docketYard = models.CharField(default='', max_length=255)
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
 
     noOfKm = models.FloatField(default=0)
     cubicMl = models.FloatField(default=0)
@@ -260,6 +261,7 @@ class ReconciliationReport(models.Model):
 # Rcti Error section
 # -----------------------------------
 class RctiErrors(models.Model):
+    clientName = models.CharField(max_length=25 ,default=None ,blank=True,null=True)
     docketNumber = models.CharField(default=None ,blank=True,null=True ,max_length=255)
     docketDate = models.CharField(default=None, blank=True,null=True, max_length=255)
     errorDescription = models.CharField(default=None ,blank=True,null=True ,max_length=255)
@@ -292,3 +294,43 @@ class RctiExpense(models.Model):
     def __str__(self):
         return str(self.docketNumber)
     
+
+class HolcimTrip(models.Model):
+    truckNo = models.PositiveIntegerField(default=0)
+    shiftDate = models.DateField(null=True, default=None)
+    numberOfLoads = models.FloatField(default=0)
+    
+    def __str__(self):
+        return str(self.truckNo)
+    
+class HolcimDocket(models.Model):
+    tripId = models.ForeignKey(HolcimTrip, on_delete=models.CASCADE)
+    jobNo = models.PositiveIntegerField(default=0)
+    orderNo = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=200)
+    ticketed = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    loadComplete = models.CharField(max_length=200)
+    toJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    timeToDepart = models.PositiveIntegerField(default=0)
+    onJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    timeToSite = models.PositiveIntegerField(default=0)
+    beginUnload = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    waitingTime = models.PositiveIntegerField(default=0)
+    endPour = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    wash = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    toPlant = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    timeOnSite = models.PositiveIntegerField(default=0)
+    atPlant = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    leadDistance = models.PositiveIntegerField(default=0)
+    returnDistance = models.PositiveIntegerField(default=0)
+    totalDistance = models.PositiveIntegerField(default=0)
+    totalTime = models.PositiveIntegerField(default=0)
+    waitTimeBetweenJob = models.PositiveIntegerField(default=0)
+    driverName = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    quantity = models.FloatField(default=0)
+    slump = models.PositiveIntegerField(default=0)
+    waterAdded = models.FloatField(max_length=200)
+    
+    def __str__(self):
+        return str(self.jobNo)

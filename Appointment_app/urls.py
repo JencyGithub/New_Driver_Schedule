@@ -26,4 +26,8 @@ urlpatterns = [
     path('appointmentForm/update/view/<int:id>/', views.appointmentForm,name="appointmentFormUpdateView"),
     path('appointmentForm/save/', views.applicationSave,name="appointmentFormSave"),
     path('findJob/', views.findJob,name="findJob"),
+    
+    path('getTruckAndDriver/', views.getTruckAndDriver ,name="getTruckAndDriver"),
+    
+    
 ]

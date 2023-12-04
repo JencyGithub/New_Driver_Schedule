@@ -25,7 +25,7 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="status">Status :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="status" class="form-select form-control" id="status" required {% if data %}readonly{% endif %}>
+                                        <select name="status" class="form-select form-control" id="status" required {% if data %}disabled{% endif %}>
                                             <option disabled selected> Select status </option>
                                             <option value="unassigned" {% if data.Status == "unassigned" %}selected{% endif %}>unassigned</option>
                                             <option value="assigned" {% if data.Status == "assigned" %}selected{% endif %}>assigned</option>
@@ -55,14 +55,14 @@
                                     <label for="startDateTime">Start date time :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{% if data %}{{ data.Start_Date_Time }}{% endif %}" type="datetime-local" name="startDateTime" {% if data %}readonly{% endif %}
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="startDateTime">
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="startDateTime" onchange="setEndDateTime(this)">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="endDateTime">End date time :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{% if data %}{{ data.End_Date_Time }}{% endif %}" type="datetime-local" name="endDateTime" {% if data %}readonly{% endif %}
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="endDateTime">
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="endDateTime" readonly onchange="setTruckAndDriver(this)">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -127,17 +127,33 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="driverName">Driver name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="driverName" class="form-select form-control" id="driverName" required {% if data %}readonly{% endif %}>
-                                            {% for driver in drivers %}
-                                            <option value="{{driver.driverId}}" {% if data.driver.driverId == driver.driverId %}selected{% endif %} >{{driver.driverId}}-{{driver.name}}</option>
-                                            {% endfor %}
-                                        </select>
+                                        
+                                        {% if data %}
+                                            <input class="form-control" value="{% if data %}{{ data.driver.name }}{% endif %}" type="text" name="driverName" {% if data %}readonly{% endif %}
+                                                required='required' style="padding: 0.25rem 0.2rem;" id="totalTime">
+                                        {%else%}
+                                            <select name="driverName" class="form-select form-control" id="driverName" required disabled>
+                                            </select>
+                                        {%endif%}
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
+                                    <label for="truckNo">Truck No :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        {%if data%}
+                                            <input class="form-control" value="{% if data %}{{ data.truckNo }}{% endif %}" type="text" name="truckNo" {% if data %}readonly{% endif %}
+                                                    required='required' style="padding: 0.25rem 0.2rem;" id="totalTime">
+                                        {%else%}
+                                            <select name="truckNo" class="form-select form-control" id="truckNo" required disabled>
+                                            </select>
+                                        {%endif%}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 col-sm-4">
                                     <label for="stopName">Stop name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="stopName" class="form-select form-control" id="stopName" required {% if data %}readonly{% endif %}>
+                                        <select name="stopName" class="form-select form-control" id="stopName" required {% if data %}disabled{% endif %}>
                                             {% for client in clients %}
                                             <option value="{{client.clientId}}" {% if data.stop.clientId == client.clientId %}selected{% endif %}>{{client.clientId}}-{{client.name}}</option>
                                             {% endfor %}
@@ -167,30 +183,6 @@
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 
-<script>
-
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-</script>
+<script src="{% static 'js/addAppointment.js' %}"></script>
 
 {% endblock %}

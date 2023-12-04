@@ -113,17 +113,17 @@ def driverFormSave(request, id= None):
     usernames = [user.username for user in users]
     email_addresses = [user.email for user in users]
     driver_Id = [driver.driverId for driver in drivers]
-
+    driverName = request.POST.get('name').strip().replace(' ','').lower()
     # Update 
     if id :
         driverObj = Driver.objects.get(pk=id)
         user = User.objects.get(email = driverObj.email)
-        if driverObj.name != request.POST.get('name'):
-            if request.POST.get('name') in usernames:
+        if driverObj.name != driverName:
+            if driverName in usernames:
                 messages.error( request, "Driver Name  already Exist")
                 return redirect(request.META.get('HTTP_REFERER'))
             else:
-                driverObj.name = request.POST.get('name')
+                driverObj.name = driverName
                 user.username = driverObj.name
             
         if driverObj.email != request.POST.get('email'):
@@ -149,7 +149,7 @@ def driverFormSave(request, id= None):
         if int(request.POST.get('driverId')) in driver_Id :
             messages.error( request, "Driver ID already Exist")
             return redirect(request.META.get('HTTP_REFERER'))
-        elif request.POST.get('name') in usernames:
+        elif driverName in usernames:
             messages.error( request, "Driver Name  already Exist")
             return redirect(request.META.get('HTTP_REFERER'))
         elif request.POST.get('email') in email_addresses:
@@ -158,7 +158,7 @@ def driverFormSave(request, id= None):
         else:
             DriverObj = Driver()
             DriverObj.driverId = int(request.POST.get('driverId'))
-            DriverObj.name =request.POST.get('name')
+            DriverObj.name = driverName
             DriverObj.phone = request.POST.get('phone') 
             DriverObj.email = request.POST.get('email')
             DriverObj.password = request.POST.get('password')
@@ -298,7 +298,7 @@ def clientForm(request, id=None):
 def clientChange(request, id=None):
     
     dataList = {
-        'name' : request.POST.get('name'),
+        'name' : request.POST.get('name').lower().strip(),
         'email' : request.POST.get('email'),
         'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False
     }

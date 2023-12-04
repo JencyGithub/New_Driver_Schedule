@@ -50,6 +50,7 @@ def insertIntoModel(dataList,file_name):
             RCTIobj = RCTI()
     
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
+        RCTIobj.clientName = Client.objects.filter(name = 'boral').first()
         if re.match(docket_pattern ,str(dataList[1])):
             RCTIobj.docketNumber = str(dataList[1])
             dataList = dataList[2:]
@@ -177,6 +178,7 @@ def insertIntoModel(dataList,file_name):
             
         else:
             rctiErrorObj = RctiErrors( 
+                            clientName = 'boral',
                             docketNumber = dataList[1],
                             docketDate = RCTIobj.docketDate,
                             errorDescription = 'To be adjusted manually by admin team',
@@ -188,6 +190,7 @@ def insertIntoModel(dataList,file_name):
     except Exception as e:
         # print(f"Error : {e}")
         rctiErrorObj = RctiErrors( 
+                            clientName = 'boral',
                             docketNumber = RCTIobj.docketNumber,
                             docketDate = RCTIobj.docketDate,
                             errorDescription = e,

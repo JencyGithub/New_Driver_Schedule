@@ -35,6 +35,8 @@ class Appointment(models.Model):
     Total_Time = models.TimeField()
 
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    truckNo = models.IntegerField(default=0)
+    # truckNo = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
     stop = models.ForeignKey(Client, on_delete=models.CASCADE)
 
 

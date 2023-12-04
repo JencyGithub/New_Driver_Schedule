@@ -80,22 +80,30 @@
                             <form method="POST" action="{% url 'Account:pastTripSave'%}" enctype="multipart/form-data">
                                 {% csrf_token %}
 
-                                <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4">
                                     <label for="pastTripFile">Upload past trip Csv:<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input  class="form-control" type="file" name="pastTripFile" required
+                                        <input class="form-control" type="file" name="pastTripFile" required
                                             style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".xlsx">
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-sm-6">
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="monthAndYear">Month & Year:<span
+                                            class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" type="month" name="monthAndYear" required
+                                            style="padding: 0.25rem 0.2rem;" id="monthAndYear" accept=".xlsx">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
                                     <div class="checkbox">
                                     <label>
                                         <input type="checkbox" {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
                                     </label>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-sm-6 text-right">
+                                <div class="col-md-4 col-sm-4 text-right">
                                     <button type='submit' class="btn btn-default w-25 mt-4">Submit</button>
                                 </div>
 
@@ -331,6 +339,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block footerStyleEnd %}
 
 <script>
@@ -374,6 +383,10 @@
             },
           });
     }
+
+    $("#save_").click(function(){
+        alert('Please ensure, All trucks, ratecard and client truck connections are correctly configured for the data you are about to add. Incorect mappings may lead to failure of adding data.')
+    })
 </script>
 
 <!-- Datatables -->

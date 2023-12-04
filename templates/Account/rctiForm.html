@@ -50,21 +50,33 @@
             <div class="cuatom-continer">
               <form class="" method="POST" action="{% url 'Account:rctiSave'%}" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-3 col-sm-3">
                   <label for="RctiFile">Upload RCTI Invoice csv:<span class="required">*</span></label>
                   <div class="field item form-group">
                     <input class="form-control" type="file" name="RctiFile" required style="padding: 0.25rem 0.2rem;"
-                      id="RctiFile" accept=" .csv">
+                      id="RctiFile" accept=" .csv , .xlsx">
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-3 col-sm-3">
                   <label for="rctiPdf">Upload RCTI Invoice PDF <small><i>(optional)</i></small>:</label>
                   <div class="field item form-group">
                     <input class="form-control" type="file" name="rctiPdf" style="padding: 0.25rem 0.2rem;"
                       id="rctiPdf" accept=" .pdf">
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-3 col-sm-3">
+                  <label for="clientName">Client Name :<span
+                          class="required">*</span></label>
+                  <div class="field item form-group">
+                      <select name="clientName" class="form-control" id="clientName">
+                        <option value="" selected disabled >Choose Client Name</option>
+                          {%for client in client %}
+                          <option value="{{client.name}}">{{client.name}}</option>
+                          {% endfor%}
+                      </select>
+                  </div>
+              </div>
+                <div class="col-md-3 col-sm-3">
                   <div class="checkbox">
                     <label>
                       <input type="checkbox" {% if rctiErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" id="save_" style="margin-top: 2.5rem;" value="1"> Save Data In Database

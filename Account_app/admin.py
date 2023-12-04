@@ -276,11 +276,16 @@ class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]
     actions = [admin_truck_download_csv]
+admin.site.register(AdminTruck, AdminTruckAdmin)
 
     # inlines = [ClientTruckInline]
 
-admin.site.register(ClientTruckConnection)
-admin.site.register(AdminTruck, AdminTruckAdmin)
+class ClientTruckConnection_(admin.ModelAdmin):
+    list_display =['rate_card_name','clientTruckId','startDate','endDate']
+    search_fields = ['clientTruckId']
+
+admin.site.register(ClientTruckConnection,ClientTruckConnection_)
+    
 
 
 
@@ -441,3 +446,19 @@ class AppointmentAdmin(admin.ModelAdmin):
     
     send_email_action.short_description = 'Send email to selected applicants'
 
+class HolcimDocket_(admin.ModelAdmin):
+
+    list_display = ['jobNo']
+    search_fields = ["jobNo"]
+
+
+admin.site.register(HolcimDocket,HolcimDocket_)
+
+
+class HolcimTrip_(admin.ModelAdmin):
+
+    list_display = ['truckNo','shiftDate','numberOfLoads']
+    search_fields = ["truckNo"]
+
+
+admin.site.register(HolcimTrip,HolcimTrip_)

@@ -13,6 +13,8 @@ from Appointment_app.models import *
 from django.http import FileResponse
 from CRUD import *
 from Account_app.reconciliationUtils import *
+from django.db.models import Q
+import itertools
 
 # ````````````````````````````````````
 # Appointment
@@ -27,8 +29,10 @@ def convertDateTimeForTemplate(provided_date_string):
 def appointmentForm(request, id=None):
     drivers = Driver.objects.all()
     clients = Client.objects.all()
+    truckNos = AdminTruck.objects.all()
     params = {
         'drivers' : drivers,
+        'truckNos':truckNos,
         'clients' : clients,   
     }
     if id:
@@ -64,8 +68,10 @@ def applicationSave(request):
     appointmentObj.Dwell_Time = request.POST.get('dwellTime')
     appointmentObj.Block_Time = request.POST.get('blockTime')
     appointmentObj.Total_Time = request.POST.get('totalTime')
+    appointmentObj.truckNo = request.POST.get('truckNo')
     appointmentObj.driver = driver
     appointmentObj.stop = client
+    
     appointmentObj.save()
     
     messages.success(request, "Form Successfully Filled Up.")
@@ -77,3 +83,47 @@ def findJob(request):
         'jobs' : jobs
     }
     return render(request, 'Appointment/findJob.html',params)
+
+@csrf_protect
+def getTruckAndDriver(request):
+    startDateTime = request.POST.get('startDateTime')
+    endDateTime = request.POST.get('endDateTime')
+    print(startDateTime,endDateTime)
+    
+    startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M')
+    endDateTime = datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M')
+        
+    # Qry logic
+    # Appointment.objects.get(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
+    #                               03-04              01-04            03-04            04-04               02-04             01-04              02-04             04-04                   
+    # job = 1-4, 4-4        Data from form
+    # d1 = 25-3 , 02-4      Entry from database
+    # d2 = 03-4 , 10-4      Entry from database
+    
+    
+    unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
+    unavailableDriversQrySet = [] 
+    unavailableTrucksQrySet = [] 
+
+    for obj in unavailableDriversAndTrucksQrySet:
+        tempDriver = obj.driver
+        tempTruck = AdminTruck.objects.filter(adminTruckNumber = obj.truckNo).first()
+        unavailableDriversQrySet.append({'driverId':tempDriver.driverId,'name':tempDriver.name})
+        unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.adminTruckNumber})
+
+    drivers = Driver.objects.values('driverId','name')
+    trucks =  AdminTruck.objects.values('adminTruckNumber')
+
+    availableDriversList = list(itertools.filterfalse(lambda x: x in list(drivers), unavailableDriversQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableDriversQrySet, list(drivers)))
+    availableTrucksList = list(itertools.filterfalse(lambda x: x in list(trucks), unavailableTrucksQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableTrucksQrySet, list(trucks)))
+
+    # availableTrucksList = list(set(trucks.items()) - set(unavailableTrucksQrySet))
+    # availableDriversList = list(set(drivers.items()) - set(unavailableDriversQrySet.items()))
+
+    return JsonResponse({'status': True, 'availableTrucksList': availableTrucksList, 'availableDriversList': availableDriversList})
+
+    # Add logic for leave request here
+    
+   
+
+
