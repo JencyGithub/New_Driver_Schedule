@@ -73,6 +73,7 @@ class ThresholdDayShift(models.Model):
     # surcharge_per_cubic_meters_normal_cost_included = models.BooleanField(default=False)
     # surcharge_per_cubic_meters_sunday_cost_included = models.BooleanField(default=False)
     # surcharge_per_cubic_meters_public_holiday_cost_included = models.BooleanField(default=False)
+    
     transfer_cost_included = models.BooleanField(default=False)
     return_cost_included = models.BooleanField(default=False)
     standby_cost_included = models.BooleanField(default=False)

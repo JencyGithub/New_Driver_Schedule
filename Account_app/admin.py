@@ -328,7 +328,7 @@ def leave_download_csv(modeladmin, request, queryset):
     writer.writerow(["employee", "start_date", "end_date" , "reason" , "status"])
 
     for s in queryset:
-        writer.writerow([s.employee, s.start_date, s.end_date, s.reason , s.status])
+        writer.writerholow([s.employee, s.start_date, s.end_date, s.reason , s.status])
 
     return response
 
