@@ -42,27 +42,26 @@ request {% endblock %} {% block headStyle %}
     <div class="">
         <div class="clearfix"></div>
         <div class="row">
-            <div class="x_panel col-md-12 col-sm-12">
-                <h2>View old rate card :-</h2>
-                <form action="{% url 'Account:rateCardView' id=rateCard.id%}" method="post">
-                    {% csrf_token %}
-
-                <div class="row">
-                    <div class="col-md-4">
-                        <select name="rateCard" id="rateCard" class="form-control">
-                            {% for dates in rateCardDates %}
-                            <option value="{{dates|escape}}">{{dates|escape}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="submit" value="Get" class="btn btn-default px-5">
-                    </div>
+            {% if rateCard %}
+                <div class="x_panel col-md-12 col-sm-12">
+                    <h2>View old rate card :-</h2>
+                    <form action="{% url 'Account:rateCardView' id=rateCard.id%}" method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select name="rateCard" id="rateCard" class="form-control">
+                                    {% for dates in rateCardDates %}
+                                    <option value="{{dates|escape}}">{{dates|escape}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="submit" value="Get" class="btn btn-default px-5">
+                            </div>
+                        </div>
+                    </form>
                 </div>
-
-
-                </form>
-            </div>
+            {% endif %}
            
             <div class="col-md-12 col-sm-12">
                 <form class="" method="POST" action="{% if rateCard %}{% else %}{% url 'Account:rateCardSave' %}{% endif %}" novalidate enctype="multipart/form-data" id="myForm">
