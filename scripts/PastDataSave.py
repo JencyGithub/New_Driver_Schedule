@@ -58,7 +58,7 @@ def run():
                     res_ = str(data[0]).split()[0]
                 elif '/' in str(data[0]):
                     str_ = str(data[0]).split('/')
-                    res_ = str_[-1]+'-'+str_[0]+'-'+str_[-2]
+                    res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
                 else:
                     res_ = str(data[0])
 
