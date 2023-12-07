@@ -460,7 +460,6 @@ def driverEntrySave(request):
 
 
 def driverDocketEntry(request, ids , errorId = None):
-
     surcharges = Surcharge.objects.all()   
     docketData = None
     if errorId:
@@ -469,12 +468,13 @@ def driverDocketEntry(request, ids , errorId = None):
     # return HttpResponse(docketData.data)
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
-        base_plant = BasePlant.objects.all()
+        base_plant = BasePlant.objects.all().order_by('-id')
         params = {
             'basePlants': base_plant,
             'id': ids,
             'docketData': docketData,
-            'surcharges': surcharges
+            'surcharges': surcharges,
+            'errorId':errorId,
         }
         return render(request, 'Account/driverDocketEntry.html', params)
     else:
@@ -535,8 +535,9 @@ def getSinglePastTripError(request):
     pastTripErrorData = PastTripError.objects.filter(pk=request.POST.get('id')).values().first()
     return JsonResponse({'status': True,'data':pastTripErrorData})
 
-def driverDocketEntrySave(request, ids):
-    # return HttpResponse(request.POST.get('docketNumber'))
+def driverDocketEntrySave(request, ids, errorId=None):
+    
+    # return HttpResponse(errorId)
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
 
     docketNumber_ = int(float(request.POST.get('docketNumber')))
@@ -588,16 +589,19 @@ def driverDocketEntrySave(request, ids):
         driver_trip_id.numberOfLoads = no_of_loads
 
         driver_trip_id.save()
-        try:
-            errorObj = PastTripError.objects.filter(tripDate=driver_trip_id.shiftDate,truckNo=driver_trip_id.truckNo,docketNumber =float(docketNumber_)).first() 
+        # print(driver_trip_id.shiftDate,driver_trip_id.truckNo,float(docketNumber_))
+        if errorId:
+            errorObj = PastTripError.objects.filter(pk =errorId).first()
+            # print(errorObj) 
             errorObj.status = True
-            
             # return HttpResponse(errorObj.id)
             
+            
             errorObj.save()
-        except Exception as e:
-            print(f'exception : {e}')
-            pass
+        # except Exception as e:
+        #     # print(f'exception : {e}')
+        #     return HttpResponse(f'Error:{e}')
+        #     pass
         url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
         messages.success(request, "Docket Added successfully")
         return redirect(url)
@@ -1435,13 +1439,12 @@ def PastTripForm(request):
     return render(request, 'Account/pastTrip.html', params)
 
 def pastTripErrorSolve(request, id):
+    # print(f'message{id}')
     errorObj = PastTripError.objects.filter(pk=id).first()
 
     # Check if errorObj is not None before proceeding
     if errorObj:
         tripObj = DriverTrip.objects.filter(shiftDate=errorObj.tripDate, truckNo=errorObj.truckNo).first()
-        # return HttpResponse(errorObj.truckNo)
-        
         if tripObj:
             url_name = reverse('Account:pastTripErrorResolve', kwargs={'ids': tripObj.id, 'errorId': errorObj.id})
             return redirect(url_name)

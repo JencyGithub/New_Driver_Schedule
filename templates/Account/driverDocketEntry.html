@@ -38,7 +38,7 @@ request {% endblock %} {% block headStyle %}
         <div class="clearfix"></div>
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="{% url 'Account:driverDocketEntrySave' ids=id%}" novalidate enctype="multipart/form-data">
+                <form class="" method="POST" action="{% if errorId %}{% url 'Account:driverDocketErrorEntrySave' ids=id errorId=errorId%}{% else %}{% url 'Account:driverDocketEntrySave' ids=id%}{% endif %}" novalidate enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
@@ -46,6 +46,8 @@ request {% endblock %} {% block headStyle %}
                             <h2> Driver Docket Entry Form </h2>
                             {% else %}
                             <h2>Docket View</h2>
+                            {% comment %} <p> heell{{errorId}}</p> {% endcomment %}
+
                             {% endif %}
                                 <div class="float-right">
                                     <input type="radio" id="tippingToYard" name="returnToYard" 

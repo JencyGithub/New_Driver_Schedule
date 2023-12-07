@@ -85,7 +85,7 @@
                                             class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="file" name="pastTripFile" required
-                                            style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".xlsx">
+                                            style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".csv">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -93,13 +93,13 @@
                                             class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="month" name="monthAndYear" required
-                                            style="padding: 0.25rem 0.2rem;" id="monthAndYear" accept=".xlsx">
+                                            style="padding: 0.25rem 0.2rem;" id="monthAndYear" >
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
+                                        <input type="checkbox" required {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
                                     </label>
                                     </div>
                                 </div>
@@ -189,7 +189,7 @@
                                                                         <th>Docket Number</th>
                                                                         <th>Error Description</th>
                                                                         <th>File name</th>
-                                                                        <th>Action</th>
+                                                                        <th style="width:12%">Action</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -203,9 +203,13 @@
                                                                         <td>{{ error.errorFromPastTrip }}</td>
                                                                         <td>{{ error.fileName }}</td>
                                                                         <td>
-                                                                        {% if not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                        <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Resolve  </a>
-                                                                        {% endif %}
+                                                                            {% if 'Driver matching query does not exist' in error.errorFromPastTrip %}
+                                                                            <a href="{% url 'gearBox:driverFormAdd' %}" title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+                                                                            {% comment %} <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Add docket  </a> {% endcomment %}
+                                                                            {% elif not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                            <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Resolve  </a>
+                                                                            {% endif %}
+                                                                        
                                                                         </td>
                                                                     </tr>
                                                                     {% endfor %}

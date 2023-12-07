@@ -57,7 +57,9 @@ urlpatterns = [
     path('driverDocket/standByTime/count/', views.countDocketStandByTime, name='countDocketStandByTime'),
 
     
-    path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'),      
+    path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'), 
+    # for error solve      
+    path('DriverDocketEntrySave/<int:ids>/<int:errorId>', views.driverDocketEntrySave, name='driverDocketErrorEntrySave'),      
     
     # Account Tables 
     # Base plant routes

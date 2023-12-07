@@ -39,7 +39,7 @@ def run():
                 # else:
                 #     continue
 
-                if len(data) != 24:
+                if len(data) != 25:
                     pastTripErrorObj = PastTripError(
                                     tripDate = res_,
                                     docketNumber = data[5],
@@ -124,7 +124,23 @@ def run():
                     tripObj = DriverTrip.objects.get(pk=tripObjID)
 
 
-                    basePlant = BasePlant.objects.get_or_create(basePlant = "NOT SELECTED")[0] 
+                    basePlant = BasePlant.objects.filter(basePlant = data[24].strip().upper()).first() 
+                    # modified for adding 
+                    if basePlant is None:
+                        pastTripErrorObj = PastTripError(
+                                tripDate = res_,
+                                docketNumber = data[5],
+                                truckNo = data[1],
+                                lineNumber = count,
+                                errorFromPastTrip = "BasePlant does not exist.",
+                                fileName = fileName.split('@_!')[-1],
+                                data = data
+                            ) 
+                            # print('grace card not found')                   
+                        pastTripErrorObj.save()
+                        continue
+                        # Modification ends
+                    
                     surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
                         
                     docketObj = DriverDocket()                
@@ -222,6 +238,14 @@ def run():
                         docketObj.standByEndTime = 0 if str(data[21]).lower() == '' else data[21]
                         docketObj.standBySlot = standBySlot
                         docketObj.comment = data[17]
+                        # modification for adding blow back and replacement.
+                        if data[19].strip().replace(' ','') != None:
+                            docketObj.comment = docketObj.comment + 'Blow back comment : ' + data[19].strip() 
+                            
+                        if data[23].strip().replace(' ','') != None:
+                            docketObj.comment = docketObj.comment + 'Replacement comment : ' + data[23].strip() 
+                            
+                        
                         docketObj.basePlant = basePlant
                         docketObj.surcharge_type = surCharge
                         # surcharge_duration = 
