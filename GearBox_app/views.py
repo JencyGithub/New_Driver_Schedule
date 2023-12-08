@@ -11,6 +11,7 @@ from rest_framework.decorators import api_view
 from django.contrib import messages
 from django.http import Http404
 from django.contrib.auth.models import User , Group
+import os, colorama, subprocess
 
 
 # Create your views here.
@@ -140,12 +141,7 @@ def driverFormSave(request, id= None):
         user.save()
         driverObj.save()
         messages.success(request,'Updating successfully')
-        
-        # return redirect('gearBox:driversTable')
-
-
     else:
-        
         if int(request.POST.get('driverId')) in driver_Id :
             messages.error( request, "Driver ID already Exist")
             return redirect(request.META.get('HTTP_REFERER'))
@@ -176,7 +172,14 @@ def driverFormSave(request, id= None):
             user_.save()
             DriverObj.save()
             messages.success(request,'Adding successfully')
+            
+            
             # Launch subprocess to add driver trips from pastTrip error
+            colorama.AnsiToWin32.stream = None
+            os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+            cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error','--driverName', driverName]
+            subprocess.run(cmd)
+            
             
 
     return redirect('gearBox:driversTable')
