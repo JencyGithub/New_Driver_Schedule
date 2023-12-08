@@ -450,7 +450,7 @@ def driverEntrySave(request):
             f.close()
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-        cmd = ["python", "manage.py", "runscript", 'DriverCsvToModel.py']
+        cmd = ["python", "manage.py", "runscript", 'DriverCsvToModel','--continue-on-error']
         subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(
             request, "Please wait 5 minutes. The data conversion process continues")
@@ -1110,15 +1110,18 @@ def publicHolidaySave(request, id=None):
 
 # ```````````````````````````````````
 
-def rateCardTable(request):
-    RateCards = RateCard.objects.all()
+def rateCardTable(request,clientId = None):
+    
+    RateCards = RateCard.objects.filter(clientName=clientId)
     params = {
         'rateCard': RateCards,
+        'clientId':clientId,
+        
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
 
-def rateCardForm(request, id=None):
+def rateCardForm(request, id=None , clientId=None):
     rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = tds = startDate = endDate = None
     surcharges = Surcharge.objects.all()
     rateCardDates = []
@@ -1165,7 +1168,8 @@ def rateCardForm(request, id=None):
         'surcharges': surcharges,
         'startDate' : startDate,
         'endDate' : endDate,
-        'rateCardDates' : rateCardDates
+        'rateCardDates' : rateCardDates,
+        'clientId':clientId,
         # 'onLease' : onLease,
     }
     return render(request, 'Account/rateCardForm.html', params)
@@ -1177,6 +1181,7 @@ def checkOnOff(val_):
 @csrf_protect
 @api_view(['POST'])
 def rateCardSave(request, id=None, edit=0):
+    # return HttpResponse(request.POST.get('clientName'))
     # print(type(request.POST.get('costParameters_start_date')))
     # return HttpResponse('work')
     # Rate Card
@@ -1185,9 +1190,12 @@ def rateCardSave(request, id=None, edit=0):
     endDate = request.POST.get('endDate')
     
     if not id:
-        rateCard = RateCard(rate_card_name=request.POST.get('rate_card_name'))
-        tds = float(request.POST.get('rate_card_tds'))
-        rateCard.tds = tds
+        rateCard = RateCard()
+        rateCard.rate_card_name=request.POST.get('rate_card_name')
+        # tds = float(request.POST.get('rate_card_tds'))
+        # rateCard.tds = tds
+        clientId =request.POST.get('clientName')
+        rateCard.clientName = Client.objects.filter(pk = clientId).first()
         rateCard.save()
         rateCardID = RateCard.objects.filter(rate_card_name=request.POST.get('rate_card_name')).first()
 
@@ -1422,7 +1430,7 @@ def rateCardSave(request, id=None, edit=0):
     # onLease.save()
 
     messages.success(request, 'Data successfully add ')
-    return redirect('Account:rateCardTable')
+    return redirect('gearBox:clientTable')
 
 # ```````````````````````````````````
 # Past trip

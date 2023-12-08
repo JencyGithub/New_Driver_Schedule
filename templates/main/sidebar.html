@@ -42,13 +42,13 @@
                       <li><a href="{% url "gearBox:addGroups" %}">Groups</a></li>
                       <li><a href="{% url 'gearBox:addSubGroups' %}">Sub groups</a></li>
                       <li><a href="{% url 'gearBox:truckTable'%}">Trucks</a></li>
-                      <li><a>Rate cards & Surcharge<span class="fa fa-chevron-down"></span></a>
+                      {% comment %} <li><a>Rate cards & Surcharge<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                           <li class="sub_menu"><a href="{% url 'Account:rateCardTable'%}">Rate Cards </a>
                           </li>
                           <li><a href="{% url 'Account:surchargeTable'%}">Surcharge</a></li>
                         </ul>
-                      </li>
+                      </li> {% endcomment %}
                       
                     </ul>
                   </li>

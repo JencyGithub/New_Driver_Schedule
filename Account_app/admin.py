@@ -305,7 +305,7 @@ def driver_download_csv(modeladmin, request, queryset):
 class Driver_(admin.ModelAdmin):
     # inlines = [LeaveReqAdminDriver]
     list_display = ["driverId", "name", 'phone']
-    search_fields = ["driverId"]
+    search_fields = ["driverId",'name']
     actions = [driver_download_csv]
 
     def upcoming_leave_requests(self, obj):
