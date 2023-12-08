@@ -28,11 +28,13 @@ class Appointment(models.Model):
     
     Created_by = models.CharField(max_length=255)
     Created_time = models.TimeField(default=timezone.now())
+    preStartWindow = models.CharField(max_length=2,default='15')
 
-    Report_Time = models.TimeField()
-    Dwell_Time = models.TimeField()
-    Block_Time = models.TimeField()
-    Total_Time = models.TimeField()
+    # preStart_Time = models.DateTimeField(default=Start_Date_Time-preStartWindow)
+    # Report_Time = models.TimeField()
+    # Dwell_Time = models.TimeField()
+    # Block_Time = models.TimeField()
+    # Total_Time = models.TimeField()
 
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     truckNo = models.IntegerField(default=0)

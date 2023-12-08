@@ -96,6 +96,8 @@ request {% endblock %} {% block headStyle %}
                                     <label for="endDate">End Date :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{% if rateCard %}{{endDate}}{% endif %}" {% if rateCard %} readonly {% endif %} type="date" name="endDate" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
+                                        <input class="form-control" value="{{clientId}}" name="clientName" type="hidden">
+
                                     </div>
                                 </div>
                             </div>

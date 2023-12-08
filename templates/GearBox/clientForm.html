@@ -13,6 +13,12 @@
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>{% if data %}Edit{% else %}Add{% endif %} client</h2>
+                        {%if data%}
+                        <div class="float-right">
+                            <a href="{% url 'Account:rateCardTableClient' clientId=data.clientId %}" class="btn btn-default">RateCard</a>
+                            <a href="{% url 'Account:surchargeTable' %}" class="btn btn-default">Surcharge</a>
+                        </div>
+                        {% endif %}
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">

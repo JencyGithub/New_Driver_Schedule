@@ -176,8 +176,6 @@ def driverFormSave(request, id= None):
             user_.save()
             DriverObj.save()
             messages.success(request,'Adding successfully')
-            # Launch subprocess to add driver trips from pastTrip error
-            
 
     return redirect('gearBox:driversTable')
 

@@ -8,7 +8,19 @@ TRUCK_TYPE_CHOICES = (
     ('Casual','Casual'),
     
 )
+# -----------------------------------
+# Client section
+# -----------------------------------
 
+class Client(models.Model):
+    clientId = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200)
+    email = models.CharField(max_length=255,default=None, null=True, blank=True)
+    docketGiven = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.name) 
+    
 # -----------------------------------
 # Rate Card
 # -----------------------------------   
@@ -30,6 +42,7 @@ standby_time_grace_options = (
 class RateCard(models.Model):
     rate_card_name = models.CharField(max_length=255 , unique=True)
     tds = models.FloatField(default=0)
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE , default=1)
 
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -147,18 +160,7 @@ class OnLease(models.Model):
 
 
 
-# -----------------------------------
-# Client section
-# -----------------------------------
 
-class Client(models.Model):
-    clientId = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=200)
-    email = models.CharField(max_length=255,default=None, null=True, blank=True)
-    docketGiven = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return str(self.name) 
     
 # -----------------------------------
 # Trucks section

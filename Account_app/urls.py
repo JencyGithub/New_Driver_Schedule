@@ -79,7 +79,9 @@ urlpatterns = [
 
     # Rate Card 
     path('RateCardTable', views.rateCardTable, name='rateCardTable'),
-    path('RateCardForm', views.rateCardForm, name='rateCardForm'),
+    path('RateCardTable/<int:clientId>', views.rateCardTable, name='rateCardTableClient'),
+    path('RateCardForm/<int:clientId>', views.rateCardForm, name='rateCardForm'),
+    # path('RateCardForm/<int:clientId>', views.rateCardForm, name='rateCardWithClient'),
     path('RateCardSave', views.rateCardSave, name='rateCardSave'),
     path('RateCard/view/<int:id>/', views.rateCardForm, name='rateCardView'),
     path('RateCard/revision/<int:id>/', views.rateCardSave, name='rateCardRevision'),
