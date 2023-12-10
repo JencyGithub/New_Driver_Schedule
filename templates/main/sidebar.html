@@ -171,18 +171,21 @@
               <li><a>Invoicing<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                   {% comment %} Verified trips {% endcomment %}
-                  
-                  <li><a>Charged Jobs<span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li class="sub_menu"><a href="{% url 'Account:DriverShiftForm' id=1%}">Existing Charged Jobs</a>
-                      </li>
-                      <li><a href="{% url 'Account:pastTripForm' %}">Charged Jobs Entry</a>
-                      </li>
-                      <li><a href="{% url 'Account:uplodedPastTrip'%}">Existing Charged Jobs Files</a>
-    
-                    </ul>
+                  <li class="sub_menu"><a href="{% url 'Account:DriverShiftForm' id=1%}">Charged Jobs</a>
                   </li>
-                  <li><a>Client RCTI<span class="fa fa-chevron-down"></span></a>
+                  {% comment %} <li><a>Charged Jobs<span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li class="sub_menu"><a href="{% url 'Account:DriverShiftForm' id=1%}">Existing Jobs</a>
+                      </li> {% endcomment %}
+                      {% comment %} <li><a href="{% url 'Account:pastTripForm' %}">Charged Jobs Entry</a>
+                      </li>
+                      <li><a href="{% url 'Account:uplodedPastTrip'%}">Existing Charged Jobs Files</a> {% endcomment %}
+    
+                    {% comment %} </ul> {% endcomment %}
+                  {% comment %} </li> {% endcomment %}
+                  <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
+                  </li>
+                  {% comment %} <li><a>Client RCTI<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li class="sub_menu"><a href="{% url 'Account:rcti'%}">RCTI Entry</a>
                       </li>
@@ -191,7 +194,7 @@
                       <li><a href="{% url 'Account:UplodedRCTI'%}">Uploded RCTI Files</a>
                       </li>
                     </ul>
-                  </li>
+                  </li> {% endcomment %}
                 </ul>
               </li>
               <li><a>Clients<span class="fa fa-chevron-down"></span></a>

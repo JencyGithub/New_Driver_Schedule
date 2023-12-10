@@ -1,42 +1,41 @@
+{% extends "Trip_details/main/main.html" %}
 {% load static %}
+{% block title %}Driver Trip Form 2{% endblock title %}
 
-<head>
-    <title>Driver details form-2</title>
-    <!-- Include Bootstrap CSS -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="{% static 'css/vendor/bootstrap5/bootstrap5.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
-    
-    <style>
-        .form-element {
-            margin-bottom: 1rem;
-        }
-
-        .file-input.error {
-            border: 2px solid red;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 15px;
-            }
-
-            #signUpForm {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 308px) {
-            .mybtn {
-                width: 100px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
+{% block headStyle %} 
+     <!-- Include Bootstrap CSS -->
+     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     <link rel="stylesheet" href="{% static 'css/vendor/bootstrap5/bootstrap5.css' %}">
+     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+     <link rel="stylesheet" href="{% static 'css/form.css' %}">
+     
+     <style>
+         .form-element {
+             margin-bottom: 1rem;
+         }
+ 
+         .file-input.error {
+             border: 2px solid red;
+         }
+ 
+         @media (max-width: 768px) {
+             .container {
+                 padding: 0 15px;
+             }
+ 
+             #signUpForm {
+                 width: 100%;
+             }
+         }
+ 
+         @media (max-width: 308px) {
+             .mybtn {
+                 width: 100px;
+             }
+         }
+     </style>
+{% endblock %}
+{% block content %}
     <div class="container-fluid">
         <form id="signUpForm" action="{% url 'Account:formsSave' %}" method="POST"
             enctype="multipart/form-data">
@@ -81,14 +80,10 @@
         </form>
     </div>
 
-    <!-- Include Bootstrap JS -->
-    <script src="{% static 'js/vendor/bootstrap5/bootstrap5.bundle.min.js' %}"></script>
+{% endblock %}
+{% block footerStyleEnd %}
 
-    <!-- jquery cdn  -->
-    <script src="{% static 'js/vendor/jquery/jquery-3.7.0.min.js' %}"></script>
-    <script src="{% static 'js/vendor/jquery/jquery.validate.min.js' %}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         $(document).ready(function () {
             $('input[type="file"]').change(function () {
@@ -106,4 +101,4 @@
             });
         });
     </script>
-</body>
+{% endblock  %}

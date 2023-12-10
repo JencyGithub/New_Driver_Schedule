@@ -36,6 +36,62 @@
   <div class="">
     <div class="clearfix"></div>
     <div class="row">
+
+
+      {% comment %} RCTI Expense  {% endcomment %}
+      <div class="col-md-12 col-sm-12">
+        <div class="x_panel">
+            <form action="{% url 'Account:rctiTable' %}" method="POST" novalidate id="reconciliationForm">
+            <div class="x_title">
+                <h2>RCTI | Expenses  Form</h2>
+                <div class="float-right">
+                    <input type="radio" checked id="rctiDocket"value="rctiDocket" name="RCTI" style="margin-top: .8rem;">
+                    <label for="rctiDocket" class=" ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Rcti Docket</label>
+                    <input type="radio" id="rctiExpense" value="rctiExpense"name="RCTI"style="margin-top: .8rem;" >
+                    <label for="rctiExpense" class=" ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Rcti Expenses</label>
+                    <a href="{% url 'Account:UplodedRCTI'%}"class=" btn btn-sm btn-default" target="_blank">Uploded  Files</a>
+                    
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="cuatom-continer">
+                        {% csrf_token %}
+                        <div class="col-md-4 col-sm-4">
+                            <label for="startDate">Start Date:</label>
+                            <div class="field item form-group">
+                                <input class="form-control date" type="date" name="startDate" id="startDate">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label for="endDate">End Date:<span class="required">*</span></label>
+                            <div class="field item form-group">
+                                <input class="form-control date" type="date" name="endDate" id="endDate" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4">
+                            <label for="clientId">Docket Yard</label>
+                            <div class="field item form-group">
+                                <select class="form-control"  id="basePlant" name="basePlant">
+                                    <option value="" disabled selected>Select Yard Name</option>
+                                    {% for basePlant in basePlants %}
+                                    <option value="{{ basePlant.id }}">{{ basePlant.id }} . {{ basePlant.basePlant }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-right">
+                            <button type='submit' class="btn btn-primary px-4">Submit</button>
+                        </div>
+                </div>
+            </div>
+            </form>
+            
+        </div>
+      </div>
+
+
+      {% comment %} RCTI ENTRY  {% endcomment %}
       <div class="col-md-12 col-sm-12">
         <div class="x_panel">
           <div class="x_title">
@@ -54,7 +110,7 @@
                   <label for="RctiFile">Upload RCTI Invoice csv:<span class="required">*</span></label>
                   <div class="field item form-group">
                     <input class="form-control" type="file" name="RctiFile" required style="padding: 0.25rem 0.2rem;"
-                      id="RctiFile" accept=" .csv , .xlsx">
+                      id="RctiFile" accept=" .csv">
                   </div>
                 </div>
                 <div class="col-md-3 col-sm-3">
@@ -68,7 +124,7 @@
                   <label for="clientName">Client Name :<span
                           class="required">*</span></label>
                   <div class="field item form-group">
-                      <select name="clientName" class="form-control" id="clientName">
+                      <select name="clientName" class="form-control" required id="clientName">
                         <option value="" selected disabled >Choose Client Name</option>
                           {%for client in client %}
                           <option value="{{client.name}}">{{client.name}}</option>
@@ -295,7 +351,10 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
+<script src="{% static 'js/reconciliation_analysis.js' %}"></script>
+
 <script>
+
   const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
   $(document).ready(function () {
@@ -335,6 +394,29 @@
         },
       });
   }
+
+  var validator = new FormValidator({
+    "events": ['blur', 'input', 'change']
+  }, document.forms[0]);
+  // on form "submit" event
+  document.forms[0].onsubmit = function (e) {
+
+      var submit = true,
+          validatorResult = validator.checkAll(this);
+      console.log(validatorResult);
+
+      return !!validatorResult.valid;
+  };
+  // on form "reset" event
+  document.forms[0].onreset = function (e) {
+      validator.reset();
+  };
+  // stuff related ONLY for this demo page:
+  $('.toggleValidationTooltips').change(function () {
+      validator.settings.alerts = !this.checked;
+      if (this.checked)
+          $('form .alert').remove();
+  }).prop('checked', false);
 
 </script>
 <!-- Datatables -->

@@ -58,7 +58,7 @@ def run():
                             
             except Exception as e:
                 pass
-                print(e)
+                # print(e)
                 # with open("Driver_reg_file.txt", 'a')as f:
                 #     f.write(str(e)+str(data)+'\n')
             
