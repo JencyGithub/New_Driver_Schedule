@@ -39,74 +39,78 @@
 {% block content %}
 <!-- page content -->
 <div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
+    <div class="clearfix"></div>
 
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>{% if basePlant %}Edit{% else %}Add{% endif %} Deports</h2>
-                        <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <form class="" action="{% if basePlant %} {% url 'Account:basePlantEditSave' id=basePlant.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST">
+                {% csrf_token %}
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>{% if basePlant %}Edit{% else %}Add{% endif %} Depot / Location</h2>
+                    <div class="float-right">
+                        <input type="radio" checked id="typeDepot"value="typeDepot" name="basePlantType" style="margin-top: .8rem;">
+                        <label for="typeDepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
+                        <input type="radio" id="typeLocation" value="typeLocation" name="basePlantType"style="margin-top: .8rem;" {% if basePlant %} {% if basePlant.basePlantType is False %} checked {% endif %}{% endif %}>
+                        <label for="typeLocation" class="ml-2"style="margin-right: 1rem;">Location</label>
                     </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form class="" action="{% if basePlant %} {% url 'Account:basePlantEditSave' id=basePlant.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="basePlant"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Deports :<span
-                                                class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="basePlant" required="required"
-                                                id="basePlant" type="text" value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" {% if basePlant is none and location is not none %} disabled {% endif %}/>
-                                        </div>
-                                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="cuatom-continer">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="basePlant">Name:<span class="required">*</span></label>
+                                    <input class="form-control" type="text" name="basePlant" required  value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" id="basePlant">
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-9 col-sm-9 text-right">
-                                        <button type='submit' class="btn btn-primary px-4">Submit</button>
-                                    </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="address">Address:<span class="required">*</span></label>
+                                    <input class="form-control" type="text" name="address" required  value="{% if basePlant %}{{ basePlant.address }}{% endif %}" id="address">
                                 </div>
-                            </form> 
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="phone">Phone:<span class="required">*</span></label>
+                                    <input class="form-control" type="number" name="phone" required  value="{% if basePlant %}{{ basePlant.phone }}{% endif %}" id="phone">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="personOnName">Person Name:<span class="required">*</span></label>
+                                    <input class="form-control" type="text" name="personOnName" required  value="{% if basePlant %}{{ basePlant.personOnName }}{% endif %}" id="personOnName">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="managerName">Manager Name:<span class="required">*</span></label>
+                                    <input class="form-control" type="text" name="managerName" required  value="{% if basePlant %}{{ basePlant.managerName }}{% endif %}" id="managerName">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="lat">Lat:<span class="required">*</span></label>
+                                    <input class="form-control" type="number" name="lat" required  value="{% if basePlant %}{{ basePlant.lat }}{% endif %}" id="lat">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="long">Long:<span class="required">*</span></label>
+                                    <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="long">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9 col-sm-9 text-right">
+                                <button type='submit' class="btn btn-primary px-4">Submit</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>{% if location %}Edit{% else %}Add{% endif %} Location</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form class="" action="{% if location %} {% url 'Account:locationEditSave' id=location.id %} {% else %} {% url 'Account:locationSave' %} {% endif %}" method="POST">
-                                {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="location"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Location :<span
-                                                class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="location" required="required"
-                                                id="location" type="text" value="{% if location %} {{ location.location }} {% endif %}" {% if basePlant is not none and location is  none %} disabled {% endif %}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-9 col-sm-9 text-right">
-                                        <button type='submit' class="btn btn-primary px-4">Submit</button>
-                                    </div>
-                                </div>
-                            </form> 
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            </form>
         </div>
     </div>
 </div>

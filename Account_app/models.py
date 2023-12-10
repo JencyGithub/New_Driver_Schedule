@@ -17,6 +17,12 @@ class BasePlant(models.Model):
     managerName = models.CharField(max_length=25, default='')
     lat = models.CharField(max_length=20, default='')
     long = models.CharField(max_length=20, default='')
+    
+    # True = BasePlant, False = Location
+    basePlantType = models.BooleanField(default=True) 
+    
+    class Meta:
+        unique_together = (('lat', 'long'),)
 
     def __str__(self) -> str:
         return str(self.basePlant)
@@ -25,11 +31,20 @@ class BasePlant(models.Model):
 # Location 
 # -----------------------------------
 
-class Location(models.Model):
-    location = models.CharField(max_length=200)
+# class Location(models.Model):
+#     location = models.CharField(max_length=200)
+#     address = models.CharField(max_length=255, default='')
+#     phone = models.CharField(max_length=20, default='')
+#     personOnName = models.CharField(max_length=25, default='')
+#     managerName = models.CharField(max_length=25, default='')
+#     lat = models.CharField(max_length=20, default='')
+#     long = models.CharField(max_length=20, default='')
 
-    def __str__(self) -> str:
-        return str(self.location)
+#     class Meta:
+#         unique_together = (('lat', 'long'),)
+
+#     def __str__(self) -> str:
+#         return str(self.location)
 
 # -----------------------------------
 # Trips section

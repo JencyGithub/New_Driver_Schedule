@@ -416,7 +416,7 @@ class RctiExpenseAdmin(admin.ModelAdmin):
 
 admin.site.register(RctiExpense , RctiExpenseAdmin)
 
-admin.site.register(Location)
+# admin.site.register(Location)
 
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
@@ -425,8 +425,8 @@ admin.site.register(TruckDocument)
 
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
-    search_fields = ('driver', 'client',)
-    list_display = ["Title", "Start_Date_Time", "End_Date_Time", "Status", "driver","scheduled"]
+    search_fields = ('client',)
+    list_display = ["Title", "Start_Date_Time", "End_Date_Time", "Status","scheduled"]
     list_filter = ["Status"]
     actions = ['send_email_action']
 
@@ -462,3 +462,7 @@ class HolcimTrip_(admin.ModelAdmin):
 
 
 admin.site.register(HolcimTrip,HolcimTrip_)
+
+admin.site.register(AppointmentTruck)
+admin.site.register(AppointmentDriver)
+

@@ -5,13 +5,13 @@ from GearBox_app.models import *
 
 class Appointment(models.Model):
     TRIP_STATUS = [
-        ('unassigned', 'Unassigned'),
-        ('assigned', 'Assigned'),
-        ('dispacted', 'Dispatched'),
-        ('in_progress', 'In Progress'),
-        ('incomplete', 'Incomplete'),
-        ('complete', 'Complete'),
-        ('cancelled', 'Cancelled'),
+        ('Unassigned', 'Unassigned'),
+        ('Assigned', 'Assigned'),
+        ('Dispatched', 'Dispatched'),
+        ('InProgress', 'InProgress'),
+        ('Incomplete', 'Incomplete'),
+        ('Complete', 'Complete'),
+        ('Cancelled', 'Cancelled'),
     ]
     scheduled = models.BooleanField(default=False)
 
@@ -36,8 +36,8 @@ class Appointment(models.Model):
     # Block_Time = models.TimeField()
     # Total_Time = models.TimeField()
 
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    truckNo = models.IntegerField(default=0)
+    # driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    # truckNo = models.IntegerField(default=0)
     # truckNo = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
     stop = models.ForeignKey(Client, on_delete=models.CASCADE)
 
@@ -49,3 +49,24 @@ class Appointment(models.Model):
             status='Approved'
         )
         return not leave_requests.exists()
+    
+    def __str__(self):
+        return self.Title
+    
+    
+
+class AppointmentTruck(models.Model):
+    appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE)
+    truckNo = models.ForeignKey(AdminTruck,on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.truckNo.adminTruckNumber)
+
+
+class AppointmentDriver(models.Model):
+    appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE)
+    driverName = models.ForeignKey(Driver,on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.driverName.name)
+
