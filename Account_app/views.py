@@ -211,11 +211,14 @@ def rcti(request):
     rctiErrors = RctiErrors.objects.filter(status = False).values()
     rctiSolve = RctiErrors.objects.filter(status = True).values()
     client = Client.objects.all()
+    BasePlant_ = BasePlant.objects.all()
+    # return render(request, 'Account/rctiCsvForm.html', {'basePlants': BasePlant_})
     # return HttpResponse(rctiErrors)
     params = {
         'rctiErrors' : rctiErrors,
         'rctiSolve' :rctiSolve,
-        'client':client
+        'client':client,
+        'basePlants': BasePlant_
     }
     
     return render(request, 'Account/rctiForm.html',params)
@@ -336,6 +339,7 @@ def rctiSave(request):
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     time = getCurrentTimeInString()
+    location = None
     if rctiPdf:
         rctiPdfName = time + "@_!" + (str(rctiPdf.name)).replace(' ','')
         pdfLocation = 'static/Account/RCTI/uplodedRctiPdf'
@@ -651,64 +655,86 @@ def rctiTable(request):
 
 def basePlantTable(request):
     basePlants = BasePlant.objects.all()
-    locations = Location.objects.all()
-    return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants, 'locations':locations})
+    # locations = Location.objects.all()
+    return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants})
 
 def basePlantForm(request, id=None):
-    basePlant = location = None
+    
+    basePlant = None
     if id:
         basePlant = BasePlant.objects.get(pk=id)
+        
     params = {
         'basePlant': basePlant,
-        'location': location,
     }
     return render(request, "Account/basePlantForm.html", params)
 
-def locationEditForm(request, id=None):
-    basePlant = location = None
-    if id:
-        location = Location.objects.get(pk=id)
-    params = {
-        'basePlant': basePlant,
-        'location': location,
-    }
-    return render(request, "Account/basePlantForm.html", params)
+# def locationEditForm(request, id=None):
+#     basePlant = location = None
+#     if id:
+#         location = Location.objects.get(pk=id)
+#     params = {
+#         'basePlant': basePlant,
+#         'location': location,
+#     }
+#     return render(request, "Account/basePlantForm.html", params)
 
-def locationTable(request):
-    locations = Location.objects.all()
-    return render(request, 'GearBox/truckForm.html', {'locations': locations})
+# def locationTable(request):
+#     locations = Location.objects.all()
+#     return render(request, 'GearBox/truckForm.html', {'locations': locations})
 
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
     dataList = {
-        'basePlant': request.POST.get('basePlant')
+        'basePlant': request.POST.get('basePlant').upper(),
+        'address': request.POST.get('address'),
+        'phone': request.POST.get('phone'),
+        'personOnName': request.POST.get('personOnName'),
+        'managerName': request.POST.get('managerName'),
+        'lat': request.POST.get('lat'),
+        'long': request.POST.get('long'),
+        'basePlantType' : False if  request.POST.get('basePlantType') == "typeLocation" else True
     }
+    
+    result = None
     if id:
-        updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
-        messages.success(request, 'BasePlant updated successfully')
+        result = updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
     else:
-        insertIntoTable(tableName='BasePlant', dataSet=dataList)
-        messages.success(request, 'BasePlant added successfully')
+        result = insertIntoTable(tableName='BasePlant', dataSet=dataList)
 
-    return redirect('Account:basePlantTable')
-
-@csrf_protect
-@api_view(['POST'])
-def locationSave(request, id=None):
-    dataList = {
-        'location': request.POST.get('location')
-    }
-    if id:
-        updateIntoTable(record_id=id, tableName='Location', dataSet=dataList)
-        messages.success(request, 'Location updated successfully')
+    if result is not True:
+        messages.error(request, 'This location already exist.')
+        return redirect(request.META.get('HTTP_REFERER'))
     else:
-        insertIntoTable(tableName='Location', dataSet=dataList)
-        messages.success(request, 'Location added successfully')
-
-    return redirect('Account:basePlantTable')
+        messages.success(request, 'Depot Change successfully')
+        return redirect('Account:basePlantTable')
 
 
+# @csrf_protect
+# # @api_view(['POST'])
+# def locationSave(request, id=None):
+#     locationObj = None
+#     if id:
+#         locationObj = Location.objects.filter(pk=id).first()
+#     else:
+#         locationObj = Location()
+    
+#     locationObj.location = request.POST.get('location').upper()
+#     locationObj.address = request.POST.get('locationAddress')
+#     locationObj.phone = request.POST.get('locationPhone')
+#     locationObj.personOnName = request.POST.get('locationPersonOnName')
+#     locationObj.managerName = request.POST.get('locationManagerName')
+#     locationObj.lat = request.POST.get('locationLat')
+#     locationObj.long = request.POST.get('locationLong')
+#     locationObj.save()
+    
+#     if id:
+#         messages.success(request, 'Location updated successfully')
+#     else:
+#         messages.success(request, 'Location added successfully')
+
+#     return redirect('Account:basePlantTable')
 
 def foreignKeySet(dataset):
     for data in dataset:
@@ -716,10 +742,7 @@ def foreignKeySet(dataset):
             pk=data['clientName_id']).first().name
         data['driverId_id'] = Driver.objects.filter(
             pk=data['driverId_id']).first().name
-
     return dataset
-
-
 
 @csrf_protect
 @api_view(['POST'])
@@ -1545,10 +1568,17 @@ def surchargeSave(request, id=None):
     return redirect('Account:surchargeTable')
 
 def DriverShiftForm(request,id):
+    pastTripFile = os.listdir('static/Account/PastTripsEntry')
+    pasrTripFileNameList = []
+    for file in pastTripFile:
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        
+    # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()
     params ={
             'clients': client,
             'id':id,
+            'pasrTripFileNameLists' : pasrTripFileNameList,
         }      
     return render(request, 'Account/driverShiftForm.html',params)
 

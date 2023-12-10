@@ -27,13 +27,15 @@ def convertDateTimeForTemplate(provided_date_string):
     return formatted_datetime
 
 def appointmentForm(request, id=None):
+    currentUser = request.user
     drivers = Driver.objects.all()
     clients = Client.objects.all()
     truckNos = AdminTruck.objects.all()
     params = {
         'drivers' : drivers,
         'truckNos':truckNos,
-        'clients' : clients,   
+        'clients' : clients,  
+        'currentUser' : currentUser 
     }
     if id:
         data = Appointment.objects.filter(pk=id).first()
@@ -48,32 +50,53 @@ def appointmentForm(request, id=None):
     return render(request, 'Appointment/appointmentForm.html',params)
 
 @csrf_protect
-@api_view(['POST'])
-def applicationSave(request):
-    driver = Driver.objects.filter(pk=request.POST.get('driverName')).first()
-    client = Client.objects.filter(pk=request.POST.get('stopName')).first()
+def appointmentSave(request):
 
+    client = Client.objects.filter(pk=request.POST.get('stopName')).first()
+    newOrigin = request.POST.get('originAddVal')
+    if newOrigin == 1:
+        originObj = BasePlant()
+        originObj.basePlant = request.POST.get('origin')
+        originObj.address = request.POST.get('originAddress')
+        originObj.phone = request.POST.get('originPhone')
+        originObj.personOnName = request.POST.get('originPersonOnName')
+        originObj.managerName = request.POST.get('originPersonOnName')
+        originObj.lat = request.POST.get('originLatitude')
+        originObj.long = request.POST.get('originLongitude')
+        originObj.save()
+        
     appointmentObj = Appointment()
     appointmentObj.Title = request.POST.get('title')
     appointmentObj.Start_Date_Time = request.POST.get('startDateTime')
     appointmentObj.End_Date_Time = request.POST.get('endDateTime')
     appointmentObj.report_to_origin = request.POST.get('reportToOrigin')
-    appointmentObj.Status = request.POST.get('status')
-    appointmentObj.Origin = request.POST.get('origin')
     appointmentObj.Recurring = request.POST.get('recurring')
     appointmentObj.Staff_Notes = request.POST.get('staffNotes')
-    appointmentObj.Created_by = request.POST.get('createdBy')
-    # appointmentObj.Created_time = request.POST.get('Created_time')
-    appointmentObj.Report_Time = request.POST.get('reportTime')
-    appointmentObj.Dwell_Time = request.POST.get('dwellTime')
-    appointmentObj.Block_Time = request.POST.get('blockTime')
-    appointmentObj.Total_Time = request.POST.get('totalTime')
-    appointmentObj.truckNo = request.POST.get('truckNo')
-    appointmentObj.driver = driver
+    appointmentObj.Created_by = request.user.id
     appointmentObj.stop = client
-    
+    appointmentObj.Origin = request.POST.get('origin')
+    appointmentObj.Status = 'Unassigned'
     appointmentObj.save()
+
+    driver = Driver.objects.filter(pk=request.POST.get('driverName')).first()
+    if driver:
+        appointmentDriverObj = AppointmentDriver()
+        appointmentDriverObj.driverName = driver
+        appointmentDriverObj.appointmentId = appointmentObj
+        appointmentDriverObj.save()
     
+    truck = AdminTruck.objects.filter(adminTruckNumber=request.POST.get('truckNo')).first()
+
+    if truck:
+        appointmentTruckObj = AppointmentTruck()
+        appointmentTruckObj.truckNo = truck
+        appointmentTruckObj.appointmentId = appointmentObj
+        appointmentTruckObj.save()
+        
+    if driver and truck:
+        appointmentObj.Status = "Assigned"
+        appointmentObj.save()
+        
     messages.success(request, "Form Successfully Filled Up.")
     return redirect(request.META.get('HTTP_REFERER'))
 
@@ -88,10 +111,9 @@ def findJob(request):
 def getTruckAndDriver(request):
     startDateTime = request.POST.get('startDateTime')
     endDateTime = request.POST.get('endDateTime')
-    print(startDateTime,endDateTime)
     
-    startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M')
-    endDateTime = datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M')
+    startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M:%S')
+    endDateTime = datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M:%S')
         
     # Qry logic
     # Appointment.objects.get(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
@@ -117,13 +139,22 @@ def getTruckAndDriver(request):
     availableDriversList = list(itertools.filterfalse(lambda x: x in list(drivers), unavailableDriversQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableDriversQrySet, list(drivers)))
     availableTrucksList = list(itertools.filterfalse(lambda x: x in list(trucks), unavailableTrucksQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableTrucksQrySet, list(trucks)))
 
-    # availableTrucksList = list(set(trucks.items()) - set(unavailableTrucksQrySet))
-    # availableDriversList = list(set(drivers.items()) - set(unavailableDriversQrySet.items()))
-
     return JsonResponse({'status': True, 'availableTrucksList': availableTrucksList, 'availableDriversList': availableDriversList})
 
     # Add logic for leave request here
     
-   
+
+@csrf_protect
+def getOriginDetails(request):
+    originName = request.POST.get('originName').strip().upper()
+    status = True
+    origin = BasePlant.objects.filter(basePlant=originName).values().first()
+    print(originName,origin)
+    if not origin:
+        status = False
+    return JsonResponse({'status': status ,'origin' : origin})
+        
+
+
 
 

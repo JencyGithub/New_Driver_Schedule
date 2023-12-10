@@ -70,9 +70,9 @@ urlpatterns = [
     path('BasePlant/edit/save/<int:id>/', views.basePlantSave, name='basePlantEditSave'),   
 
     # Location
-    path('location/save/', views.locationSave, name='locationSave'), 
-    path('location/edit/<int:id>/', views.locationEditForm, name='locationEdit'),   
-    path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
+    # path('location/save/', views.locationSave, name='locationSave'), 
+    # path('location/edit/<int:id>/', views.locationEditForm, name='locationEdit'),   
+    # path('location/edit/save/<int:id>', views.locationSave, name='locationEditSave'),   
 
     path('RctiTable/', views.rctiTable, name='rctiTable'),
     # path('DriverTripsTable/', views.driverTripsTable, name='driverTripsTable'),
