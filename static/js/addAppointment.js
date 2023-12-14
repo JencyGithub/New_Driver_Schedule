@@ -76,7 +76,6 @@ function checkOrigin(){
               xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: function (data) {
-                console.log(data)
                 if(data.status == true){
                     $('#originAddress').val(data.origin.address);
                     $('#originPhone').val(data.origin.phone)
@@ -88,8 +87,8 @@ function checkOrigin(){
                     $('#originPersonOnName').attr('readonly',true)
                     $('#originLatitude').attr('readonly',true)
                     $('#originLongitude').attr('readonly',true)
+                    $('#locationDiv').addClass('d-none')
                     $('#errorMsgForOrigin').addClass('d-none')
-                  
                 }else{
                     $('#originAddress').val('')
                     $('#originPhone').val('')
@@ -103,6 +102,7 @@ function checkOrigin(){
                     $('#originLatitude').removeAttr('readonly')
                     $('#originLongitude').removeAttr('readonly')
                     $('#errorMsgForOrigin').removeClass('d-none')
+                    $('#locationDiv').removeClass('d-none')
                     $("#originAddVal").val(1)
                 }
             },

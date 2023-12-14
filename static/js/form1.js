@@ -3,8 +3,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 if ($(window).width() < 1000) {
   $("body #mainCont").addClass("container-fluid");
   $("body #mainCont").removeClass("container");
-} else {
-}
+} 
 
 document.getElementById("nextBtn").addEventListener("click", function (event) {
   event.preventDefault();
@@ -263,3 +262,13 @@ numberOfLoadsInput.on("input", function () {
   // Update the input value
   $(this).val(value);
 });
+
+$('#startTime').on('change',function () {
+  let startTime = $('#startTime').val()
+  let endTime = $('#endTime')
+  endTime.attr('min', startTime);
+  endTime.removeAttr('readonly')
+  
+
+  console.log(startTime);
+})

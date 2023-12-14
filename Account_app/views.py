@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.contrib import messages
 from Account_app.models import *
 from GearBox_app.models import *
+from Appointment_app.models import *
 from django.http import FileResponse
 from CRUD import *
 from .models import RCTI
@@ -16,6 +17,8 @@ from Account_app.reconciliationUtils import *
 from django.urls import reverse
 from django.db.models import Q
 from itertools import chain
+
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -190,6 +193,107 @@ def formsSave(request):
     messages.success(request, " Form Successfully Filled Up")
     return redirect('index')
 
+
+def assignedJobShow(request):
+    driverObj = Driver.objects.filter(name = request.user.username).first()
+    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
+    jobs = []
+    for obj in driverAppointments:
+        print(obj.appointmentId.Status)
+        if obj.appointmentId.Status == "Assigned":
+            jobs.append(obj.appointmentId)
+            
+    params = {'jobs':jobs}
+    
+    return render(request, 'Trip_details/assignedJobs.html',params)
+
+def assignedJobAccept(request,id):
+    # Check wether any job is currently open or not start
+    driverObj = Driver.objects.filter(name = request.user.username).first()
+    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
+    jobs = 0
+    
+    for obj in driverAppointments:
+        if obj.appointmentId.Status == "Dispatched":
+            jobs += 1 
+    
+    if jobs > 0 :
+        messages.error(request,'Please finish your current job before starting a new one.')
+        return redirect(request.META.get('HTTP_REFERER'))
+    
+    # Check wether any job is currently open or not end
+    
+    appObj = Appointment.objects.filter(pk=id).first()
+    # appObj.Status = "Dispatched"
+    appObj.save()
+    return redirect('Account:openJobShow')
+
+def singleJobView(request,id):
+    job = Appointment.objects.filter(pk=id).first()
+    driver = AppointmentDriver.objects.filter(appointmentId = job).first()
+    truck = AppointmentTruck.objects.filter(appointmentId = job).first()
+
+    params = {
+        'job':job,
+        'driver':driver,
+        'truck':truck
+    }
+    return render(request,'Trip_details/jobView.html',params)
+
+# @login_required
+def openJobShow(request):
+    driverObj = Driver.objects.filter(name = request.user.username).first()
+    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
+    jobs = []
+    for obj in driverAppointments:
+        print(obj.appointmentId.Status)
+        if obj.appointmentId.Status == "Dispatched":
+            jobs.append(obj.appointmentId)
+            
+    params = {'jobs':jobs}    
+    return render(request, 'Trip_details/openJobs.html',params)
+    
+def finishJob(request, id):
+    
+    if id:
+        appObj = Appointment.objects.filter(pk=id).first()
+        if not appObj.stop.docketGiven:
+            return redirect('Account:uploadDocketView' , id)
+        else:
+            # appObj.Status = "Dispatched"
+            appObj.save()    
+        
+    
+    # For get all assigned job
+    driverObj = Driver.objects.filter(name = request.user.username).first()
+    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
+    jobs = []
+    for obj in driverAppointments:
+        print(obj.appointmentId.Status)
+        if obj.appointmentId.Status == "Assigned":
+            jobs.append(obj.appointmentId)
+            
+    params = {'jobs':jobs}
+    
+    return render(request, 'Trip_details/assignedJobs.html',params)
+    # return redirect('Account:assignedJobAccept')
+
+
+@login_required
+def uploadDocketView(request,id):
+    
+    params = {'id':id}
+    return render(request, 'Trip_details/uploadDocket.html',params)
+
+@csrf_protect
+def uploadDocketSave(request, id):
+    docketFile = request.FILES.get('docketImage')
+    docketNumber = request.POST.get('docketNumber')
+    
+    appObj = Appointment.objects.filter(pk=id).first()
+    # appObj.Status = "Dispatched"
+    appObj.save()
+    return HttpResponse(docketNumber)
 
 @csrf_protect
 @api_view(['POST'])

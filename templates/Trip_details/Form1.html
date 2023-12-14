@@ -235,7 +235,7 @@
                         <div class="mb-3">
                             <label for="endTime">End time :</label>
                             <input type="time" name="endTime" id="endTime"
-                                value="{{ request.session.data.endTime|default_if_none:'' }}" />
+                                value="{{ request.session.data.endTime|default_if_none:'' }}" readonly/>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -258,9 +258,12 @@
                 <textarea placeholder="Comments" name="comments" class="form-control">{{ request.session.data.comments|default_if_none:'' }}</textarea>
             </div>
             <div class="row">
-                <div class="form-footer">
-                    <input type="submit" id="nextBtn" value="Next"
-                        class="btn btn-primary btn-lg responsive-btn mybtn" />
+                <div class="col-md-9 col-sm-9"></div>
+                <div class="col-md-3 col-sm-3 col-xs-12">
+                    <div class="form-footer">
+                        <input type="submit" id="nextBtn" value="Next"
+                            class="btn btn-default btn-lg responsive-btn " />
+                    </div>
                 </div>
             </div>
         </form>

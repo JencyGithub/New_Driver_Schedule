@@ -28,6 +28,18 @@ urlpatterns = [
     
     path('createFormSession/',views.createFormSession, name='createFormSession'),
     path('formsSave/', views.formsSave, name='formsSave'),
+    
+    path('jobs/assigned/', views.assignedJobShow, name='assignedJobShow'),
+    path('jobs/assigned/accept/<int:id>/', views.assignedJobAccept, name='assignedJobAccept'),
+    path('jobs/view/<int:id>/', views.singleJobView, name='singleJobView'),
+
+    path('jobs/open/', views.openJobShow, name='openJobShow'),
+    path('jobs/finish/<int:id>/', views.finishJob, name='finishJob'),
+
+    path('docket/upload/<int:id>/', views.uploadDocketView, name='uploadDocketView'),
+    path('docket/save/<int:id>/', views.uploadDocketSave, name='uploadDocketSave'),
+    
+    
 
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     
