@@ -104,6 +104,16 @@
                                         required='required' style="padding: 0.25rem 0.2rem;" id="staffNotes">
                                 </div>
                             </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="shiftType">Shift type :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <select name="shiftType" class="form-select form-control" id="shiftType" required {% if data %}disabled{% endif %}>
+                                        <option disabled selected> Select shift type </option>
+                                        <option value="Day" {% if data.shiftType == "Day" %}selected{% endif %}>Day</option>
+                                        <option value="Night" {% if data.shiftType == "Night" %}selected{% endif %}>Night</option>
+                                        </select>
+                                </div>
+                            </div>
                             <!-- <div class="col-md-4 col-sm-4">
                                 <label for="reportTime">Report time :<span class="required">*</span></label>
                                 <div class="field item form-group">
