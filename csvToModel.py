@@ -71,12 +71,25 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
                     RCTIobj.othersTotal = convertIntoFloat(dump[9])
                     dataList = dataList[10:]
-
                     continue
                     
                 RCTIobj.docketDate = dateConvert(dump[0])
+                
                 if dump[1] is not BasePlant_:
-                        BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dump[1]).upper())[0]
+                    rctiErrorObj = RctiErrors( 
+                                        clientName = 'boral',
+                                        docketNumber = RCTIobj.docketNumber,
+                                        docketDate = RCTIobj.docketDate,
+                                        errorDescription = "Earning Depot/Location does not exist.",
+                                        fileName = file_name,
+                                        data = str(dataList)
+                    )
+                    rctiErrorObj.save()
+                    dataList = dataList[10:]
+                    continue
+                else:
+                    BasePlant_ = BasePlant.objects.filter(basePlant = str(dump[1]).upper()).first()
+
                 RCTIobj.docketYard = dump[1]
                 
                 if "truck transfer" in description:
@@ -210,19 +223,32 @@ def insertIntoExpenseModel(dataList , file_name):
                 rctiExpenseObj.truckNo = str(dataList[0])
                 rctiExpenseObj.docketNumber = str(dataList[1])
                 rctiExpenseObj.docketDate = dateConvert(dataList[2])
-                if dataList[2] is not BasePlant_:
-                    BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dataList[3]).upper())[0]
+                
+                # if dataList[2] is not BasePlant_:
+                #     BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dataList[3]).upper())[0]
 
-                rctiExpenseObj.docketYard = str(dataList[3]).upper()
-                rctiExpenseObj.description = str(dataList[4])
-                rctiExpenseObj.paidKm =  0
-                rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[6])
-                rctiExpenseObj.unit =  dataList[7]
-                rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[8])
-                rctiExpenseObj.gstPayable =  convertIntoFloat(dataList[9])
-                rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
-                rctiExpenseObj.total =  convertIntoFloat(dataList[11])
-                rctiExpenseObj.save()
+                if dataList[2] is not BasePlant_:
+                    rctiErrorObj = RctiErrors( 
+                                        docketNumber = rctiExpenseObj.docketNumber,
+                                        docketDate = rctiExpenseObj.docketDate,
+                                        errorDescription = "Expense Depot/Location does not exist.",
+                                        fileName = file_name,
+                                        data = str(dataList))
+                    rctiErrorObj.save()
+                    pass
+                else:
+                    BasePlant_ = BasePlant.objects.filter(basePlant = str(dataList[1]).upper()).first()
+
+                    rctiExpenseObj.docketYard = str(dataList[3]).upper()
+                    rctiExpenseObj.description = str(dataList[4])
+                    rctiExpenseObj.paidKm =  0
+                    rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[6])
+                    rctiExpenseObj.unit =  dataList[7]
+                    rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[8])
+                    rctiExpenseObj.gstPayable =  convertIntoFloat(dataList[9])
+                    rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
+                    rctiExpenseObj.total =  convertIntoFloat(dataList[11])
+                    rctiExpenseObj.save()
         except Exception as e:
             rctiErrorObj = RctiErrors( 
                             docketNumber = rctiExpenseObj.docketNumber,
@@ -238,7 +264,7 @@ try:
         file_name = f.read()
     # file_name = file_name.strip()
     file_name = file_name.split('<>')
-
+    
     # file_name = 'converted_20231030113104@_!pdf1.csv'
     convertFileName = file_name[0].split('@_!')[1]
 
@@ -250,8 +276,6 @@ try:
         insertIntoModel(row,convertFileName)
 
     # Expense 
-
-
     fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
     reader = csv.reader(fileExpense)
     for row in reader:

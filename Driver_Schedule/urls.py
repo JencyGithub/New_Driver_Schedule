@@ -33,9 +33,8 @@ urlpatterns = [
     path('changePassword/',views.changePasswordView, name='changePasswordView'),
     path('changePassword/change/',views.changePasswordChange, name='changePasswordChange'),
 
-
     # Account routes
-    path('account/',include('Account_app.urls')),
+    path('account/',include('Account_app.urls')),   
 
     # GearBox routes
     path('gearBox/',include('GearBox_app.urls')),
