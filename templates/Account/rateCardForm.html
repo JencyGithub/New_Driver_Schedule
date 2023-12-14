@@ -45,17 +45,30 @@ request {% endblock %} {% block headStyle %}
             {% if rateCard %}
                 <div class="x_panel col-md-12 col-sm-12">
                     <h2>View old rate card :-</h2>
+                    <hr>
                     <form action="{% url 'Account:rateCardView' id=rateCard.id%}" method="post">
                         {% csrf_token %}
                         <div class="row">
-                            <div class="col-md-4">
-                                <select name="rateCard" id="rateCard" class="form-control">
-                                    {% for dates in rateCardDates %}
+                            <div class="col-md-3">
+                                <label for="oldRateCardStartDate">Start Date :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" type="date" name="oldRateCardStartDate" required='required' onchange="setEndDate(this,'oldRateCardEndDate')" id="oldRateCardStartDate">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="oldRateCardEndDate">End Date :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control"  type="date" name="oldRateCardEndDate" required='required' readonly id="oldRateCardEndDate" onchange="getOldRateCards()">
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="padding-top: 1.7rem;">
+                                <select name="rateCard" id="rateCard" class="form-control" disabled>
+                                     {% comment %} {% for dates in rateCardDates %}
                                     <option value="{{dates|escape}}">{{dates|escape}}</option>
-                                    {% endfor %}
+                                    {% endfor %}  {% endcomment %}
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-2" style="padding-top: 1.7rem;">
                                 <input type="submit" value="Get" class="btn btn-default px-5">
                             </div>
                         </div>
@@ -70,11 +83,9 @@ request {% endblock %} {% block headStyle %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Add Rate Card Form :-</h2>
-                            
                             {% if rateCard %}
-                            <label id="editRateCard" class="btn btn-default float-right " onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
-                            <label id="rateRevision" class="btn btn-default float-right " onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
-
+                                <label id="editRateCard" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
+                                <label id="rateRevision" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
                            {% endif %}
                             <div class="clearfix"></div>
                         </div>
@@ -89,15 +100,14 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-3 col-sm-3">
                                     <label for="startDate">Start Date :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if rateCard %}{{startDate}}{% endif %}" {% if rateCard %} readonly {% endif %} type="date" name="startDate" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
+                                        <input class="form-control" value="{% if rateCard %}{{startDate}}{% endif %}" {% if rateCard %} readonly {% endif %} type="date" name="startDate" required='required' style="padding: 0.25rem 0.2rem;" onchange="setEndDate(this,'endDate')" id="startDate">
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
                                     <label for="endDate">End Date :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if rateCard %}{{endDate}}{% endif %}" {% if rateCard %} readonly {% endif %} type="date" name="endDate" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
+                                        <input class="form-control" value="{% if rateCard %}{{endDate}}{% endif %}" readonly type="date" name="endDate" required='required' style="padding: 0.25rem 0.2rem;" id="endDate">
                                         <input class="form-control" value="{{clientId}}" name="clientName" type="hidden">
-
                                     </div>
                                 </div>
                             </div>
@@ -799,11 +809,13 @@ request {% endblock %} {% block headStyle %}
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
 
 {% block footerStyle %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     $(document).ready(function () {
         $('#myForm').submit(function (event) {
@@ -843,12 +855,9 @@ request {% endblock %} {% block headStyle %}
 
 
     function rateRevision(id,value=null){
-       
         rateRevisionVal = $("#rateRevisionVal").val()
         console.log(rateRevisionVal)
         if(rateRevisionVal == "open"){
-            
-
             event.preventDefault();
             $('input').each(function () {
                 $(this).removeAttr('readonly')
@@ -868,14 +877,51 @@ request {% endblock %} {% block headStyle %}
                 $('input[type="date"]').each(function(){
                     $(this).prop('readonly', true);
                 })
-
             }
             $("#submitBtn").append(`<button type='submit' class="btn btn-primary px-4">Submit</button>`);
-            $('#rate_card_name').prop('readonly', true);
+            $('#rate_card_name').attr('readonly', true);
             $("#rateRevisionVal").val('close');
+            $("#oldRateCardStartDate").attr('readonly',true)
+            $("#oldRateCardEndDate").attr('readonly',true)
+            $("#rateCard").attr('disabled',true)
         }
     };
+
+    function setEndDate(dataRow,endDateId){
+        let oldRateCardStartDate = $(`#${dataRow.id}`).val()
+        $(`#${endDateId}`).attr('min', oldRateCardStartDate);
+        $(`#${endDateId}`).removeAttr('readonly')
+    }
+
+    function getOldRateCards(){
+        let oldRateCardStartDate = $(`#oldRateCardStartDate`).val()
+        let oldRateCardEndDate = $(`#oldRateCardEndDate`).val()
+        console.log({{ rateCard.id }})
+
+        $.ajax({
+            url: "/account/getOld/rateCards/",
+            method: "POST",
+            data: {
+                'startDate' : oldRateCardStartDate,
+                'endDate' : oldRateCardEndDate,
+                'rateCardId' : {{ rateCard.id }}
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                console.log(data)
+
+                data.rateCardDates.forEach(function (item) {
+                    $("#rateCard").append(
+                        `<option value="${item}">${item}</option>`
+                    );
+                });
+
+                $('#rateCard').removeAttr('disabled')
+            },
+        });
+    }
 </script>
 
-{% endblock %}
 {% endblock %}

@@ -1222,7 +1222,6 @@ def rateCardTable(request,clientId = None):
     params = {
         'rateCard': RateCards,
         'clientId':clientId,
-        
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
@@ -1250,7 +1249,6 @@ def rateCardForm(request, id=None , clientId=None):
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
-            
 
         else:
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
@@ -1279,6 +1277,19 @@ def rateCardForm(request, id=None , clientId=None):
         # 'onLease' : onLease,
     }
     return render(request, 'Account/rateCardForm.html', params)
+
+@csrf_protect
+def getOldRateCards(request):
+    rateCardDates = []
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    rateCard = RateCard.objects.filter(pk=request.POST.get('rateCardId')).first()
+    costParameters = CostParameters.objects.filter(Q(rate_card_name=rateCard,end_date__gte = startDate,start_date__lte = endDate)|Q(rate_card_name=rateCard,start_date__gte = startDate,end_date__lte = endDate)).values()
+
+    for obj in costParameters:
+        rateCardDates.append(str(obj['start_date']) + ' to ' + str(obj['end_date']))
+
+    return JsonResponse({'status':True, 'rateCardDates':rateCardDates})
 
 def checkOnOff(val_):
     return True if str(val_) =='on' else False
