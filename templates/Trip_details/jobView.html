@@ -58,6 +58,7 @@
             </table>
         </div>
         <div class="col-md-5 col-sm-12">
+            <!-- Origin details section start -->
             <table class="table border mt-3 mb-2">
                 <tr>
                     <th class="py-2">Origin </th>
@@ -80,10 +81,17 @@
                     <td class="py-2"><span>{{ job.Origin.address }}</span></td>
                 </tr>
             </table>
+            <!-- Origin details section end -->
+
+            <!-- Truck details section start -->
+            <div class="div border p-5 mt-4" >
+                <h5 class="card-title text-muted">Truck details displayed here</h5>
+            </div>
+            <!-- Truck details section end -->
+
         </div>
     </div>
-
-    <hr>
+    {% if job.Status == "Assigned" %}<hr>{% endif %}
 </div>
 
 {% if job.Status == "Assigned" %}
@@ -97,8 +105,6 @@
     </div>
 </div>
 {% endif %}
-
-
 
 {% endblock %}
 {% block footerStyle %}

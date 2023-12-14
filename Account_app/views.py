@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil ,os  ,colorama ,subprocess ,csv
+import shutil, os, colorama, subprocess, csv, re
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime , time
 from django.core.files.storage import FileSystemStorage
@@ -224,7 +224,7 @@ def assignedJobAccept(request,id):
     # Check wether any job is currently open or not end
     
     appObj = Appointment.objects.filter(pk=id).first()
-    # appObj.Status = "Dispatched"
+    appObj.Status = "Dispatched"
     appObj.save()
     return redirect('Account:openJobShow')
 
@@ -260,7 +260,7 @@ def finishJob(request, id):
         if not appObj.stop.docketGiven:
             return redirect('Account:uploadDocketView' , id)
         else:
-            # appObj.Status = "Dispatched"
+            appObj.Status = "Dispatched"
             appObj.save()    
         
     
@@ -287,13 +287,94 @@ def uploadDocketView(request,id):
 
 @csrf_protect
 def uploadDocketSave(request, id):
+    appointmentObj = Appointment.objects.filter(pk=id).first()
+    startDateObj = datetime.strptime(str(appointmentObj.Start_Date_Time), "%Y-%m-%d %H:%M:%S%z")
+    endDateObj = datetime.strptime(str(appointmentObj.End_Date_Time), "%Y-%m-%d %H:%M:%S%z")
+
+    AppointmentTruckObject = AppointmentTruck.objects.filter(appointmentId = appointmentObj).first()
+
     docketFile = request.FILES.get('docketImage')
     docketNumber = request.POST.get('docketNumber')
+    driverObj = Driver.objects.filter(name = request.user.username).first()
     
-    appObj = Appointment.objects.filter(pk=id).first()
-    # appObj.Status = "Dispatched"
-    appObj.save()
-    return HttpResponse(docketNumber)
+    # Trip save start
+    tripObj = DriverTrip.objects.filter(driverId = driverObj, shiftDate=startDateObj.date()).first()
+    if not tripObj:
+        tripObj = DriverTrip()
+        tripObj.partially = True
+        tripObj.driverId = driverObj
+        tripObj.clientName = appointmentObj.stop
+        tripObj.shiftType = appointmentObj.shiftType
+        tripObj.truckNo = AppointmentTruckObject.truckNo.adminTruckNumber
+        tripObj.shiftDate = startDateObj.date()
+        
+    # return HttpResponse(tripObj)
+    # tripObj.numberOfLoads += 1
+    
+    startTime = tripObj.startTime
+    endTime = tripObj.endTime
+    time_pattern = re.compile(r'^\d{2}:\d{2}$')
+    
+    if time_pattern.match(startTime):
+        startTime = startTime+":00"
+    if time_pattern.match(endTime):
+        startTime = startTime+":00"
+
+    # Set start time  
+    if not startTime:
+        tripObj.startTime = startDateObj.time()
+    else:
+        if not isinstance(startTime, datetime):
+            startTime = datetime.strptime(startTime, "%H:%M:%S")
+        if startTime.time() < startDateObj.time():
+            tripObj.startTime = startDateObj.time()
+    # Set start time  
+
+    # Set end time 
+    if not endTime:
+        tripObj.endTime = endDateObj.time()
+    else:
+        if not isinstance(endTime, datetime):
+            endTime = datetime.strptime(endTime, "%H:%M:%S")
+        if endTime.time() < endDateObj.time():
+            tripObj.endTime = endDateObj.time()
+    # Set end time
+    
+    tripObj.save()    
+    # Trip save end
+
+    # Docket save start
+    # docketObj = DriverDocket.objects.filter(shiftDate = tripObj.shiftDate,tripId = tripObj ,docketNumber=docketNumber).first()
+    docketObj = DriverDocket.objects.filter(tripId = tripObj ,docketNumber=docketNumber).first()
+    if docketObj:
+        messages.error(request, "This docket is already exist, please check docket number.")
+        return redirect(request.META.get('HTTP_REFERER'))
+
+    else:
+        docketObj = DriverDocket()
+        docketObj.docketNumber = docketNumber
+        if docketFile:
+            docketObj.docketFile = docketFileSave(docketFile, docketNumber)
+        
+        docketObj.basePlant = appointmentObj.Origin
+        docketObj.tripId = tripObj
+        docketObj.shiftDate = startDateObj.date()
+
+        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = "Nosurcharge").first()
+
+        tripObj.numberOfLoads += 1
+        tripObj.save()
+
+        docketObj.save()
+        
+    # Docket save end
+
+    appointmentObj.Status = "Complete"
+    appointmentObj.save()
+    messages.success(request, "Docket Updated")
+    
+    return redirect('Account:assignedJobShow')
+
 
 @csrf_protect
 @api_view(['POST'])

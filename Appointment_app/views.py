@@ -111,6 +111,7 @@ def appointmentSave(request):
     appointmentObj.stop = client
     appointmentObj.Origin = originObj
     appointmentObj.Status = 'Unassigned'
+    appointmentObj.shiftType = request.POST.get('shiftType')
     appointmentObj.save()
 
     driver = Driver.objects.filter(pk=request.POST.get('driverName')).first()

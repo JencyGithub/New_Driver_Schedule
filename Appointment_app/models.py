@@ -26,6 +26,7 @@ class Appointment(models.Model):
     Origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE)
     Recurring = models.CharField(max_length=255)
     Staff_Notes	= models.CharField(max_length=1024)
+    shiftType = models.CharField(max_length=10,choices=[('Day','Day'),('Night','Night')], default='Day')
     
     Created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     Created_time = models.TimeField(default=timezone.now())

@@ -52,6 +52,7 @@ class BasePlant(models.Model):
 
 class DriverTrip(models.Model):
     verified = models.BooleanField(default=False)
+    partially = models.BooleanField(default=False)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE)
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
     shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')))
@@ -60,7 +61,7 @@ class DriverTrip(models.Model):
     shiftDate = models.DateField(null=True, default=None)
     startTime = models.CharField(max_length=200)
     endTime = models.CharField(max_length=200)
-    loadSheet = models.FileField(upload_to='static/img/finalloadSheet')
+    loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
 
     def __str__(self) -> str:
