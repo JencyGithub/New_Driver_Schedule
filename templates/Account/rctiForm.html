@@ -215,7 +215,7 @@
                             <thead>
                               <tr>
                                 <th>View</th>
-                                <th>Data</th>
+                                <th>Client</th>
                                 <th>DocketNumber</th>
                                 <th>DocketDate</th>
                                 <th class="w-50">ErrorDescription</th>
@@ -227,7 +227,7 @@
                               {% for error in rctiErrors %}
                               <tr>
                                 <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                <td>Default</td>
+                                <td>{{ error.clientName }}</td>
                                 <td> {{ error.docketNumber }}</td>
                                 <td >{{error.docketDate}}</td>
                                 <td>{{error.errorDescription}}</td>

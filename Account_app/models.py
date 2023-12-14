@@ -322,7 +322,7 @@ class HolcimTrip(models.Model):
     numberOfLoads = models.FloatField(default=0)
     
     def __str__(self):
-        return str(self.truckNo)
+        return str(self.id)
     
 class HolcimDocket(models.Model):
     truckNo =  models.PositiveBigIntegerField(default=0)
@@ -330,7 +330,8 @@ class HolcimDocket(models.Model):
     jobNo = models.PositiveIntegerField(default=0)
     orderNo = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=200)
-    ticketed = models.DateTimeField(null=True, blank=True)
+    ticketedDate = models.DateField(null=True, default=None)
+    ticketedTime = models.TimeField(null=True, blank=True)
     load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     loadComplete = models.CharField(max_length=200)
     toJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
@@ -358,4 +359,4 @@ class HolcimDocket(models.Model):
         return str(self.jobNo)
     
     class Meta:
-        unique_together = (('jobNo', 'ticketed','tripId'))
+        unique_together = (('jobNo', 'ticketedDate','truckNo'))

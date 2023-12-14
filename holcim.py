@@ -6,21 +6,25 @@ from datetime import datetime
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import re 
-def dateConvert(dataList:str):
+def dateConvert(dataList,type_):
     try:
-        # Check if the value is 'nan' before attempting to parse
         if dataList.lower() != 'nan':
             timestamp_obj = datetime.strptime(dataList, '%d/%m/%Y %I:%M:%S %p')
-            date_only_str = timestamp_obj.strftime('%Y-%m-%d')
+            if type_ =='date':
+                date_only_str = timestamp_obj.strftime('%Y-%m-%d')
+                return date_only_str
+            elif type_ == 'time':
+                time_only_str = timestamp_obj.strftime('%H:%M:%S')
+                return time_only_str
         else:
-            date_only_str = None  # or any other default value if needed
+            date_only_str = None  
         return date_only_str
     except Exception as e:
         return None
+    
 
 def dateTimeConvert(dataList):
     try:
-        # Check if the value is 'NaT', 'nan', or a datetime string
         if pd.isna(dataList) or str(dataList).lower() == 'nan':
             return None
         else:
@@ -55,19 +59,18 @@ def insertIntoHolcimModel(key,dataList , file_name):
             try:
                 re.fullmatch(vehicleNumber , dataList[0])
                 try:
-                    existingTrip = HolcimTrip.objects.filter(truckNo = int(dataList[0]) , shiftDate = dateConvert(str(dataList[8]))).values().first()
-                    # if HolcimTrip.objects.filter(truckNo = int(dataList[0]) , shiftDate = dateConvert(str(dataList[8]))).values().first()
+                    existingTrip = HolcimTrip.objects.filter(truckNo = int(dataList[0]) , shiftDate = dateConvert(dataList[8],'date')).values().first()
                     if existingTrip:
                         holcimTripObj = HolcimTrip.objects.get(pk=existingTrip['id'])
                     else:
                         holcimTripObj = HolcimTrip(
                             truckNo = int(dataList[0]),
-                            shiftDate = dateConvert(str(dataList[8]))
+                            shiftDate = dateConvert(str(dataList[8]),'date')
                         )
                         holcimTripObj.save()
                     existingDockets = HolcimDocket.objects.filter(tripId = holcimTripObj.id).count()
                     try:
-                        currentMatchingDocket = HolcimDocket.objects.filter(tripId =  holcimTripObj.id,jobNo = dataList[4], truckNo = int(dataList[0]) , ticketed = dateTimeConvert(dataList[8])).first()
+                        currentMatchingDocket = HolcimDocket.objects.filter(tripId =  holcimTripObj.id,jobNo = dataList[4], truckNo = int(dataList[0]) ,ticketedDate = dateConvert(dataList[8],'date')).first()
                         if currentMatchingDocket:
                             rctiErrorObj = RctiErrors( 
                                 clientName = 'holcim',
@@ -80,7 +83,6 @@ def insertIntoHolcimModel(key,dataList , file_name):
                             rctiErrorObj.save()
                             return
                     except Exception as e:
-                        # print(e)
                         pass
                     
                     holcimTripObj.numberOfLoads = existingDockets + 1
@@ -102,8 +104,9 @@ def insertIntoHolcimModel(key,dataList , file_name):
                         return 
                     holcimDocketObj.orderNo  = 0 if str(dataList[2]) == 'nan' else dataList[2]
                     holcimDocketObj.status  = 0 if str(dataList[6]) == 'nan' else dataList[6]
-                    holcimDocketObj.ticketed  =  dateTimeConvert(dataList[8])
-                    if holcimDocketObj.ticketed is None:
+                    holcimDocketObj.ticketedDate  =  dateConvert(dataList[8],'date')
+                    holcimDocketObj.ticketedTime  =  dateConvert(dataList[8],'time')
+                    if holcimDocketObj.ticketedDate is None:
                         rctiErrorObj = RctiErrors( 
                             clientName = 'holcim',
                             docketNumber = holcimDocketObj.jobNo,
@@ -152,8 +155,7 @@ def insertIntoHolcimModel(key,dataList , file_name):
             except:
                 pass
         except Exception as e:
-            
-                pass
+            pass
     else:
         pass
    

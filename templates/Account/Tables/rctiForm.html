@@ -1043,11 +1043,11 @@
                         
                                                         <!-- basePlant noOfKm  transferKM  -->
                                                         <div class="col-md-4 col-sm-4 ">
-                                                            <label for="vehicle">Vehicle No :<span class="required">*</span></label>
+                                                            <label for="truckNo">Vehicle No :<span class="required">*</span></label>
                                                             <div class="field item form-group">
                                                                 <input class="form-control"  type="number"
-                                                                    name="vehicle" required='required'
-                                                                    style="padding: 0.25rem 0.2rem;" id="vehicle" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.truckNo}}{% endif%}" >
+                                                                    name="truckNo" required='required'
+                                                                    style="padding: 0.25rem 0.2rem;" id="truckNo" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.truckNo}}{% endif%}" >
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4 col-sm-4 ">
@@ -1076,11 +1076,19 @@
                                                         </div>
                                                         
                                                         <div class="col-md-4 col-sm-4 ">
-                                                            <label for="ticketed">Ticketed  :<span class="required">*</span></label>
+                                                            <label for="ticketedDate">ticketedDate Date :<span class="required">*</span></label>
                                                             <div class="field item form-group">
-                                                                <input class="form-control"  type="{% if docketData%}text{%else%}datetime-local{% endif%}"
-                                                                    name="ticketed" required='required'
-                                                                    style="padding: 0.25rem 0.2rem;" id="ticketed" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketed}}{% endif%}" >
+                                                                <input class="form-control"  type="{% if docketData%}text{%else%}Date{% endif%}"
+                                                                    name="ticketedDate" required='required'
+                                                                    style="padding: 0.25rem 0.2rem;" id="ticketedDate" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketedDate}}{% endif%}" >
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-4 ">
+                                                            <label for="ticketedTime">ticketedTime Time :<span class="required">*</span></label>
+                                                            <div class="field item form-group">
+                                                                <input class="form-control"  type="{% if docketData%}text{%else%}time{% endif%}"
+                                                                    name="ticketedTime" required='required'
+                                                                    style="padding: 0.25rem 0.2rem;" id="ticketedTime" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketedTime}}{% endif%}" >
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4 col-sm-4 ">
