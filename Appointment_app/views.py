@@ -42,18 +42,51 @@ def appointmentForm(request, id=None):
         data.Start_Date_Time = convertDateTimeForTemplate(data.Start_Date_Time)
         data.End_Date_Time = convertDateTimeForTemplate(data.End_Date_Time)
         data.report_to_origin = convertDateTimeForTemplate(data.report_to_origin)
-        data.Report_Time = str(data.Report_Time)
-        data.Dwell_Time = str(data.Dwell_Time)
-        data.Block_Time = str(data.Block_Time)
-        data.Total_Time = str(data.Total_Time)
+        appointmentDriver = AppointmentDriver.objects.filter(appointmentId = data.id).first()
+        appointmentTruck = AppointmentTruck.objects.filter(appointmentId = data.id).first()
+
         params['data'] = data
+        params['appointmentDriver'] = appointmentDriver
+        params['appointmentTruck'] = appointmentTruck
+        
+        
+        
+        unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(Start_Date_Time__gte = data.Start_Date_Time,Start_Date_Time__lte = data.End_Date_Time)|Q(End_Date_Time__gte = data.Start_Date_Time,End_Date_Time__lte = data.End_Date_Time))
+        unavailableDriversQrySet = [] 
+        unavailableTrucksQrySet = [] 
+        
+
+        for obj in unavailableDriversAndTrucksQrySet:
+            # tempDriver = obj.driver
+            # tempTruck = AdminTruck.objects.filter(adminTruckNumber = obj.truckNo).first()
+            
+            tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).first()
+            tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).first()
+            if tempDriver:
+                unavailableDriversQrySet.append({'driverId':tempDriver.driverName.driverId,'name':tempDriver.driverName.name})
+            if tempTruck:
+                unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.truckNo.adminTruckNumber})
+
+        drivers = Driver.objects.values('driverId','name')
+        trucks =  AdminTruck.objects.values('adminTruckNumber')
+
+        availableDriversList = list(itertools.filterfalse(lambda x: x in list(drivers), unavailableDriversQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableDriversQrySet, list(drivers)))
+        availableTrucksList = list(itertools.filterfalse(lambda x: x in list(trucks), unavailableTrucksQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableTrucksQrySet, list(trucks)))
+        
+        
+        params['availableDriversList'] = availableDriversList
+        params['availableTrucksList'] = availableTrucksList
+        
+        print(availableDriversList,availableTrucksList)
+        
+        
     return render(request, 'Appointment/appointmentForm.html',params)
 
 @csrf_protect
 def appointmentSave(request):
-
     client = Client.objects.filter(pk=request.POST.get('stopName')).first()
     newOrigin = request.POST.get('originAddVal')
+    originObj = None
     if newOrigin == 1:
         originObj = BasePlant()
         originObj.basePlant = request.POST.get('origin')
@@ -64,6 +97,8 @@ def appointmentSave(request):
         originObj.lat = request.POST.get('originLatitude')
         originObj.long = request.POST.get('originLongitude')
         originObj.save()
+    else:
+        originObj = BasePlant.objects.filter(basePlant=request.POST.get('origin').upper()).first()
         
     appointmentObj = Appointment()
     appointmentObj.Title = request.POST.get('title')
@@ -72,9 +107,9 @@ def appointmentSave(request):
     appointmentObj.report_to_origin = request.POST.get('reportToOrigin')
     appointmentObj.Recurring = request.POST.get('recurring')
     appointmentObj.Staff_Notes = request.POST.get('staffNotes')
-    appointmentObj.Created_by = request.user.id
+    appointmentObj.Created_by = request.user
     appointmentObj.stop = client
-    appointmentObj.Origin = request.POST.get('origin')
+    appointmentObj.Origin = originObj
     appointmentObj.Status = 'Unassigned'
     appointmentObj.save()
 
@@ -112,8 +147,14 @@ def getTruckAndDriver(request):
     startDateTime = request.POST.get('startDateTime')
     endDateTime = request.POST.get('endDateTime')
     
-    startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M:%S')
-    endDateTime = datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M:%S')
+    print(startDateTime,endDateTime)
+    
+    try:
+        startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M:%S')
+        endDateTime = datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M:%S')
+    except ValueError as e:
+        startDateTime =  datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M')
+        endDateTime =  datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M')
         
     # Qry logic
     # Appointment.objects.get(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
@@ -128,10 +169,15 @@ def getTruckAndDriver(request):
     unavailableTrucksQrySet = [] 
 
     for obj in unavailableDriversAndTrucksQrySet:
-        tempDriver = obj.driver
-        tempTruck = AdminTruck.objects.filter(adminTruckNumber = obj.truckNo).first()
-        unavailableDriversQrySet.append({'driverId':tempDriver.driverId,'name':tempDriver.name})
-        unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.adminTruckNumber})
+        # tempDriver = obj.driver
+        # tempTruck = AdminTruck.objects.filter(adminTruckNumber = obj.truckNo).first()
+        
+        tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).first()
+        tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).first()
+        if tempDriver:
+            unavailableDriversQrySet.append({'driverId':tempDriver.driverName.driverId,'name':tempDriver.driverName.name})
+        if tempTruck:
+            unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.truckNo.adminTruckNumber})
 
     drivers = Driver.objects.values('driverId','name')
     trucks =  AdminTruck.objects.values('adminTruckNumber')

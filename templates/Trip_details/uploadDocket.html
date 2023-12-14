@@ -1,0 +1,65 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Docket upload{% endblock title %}
+
+{% block headStyle %} 
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <form action="{% url 'Account:uploadDocketSave' id=id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card border-0">
+            <div class="mb-4">
+
+                <h4 class="card-title text-uppercase text-default d-inline-block">Upload current docket image</h4>
+            </div>
+            <!-- <hr> -->
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <div class="mb-3">
+                        <label for="docketNumber">Docket number:</label>
+                        <input type="number" name="docketNumber" id="docketNumber" class="form-control" required autocomplete="off"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="docketImage">Upload docket image:</label>
+                        <input type="file" name="docketImage" id="docketImage" class="form-control"  accept=".jpg, .png" required/>
+                    </div>
+                    <input type="submit" class="btn btn-sm btn-default form-control" value="Submit">
+                </div>
+                <div class="col-md-8 col-12">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4zGCi3zopn2o_TNs3JU18b7GjJKEE_ZvW15Vwfjv4sXFIVQROwOAixqUtkwICmNhShbc&usqp=CAU" alt="Preview" id="imagePreview" class="preview-image img-thumbnail mt-3">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+    
+
+{% endblock %}
+{% block footerStyle %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        console.log("Document is ready."); // Add this line for checking
+        // Display image preview on file input change
+        $('#docketImage').change(function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imagePreview').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            } else {
+                $('#imagePreview').hide();
+            }
+        });
+    });
+ </script>
+{% endblock %}

@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
-
+from django.contrib.auth.models import User
 from GearBox_app.models import *
+from Account_app.models import *
 
 class Appointment(models.Model):
     TRIP_STATUS = [
@@ -22,13 +23,14 @@ class Appointment(models.Model):
     Status = models.CharField(
         max_length=20, choices=TRIP_STATUS, default='incomplete'
     )
-    Origin = models.CharField(max_length=255)
+    Origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE)
     Recurring = models.CharField(max_length=255)
     Staff_Notes	= models.CharField(max_length=1024)
     
-    Created_by = models.CharField(max_length=255)
+    Created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     Created_time = models.TimeField(default=timezone.now())
     preStartWindow = models.CharField(max_length=2,default='15')
+    stop = models.ForeignKey(Client, on_delete=models.CASCADE)
 
     # preStart_Time = models.DateTimeField(default=Start_Date_Time-preStartWindow)
     # Report_Time = models.TimeField()
@@ -39,7 +41,7 @@ class Appointment(models.Model):
     # driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     # truckNo = models.IntegerField(default=0)
     # truckNo = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
-    stop = models.ForeignKey(Client, on_delete=models.CASCADE)
+    
 
 
     def is_driver_available(self):

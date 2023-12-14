@@ -1,6 +1,4 @@
-body {
-    font-family: 'Open Sans', sans-serif;
-}
+
 
 #signUpForm {
     max-width: 80%;
@@ -31,7 +29,7 @@ body {
 
 #signUpForm .form-header .stepIndicator.finish {
     font-weight: 600;
-    color: #009688;
+    color: #2A3F54;
 }
 
 #signUpForm .form-header .stepIndicator::before {
@@ -43,7 +41,7 @@ body {
     z-index: 9;
     width: 25%;
     height: 4px;
-    background-color: #198754d0;
+    background-color: #2A3F54;
     border-radius: 5%;
     /* border: 3px solid #ecf5f4; */
 }
@@ -54,7 +52,7 @@ body {
 }
 
 #signUpForm .form-header .stepIndicator.finish::before {
-    background-color: #009688;
+    background-color: #2A3F54;
     border: 3px solid #b7e1dd;
 }
 
@@ -65,7 +63,7 @@ body {
     bottom: 8px;
     width: 80%;
     height: 3px;
-    background-color: #19875445;
+    background-color: #6d92b7;
 }
 
 #signUpForm .form-header .stepIndicator.active::after {
@@ -73,7 +71,7 @@ body {
 }
 
 #signUpForm .form-header .stepIndicator.finish::after {
-    background-color: #009688;
+    background-color: #2A3F54;
 }
 
 #signUpForm .step label,
@@ -94,7 +92,7 @@ body {
 
 #signUpForm input:focus,
 #signUpForm textarea:focus {
-    border: 1px solid #009688;
+    border: 1px solid #2A3F54;
     outline: 0;
 }
 
@@ -110,11 +108,11 @@ body {
 #signUpForm .form-footer button,
 #signUpForm .form-footer a,
 #signUpForm .form-footer #nextBtn {
-    background-color: #009688;
-    border: 1px solid #009688 !important;
+    background-color: #2A3F54;
+    border: 1px solid #2A3F54 !important;
     color: #ffffff;
     border: none;
-    padding: 13px 30px;
+    /* padding: 13px 30px; */
     font-size: 1em;
     cursor: pointer;
     border-radius: 5px;
@@ -132,18 +130,18 @@ body {
 
 #signUpForm .form-footer #prevBtn {
     background-color: #fff;
-    color: #009688;
+    color: #2A3F54;
     cursor: pointer;
 }
 
 #signUpForm .text-active {
     font-size: 1.05rem !important;
-    color: #009688;
+    color: #2A3F54;
     font-weight: 900;
 }
 
 .text-basic {
-    color: #009688 !important;
+    color: #2A3F54 !important;
 }
 @media (max-width: 768px) {
     /* .container {
