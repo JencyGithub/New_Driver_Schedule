@@ -317,7 +317,7 @@ class RctiExpense(models.Model):
     
 
 class HolcimTrip(models.Model):
-    truckNo = models.PositiveIntegerField(default=0)
+    truckNo = models.PositiveBigIntegerField(default=0)
     shiftDate = models.DateField(null=True, default=None)
     numberOfLoads = models.FloatField(default=0)
     
@@ -325,11 +325,12 @@ class HolcimTrip(models.Model):
         return str(self.truckNo)
     
 class HolcimDocket(models.Model):
+    truckNo =  models.PositiveBigIntegerField(default=0)
     tripId = models.ForeignKey(HolcimTrip, on_delete=models.CASCADE)
     jobNo = models.PositiveIntegerField(default=0)
     orderNo = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=200)
-    ticketed = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    ticketed = models.DateTimeField(null=True, blank=True)
     load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     loadComplete = models.CharField(max_length=200)
     toJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
@@ -355,3 +356,6 @@ class HolcimDocket(models.Model):
     
     def __str__(self):
         return str(self.jobNo)
+    
+    class Meta:
+        unique_together = (('jobNo', 'ticketed','tripId'))

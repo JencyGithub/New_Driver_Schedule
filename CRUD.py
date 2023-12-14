@@ -133,3 +133,12 @@ def getCurrentTimeInString():
     return time[0]
     
 
+def holcimDateConvertStr(str_):
+    val_ = str_.split('T',)
+    val_ = val_[0]+ ' '+val_[1]
+    return val_
+
+
+
+    
+    

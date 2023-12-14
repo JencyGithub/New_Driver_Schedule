@@ -394,7 +394,15 @@ admin.site.register(Surcharge)
 
 admin.site.register(PublicHoliday)
 
-admin.site.register(RctiErrors)
+
+class RctiErrors_(admin.ModelAdmin):
+
+    list_display = ['docketNumber',"docketDate","errorDescription"]
+    search_fields = ["docketNumber"]
+
+
+admin.site.register(RctiErrors,RctiErrors_)
+
 class PastTripError_(admin.ModelAdmin):
 
     list_display = ['docketNumber',"status"]
@@ -448,7 +456,7 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 class HolcimDocket_(admin.ModelAdmin):
 
-    list_display = ['jobNo']
+    list_display = ['truckNo' ,'jobNo','tripId']
     search_fields = ["jobNo"]
 
 

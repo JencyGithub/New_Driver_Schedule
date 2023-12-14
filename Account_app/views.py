@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 import shutil ,os  ,colorama ,subprocess ,csv
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime
+from datetime import datetime , time
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from django.contrib import messages
@@ -15,6 +15,7 @@ from .models import RCTI
 from Account_app.reconciliationUtils import *
 from django.urls import reverse
 from django.db.models import Q
+from itertools import chain
 
 
 def index(request):
@@ -231,12 +232,20 @@ def rctiErrorSolve(request ,id):
     return redirect(request.META.get('HTTP_REFERER'))
     
 
-def rctiForm(request, id= None):
+def rctiForm(request, id= None , holcimDocketId = None):
     rcti = None
+    holcimDocket = None
+    clientName = Client.objects.all()
+    drivers = Driver.objects.all()
     if id:
-        rcti = RCTI.objects.get(id=id)
+        rcti = RCTI.objects.filter(pk=id).first()
+    elif holcimDocketId:
+        holcimDocket = HolcimDocket.objects.filter(pk = holcimDocketId).first()
     params = {
         'rcti': rcti,
+        'clientNames':clientName,
+        'docketData':holcimDocket,
+        'Driver':drivers,
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
 
@@ -335,6 +344,64 @@ def rctiFormSave(request):
     return redirect('Account:rcti')
 
 @csrf_protect
+def rctiHolcimFormSave(request):
+    driverObj = Driver.objects.filter(pk = request.POST.get('driverId')).first()
+    datetime_object = datetime.strptime(request.POST.get('ticketed'), "%Y-%m-%dT%H:%M")
+    shiftDate = datetime_object.date()
+    ticketed_ = datetime.strptime(request.POST.get('ticketed'), "%Y-%m-%dT%H:%M")
+    holcimTripObj = HolcimTrip()
+    
+    existingTrip = HolcimTrip.objects.filter(truckNo = int(request.POST.get('vehicle')),shiftDate = shiftDate).first()
+    if existingTrip:
+        existingDocket = HolcimDocket.objects.filter(ticketed = ticketed_ ,jobNo = int(request.POST.get('jobNo')), truckNo = int(request.POST.get('vehicle'))).first()
+        
+        if existingDocket:
+            messages.error( request, "Job no already exist")
+            return redirect(request.META.get('HTTP_REFERER'))
+        existingTrip.numberOfLoads = existingTrip.numberOfLoads + 1
+        existingTrip.save()
+        holcimTripObj = existingTrip
+    else:
+        holcimTripObj.truckNo = request.POST.get('vehicle')
+        holcimTripObj.shiftDate = shiftDate
+        holcimTripObj.numberOfLoads = 1
+        holcimTripObj.save()
+        
+        
+
+    holcimDocketObj =HolcimDocket()
+    holcimDocketObj.truckNo = request.POST.get('vehicle')
+    holcimDocketObj.tripId = holcimTripObj
+    holcimDocketObj.jobNo = request.POST.get('orderNo')
+    holcimDocketObj.orderNo = request.POST.get('jobNo')
+    holcimDocketObj.status = request.POST.get('status')
+    holcimDocketObj.ticketed =  ticketed_
+    holcimDocketObj.load = holcimDateConvertStr(request.POST.get('load'))
+    holcimDocketObj.loadComplete = request.POST.get('loadComplete')
+    holcimDocketObj.toJob = holcimDateConvertStr(request.POST.get('toJob'))
+    holcimDocketObj.timeToDepart = request.POST.get('timeToDepart')
+    holcimDocketObj.onJob = holcimDateConvertStr(request.POST.get('onJob'))
+    holcimDocketObj.timeToSite = request.POST.get('timeToSite')
+    holcimDocketObj.beginUnload = holcimDateConvertStr(request.POST.get('beginUnload'))
+    holcimDocketObj.waitingTime = request.POST.get('waitingTime')
+    holcimDocketObj.endPour = holcimDateConvertStr(request.POST.get('endPour'))
+    holcimDocketObj.wash = holcimDateConvertStr(request.POST.get('wash'))
+    holcimDocketObj.toPlant = holcimDateConvertStr(request.POST.get('toPlant'))
+    holcimDocketObj.timeOnSite = request.POST.get('timeOnSite')
+    holcimDocketObj.atPlant = holcimDateConvertStr(request.POST.get('atPlant'))
+    holcimDocketObj.leadDistance = request.POST.get('leadDistance')
+    holcimDocketObj.returnDistance = request.POST.get('returnDistance')
+    holcimDocketObj.totalDistance = request.POST.get('totalDistance')
+    holcimDocketObj.totalTime = request.POST.get('totalTime')
+    holcimDocketObj.waitTimeBetweenJob = request.POST.get('waitTimeBetweenJob')
+    holcimDocketObj.driverName = driverObj
+    holcimDocketObj.quantity = request.POST.get('quantity')
+    holcimDocketObj.slump = request.POST.get('slump')
+    holcimDocketObj.waterAdded = request.POST.get('waterAdded')
+    holcimDocketObj.save()
+    messages.success( request, "RCTI holcim entry successfully done.")
+    return redirect('Account:rcti')
+@csrf_protect
 def rctiSave(request):
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
@@ -379,8 +446,6 @@ def rctiSave(request):
                 cmd = ["python", "manage.py", "runscript", 'holcim.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success( request, "Please wait 5 minutes. The data conversion process continues")
-        
-        
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
@@ -631,28 +696,46 @@ def rctiTable(request):
     docketYard = BasePlant.objects.filter(id = basePlant_).first()
     dataType = request.POST.get('RCTI')
 
+    holcimStartDate_ = datetime.combine(datetime.strptime(startDate_, '%Y-%m-%d'), time())
+    holcimEndDate_ = datetime.combine(datetime.strptime(endDate_, '%Y-%m-%d'), time())
+  
+    # try:
+    #     holcimData = None
+    if basePlant_:
+        if dataType== 'rctiDocket':
+            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard).values()
+            holcimData = HolcimDocket.objects.filter(ticketed__range=(holcimStartDate_,holcimEndDate_)).values()
+            # rctiData = list(chain(rctiData, holcimData))
+        elif dataType == 'rctiExpense':
+            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard).values()
+    else:
+        if dataType== 'rctiDocket':
+            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+            holcimData = HolcimDocket.objects.filter(ticketed__range=(holcimStartDate_,holcimEndDate_)).values()
+            # rctiData = list(chain(rctiData, holcimData))
+        elif dataType == 'rctiExpense':
+            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+    
+    params = {
+        'RCTIs': rctiData,
+        'dataType':dataType,
+        'holcimData':holcimData,
+    }
+    # return HttpResponse(params['holcimData'])
+    return render(request, 'Account/Tables/rctiTable.html', params)
+    # except:
+        # messages.warning(request, "Invalid Request ")
+        # return redirect(request.META.get('HTTP_REFERER'))
 
-    try:
-        if basePlant_:
-            if dataType== 'rctiDocket':
-                rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard).values()
-            elif dataType == 'rctiExpense':
-                rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard).values()
-        else:
-            if dataType== 'rctiDocket':
-                rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-            elif dataType == 'rctiExpense':
-                rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-        params = {
-            'RCTIs': rctiData,
-            'dataType':dataType
-        }
-        return render(request, 'Account/Tables/rctiTable.html', params)
-    except:
-        messages.warning(request, "Invalid Request ")
-        return redirect('Account:rctiCsvForm')
 
-
+def HolcimDocketView(request,id):
+    holcimDocketObj = HolcimDocket.objects.filter(pk = id).first()
+    holcimTripObj = HolcimTrip.objects.filter(pk = holcimDocketObj.tripId.id).first()
+    params = {
+        'docketData':holcimDocketObj,
+        'holcimTripObj':holcimTripObj,
+    }
+    return render(request, 'Account/Holcim/docketView.html',params)
 def basePlantTable(request):
     basePlants = BasePlant.objects.all()
     # locations = Location.objects.all()
@@ -1575,10 +1658,14 @@ def DriverShiftForm(request,id):
         
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()
+    pastTripErrors = PastTripError.objects.filter(status = False).values()
+    pastTripSolved = PastTripError.objects.filter(status = True).values()
     params ={
             'clients': client,
             'id':id,
             'pasrTripFileNameLists' : pasrTripFileNameList,
+            'pastTripErrors' : pastTripErrors ,
+            'pastTripSolved' :pastTripSolved,
         }      
     return render(request, 'Account/driverShiftForm.html',params)
 

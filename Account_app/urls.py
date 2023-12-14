@@ -144,5 +144,11 @@ urlpatterns = [
     # Trip 
     path('Driver/Shift/Form/<int:id>', views.DriverShiftForm, name='DriverShiftForm'),
     path('Driver/Shift/Details/<int:id>', views.ShiftDetails, name='ShiftDetails'),
+    
+    # Holcim 
+    path('Holcim/Docket/View<int:id>', views.HolcimDocketView, name='HolcimDocketView'),
+    path('rctiHolcimForm/<int:holcimDocketId>/', views.rctiForm, name='rctiHolcimForm'), 
+    path('rctiHolcimFormSave/', views.rctiHolcimFormSave, name='rctiHolcimFormSave'), 
+    
 
 ]

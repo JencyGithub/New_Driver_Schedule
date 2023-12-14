@@ -32,44 +32,98 @@ def dateTimeConvert(dataList):
             return formatted_timestamp
     except ValueError as e:
         return None
-        return None
-        
+    
+    
 def insertIntoHolcimModel(key,dataList , file_name):
-    if len(dataList) == 44:
+    if len(dataList) == 44 :
         try:
-            driverId = Driver.objects.filter(name = 'sawankumar').first()
+            driverId = Driver.objects.filter(name = dataList[40].strip().replace(' ','').lower()).first()
+            if driverId is None:
+                rctiErrorObj = RctiErrors( 
+                            clientName = 'holcim',
+                            docketNumber = str(dataList[4]),
+                            docketDate = dateTimeConvert(dataList[8]),
+                            errorDescription = 'Driver matching query does not exist.',
+                            fileName = file_name,
+                            data = str(dataList)
+                )
+                rctiErrorObj.save()
+                return 
+                
             vehicleNumber = '[0-9]{4,4}'
             
             try:
                 re.fullmatch(vehicleNumber , dataList[0])
                 try:
                     existingTrip = HolcimTrip.objects.filter(truckNo = int(dataList[0]) , shiftDate = dateConvert(str(dataList[8]))).values().first()
+                    # if HolcimTrip.objects.filter(truckNo = int(dataList[0]) , shiftDate = dateConvert(str(dataList[8]))).values().first()
                     if existingTrip:
                         holcimTripObj = HolcimTrip.objects.get(pk=existingTrip['id'])
                     else:
                         holcimTripObj = HolcimTrip(
-                            truckNo = dataList[0],
+                            truckNo = int(dataList[0]),
                             shiftDate = dateConvert(str(dataList[8]))
                         )
                         holcimTripObj.save()
                     existingDockets = HolcimDocket.objects.filter(tripId = holcimTripObj.id).count()
+                    try:
+                        currentMatchingDocket = HolcimDocket.objects.filter(tripId =  holcimTripObj.id,jobNo = dataList[4], truckNo = int(dataList[0]) , ticketed = dateTimeConvert(dataList[8])).first()
+                        if currentMatchingDocket:
+                            rctiErrorObj = RctiErrors( 
+                                clientName = 'holcim',
+                                docketNumber = str(dataList[4]),
+                                docketDate = dateTimeConvert(dataList[8]),
+                                errorDescription = 'Docket already exist.',
+                                fileName = file_name,
+                                data = str(dataList)
+                            )
+                            rctiErrorObj.save()
+                            return
+                    except Exception as e:
+                        # print(e)
+                        pass
+                    
                     holcimTripObj.numberOfLoads = existingDockets + 1
                     holcimTripObj.save()  
                     holcimDocketObj = HolcimDocket()
+                    holcimDocketObj.truckNo  = int(dataList[0])
                     holcimDocketObj.tripId  = holcimTripObj
-                    holcimDocketObj.jobNo  = 0 if str(dataList[4]) == 'nan' else dataList[4]
+                    holcimDocketObj.jobNo  =  dataList[4]
+                    if holcimDocketObj.jobNo == 'nan':
+                        rctiErrorObj = RctiErrors( 
+                                clientName = 'holcim',
+                                docketNumber = holcimDocketObj.jobNo,
+                                docketDate = dateTimeConvert(dataList[8]),
+                                errorDescription = 'Job No. Miss match',
+                                fileName = file_name,
+                                data = str(dataList)
+                            )
+                        rctiErrorObj.save()
+                        return 
                     holcimDocketObj.orderNo  = 0 if str(dataList[2]) == 'nan' else dataList[2]
                     holcimDocketObj.status  = 0 if str(dataList[6]) == 'nan' else dataList[6]
                     holcimDocketObj.ticketed  =  dateTimeConvert(dataList[8])
+                    if holcimDocketObj.ticketed is None:
+                        rctiErrorObj = RctiErrors( 
+                            clientName = 'holcim',
+                            docketNumber = holcimDocketObj.jobNo,
+                            docketDate = dateTimeConvert(dataList[8]),
+                            errorDescription = 'Ticketed Miss match',
+                            fileName = file_name,
+                            data = str(dataList)
+                        )
+                        rctiErrorObj.save()
+                        return 
                     holcimDocketObj.load  =  dateTimeConvert(dataList[13])
                     holcimDocketObj.loadComplete  = 0 if str(dataList[15]) == 'nan' else dataList[15]
                     holcimDocketObj.toJob  =  dateTimeConvert(dataList[16])
+                    
                     holcimDocketObj.timeToDepart  = 0 if str(dataList[18]) == 'nan' else dataList[18]
                     holcimDocketObj.onJob  =  dateTimeConvert(dataList[19])
                     holcimDocketObj.timeToSite  = 0 if str(dataList[21]) == 'nan' else dataList[21]
                     holcimDocketObj.beginUnload  = dateTimeConvert(dataList[22])
                     holcimDocketObj.waitingTime  = 0 if str(dataList[24]) == 'nan' else dataList[24]
-                    holcimDocketObj.endPour  = 0 if str(dataList[25]) == 'nan' else dataList[25]
+                    holcimDocketObj.endPour  = dateTimeConvert(dataList[25])
                     holcimDocketObj.wash  =dateTimeConvert(dataList[26])
                     holcimDocketObj.toPlant  =  dateTimeConvert(dataList[27])
                     holcimDocketObj.timeOnSite  = 0 if str(dataList[32]) == 'nan' else dataList[32]
@@ -85,19 +139,21 @@ def insertIntoHolcimModel(key,dataList , file_name):
                     holcimDocketObj.waterAdded  = 0 if str(dataList[43]) == 'nan' else str(dataList[43]).replace('(','').replace('L','').replace(')','').strip()
                     holcimDocketObj.save()
                 except Exception as e:
-                    rctiErrorObj = RctiErrors() 
-                    rctiErrorObj.clientName = 'holcim',
-                    rctiErrorObj.docketNumber = dataList[4],
-                    rctiErrorObj.docketDate = dateConvert(str(dataList[8])),
-                    rctiErrorObj.errorDescription = e,
-                    rctiErrorObj.fileName = file_name,
-                    rctiErrorObj.data = str(dataList)
-                    
+                    rctiErrorObj = RctiErrors( 
+                            clientName = 'holcim',
+                            docketNumber = holcimDocketObj.jobNo,
+                            docketDate = dateTimeConvert(dataList[8]),
+                            errorDescription = e,
+                            fileName = file_name,
+                            data = str(dataList)
+                        )
                     rctiErrorObj.save()
+                    pass
             except:
                 pass
         except Exception as e:
-            pass
+            
+                pass
     else:
         pass
    
@@ -109,12 +165,15 @@ with open(r"File_name_file.txt", 'r') as f:
 file = f'static/Account/RCTI/RCTIInvoice/{file_name}'
 
 
-# file = 'static/Account/RCTI/RCTIInvoice/20231128042146@_!holcim.xlsx'
+# file = 'static/Account/RCTI/RCTIInvoice/20231210053127@_!holcim.xlsx'
 data = pd.read_excel(file)
 try:
     for key,row in data.iterrows():
-       
-        insertIntoHolcimModel(key,row,file_name)
+        try:
+            int(row[0])
+            insertIntoHolcimModel(key,row,file_name)
+        except:
+            pass
 except Exception as e:
     pass
         
