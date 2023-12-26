@@ -293,25 +293,25 @@ holcimMatchingData = PastTripError.objects.filter(errorFromPastTrip="Client truc
 
 if holcimMatchingData:
     for i in holcimMatchingData:
-        pastTruckNo = data[0].strip().replace(' ','').lower()
-        tripDate = dateConvert(str(data[8]).strip(),'date')
-        clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = pastTruckNo,startDate__lte = tripDate , endDate__gte = tripDate).first()
-        if pastTruckNo == truckNo:
         
-            try:
-                data = i.data
-                data = data.replace('[','').replace(']','').replace('\\n','').replace("'",'')
-                data = data.split(',')
-                
+        
+        try:
+            data = i.data
+            data = data.replace('[','').replace(']','').replace('\\n','').replace("'",'')
+            data = data.split(',')
+            
 
-                pastDriver = data[40].strip().replace(' ','').lower()
-                driverId = Driver.objects.filter(name =pastDriver).first()
-                client = Client.objects.filter(name = 'holcim').first()
-                existingTrip = HolcimTrip.objects.filter(truckNo= pastTruckNo ,  shiftDate= tripDate).first()
-                existingDockets = HolcimDocket.objects.filter(tripId = existingTrip.id).count()
+            pastDriver = data[40].strip().replace(' ','').lower()
+            driverId = Driver.objects.filter(name =pastDriver).first()
+            pastTruckNo = data[0].strip().replace(' ','').lower()
+            tripDate = dateConvert(str(data[8]).strip(),'date')
+            client = Client.objects.filter(name = 'holcim').first()
+            existingTrip = HolcimTrip.objects.filter(truckNo= pastTruckNo ,  shiftDate= tripDate).first()
+            existingDockets = HolcimDocket.objects.filter(tripId = existingTrip.id).count()
+            if pastTruckNo == truckNo:
+                i.status =True
+                i.save()
                 try:
-                    i.status =True
-                    i.save()
                     holcimDocketObj = HolcimDocket()
                     holcimDocketObj.truckNo  = pastTruckNo
                     holcimDocketObj.tripId  = existingTrip
@@ -384,15 +384,16 @@ if holcimMatchingData:
                             data = data
                         )
                     pastTripErrorObj.save()
-            except Exception as e:
-                pastTripErrorObj = PastTripError(
-                        clientName = 'holcim',
-                        tripDate = tripDate,
-                        docketNumber = str(data[4]),
-                        truckNo = pastTruckNo,
-                        lineNumber = i.count,
-                        errorFromPastTrip = e,
-                        fileName = i.fileName.split('@_!')[-1],
-                        data = data
-                    )
-                pastTripErrorObj.save()
+                    
+        except Exception as e:
+            pastTripErrorObj = PastTripError(
+                    clientName = 'holcim',
+                    tripDate = tripDate,
+                    docketNumber = str(data[4]),
+                    truckNo = pastTruckNo,
+                    lineNumber = i.count,
+                    errorFromPastTrip = e,
+                    fileName = i.fileName.split('@_!')[-1],
+                    data = data
+                )
+            pastTripErrorObj.save()
