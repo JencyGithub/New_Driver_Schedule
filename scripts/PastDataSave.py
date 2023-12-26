@@ -41,6 +41,7 @@ def run():
 
                 if len(data) != 25:
                     pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
                                     tripDate = res_,
                                     docketNumber = data[5],
                                     truckNo = data[1],
@@ -69,6 +70,7 @@ def run():
                 
                 if res_.split('-')[1] != monthAndYear.split('-')[-1] or res_.split('-')[0] != monthAndYear.split('-')[0]:
                     pastTripErrorObj = PastTripError(
+                                clientName = 'boral',
                                 tripDate = res_,
                                 docketNumber = data[5],
                                 truckNo = data[1],
@@ -127,6 +129,7 @@ def run():
                         # modified for adding 
                         if basePlant is None:
                             pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
                                     tripDate = res_,
                                     docketNumber = data[5],
                                     truckNo = data[1],
@@ -175,6 +178,7 @@ def run():
                             graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
                             if not graceObj:
                                 pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
                                     tripDate = res_,
                                     docketNumber = data[5],
                                     truckNo = data[1],
@@ -197,6 +201,7 @@ def run():
 
                             if not costParameterObj:
                                 pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
                                     tripDate = res_,
                                     docketNumber = data[5],
                                     truckNo = data[1],
@@ -294,6 +299,7 @@ def run():
                         
                         else:
                             pastTripErrorObj = PastTripError(
+                                clientName = 'boral',
                                 tripDate = res_,
                                 docketNumber = data[5],
                                 truckNo = data[1],
@@ -305,6 +311,7 @@ def run():
                             pastTripErrorObj.save()
                     except Exception as e:       
                         pastTripErrorObj = PastTripError(
+                            clientName = 'boral',
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -316,6 +323,7 @@ def run():
                         pastTripErrorObj.save()
                 else:
                     pastTripErrorObj = PastTripError(
+                            clientName = 'boral',
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -329,6 +337,7 @@ def run():
                     
             except Exception as e:
                 pastTripErrorObj = PastTripError(
+                        clientName = 'boral',
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],

@@ -75,6 +75,7 @@ for i in matchingData:
                 # modified for adding 
                 if basePlant is None:
                     pastTripErrorObj = PastTripError(
+                            clientName = 'boral',
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -101,6 +102,7 @@ for i in matchingData:
                     graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
                     if not graceObj:
                         pastTripErrorObj = PastTripError(
+                            clientName = 'boral',
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -123,6 +125,7 @@ for i in matchingData:
 
                     if not costParameterObj:
                         pastTripErrorObj = PastTripError(
+                            clientName = 'boral',
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -150,6 +153,7 @@ for i in matchingData:
                             standBySlot = 0
                     except Exception as e:
                         pastTripErrorObj = PastTripError(
+                                        clientName = 'boral',
                                         tripDate = res_,
                                         docketNumber = data[5],
                                         truckNo = data[1],
@@ -226,6 +230,7 @@ for i in matchingData:
                     
                 else:
                     pastTripErrorObj = PastTripError(
+                        clientName = 'boral',
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],
@@ -238,6 +243,7 @@ for i in matchingData:
                     continue
             except Exception as e:       
                 pastTripErrorObj = PastTripError(
+                    clientName = 'boral',
                     tripDate = res_,
                     docketNumber = data[5],
                     truckNo = data[1],
@@ -252,6 +258,7 @@ for i in matchingData:
             continue
     except Exception as e:
         pastTripErrorObj = PastTripError(
+            clientName = 'boral',
             tripDate = res_,
             docketNumber = data[5],
             truckNo = data[1],

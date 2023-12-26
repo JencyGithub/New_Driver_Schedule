@@ -200,6 +200,7 @@ class PublicHoliday(models.Model):
 # -----------------------------------
 
 class PastTripError(models.Model):
+    clientName = models.CharField(max_length=25 ,default=None ,blank=True,null=True)
     tripDate = models.CharField(max_length=255, default=None, null=True, blank=True) 
     truckNo = models.IntegerField(default=0) 
     docketNumber = models.CharField(max_length=255, default=None, null=True, blank=True)

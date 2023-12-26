@@ -258,20 +258,32 @@
                                                                 <td>{{ error.errorFromPastTrip }}</td>
                                                                 <td>{{ error.fileName }}</td>
                                                                 <td>
-                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip %}
+                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'boral' %}
                                                                     <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
 
+                                                                    {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
                                                                     {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip %}
                                                                     <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
 
-                                                                    {% elif 'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                    {% elif error.clientName == 'boral' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
                                                                     <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
 
-                                                                    {% elif not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    {% elif error.clientName == 'boral' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
                                                                     <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a>
+                                                                    {% comment %} HOLCIM  {% endcomment %}
+                                                                    
+                                                                    {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
+                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
 
+                                                                    {% elif error.clientName == 'holcim' and 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-primary">  Add truck  </a>
+
+                                                                    {% elif error.clientName == 'holcim' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                                                    {% elif error.clientName == 'holcim' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Resolve  </a> {% endcomment %}
                                                                     {% endif %}
-                                                                
                                                                 </td>
                                                             </tr>
                                                             {% endfor %}
@@ -418,7 +430,9 @@
         $('#no').click(function(){
             $('#save_').prop('checked', false);
         })
-
+    function wip(){
+        alert('Work in progress')
+        }
     });
     function showModel(data) {
         $("#errorModel").modal("toggle");

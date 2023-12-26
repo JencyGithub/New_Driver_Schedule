@@ -69,6 +69,7 @@ def run():
                     tripDate = dateConvert(str(data[8]),'date')
                     if tripDate.split('-')[1] != monthAndYear.split('-')[-1] or tripDate.split('-')[0] != monthAndYear.split('-')[0]:
                         pastTripErrorObj = PastTripError(
+                                    clientName = 'holcim',
                                     tripDate = tripDate,
                                     docketNumber = str(data[4]),
                                     truckNo = int(data[0]),
@@ -84,6 +85,7 @@ def run():
                     # exit()
                     if driverId is None:
                         pastTripErrorObj = PastTripError(
+                            clientName = 'holcim',
                             tripDate = tripDate,
                             docketNumber = str(data[4]),
                             truckNo = int(data[0]),
@@ -107,6 +109,7 @@ def run():
                     currentMatchingDocket = HolcimDocket.objects.filter(tripId =  holcimTripObj.id,jobNo = data[4] ,ticketedDate = tripDate).first()
                     if currentMatchingDocket:
                         pastTripErrorObj = PastTripError(
+                        clientName = 'holcim',
                         tripDate = tripDate,
                         docketNumber = str(data[4]),
                         truckNo = int(data[0]),
@@ -118,14 +121,14 @@ def run():
                         pastTripErrorObj.save()
                         continue
                     
-                    holcimTripObj.numberOfLoads = existingDockets + 1
-                    holcimTripObj.save()  
+                     
                     client = Client.objects.filter(name = 'holcim').first()
                     adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = holcimTripObj.truckNo).first()
                     clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = holcimTripObj.shiftDate,endDate__gte = holcimTripObj.shiftDate, clientId = client).first()
                     
                     if clientTruckConnectionObj is None:
                         pastTripErrorObj = PastTripError(
+                            clientName = 'holcim',
                             tripDate = tripDate,
                             docketNumber = str(data[4]),
                             truckNo = int(data[0]),
@@ -143,6 +146,7 @@ def run():
                     holcimDocketObj.jobNo  =  data[4]
                     if holcimDocketObj.jobNo == 'nan':
                         pastTripErrorObj = PastTripError(
+                            clientName = 'holcim',
                             tripDate = tripDate,
                             docketNumber = str(data[4]),
                             truckNo = int(data[0]),
@@ -159,6 +163,7 @@ def run():
                     holcimDocketObj.ticketedTime  =  dateConvert(data[8],'time')
                     if holcimDocketObj.ticketedDate is None:
                         pastTripErrorObj = PastTripError(
+                            clientName = 'holcim',
                             tripDate = tripDate,
                             docketNumber = str(data[4]),
                             truckNo = int(data[0]),
@@ -192,8 +197,11 @@ def run():
                     holcimDocketObj.slump  = 0 if str(data[42]) == '' else data[42]
                     holcimDocketObj.waterAdded  = 0 if str(data[43]).strip() == '' else str(data[43]).replace('L','').strip()
                     holcimDocketObj.save()
+                    holcimTripObj.numberOfLoads = existingDockets + 1
+                    holcimTripObj.save()
                 except Exception as e:
                     pastTripErrorObj = PastTripError(
+                        clientName = 'holcim',
                         tripDate = tripDate,
                         docketNumber = str(data[4]),
                         truckNo = int(data[0]),

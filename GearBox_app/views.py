@@ -269,10 +269,8 @@ def truckConnectionSave(request,id):
         'startDate' : request.POST.get('startDate'),
         'endDate' : request.POST.get('endDate')
     }
-    # adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = dataList['truckNumber']).first()
-    # return HttpResponse(adminTruckObj)
+
     existingData = ClientTruckConnection.objects.filter(Q(truckNumber = adminTruck,clientId=dataList['clientId'],startDate__gte = dataList['startDate'],startDate__lte = dataList['endDate'])|Q(truckNumber = adminTruck,clientId=dataList['clientId'],endDate__gte = dataList['startDate'],endDate__lte = dataList['endDate'])).first()
-    # return HttpResponse(existingData)
     if existingData:
         messages.error( request, "Connection already exist.")
         return redirect(request.META.get('HTTP_REFERER'))
@@ -286,10 +284,7 @@ def truckConnectionSave(request,id):
     insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
     with open("scripts/addPastTripForMissingTruckNo.txt", 'w') as f:
         f.write(str(dataList['truckNumber']))
-    # colorama.AnsiToWin32.stream = None
-    # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-    # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingTruckNo','--continue-on-error']
-    # subprocess.run(cmd)
+
     colorama.AnsiToWin32.stream = None
     os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
     cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingTruckNo','--continue-on-error']
