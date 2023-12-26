@@ -79,7 +79,7 @@
                         </tr>
                       {% endfor %}
                       {% comment %} Holcim Data  {% endcomment %}
-                      {% for docket in holcimData %}
+                      {% comment %} {% for docket in holcimData %}
                         <tr>
                           <td>Holcim</td>
                           <td>{{docket.truckNo}}</td>
@@ -93,7 +93,7 @@
                             </label>
                           </td>                       
                         </tr>
-                      {% endfor %}
+                      {% endfor %} {% endcomment %}
                     </tbody>
                   </table>
                 </div>

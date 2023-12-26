@@ -66,7 +66,7 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
-                    <form action="{% url 'Account:ShiftDetails' id=id%}" method="POST" novalidate
+                    <form action="{% url 'Account:ShiftDetails' id=id%}" method="POST"
                         id="reconciliationForm">
                         {%csrf_token%}
                         <div class="x_title">
@@ -101,7 +101,7 @@
                                         <select class="form-control" id="clients" name="clients">
                                             <option value="" disabled selected>Select Client Name</option>
                                             {% for client in clients %}
-                                            <option value="{{ client.id }}">{{ client.name }}</option>
+                                            <option value="{{ client.name }}">{{ client.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -115,11 +115,11 @@
 
                 </div>
             </div>
-            {% if id == 0 %}
+            {% if id == 1 %}
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Completed Jobs</h2>
+                        <h2>Charged Jobs</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -127,7 +127,7 @@
                             <form method="POST" action="{% url 'Account:pastTripSave'%}" enctype="multipart/form-data">
                                 {% csrf_token %}
 
-                                <div class="col-md-4 col-sm-4">
+                                <div class="col-md-3 col-sm-3">
                                     <label for="pastTripFile">Upload past trip Csv:<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
@@ -135,7 +135,7 @@
                                             style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".csv">
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
+                                <div class="col-md-3 col-sm-3">
                                     <label for="monthAndYear">Month & Year:<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
@@ -143,15 +143,26 @@
                                             style="padding: 0.25rem 0.2rem;" id="monthAndYear" >
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="clientId">Client Name</label>
+                                    <div class="field item form-group">
+                                        <select class="form-control" id="clients" name="clientName">
+                                            <option value="" disabled selected>Select Client Name</option>
+                                            {% for client in clients %}
+                                            <option value="{{ client.name }}">{{ client.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3">
                                     <div class="checkbox">
                                     <label>
                                         <input type="checkbox" required {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
                                     </label>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4 text-right">
-                                    <button type='submit' class="btn btn-default w-25 mt-4">Submit</button>
+                                <div class="col-md-12 text-right">
+                                    <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
                                 </div>
 
                                 <!-- Modal -->
@@ -183,7 +194,7 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2><i class="fa fa-bars"></i> Completed Jobs <small>Errors</small></h2>
+                        <h2><i class="fa fa-bars"></i> Charged Jobs <small>Errors</small></h2>
                         <ul class="nav navbar-right panel_toolbox">
                             <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                             </li>
@@ -247,13 +258,32 @@
                                                                 <td>{{ error.errorFromPastTrip }}</td>
                                                                 <td>{{ error.fileName }}</td>
                                                                 <td>
-                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
-                                                                    {% comment %} <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Add docket  </a> {% endcomment %}
-                                                                    {% elif not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" title="solved" class="btn btn-sm btn-success">  Resolve  </a>
+                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'boral' %}
+                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+
+                                                                    {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
+                                                                    {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
+
+                                                                    {% elif error.clientName == 'boral' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                                                    {% elif error.clientName == 'boral' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a>
+                                                                    {% comment %} HOLCIM  {% endcomment %}
+                                                                    
+                                                                    {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
+                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+
+                                                                    {% elif error.clientName == 'holcim' and 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-primary">  Add truck  </a>
+
+                                                                    {% elif error.clientName == 'holcim' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                                                    {% elif error.clientName == 'holcim' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Resolve  </a> {% endcomment %}
                                                                     {% endif %}
-                                                                
                                                                 </td>
                                                             </tr>
                                                             {% endfor %}
@@ -283,9 +313,7 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="card-box table-responsive">
-                                                    <table id="solved-datatable-buttons"
-                                                        class="table table-striped table-bordered"
-                                                        style="width:100%">
+                                                    <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
                                                         <thead>
                                                             <tr>
                                                                 <th>Id</th>
@@ -295,6 +323,7 @@
                                                                 <th>Docket Number</th>
                                                                 <th>Error Description</th>
                                                                 <th>File name</th>
+                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -307,6 +336,9 @@
                                                                 <td>{{ solve.docketNumber }}</td>
                                                                 <td>{{ solve.errorFromPastTrip }}</td>
                                                                 <td>{{ solve.fileName }}</td>
+                                                                <td>
+                                                                    <a href="{% url 'Account:resolveError' id=solve.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View  </a>
+                                                                </td>
                                                             </tr>
                                                             {% endfor %}
                                                         </tbody>
@@ -389,7 +421,7 @@
 {% block footerStyleEnd %}
 <script src="{% static 'js/reconciliation_analysis.js' %}"></script>
 <script>
-    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     $(document).ready(function () {
         $('#datatable-buttons').DataTable();
@@ -398,7 +430,9 @@
         $('#no').click(function(){
             $('#save_').prop('checked', false);
         })
-
+    function wip(){
+        alert('Work in progress')
+        }
     });
     function showModel(data) {
         $("#errorModel").modal("toggle");

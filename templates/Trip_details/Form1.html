@@ -108,11 +108,11 @@
                         <div class="mb-3">
                             <label for="driverId">Driver ID :</label>
 
-                            {% if driver_ids is not None %}
-                            <input type="text" name="driverId" id="driverId"
-                                value="{% if driver_ids is not None %}{{driver_ids}}{% endif %}" readonly
-                                class="d-block" />
-                            {% endif %} {% if drivers is not None%}
+                            {% if driver_ids %}
+                            <input type="text" name="driverId" id="driverId" value="{% if driver_ids is not None %}{{driver_ids}}{% endif %}" readonly class="d-block" />
+                            {% endif %} 
+                            
+                            {% if drivers is not None%}
                             <select name="driverId" class="form-select" id="driverId">
                                 <option value="" disabled selected>Select Driver Id</option>
                                 {% for driver in drivers %}
@@ -132,20 +132,16 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="clientId">Client Name :</label>
-                            {% if client_names is not None %}
-                            <input type="text" name="clientName" id="clientId"
-                                value="{% if client_names is not None %}{{client_names}}{% endif %}" readonly
-                                class="d-block" />
-                            {% comment %} {% endif %}
-                            {% if client_ids is not None%} {% endcomment %}
+                            
+                            {% if existingTodayTrip %}
+                                <input type="text" name="clientName" id="clientId" value="{% if existingTodayTrip %}{{existingTodayTrip.clientName}}{% endif %}" readonly class="d-block" />
                             {% else %}
-
-                            <select name="clientName" class="form-select" id="clientId">
-                                <option value="" disabled selected>Select Client Name</option>
-                                {% for client_name in client_ids %}
-                                <option value="{{ client_name }}">{{ client_name }}</option>
-                                {% endfor %}
-                            </select>
+                                <select name="clientName" class="form-select" id="clientId">
+                                    <option value="" disabled selected>Select Client Name</option>
+                                    {% for client_name in client_ids %}
+                                        <option value="{{ client_name }}">{{ client_name }}</option>
+                                    {% endfor %}
+                                </select>
                             {% endif %}
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
@@ -159,14 +155,12 @@
                         <div class="mb-3">
                             <label for="numberOfLoads">Truck No :</label>
 
-                            {% if DriverTruckNum is not None %}
-                            <input type="text" name="truckNum" id="truckNum"
-                                value="{% if DriverTruckNum is not None %}{{DriverTruckNum}}{% endif %}" readonly
-                                class="d-block" />
+                            {% if existingTodayTrip %}
+                                <input type="text" name="truckNum" id="truckNum" value="{% if existingTodayTrip %}{{existingTodayTrip.truckNo}}{% endif %}" readonly class="d-block" />
                             {% else %}
-                            <select id="truckNum" class="js-select2 form-control" disabled name="truckNum">
-                                <option value="">Select an Item</option>
-                            </select>
+                                <select id="truckNum" class="js-select2 form-control" disabled name="truckNum">
+                                    <option value="">Select an Item</option>
+                                </select>
                             {% endif %}
 
                             <i class="fa" aria-hidden="true"></i>
@@ -182,8 +176,7 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="numberOfLoads">Number of load :</label>
-                            <input type="number" min="1" id="numberOfLoads" name="numberOfLoads"
-                                value="{{ request.session.data.numberOfLoads|default_if_none:'' }}" />
+                            <input type="number" min="1" id="numberOfLoads" name="numberOfLoads" value="{% if existingTodayTrip %}{{existingTodayTrip.numberOfLoads}}{% endif %}" {% if existingTodayTrip %}readonly{% endif %}/>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -193,10 +186,10 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="shiftType">Shift Type :</label>
-                            <select id="shiftType" class="form-select" name="shiftType">
+                            <select id="shiftType" class="form-select bg-white" name="shiftType" {% if existingTodayTrip %}disabled{% endif %}>
                                 <option value="" selected disabled>Select Shift Type</option>
-                                <option value="Day">Day</option>
-                                <option value="Night">Night</option>
+                                <option value="Day"  {% if existingTodayTrip.shiftType == "Day" %} selected{% endif %}>Day</option>
+                                <option value="Night"  {% if existingTodayTrip.shiftType == "Night" %} selected{% endif %}>Night</option>
                             </select>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
@@ -207,7 +200,7 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="shiftDate">Shift date:</label>
-                            <input type="date" id="shiftDate" name="shiftDate" />
+                            <input type="date" id="shiftDate" name="shiftDate" value="{% if existingTodayTrip %}{{existingTodayTrip.shiftDate}}{% endif %}" {% if existingTodayTrip %}readonly{% endif %}/>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -223,8 +216,7 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="startTime">Start time :</label>
-                            <input type="time" name="startTime" id="startTime"
-                                value="{{ request.session.data.startTime|default_if_none:'' }}" />
+                            <input type="time" name="startTime" id="startTime" value="{% if existingTodayTrip %}{{existingTodayTrip.startTime}}{% endif %}" {% if existingTodayTrip %}readonly{% endif %}/>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -234,8 +226,7 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="endTime">End time :</label>
-                            <input type="time" name="endTime" id="endTime"
-                                value="{{ request.session.data.endTime|default_if_none:'' }}" readonly/>
+                            <input type="time" name="endTime" id="endTime" value="{% if existingTodayTrip %}{{existingTodayTrip.endTime}}{% endif %}" readonly/>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -245,8 +236,7 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="loadSheet">Upload Load Sheet :</label>
-                            <input type="file" placeholder="Load Sheet" name="loadSheet" class="p-2" id="loadSheet"
-                                accept=".jpg, .jpeg, .pdf" />
+                            <input type="file" placeholder="Load Sheet" name="loadSheet" class="p-2" id="loadSheet" accept=".jpg, .jpeg, .pdf" />
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
                         </div>
@@ -273,7 +263,6 @@
 {% block footerStyleEnd %}
 
     <!-- select2 for searching dropdown -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
         integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>

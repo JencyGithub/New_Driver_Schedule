@@ -145,7 +145,7 @@
                         </ul>
                     </div> 
                     <!-- {% url 'gearBox:truckFormAdd' %} -->
-                    <form action="" method="post" class="" novalidate>
+                    <form action="{% url 'gearBox:truckFormAdd' %}" method="post" class="" novalidate>
                         {% csrf_token %}
                         <div class="x_title">
                             <h6>Mandatory Fields</h6>

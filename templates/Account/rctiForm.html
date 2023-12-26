@@ -41,7 +41,7 @@
       {% comment %} RCTI Expense  {% endcomment %}
       <div class="col-md-12 col-sm-12">
         <div class="x_panel">
-            <form action="{% url 'Account:rctiTable' %}" method="POST" novalidate id="reconciliationForm">
+            <form action="{% url 'Account:rctiTable' %}" method="POST" id="reconciliationForm">
             <div class="x_title">
                 <h2>RCTI | Expenses  Form</h2>
                 <div class="float-right">
@@ -60,13 +60,13 @@
                         <div class="col-md-4 col-sm-4">
                             <label for="startDate">Start Date:</label>
                             <div class="field item form-group">
-                                <input class="form-control date" type="date" name="startDate" id="startDate">
+                                <input class="form-control date" type="date" name="startDate" id="startDate" required>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-4">
                             <label for="endDate">End Date:<span class="required">*</span></label>
                             <div class="field item form-group">
-                                <input class="form-control date" type="date" name="endDate" id="endDate" readonly>
+                                <input class="form-control date" type="date" name="endDate" id="endDate" readonly required>
                             </div>
                         </div>
                         <div class="col-md-4 col-sm-4">
@@ -131,7 +131,7 @@
                           {% endfor%}
                       </select>
                   </div>
-              </div>
+                </div>
                 <div class="col-md-3 col-sm-3">
                   <div class="checkbox">
                     <label>
@@ -173,6 +173,8 @@
         </div>
         <div class="clearfix"></div>
       </div>
+
+      {% comment %} RCTI ERRORS  {% endcomment %}
       <div class="col-md-12 col-sm-12 ">
         <div class="x_panel">
           <div class="x_title">
@@ -200,8 +202,6 @@
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <!-- Error Table  -->
-
-
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>Error</h2>
@@ -218,7 +218,7 @@
                                 <th>Client</th>
                                 <th>DocketNumber</th>
                                 <th>DocketDate</th>
-                                <th class="w-50">ErrorDescription</th>
+                                <th >ErrorDescription</th>
                                 <th>FileName</th>
                                 <th>Action</th>
                               </tr>
@@ -232,9 +232,18 @@
                                 <td >{{error.docketDate}}</td>
                                 <td>{{error.errorDescription}}</td>
                                 <td>{{error.fileName}}</td>
+                                <td>
                                 {% comment %} {% url 'Account:rctiErrorSolve' id=error.id%} {% endcomment %}
-                                <td> {% if error.status is False %} <a href="#"
-                                    class="btn btn-sm btn-info"> Resolve</i></a>{% endif%}</td>
+
+                                {% comment %} <td> {% if error.status is False %} <a href="#" onclick="wip()" class="btn btn-sm btn-info"> Resolve</i></a>{% endif%}</td> {% endcomment %}
+                                {% if 'Earning Depot/Location does not exist' in error.errorDescription %}
+                                <a href="{% url 'Account:basePlantAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                {% else %}
+                                <a href="{% url 'Account:rctiErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a> 
+                                
+                                 {% endif %}
+                                </td>
                               </tr>
                               {% endfor %}
                             </tbody>
@@ -354,7 +363,6 @@
 <script src="{% static 'js/reconciliation_analysis.js' %}"></script>
 
 <script>
-
   // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
   $(document).ready(function () {
@@ -366,7 +374,9 @@
     })
 
   });
-
+  function wip(){
+    alert('Work in progress')
+  }
   function showModel(data) {
     $("#errorModel").modal("toggle");
     $.ajax({
@@ -394,30 +404,6 @@
         },
       });
   }
-
-  var validator = new FormValidator({
-    "events": ['blur', 'input', 'change']
-  }, document.forms[0]);
-  // on form "submit" event
-  document.forms[0].onsubmit = function (e) {
-
-      var submit = true,
-          validatorResult = validator.checkAll(this);
-      console.log(validatorResult);
-
-      return !!validatorResult.valid;
-  };
-  // on form "reset" event
-  document.forms[0].onreset = function (e) {
-      validator.reset();
-  };
-  // stuff related ONLY for this demo page:
-  $('.toggleValidationTooltips').change(function () {
-      validator.settings.alerts = !this.checked;
-      if (this.checked)
-          $('form .alert').remove();
-  }).prop('checked', false);
-
 </script>
 <!-- Datatables -->
 <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>

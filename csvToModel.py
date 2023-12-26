@@ -1,6 +1,7 @@
 import csv , re
 from Account_app.models import *
 from Account_app.reconciliationUtils import *
+import time
 
 def convertIntoFloat(str_):
     if '(' in str_:
@@ -41,6 +42,7 @@ docket_pattern = r'^\d{8}$|^\d{6}$'
 def insertIntoModel(dataList,file_name):
     
     try:
+        errorSolve = dataList
         RCTIobj = None
         try:
             existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
@@ -74,23 +76,21 @@ def insertIntoModel(dataList,file_name):
                     continue
                     
                 RCTIobj.docketDate = dateConvert(dump[0])
-                
-                if dump[1] is not BasePlant_:
+                if dump[1] not in BasePlant_:
                     rctiErrorObj = RctiErrors( 
                                         clientName = 'boral',
                                         docketNumber = RCTIobj.docketNumber,
                                         docketDate = RCTIobj.docketDate,
                                         errorDescription = "Earning Depot/Location does not exist.",
                                         fileName = file_name,
-                                        data = str(dataList)
+                                        data = str(errorSolve)
                     )
                     rctiErrorObj.save()
                     dataList = dataList[10:]
-                    continue
+                    return
                 else:
-                    BasePlant_ = BasePlant.objects.filter(basePlant = str(dump[1]).upper()).first()
-
-                RCTIobj.docketYard = dump[1]
+                    # BasePlant_ = BasePlant.objects.filter(basePlant = str(dump[1]).upper()).first()
+                    RCTIobj.docketYard = dump[1]
                 
                 if "truck transfer" in description:
                     RCTIobj.transferKM = convertIntoFloat(dump[4])
@@ -196,7 +196,7 @@ def insertIntoModel(dataList,file_name):
                             docketDate = RCTIobj.docketDate,
                             errorDescription = 'To be adjusted manually by admin team',
                             fileName = file_name,
-                            data = str(dataList)
+                            data = str(errorSolve)
         )
             rctiErrorObj.save()
 
@@ -208,12 +208,13 @@ def insertIntoModel(dataList,file_name):
                             docketDate = RCTIobj.docketDate,
                             errorDescription = e,
                             fileName = file_name,
-                            data = str(dataList)
+                            data = str(errorSolve)
         )
         rctiErrorObj.save()
         pass
 
 def insertIntoExpenseModel(dataList , file_name):
+    errorSolve = dataList
     basePlants = BasePlant.objects.all()
     BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
     if dataList and len(dataList) > 10:
@@ -226,36 +227,37 @@ def insertIntoExpenseModel(dataList , file_name):
                 
                 # if dataList[2] is not BasePlant_:
                 #     BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dataList[3]).upper())[0]
+                # print(dataList,len(dataList))
 
-                if dataList[2] is not BasePlant_:
-                    rctiErrorObj = RctiErrors( 
-                                        docketNumber = rctiExpenseObj.docketNumber,
-                                        docketDate = rctiExpenseObj.docketDate,
-                                        errorDescription = "Expense Depot/Location does not exist.",
-                                        fileName = file_name,
-                                        data = str(dataList))
-                    rctiErrorObj.save()
-                    pass
-                else:
-                    BasePlant_ = BasePlant.objects.filter(basePlant = str(dataList[1]).upper()).first()
+                # if dataList[3] not in  BasePlant_:
+                #     rctiErrorObj = RctiErrors( 
+                #                         docketNumber = rctiExpenseObj.docketNumber,
+                #                         docketDate = rctiExpenseObj.docketDate,
+                #                         errorDescription = "Expense Depot/Location does not exist.",
+                #                         fileName = file_name,
+                #                         data = str(dataList))
+                #     rctiErrorObj.save()
+                #     pass
+                # else:
+                #     BasePlant_ = BasePlant.objects.filter(basePlant = str(dataList[1]).upper()).first()
 
-                    rctiExpenseObj.docketYard = str(dataList[3]).upper()
-                    rctiExpenseObj.description = str(dataList[4])
-                    rctiExpenseObj.paidKm =  0
-                    rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[6])
-                    rctiExpenseObj.unit =  dataList[7]
-                    rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[8])
-                    rctiExpenseObj.gstPayable =  convertIntoFloat(dataList[9])
-                    rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
-                    rctiExpenseObj.total =  convertIntoFloat(dataList[11])
-                    rctiExpenseObj.save()
+                rctiExpenseObj.docketYard = str(dataList[3]).upper()
+                rctiExpenseObj.description = str(dataList[4])
+                rctiExpenseObj.paidKm =  0
+                rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[6])
+                rctiExpenseObj.unit =  dataList[7]
+                rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[8])
+                rctiExpenseObj.gstPayable =  convertIntoFloat(dataList[9])
+                rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
+                rctiExpenseObj.total =  convertIntoFloat(dataList[11])
+                rctiExpenseObj.save()
         except Exception as e:
             rctiErrorObj = RctiErrors( 
                             docketNumber = rctiExpenseObj.docketNumber,
                             docketDate = rctiExpenseObj.docketDate,
                             errorDescription = e,
                             fileName = file_name,
-                            data = str(dataList)
+                            data = str(errorSolve)
             )
             rctiErrorObj.save()
             

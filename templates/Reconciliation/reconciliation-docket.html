@@ -36,9 +36,10 @@
 							</div>
 							<div class="x_content">
 								<br />
+								
 								{% comment %} Not Matched {% endcomment %}
 								<form class="form-horizontal form-label-left">
-									{% if rctiDocket.docketYard != driverDocket.basePlant %}
+									{% if rctiDocket.docketYard != driverDocket.basePlant.basePlant %}
 									<div class="form-group row">
 										<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
 											site:</label>
@@ -192,7 +193,8 @@
 																value={{rctiDocket.docketDate}} required>
 														</div>
 													</div>
-													{% if rctiDocket.docketYard != 0 and rctiDocket.docketYard == driverDocket.docketYard %}
+													
+													{% if rctiDocket.docketYard == driverDocket.basePlant.basePlant %}
 													<div class="form-group row">
 														<label for="RCTIbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
 															site:</label>
@@ -389,7 +391,7 @@
 															<div class="col-md-6 col-sm-6 ">
 																<label for="basePlant">basePlant :<span class="required">*</span></label>
 																<div class="field item form-group">
-																	<select name="basePlant" class="form-control" {% if driverDocket %}readonly{% endif %}>
+																	<select name="basePlant" class="form-control" {% if driverDocket %}disabled{% endif %}>
 																		{% for basePlant_ in basePlants %}
 																		<option {% if driverDocket.basePlant.basePlant == basePlant_.basePlant %}selected{% endif %} value="{{basePlant_.id}}">{{ basePlant_.basePlant }}</option>
 																		{% endfor %}
@@ -462,7 +464,7 @@
 															<div class="col-md-6 col-sm-6">
 																<label for="surcharge_type">Surcharge Type:<span class="required">*</span></label>
 																<div class="field item form-group">
-																	<select name="surcharge_type" class="form-control" readonly>
+																	<select name="surcharge_type" class="form-control" {% if driverDocket %}disabled{% endif %}>
 																		{% for surcharge in surcharges %}
 																		<option value="{{surcharge.id}}" {% if driverDocket.surcharge_type.surcharge_Name == surcharge.surcharge_Name %}selected{% endif %}>{{surcharge.surcharge_Name}}</option>
 																		{% endfor %}
@@ -548,9 +550,9 @@
 
 								{% comment %} miss matched {% endcomment %}
 
-
+								
 								<form class="form-horizontal form-label-left">
-									{% if rctiDocket.docketYard != driverDocket.basePlant %}
+									{% if rctiDocket.docketYard != driverDocket.basePlant.basePlant %}
 									<div class="form-group row">
 										<label for="DriverbasePlant" class="control-label col-md-3 col-sm-3 ">Loading
 											site:</label>
@@ -704,7 +706,7 @@
 																readonly value={{driverDocket.shiftDate}}>
 														</div>
 													</div>
-													{% if driverDocket.basePlant != 0 and rctiDocket.basePlant == driverDocket.basePlant %}
+													{% if rctiDocket.docketYard == driverDocket.basePlant.basePlant %}
 													<div class="form-group row">
 														<label for="DriverbasePlant"
 															class="control-label col-md-3 col-sm-3 ">Loading
@@ -802,7 +804,7 @@
 														</div>
 													</div>
 													{% endif %}
-													{% if driverDocket.standBySlotstandBySlot != 0 and rctiDocket.standByNoSlot == driverDocket.standBySlot %}
+													{% if driverDocket.standBySlot != 0 and rctiDocket.standByNoSlot == driverDocket.standBySlot %}
 													<div class="form-group row">
 														<label for="DriverStandBySlot"
 															class="control-label col-md-3 col-sm-3"> Stand By Slot:

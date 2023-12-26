@@ -41,13 +41,9 @@
                     {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_title">
-                            {% if docketData%}
-                            <h2> Holcim Docket  </h2>
-                            <!-- {{holcimTripObj}} -->
-                            {% endif%}
+                            <h2> Holcim Trip  </h2>
                             <div class="clearfix"></div>
                         </div>
-                        
                         <div class="x_content">
                             <div class="custom-continer">
 
@@ -60,6 +56,38 @@
                                             style="padding: 0.25rem 0.2rem;" id="vehicle" {% if docketData%} readonly  {% endif%}   value="{% if holcimTripObj %}{{holcimTripObj.truckNo}}{% endif%}" >
                                     </div>
                                 </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="shiftDate">ShiftDate :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="text"
+                                            name="shiftDate" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="shiftDate" {% if docketData%} readonly  {% endif%}   value="{% if holcimTripObj %}{{holcimTripObj.shiftDate}}{% endif%}" >
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="jobNo">No Of Loads :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="number"
+                                            name="jobNo" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="jobNo" {% if docketData%} readonly  {% endif%}   value="{% if holcimTripObj %}{{holcimTripObj.numberOfLoads}}{% endif%}" >
+                                    </div>
+                                </div>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                    {% for docketData in docketData %}
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Holcim Docket  </h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="custom-continer">
+
+                                <!-- basePlant noOfKm  transferKM  -->
+                                
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="orderNo">Order No :<span class="required">*</span></label>
                                     <div class="field item form-group">
@@ -79,17 +107,26 @@
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="status">Status  :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="text"
+                                        <input class="form-control"  type="{% if docketData%} text {%else%} date {% endif%}"
                                             name="status" required='required'
                                             style="padding: 0.25rem 0.2rem;" id="status" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.status}}{% endif%}" >
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-4 col-sm-4 ">
-                                    <label for="ticketed">Ticketed  :<span class="required">*</span></label>
+                                    <label for="ticketed">Ticketed Date  :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="{% if docketData%} text {%else%} datetime-local {% endif%}"
+                                        <input class="form-control"  type="{% if docketData%} text {%else%} date {% endif%}"
                                             name="ticketed" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="ticketed" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketed}}{% endif%}" >
+                                            style="padding: 0.25rem 0.2rem;" id="ticketed" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketedDate}}{% endif%}" >
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="ticketedTime">Ticketed Time  :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="{% if docketData%} text {%else%} date {% endif%}"
+                                            name="ticketedTime" required='required'
+                                            style="padding: 0.25rem 0.2rem;" id="ticketedTime" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.ticketedTime}}{% endif%}" >
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4 ">
@@ -236,6 +273,7 @@
                                             style="padding: 0.25rem 0.2rem;" id="waitTimeBetweenJob" {% if docketData%} readonly  {% endif%}   value="{% if docketData %}{{docketData.waitTimeBetweenJob}}{% endif%}" >
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="driverName">DriverName  :<span class="required">*</span></label>
                                     <div class="field item form-group">
@@ -270,14 +308,9 @@
                                 </div>
 
                             </div>
-                            {% if docketData%}  
-                            {%else%} 
-                            <div class="col-md-12 text-right p-0">
-                                <button type='submit' style="margin: 0px;" id="submit_" class="btn btn-primary px-4">Save</button>
-                            </div>
-                            {% endif%}
                         </div>
                     </div>
+                    {% endfor %}
                 </form>
             </div>
         </div>
