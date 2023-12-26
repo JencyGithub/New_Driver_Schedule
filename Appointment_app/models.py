@@ -77,10 +77,9 @@ class PreStart(models.Model):
     fitForWork = models.BooleanField(default = False)
     vehicleStatus = models.BooleanField(default = False)
     vehiclePaper = models.BooleanField(default = False)
+    curDate = models.DateTimeField(default=timezone.now())
     comment = models.CharField(max_length = 1024, default='', null=True)
-
-
-
+    
 
     def __str__(self):
         return str(self.fitForWork)

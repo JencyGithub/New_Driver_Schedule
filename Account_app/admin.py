@@ -474,3 +474,7 @@ admin.site.register(HolcimTrip,HolcimTrip_)
 admin.site.register(AppointmentTruck)
 admin.site.register(AppointmentDriver)
 
+admin.site.register(PreStart)
+
+
+
