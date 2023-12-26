@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.http import Http404
 from django.contrib.auth.models import User , Group
 import os, colorama, subprocess
+from django.db.models import Q
 
 
 # Create your views here.
@@ -140,6 +141,9 @@ def driverFormSave(request, id= None):
             
         user.save()
         driverObj.save()
+        
+        
+        
         messages.success(request,'Updating successfully')
     else:
         if int(request.POST.get('driverId')) in driver_Id :
@@ -171,14 +175,19 @@ def driverFormSave(request, id= None):
             user_.set_password(DriverObj.password)
             user_.save()
             DriverObj.save()
-            messages.success(request,'Adding successfully')
+            messages.success(request,'Driver Entry successfully')
             
             
-            # Launch subprocess to add driver trips from pastTrip error
+            with open("scripts/addPastTripForMissingDriver.txt", 'w') as f:
+                f.write(driverName)
+            # colorama.AnsiToWin32.stream = None
+            # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+            # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error']
+            # subprocess.run(cmd)
             colorama.AnsiToWin32.stream = None
             os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-            cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error','--driverName', driverName]
-            subprocess.run(cmd)
+            cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error']
+            subprocess.Popen(cmd, stdout=subprocess.PIPE)
             
             
 
@@ -225,11 +234,12 @@ def truckForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def truckFormSave(request):
+    # return HttpResponse(request.POST.get('truckNo'))
     dataList = {
         'adminTruckNumber' : request.POST.get('truckNo'),
     }
     insertIntoTable(tableName='AdminTruck',dataSet=dataList)
-    
+
     messages.success(request,'Adding successfully')
     return redirect('gearBox:truckTable')
 
@@ -247,15 +257,7 @@ def truckConnectionForm(request, id):
 @csrf_protect
 @api_view(['POST'])
 def truckConnectionSave(request,id):
-    try:
-        oldData = ClientTruckConnection.objects.get(clientId=request.POST.get('clientId'),clientTruckId=request.POST.get('clientTruckNumber'),truckNumber=id)
-        if oldData:
-            oldData.endDate = getYesterdayDate(request.POST.get('StartDate'))
-            oldData.save()
-    except:
-        pass
     adminTruck = AdminTruck.objects.get(id=id)
-
     rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
     client = Client.objects.get(pk=request.POST.get('clientId'))
     dataList = {
@@ -263,10 +265,36 @@ def truckConnectionSave(request,id):
         'rate_card_name' : rateCard,
         'clientId' : client,
         'clientTruckId' : request.POST.get('clientTruckNumber'),
-        'startDate' : request.POST.get('StartDate')
+        'truckType' : request.POST.get('truckType'),
+        'startDate' : request.POST.get('startDate'),
+        'endDate' : request.POST.get('endDate')
     }
+    # adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = dataList['truckNumber']).first()
+    # return HttpResponse(adminTruckObj)
+    existingData = ClientTruckConnection.objects.filter(Q(truckNumber = adminTruck,clientId=dataList['clientId'],startDate__gte = dataList['startDate'],startDate__lte = dataList['endDate'])|Q(truckNumber = adminTruck,clientId=dataList['clientId'],endDate__gte = dataList['startDate'],endDate__lte = dataList['endDate'])).first()
+    # return HttpResponse(existingData)
+    if existingData:
+        messages.error( request, "Connection already exist.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    try:
+        oldData = ClientTruckConnection.objects.get(clientId=request.POST.get('clientId'),clientTruckId=request.POST.get('clientTruckNumber'),truckNumber=id)
+        if oldData:
+            oldData.endDate = getYesterdayDate(request.POST.get('StartDate'))
+            oldData.save()
+    except:
+        pass
     insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
-    messages.success(request,'Added successfully')
+    with open("scripts/addPastTripForMissingTruckNo.txt", 'w') as f:
+        f.write(str(dataList['truckNumber']))
+    # colorama.AnsiToWin32.stream = None
+    # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+    # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingTruckNo','--continue-on-error']
+    # subprocess.run(cmd)
+    colorama.AnsiToWin32.stream = None
+    os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+    cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingTruckNo','--continue-on-error']
+    subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    messages.success(request,'Truck Connection Add Successfully')
     return redirect('gearBox:truckTable')
 
     # Document 

@@ -7,11 +7,11 @@ from datetime import time
 import sys
 
 
-f = open(r"scripts/addPastTripForMissingDriver.txt", 'r')
-driverName = f.read()
+f = open(r"scripts/addPastTripForMissingTruckNo.txt", 'r')
+truckNo = f.read()
 # data = data.split(',')[0:-1]
 
-matchingData = PastTripError.objects.filter(errorFromPastTrip="Driver matching query does not exist.", status=False)
+matchingData = PastTripError.objects.filter(errorFromPastTrip="Client truck connection object does not exist.", status=False)
 
 for i in matchingData:
     try:
@@ -20,6 +20,7 @@ for i in matchingData:
         data = data.split(',')
         
 
+        pastTruckNo = data[1].strip().replace(' ','').lower()
         pastDriver = data[4].strip().replace(' ','').lower()
         if ' ' in str(data[0]):
             res_ = str(data[0]).split()[0]
@@ -32,7 +33,7 @@ for i in matchingData:
         driver = Driver.objects.filter(name =pastDriver).first()
         client = Client.objects.filter(name = 'boral').first()
 
-        if pastDriver == driverName:
+        if pastTruckNo == truckNo:
             i.status = True
             i.save()
             try:
@@ -72,22 +73,6 @@ for i in matchingData:
                 tripObj = DriverTrip.objects.get(pk=tripObjID)
                 
                 basePlant = BasePlant.objects.filter(basePlant = data[24].strip().upper()).first() 
-                # modified for adding 
-                if basePlant is None:
-                    pastTripErrorObj = PastTripError(
-                            tripDate = res_,
-                            docketNumber = data[5],
-                            truckNo = data[1],
-                            lineNumber = i.lineNumber,
-                            errorFromPastTrip = "BasePlant does not exist.",
-                            fileName = i.fileName.split('@_!')[-1],
-                            data = data
-                        ) 
-                        # print('grace card not found')                   
-                    pastTripErrorObj.save()
-                    continue
-                    # Modification ends
-                
                 surCharge = Surcharge.objects.filter(surcharge_Name = 'Nosurcharge').first()
                     
                 docketObj = DriverDocket()                
@@ -138,14 +123,13 @@ for i in matchingData:
                     # print("COST PARAMETER found!!!")
                     standBySlot = 0
                     try:
-                        if str(data[20]).strip() != '' or str(data[21]).strip() != '':
+                        if str(data[20]).strip().lower() != '' or str(data[21]).strip().lower() != '':
                             start = datetime.strptime(str(data[20].strip()),'%H:%M:%S')
                             end = datetime.strptime(str(data[21].strip()),'%H:%M:%S')
                             totalStandByTime = ((end-start).total_seconds())/60
                             if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
                                 totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
                                 standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
-                                
                         else:
                             standBySlot = 0
                     except Exception as e:
@@ -223,7 +207,8 @@ for i in matchingData:
                     reconciliationDocketObj.fromDriver = True 
                     reconciliationDocketObj.save()
                     checkMissingComponents(reconciliationDocketObj)
-                    
+                    i.status = True
+                    i.save()
                 else:
                     pastTripErrorObj = PastTripError(
                         tripDate = res_,

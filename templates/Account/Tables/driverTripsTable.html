@@ -123,28 +123,46 @@
                         {% comment %} <th>verified</th> {% endcomment %}
                         <th>truckNo</th>
                         <th>clientName</th>
-                        <th>driverName</th>
+                        {% comment %} <th>driverName</th> {% endcomment %}
                         <th>shiftDate</th>
                         <th>numberOfLoads</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% for driverTtips in driverTrip %}
+                      {% if boralTrip %}
+                      {% for boralTrip in boralTrip %}
                       <tr>
                         {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
-                        <td>{{ driverTtips.truckNo }}</td>
-                        <td>{{ driverTtips.clientName.name }}</td>
-                        <td>{{ driverTtips.driverId.name }}</td>
-                        <td>{{ driverTtips.shiftDate }}</td>
-                        <td>{{ driverTtips.numberOfLoads }}</td>
+                        <td>{{ boralTrip.truckNo }}</td>
+                        <td>{{ boralTrip.clientName.name }}</td>
+                        {% comment %} <td>{{ boralTrip.driverId.name }}</td> {% endcomment %}
+                        <td>{{ boralTrip.shiftDate }}</td>
+                        <td>{{ boralTrip.numberOfLoads }}</td>
                         <td>
-                            <a href="{% url 'Account:DriverTripEdit' id=driverTtips.id%}" title="update">
+                            <a href="{% url 'Account:DriverTripEdit' id=boralTrip.id%}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                         </td>
                       </tr>
                       {% endfor %}
+                      {% endif %}
+                      {% if holcimTrip %}
+                      {% for holcimTrip in holcimTrip %}
+                      <tr>
+                        {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
+                        <td>{{ holcimTrip.truckNo }}</td>
+                        <td>holcim</td>
+                        <td>{{ holcimTrip.shiftDate }}</td>
+                        <td>{{ holcimTrip.numberOfLoads }}</td>
+                        <td>
+                            <a href="{% url 'Account:HolcimDocketView' id=holcimTrip.id%}" title="update">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                            </a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                      {% endif %}
                     </tbody>
                   </table>
                 </div>

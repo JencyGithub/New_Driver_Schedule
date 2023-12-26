@@ -45,13 +45,11 @@ $(document).ready(function () {
   });
 
   // reconciliation
-  document
-    .getElementById("reconciliation")
-    .addEventListener("click", function (event) {
-      event.preventDefault();
-      if (checkDateValid()) {
-        $("#signUpForm").submit();
-      }
-    });
+  $("#reconciliation").on("click", function (event) {
+    event.preventDefault();
+    if (checkDateValid()) {
+      $("#signUpForm").submit();
+    }
+  }); 
 
 });

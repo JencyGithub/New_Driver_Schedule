@@ -306,7 +306,7 @@ class Driver_(admin.ModelAdmin):
     # inlines = [LeaveReqAdminDriver]
     list_display = ["driverId", "name", 'phone']
     search_fields = ["driverId",'name']
-    actions = [driver_download_csv]
+    # actions = [driver_download_csv]
 
     def upcoming_leave_requests(self, obj):
         now = timezone.now()
@@ -397,7 +397,7 @@ admin.site.register(PublicHoliday)
 
 class RctiErrors_(admin.ModelAdmin):
 
-    list_display = ['docketNumber',"docketDate","errorDescription"]
+    list_display = ['docketNumber',"status","docketDate","errorDescription"]
     search_fields = ["docketNumber"]
 
 
@@ -405,7 +405,7 @@ admin.site.register(RctiErrors,RctiErrors_)
 
 class PastTripError_(admin.ModelAdmin):
 
-    list_display = ['docketNumber',"status"]
+    list_display = ['docketNumber',"status","errorFromPastTrip"]
     search_fields = ["docketNumber"]
 
 

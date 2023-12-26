@@ -33,7 +33,7 @@ urlpatterns = [
     path('jobs/assigned/accept/<int:id>/', views.assignedJobAccept, name='assignedJobAccept'),
     path('jobs/view/<int:id>/', views.singleJobView, name='singleJobView'),
 
-    path('jobs/open/', views.openJobShow, name='openJobShow'),
+    # path('jobs/open/', views.openJobShow, name='openJobShow'),
     path('jobs/finish/<int:id>/', views.finishJob, name='finishJob'),
 
     path('docket/upload/<int:id>/', views.uploadDocketView, name='uploadDocketView'),
@@ -145,6 +145,10 @@ urlpatterns = [
     path('pastTrip/error/get/', views.getSinglePastTripError, name='getSinglePastTripError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
+    
+    
+    # Resolve Error  
+    path('resolveError/<int:id>', views.resolveError, name='resolveError'),
      
     
     

@@ -55,6 +55,8 @@ def checkLoadAndKmCost(driverDocketNumber,docketDate):
  
  
     except Exception as e :
+        with open("scripts/checkLoadAndKmCost.txt", 'a') as f:
+            f.write(driverDocketNumber + str(e)+','+'\n')
         # print(f'{driverDocketNumber}Load And Km Cost : {e}')
         return -404.0
 
@@ -199,7 +201,6 @@ def checkStandByTotal(driverDocketNumber,docketDate,standBySlot, costDict = cost
             
         return round(finalStandByCost,2)  
 
-        
     except Exception as e :
         # print(f'{driverDocketNumber}Standby time : {e}')
         return -404.0

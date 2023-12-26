@@ -84,15 +84,13 @@ def run():
                 existingTrip = None
 
                 driverName = data[4].strip().replace(' ','').lower()
-                client = Client.objects.get_or_create(name = 'boral')[0]
+                client = Client.objects.filter(name = 'boral').first()
                 
                 driver = Driver.objects.filter(name = driverName).first()
                 if driver:
                     # Trip save
                     try:
                         existingTrip = DriverTrip.objects.filter(truckNo = data[1],shiftDate = res_pythonDate).values().first()
-                        
-                        
                         if existingTrip:
                             tripObj = DriverTrip.objects.filter(pk=existingTrip['id']).first()
                         else:
@@ -115,11 +113,11 @@ def run():
                         tripObj.numberOfLoads = existingDockets + 1
                                 
                         if tripObj.startTime and tripObj.endTime :
-                            tripObj.startTime = getMaxTimeFromTwoTime(str(tripObj.startTime),str(data[6]),'min')
-                            tripObj.endTime = getMaxTimeFromTwoTime(str(tripObj.endTime),str(data[7]))
+                            tripObj.startTime = getMaxTimeFromTwoTime(str(tripObj.startTime),str(data[6]),'min').strip()
+                            tripObj.endTime = getMaxTimeFromTwoTime(str(tripObj.endTime),str(data[7])).strip()
                         else:
-                            tripObj.startTime =str(data[6])
-                            tripObj.endTime = str(data[7])
+                            tripObj.startTime =str(data[6]).strip()
+                            tripObj.endTime = str(data[7]).strip()
                                             
                         tripObj.save()
                         tripObj = DriverTrip.objects.get(pk=tripObjID)
@@ -142,7 +140,7 @@ def run():
                             continue
                             # Modification ends
                         
-                        surCharge = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
+                        surCharge = Surcharge.objects.filter(surcharge_Name = 'Nosurcharge').first()
                             
                         docketObj = DriverDocket()                
 

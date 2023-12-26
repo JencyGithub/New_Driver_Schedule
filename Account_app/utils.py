@@ -55,7 +55,11 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
     else:     
         given_line.insert(0,previous_line[2])
         given_line.insert(0,previous_line[1])
-               
+    
+    
+    if ' ' in given_line[2]:
+        given_line.insert(2,'NOT SELECTED')
+    
     if len(given_line) == 10:
         custom_row.extend(given_line[:5]) 
     else:
@@ -68,6 +72,7 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
         custom_row.insert(4,'')
     
     custom_row.insert(0,truckNo) 
+        
     
     if len(custom_row) < 11:
         return previous_line
@@ -110,9 +115,11 @@ def appendToCsv(given_list,file_name,folder_name,truckNo):
 
 # file_path = getFileName()
 args = sys.argv[-1]
+# args = '20231218124557@_!Boral-15-Apr-2023.csv'
 
 # args ='20231120042226@_!Boral-15-Jan-2023.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
+# file_path = 'static/Account/RCTI/tempRCTIInvoice/20231218124557@_!Boral-15-Apr-2023.csv'
 
 while(file_path[-4:] != '.csv'):
     print("Your given file is not valid.")

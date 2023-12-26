@@ -84,11 +84,12 @@
                                                                 <input class="form-control" type="number" required  value="{{ rcti.docketNumber }}" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
+                                                        
                                                         <div class="col-sm-4">
                                                             <div class="form-group ">
                                                                 <label for="docketDate">Docket date :<span class="required">*</span></label>
-                                                                <input class="form-control" required type="date" 
-                                                                    style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketDate }}"
+                                                                <input class="form-control" required type=date
+                                                                    style="padding: 0.25rem 0.2rem;" value="{{rcti.docketDate}}"
                                                                 {% if rcti %} readonly {% endif  %} >
                                                             </div>
                                                         </div>
@@ -610,6 +611,17 @@
                                                                 <input class="form-control" type="number" name="truckNo" required  value="{{ rcti.truckNo }}" id="truckNo" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
+                                                        {% comment %} <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="truckNo"><span class="required">*</span></label>
+                                                                <select class="form-control" id="clientName" name="clientName">
+                                                                    <option value="" disabled selected>Select Client Name</option>
+                                                                    {% for clientName in clientNames %}
+                                                                    <option value="{{ clientName.name }}">{{ clientName.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div> {% endcomment %}
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="docketNumber">Docket number:<span class="required">*</span></label>
@@ -619,7 +631,7 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="docketDate">Docket date:<span class="required">*</span></label>
-                                                                <input class="form-control" type="date" name="docketDate" required  value="{{ rcti.docketDate }}" id="docketDate" {% if rcti %} readonly {% endif %}>
+                                                                <input class="form-control"  {% if rcti %} type="text"  {% else  %}  type="date" {% endif %} name="docketDate" required  value="{{rcti.docketDate}}" id="docketDate" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
@@ -1023,6 +1035,10 @@
                                 </div>
                                 <input class="btn btn-default float-right above d-none" id="boralSub" type="submit" value="submit" >
                             </form>
+
+                            {% comment %} HOLCIM  {% endcomment %}
+
+                            
                             <form action="{% url 'Account:rctiHolcimFormSave' %}" method="post" id="holcimRctiForm">
                                 {% csrf_token %}
                                 <div class="x_content {% if not docketData %} d-none {% endif  %}" id="holcim">

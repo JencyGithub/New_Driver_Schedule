@@ -254,6 +254,7 @@
                                             style="padding: 0.25rem 0.2rem;" id="returnKm{{item.count_}}" readonly>
                                     </div>
                                 </div>
+
                                 <div class="col-md-4 col-sm-4">
                                     <label for="waitingTimeStart{{item.count_}}">Waiting Time Start :<span
                                             class="required">*</span></label>
@@ -336,7 +337,7 @@
                                     <div class="field item form-group">
                                         <input class="form-control" readonly  type="number"
                                             name="standBySlot{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standBySlot{{item.count_}}" value="{{ docketData.standBySlot }}">
+                                            style="padding: 0.25rem 0.2rem;" id="standBySlot{{item.count_}}" value="{% if docketData.standBySlot %}{{docketData.standBySlot}}{% else %}0{% endif %}">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -384,7 +385,6 @@
 
     $(document).ready(function() {
         if (!$('#verified').val()) {
-            
             $(':input').prop('disabled', true);
             $('#verified').css('display', 'none');
         }

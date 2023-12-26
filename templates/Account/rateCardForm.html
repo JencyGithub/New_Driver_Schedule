@@ -797,6 +797,8 @@ request {% endblock %} {% block headStyle %}
 
                     </div>
                     <!-- End OnLease Form  -->
+
+
                     <div class="col-md-12 text-right" id="submitBtn">
                         {% if not rateCard %}
                         <button type='submit' class="btn btn-primary px-4">Submit</button>
@@ -820,7 +822,7 @@ request {% endblock %} {% block headStyle %}
     $(document).ready(function () {
         $('#myForm').submit(function (event) {
             var errorFound = false;
-            $('input[type="number"]').each(function () {
+            $('#myForm input[type="number"]').each(function () {
                 var inputValue = $(this).val();
                 if (inputValue == '' || inputValue < 0) {
                     $(this).addClass('isInvalid')
@@ -829,7 +831,7 @@ request {% endblock %} {% block headStyle %}
                     $(this).removeClass('isInvalid')
                 }
             });
-            $('input[type="date"]').each(function () {
+            $('#myForm input[type="date"]').each(function () {
                 var inputValue = $(this).val();
                 if (inputValue == '') {
                     $(this).addClass('isInvalid')
@@ -838,7 +840,7 @@ request {% endblock %} {% block headStyle %}
                     $(this).removeClass('isInvalid')
                 }
             });
-            $('input[type="text"]').each(function () {
+            $('#myForm input[type="text"]').each(function () {
                 var inputValue = $(this).val();
                 if (inputValue == '') {
                     $(this).addClass('isInvalid')
@@ -896,7 +898,8 @@ request {% endblock %} {% block headStyle %}
     function getOldRateCards(){
         let oldRateCardStartDate = $(`#oldRateCardStartDate`).val()
         let oldRateCardEndDate = $(`#oldRateCardEndDate`).val()
-        console.log({{ rateCard.id }})
+        let rateCardId = {{ rateCard.id }}
+        // console.log({{ rateCard.id }})
 
         $.ajax({
             url: "/account/getOld/rateCards/",
@@ -904,7 +907,7 @@ request {% endblock %} {% block headStyle %}
             data: {
                 'startDate' : oldRateCardStartDate,
                 'endDate' : oldRateCardEndDate,
-                'rateCardId' : {{ rateCard.id }}
+                'rateCardId' : rateCardId
             },
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -921,7 +924,7 @@ request {% endblock %} {% block headStyle %}
                 $('#rateCard').removeAttr('disabled')
             },
         });
-    }
+    };
 </script>
 
 {% endblock %}

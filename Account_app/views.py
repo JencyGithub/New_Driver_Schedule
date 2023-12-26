@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil, os, colorama, subprocess, csv, re
+import shutil, os, colorama, subprocess, csv, re, pytz
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime , time
+from datetime import datetime , time, timedelta, timezone
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from django.contrib import messages
@@ -25,38 +25,35 @@ def index(request):
     return render(request, 'Account/dashboard.html')
 
 def getForm1(request):
-    params = {}
     if request.user.is_authenticated:
+        params = {}
         user_email = request.user.email
         client_names = Client.objects.values_list('name', flat=True).distinct()
-        admin_truck_no = AdminTruck.objects.values_list(
-            'adminTruckNumber', flat=True).distinct()
-        client_truck_no = ClientTruckConnection.objects.values_list(
-            'clientTruckId', flat=True).distinct()
+        admin_truck_no = AdminTruck.objects.values_list('adminTruckNumber', flat=True).distinct()
+        client_truck_no = ClientTruckConnection.objects.values_list('clientTruckId', flat=True).distinct()
 
         params = {
             'client_ids': client_names,
             'admin_truck_no': admin_truck_no,
             'client_truck_no': client_truck_no,
         }
-        try:
-            Driver_ = Driver.objects.get(email=user_email)
-            driver_id = str(Driver_.driverId) + '-' + str(Driver_.name)
-            params['driver_ids'] = driver_id
-            params['drivers'] = None
-            # DriverTruckNum = ClientTruckConnection.objects.get(driverId = Driver_.driverId)
-            # params['DriverTruckNum'] = str(DriverTruckNum.clientTruckId) + '-' + str(DriverTruckNum.truckNumber)
-            # params['client_names'] = str(DriverTruckNum.clientId.name)
+        
+        driver_id = drivers = None
+        driver = Driver.objects.filter(email=user_email).first()
+        if driver:
+            driver_id = str(driver.driverId) + '-' + str(driver.name)
 
-        except Exception as e:
-            params['driver_ids'] = None
+            # Get today's trip            
+            existingTodayTrip = DriverTrip.objects.filter(driverId=driver, partially=True).first()
+            if existingTodayTrip:
+                existingTodayTrip.shiftDate = dateConverterFromTableToPageFormate(existingTodayTrip.shiftDate)
+                params['existingTodayTrip'] = existingTodayTrip
+            
+        else:
             drivers = Driver.objects.all()
-            params['drivers'] = drivers
-            params['DriverTruckNum'] = None
-            params['client_names'] = None
-
+        params['driver_ids'] = driver_id  
+        params['drivers'] = drivers
         return render(request, 'Trip_details/form1.html', params)
-
     else:
         return redirect('login')
 
@@ -67,9 +64,6 @@ def getForm2(request):
     params = {
         'loads': [i+1 for i in range(int(request.session['data'].get('numberOfLoads')))]
     }
-    # params = {
-    #         'loads': [1,2,3]
-    #     }
     return render(request, 'Trip_details/Form2.html', params)
 
 # @csrf_protect
@@ -195,15 +189,26 @@ def formsSave(request):
 
 
 def assignedJobShow(request):
-    driverObj = Driver.objects.filter(name = request.user.username).first()
-    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
-    jobs = []
-    for obj in driverAppointments:
-        print(obj.appointmentId.Status)
-        if obj.appointmentId.Status == "Assigned":
-            jobs.append(obj.appointmentId)
+   
+    today = date.today()
+
+    appointmentObjs = Appointment.objects.filter(Start_Date_Time__date=today,appointmentdriver__driverName__name=request.user.username)
+
+    # return HttpResponse(len(appointmentObjs))
+    
+    indian_timezone = pytz.timezone('Asia/Kolkata')
+    check_time = datetime.now(tz=indian_timezone) - timedelta(minutes=20)
+    
+    
+    for obj in appointmentObjs:
+        if obj.Status is not "Complete" and  str(obj.Start_Date_Time) < str(check_time):
+            obj.lateForStart = True
+                    
+        print(obj.Start_Date_Time , check_time)
+        print(str(obj.Start_Date_Time) < str(check_time))
             
-    params = {'jobs':jobs}
+    params = {'jobs':appointmentObjs}
+    
     
     return render(request, 'Trip_details/assignedJobs.html',params)
 
@@ -226,13 +231,20 @@ def assignedJobAccept(request,id):
     appObj = Appointment.objects.filter(pk=id).first()
     appObj.Status = "Dispatched"
     appObj.save()
-    return redirect('Account:openJobShow')
+    return redirect(request.META.get('HTTP_REFERER'))
+    # return redirect('Account:openJobShow')
 
 def singleJobView(request,id):
     job = Appointment.objects.filter(pk=id).first()
     driver = AppointmentDriver.objects.filter(appointmentId = job).first()
     truck = AppointmentTruck.objects.filter(appointmentId = job).first()
-
+   
+    indian_timezone = pytz.timezone('Asia/Kolkata')
+    check_time = datetime.now(tz=indian_timezone) - timedelta(minutes=20)
+    
+    if str(job.Start_Date_Time) < str(check_time):
+        job.lateForStart = True 
+    
     params = {
         'job':job,
         'driver':driver,
@@ -254,7 +266,6 @@ def openJobShow(request):
     return render(request, 'Trip_details/openJobs.html',params)
     
 def finishJob(request, id):
-    
     if id:
         appObj = Appointment.objects.filter(pk=id).first()
         if not appObj.stop.docketGiven:
@@ -263,19 +274,19 @@ def finishJob(request, id):
             appObj.Status = "Dispatched"
             appObj.save()    
         
-    
-    # For get all assigned job
-    driverObj = Driver.objects.filter(name = request.user.username).first()
-    driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
-    jobs = []
-    for obj in driverAppointments:
-        print(obj.appointmentId.Status)
-        if obj.appointmentId.Status == "Assigned":
-            jobs.append(obj.appointmentId)
+            # For get all assigned job
+            driverObj = Driver.objects.filter(name = request.user.username).first()
+            driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
+            jobs = []
+            for obj in driverAppointments:
+                print(obj.appointmentId.Status)
+                if obj.appointmentId.Status == "Assigned":
+                    jobs.append(obj.appointmentId)
+                    
+            params = {'jobs':jobs}
             
-    params = {'jobs':jobs}
-    
-    return render(request, 'Trip_details/assignedJobs.html',params)
+            return render(request, 'Trip_details/assignedJobs.html',params)
+
     # return redirect('Account:assignedJobAccept')
 
 
@@ -297,20 +308,18 @@ def uploadDocketSave(request, id):
     docketNumber = request.POST.get('docketNumber')
     driverObj = Driver.objects.filter(name = request.user.username).first()
     
+    
     # Trip save start
-    tripObj = DriverTrip.objects.filter(driverId = driverObj, shiftDate=startDateObj.date()).first()
+    tripObj = DriverTrip.objects.filter(driverId = driverObj, shiftDate=startDateObj.date(),clientName = appointmentObj.stop).first()
     if not tripObj:
         tripObj = DriverTrip()
-        tripObj.partially = True
         tripObj.driverId = driverObj
         tripObj.clientName = appointmentObj.stop
         tripObj.shiftType = appointmentObj.shiftType
         tripObj.truckNo = AppointmentTruckObject.truckNo.adminTruckNumber
         tripObj.shiftDate = startDateObj.date()
         
-    # return HttpResponse(tripObj)
-    # tripObj.numberOfLoads += 1
-    
+    tripObj.partially = True
     startTime = tripObj.startTime
     endTime = tripObj.endTime
     time_pattern = re.compile(r'^\d{2}:\d{2}$')
@@ -320,7 +329,7 @@ def uploadDocketSave(request, id):
     if time_pattern.match(endTime):
         startTime = startTime+":00"
 
-    # Set start time  
+    # Set startTime  
     if not startTime:
         tripObj.startTime = startDateObj.time()
     else:
@@ -328,9 +337,9 @@ def uploadDocketSave(request, id):
             startTime = datetime.strptime(startTime, "%H:%M:%S")
         if startTime.time() < startDateObj.time():
             tripObj.startTime = startDateObj.time()
-    # Set start time  
+    # Set startTime  
 
-    # Set end time 
+    # Set endTime 
     if not endTime:
         tripObj.endTime = endDateObj.time()
     else:
@@ -338,13 +347,12 @@ def uploadDocketSave(request, id):
             endTime = datetime.strptime(endTime, "%H:%M:%S")
         if endTime.time() < endDateObj.time():
             tripObj.endTime = endDateObj.time()
-    # Set end time
+    # Set endTime
     
     tripObj.save()    
     # Trip save end
 
     # Docket save start
-    # docketObj = DriverDocket.objects.filter(shiftDate = tripObj.shiftDate,tripId = tripObj ,docketNumber=docketNumber).first()
     docketObj = DriverDocket.objects.filter(tripId = tripObj ,docketNumber=docketNumber).first()
     if docketObj:
         messages.error(request, "This docket is already exist, please check docket number.")
@@ -409,7 +417,8 @@ def rcti(request):
     
     return render(request, 'Account/rctiForm.html',params)
 
-def rctiErrorSolve(request ,id):        
+def rctiErrorSolve(request ,id): 
+           
     rctiErrorsObj = RctiErrors.objects.get(id = id)
     rctiErrorsObj.status = True
     rctiErrorsObj.save()
@@ -424,6 +433,7 @@ def rctiForm(request, id= None , holcimDocketId = None):
     drivers = Driver.objects.all()
     if id:
         rcti = RCTI.objects.filter(pk=id).first()
+        rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
     elif holcimDocketId:
         holcimDocket = HolcimDocket.objects.filter(pk = holcimDocketId).first()
     params = {
@@ -441,7 +451,9 @@ def convertIntoFloat(str):
 @csrf_protect
 def rctiFormSave(request):
     RCTIobj = RCTI()
+    clientObj = Client.objects.filter(name='boral').first()
     RCTIobj.truckNo = request.POST.get('truckNo')
+    RCTIobj.clientName = clientObj
     RCTIobj.docketNumber = request.POST.get('docketNumber')
     RCTIobj.docketDate = request.POST.get('docketDate')
     RCTIobj.docketYard = request.POST.get('docketYard')
@@ -605,15 +617,15 @@ def rctiSave(request):
         newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
         if clientName == 'boral':
             location = 'static/Account/RCTI/tempRCTIInvoice'
-        elif clientName == 'holcim':
-            location = 'static/Account/RCTI/RCTIInvoice'
+        # elif clientName == 'holcim':
+        #     location = 'static/Account/RCTI/RCTIInvoice'
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
         if clientName == 'boral' and save_data == '1':
-
             cmd = ["python", "Account_app/utils.py", newFileName]
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            
         if save_data == '1':
             if clientName == 'boral':
                 colorama.AnsiToWin32.stream = None
@@ -621,13 +633,14 @@ def rctiSave(request):
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
             elif clientName == 'holcim':
-                with open("File_name_file.txt",'w+',encoding='utf-8') as f:
-                    file_name = f.write(newFileName)
+                return HttpResponse('work in progress')
+                # with open("File_name_file.txt",'w+',encoding='utf-8') as f:
+                #     file_name = f.write(newFileName)
                     
-                colorama.AnsiToWin32.stream = None
-                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                cmd = ["python", "manage.py", "runscript", 'holcim.py']
-                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                # colorama.AnsiToWin32.stream = None
+                # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                # cmd = ["python", "manage.py", "runscript", 'holcim.py']
+                # subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success( request, "Please wait 5 minutes. The data conversion process continues")
         return redirect(request.META.get('HTTP_REFERER'))
 
@@ -717,7 +730,6 @@ def driverDocketEntry(request, ids , errorId = None):
     if errorId:
         docketData = PastTripError.objects.filter(pk = errorId).first()
 
-    # return HttpResponse(docketData.data)
     driver_trip_id = DriverTrip.objects.filter(id=ids).first()
     if driver_trip_id:
         base_plant = BasePlant.objects.all().order_by('-id')
@@ -815,7 +827,7 @@ def driverDocketEntrySave(request, ids, errorId=None):
             cubicMl=request.POST.get('cubicMl'),
             others=request.POST.get('others')
         )
-
+        # return HttpResponse(DriverDocketObj.shiftDate)
         if request.POST.get('returnToYard') == 'returnToYard':
             DriverDocketObj.returnQty = request.POST.get('returnQty')
             DriverDocketObj.returnKm = request.POST.get('returnKm')
@@ -833,6 +845,10 @@ def driverDocketEntrySave(request, ids, errorId=None):
         DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
         DriverDocketObj.standBySlot = request.POST.get('standBySlot')
         DriverDocketObj.comment = request.POST.get('comment')
+        # print(DriverDocketObj.standBySlot,DriverDocketObj.docketNumber,DriverDocketObj.shiftDate)
+        # driverStandByCost = checkStandByTotal(DriverDocketObj.docketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
+        # driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
+        # return HttpResponse(driverStandByCost)
         DriverDocketObj.save()
         driver_dockets = DriverDocket.objects.filter(tripId=driver_trip_id)
 
@@ -841,19 +857,48 @@ def driverDocketEntrySave(request, ids, errorId=None):
         driver_trip_id.numberOfLoads = no_of_loads
 
         driver_trip_id.save()
-        # print(driver_trip_id.shiftDate,driver_trip_id.truckNo,float(docketNumber_))
-        if errorId:
-            errorObj = PastTripError.objects.filter(pk =errorId).first()
-            # print(errorObj) 
-            errorObj.status = True
-            # return HttpResponse(errorObj.id)
-            
-            
-            errorObj.save()
-        # except Exception as e:
-        #     # print(f'exception : {e}')
-        #     return HttpResponse(f'Error:{e}')
-        #     pass
+        # if errorId:
+        #     DriverDocketObj.shiftDate = datetime.strptime(DriverDocketObj.shiftDate, "%Y-%m-%d").date()
+        #     driverDocketNumber = DriverDocketObj.docketNumber
+        #     reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = DriverDocketObj.shiftDate ).first()
+                    
+        #     if not  reconciliationDocketObj :
+        #         reconciliationDocketObj = ReconciliationReport()
+        #     reconciliationDocketObj.driverId = driver_trip_id.id  
+        #     reconciliationDocketObj.clientId = driver_trip_id.id 
+        #     reconciliationDocketObj.truckId = driver_trip_id.truckNo 
+                
+        #     driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     driverSurchargeCost = checkSurcharge(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     # return HttpResponse(driverSurchargeCost)
+        #     driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
+        #     driverTransferKmCost = checkTransferCost(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     driverReturnKmCost = checkReturnCost(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     # minLoad 
+        #     driverLoadDeficit = checkMinLoadCost(driverDocketNumber,DriverDocketObj.shiftDate)
+        #     # TotalCost 
+        #     driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+        #     reconciliationDocketObj.docketNumber = driverDocketNumber  
+        #     reconciliationDocketObj.docketDate = DriverDocketObj.shiftDate  
+        #     reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
+        #     reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
+        #     reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
+        #     reconciliationDocketObj.driverStandByCost = driverStandByCost 
+        #     reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
+        #     reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
+        #     reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
+        #     reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
+        #     reconciliationDocketObj.fromDriver = True 
+        #     reconciliationDocketObj.save()
+        #     # missingComponents 
+        #     checkMissingComponents(reconciliationDocketObj)
+
+        #     errorObj = PastTripError.objects.filter(pk =errorId).first()
+        #     print(errorObj)
+        #     errorObj.status = True
+        #     errorObj.save()
+
         url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
         messages.success(request, "Docket Added successfully")
         return redirect(url)
@@ -878,7 +923,7 @@ def rctiTable(request):
     basePlant_ = request.POST.get('basePlant')
     docketYard = BasePlant.objects.filter(id = basePlant_).first()
     dataType = request.POST.get('RCTI')
-
+    holcimData =None
     # holcimStartDate_ = datetime.combine(datetime.strptime(startDate_, '%Y-%m-%d'), time())
     # holcimEndDate_ = datetime.combine(datetime.strptime(endDate_, '%Y-%m-%d'), time())
   
@@ -887,14 +932,14 @@ def rctiTable(request):
     if basePlant_:
         if dataType== 'rctiDocket':
             rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard).values()
-            holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
+            # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
             # rctiData = list(chain(rctiData, holcimData))
         elif dataType == 'rctiExpense':
             rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard).values()
     else:
         if dataType== 'rctiDocket':
             rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-            holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
+            # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
             # rctiData = list(chain(rctiData, holcimData))
         elif dataType == 'rctiExpense':
             rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
@@ -912,8 +957,8 @@ def rctiTable(request):
 
 
 def HolcimDocketView(request,id):
-    holcimDocketObj = HolcimDocket.objects.filter(pk = id).first()
-    holcimTripObj = HolcimTrip.objects.filter(pk = holcimDocketObj.tripId.id).first()
+    holcimTripObj = HolcimTrip.objects.filter(pk = id).first()
+    holcimDocketObj = HolcimDocket.objects.filter(tripId = holcimTripObj.id)
     params = {
         'docketData':holcimDocketObj,
         'holcimTripObj':holcimTripObj,
@@ -962,18 +1007,30 @@ def basePlantSave(request, id=None):
         'long': request.POST.get('long'),
         'basePlantType' : False if  request.POST.get('basePlantType') == "typeLocation" else True
     }
+
     
     result = None
     if id:
         result = updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
     else:
         result = insertIntoTable(tableName='BasePlant', dataSet=dataList)
+        with open("scripts/addPastTripForMissingBasePlant.txt", 'w') as f:
+                f.write(dataList['basePlant'])
+                
+        # colorama.AnsiToWin32.stream = None
+        # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingBasePlant','--continue-on-error']
+        # subprocess.run(cmd)
+        colorama.AnsiToWin32.stream = None
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingBasePlant','--continue-on-error']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
     if result is not True:
         messages.error(request, 'This location already exist.')
         return redirect(request.META.get('HTTP_REFERER'))
     else:
-        messages.success(request, 'Depot Change successfully')
+        messages.success(request, 'Depot Add successfully')
         return redirect('Account:basePlantTable')
 
 
@@ -1051,8 +1108,7 @@ def DriverTripEditForm(request, id):
     driver = Driver.objects.all()
     clientName = Client.objects.all()
     AdminTrucks = AdminTruck.objects.all()
-    driver_trip.shiftDate = dateConverterFromTableToPageFormate(
-        driver_trip.shiftDate)
+    driver_trip.shiftDate = dateConverterFromTableToPageFormate(driver_trip.shiftDate)
     driver_docket = DriverDocket.objects.filter(tripId=id)
     surcharges = Surcharge.objects.all()
     count_ = 1
@@ -1081,8 +1137,7 @@ def driverEntryUpdate(request, ids):
 
     driver_trip.verified = True if request.POST.get('verified') == 'on' else False
     driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
-    driver_trip.clientName = Client.objects.get(
-        pk=request.POST.get('clientName'))
+    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
     driver_trip.shiftType = request.POST.get('shiftType')
     driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
     driver_trip.truckNo = request.POST.get('truckNo')
@@ -1164,7 +1219,7 @@ def driverEntryUpdate(request, ids):
             driverSurchargeCost = checkSurcharge(driverDocketNumber,docketObj.shiftDate)
             # return HttpResponse(driverSurchargeCost)
             driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,docketObj.shiftDate)
-            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate)
+            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate,docketObj.standBySlot)
             driverTransferKmCost = checkTransferCost(driverDocketNumber,docketObj.shiftDate)
             driverReturnKmCost = checkReturnCost(driverDocketNumber,docketObj.shiftDate)
             # minLoad 
@@ -1185,7 +1240,10 @@ def driverEntryUpdate(request, ids):
             reconciliationDocketObj.save()
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
+    
+    
     # return HttpResponse('Work')
+
 
     url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
     messages.success(request, "Docket Updated successfully")
@@ -1696,17 +1754,16 @@ def rateCardSave(request, id=None, edit=0):
     updatedValues.insert(1,startDate)
     updatedValues.insert(2,endDate)
 
-    with open("scripts/updateTrips&ReconciliationData.txt",'w+',encoding='utf-8') as f:
+    with open("scripts/updateTripsAndReconciliationData.txt",'w+',encoding='utf-8') as f:
         for val in updatedValues:
             f.write(str(val) + ',')
 
     if edit != 0:
+
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-        cmd = ["python", "manage.py", "runscript", 'updateTrips&Reconciliation','--continue-on-error']
-        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # stdout, stderr = process.communicate()
-        subprocess.run(cmd)
+        cmd = ["python", "manage.py", "runscript", 'updateTripsAndReconciliationData','--continue-on-error']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
     # onLease = OnLease(
     #     rate_card_name=rateCardID,
     #     hourly_subscription_charge = float(request.POST.get('onLease_hourly_subscription_charge')),
@@ -1731,6 +1788,19 @@ def rateCardSave(request, id=None, edit=0):
 
     messages.success(request, 'Data successfully add ')
     return redirect('gearBox:clientTable')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ```````````````````````````````````
 # Past trip
@@ -1762,13 +1832,23 @@ def pastTripErrorSolve(request, id):
         return HttpResponse("Error: PastTripError not found")
 
 
+def resolveError(request, id):
+    resolveErrorObj = PastTripError.objects.filter(pk=id).first()
+    tripObj = DriverTrip.objects.filter(shiftDate=resolveErrorObj.tripDate, truckNo=resolveErrorObj.truckNo).first()
+    # return HttpResponse(tripObj.id)
+    # url_name = reverse('Account:DriverTripEditForm', kwargs={'id': tripObj.id})
+    return redirect('Account:DriverTripEdit',id=tripObj.id)
+    return redirect(url_name)
     
+
 
 @csrf_protect
 @api_view(['POST'])
 def pastTripSave(request):
 
     monthAndYear = str(request.POST.get('monthAndYear'))
+    save = int(request.POST.get('save'))
+    clientName = request.POST.get('clientName')
     pastTrip_csv_file = request.FILES.get('pastTripFile')
     if not pastTrip_csv_file:
         return HttpResponse("No file uploaded")
@@ -1787,11 +1867,18 @@ def pastTripSave(request):
                         
         with open("pastTrip_entry.txt", 'w') as f:
             f.write(newFileName)
-
-        colorama.AnsiToWin32.stream = None
-        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-        cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
-        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        if save == 1 :
+            
+            if clientName == 'boral':
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+            elif clientName == 'holcim':
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'holcim','--continue-on-error']
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(request, "Please wait for some time, it takes some time to update the data.")
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
@@ -1832,7 +1919,7 @@ def surchargeForm(request, id=None):
 @api_view(['POST'])
 def surchargeSave(request, id=None):
     dataList = {
-        'surcharge_Name': request.POST.get('surcharge_Name')
+        'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
     }
     if id is not None:
         updateIntoTable(record_id=id, tableName='Surcharge', dataSet=dataList)
@@ -1854,6 +1941,7 @@ def DriverShiftForm(request,id):
     client = Client.objects.all()
     pastTripErrors = PastTripError.objects.filter(status = False).values()
     pastTripSolved = PastTripError.objects.filter(status = True).values()
+    # docketObj = DriverDocket.objects.filter(docketnumber = pastTripSolved.docketNumber).values9
     params ={
             'clients': client,
             'id':id,
@@ -1868,17 +1956,31 @@ def DriverShiftForm(request,id):
 def ShiftDetails(request,id):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
+    clientName = request.POST.get('clients')
     id_ = id
-    
+    boralTrip =None
+    holcimTrip =None
     if id ==0:
         driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
     elif id ==1:
-        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+        if clientName == 'boral':
+            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+        elif clientName == 'holcim':
+            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+        else:
+            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+        # return HttpResponse(holcimTrip.driverName)
+           
+
+            
+        
     else:
         messages.warning( request, "Invalid Request")
         return redirect(request.META.get('HTTP_REFERER'))
     params = {
-        'driverTrip': driver_trip,
+        'boralTrip': boralTrip,
+        'holcimTrip':holcimTrip,
         'startDate': startDate,
         'endDate': endDate,
         'id_': id_,

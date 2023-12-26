@@ -4,6 +4,23 @@
 
 {% block headStyle %} 
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<style>
+    #preview-container {
+        max-width: 100%;
+        margin-top: 20px;
+    }
+    #preview-container img,
+    #preview-container embed {
+        max-width: 100%;
+    }
+    #pdf-preview {
+        display: none;
+        width: 100%;
+        height: 500px; /* Set a fixed height for the PDF preview */
+    }
+
+</style>
+
 {% endblock %}
 
 {% block content %}
@@ -25,12 +42,12 @@
                     </div>
                     <div class="mb-3">
                         <label for="docketImage">Upload docket image:</label>
-                        <input type="file" name="docketImage" id="docketImage" class="form-control"  accept=".jpg, .png" required/>
+                        <input type="file" name="docketImage" id="docketImage" class="form-control"  accept=".jpg, .png, .pdf" required/>
                     </div>
                     <input type="submit" class="btn btn-sm btn-default form-control" value="Submit">
                 </div>
                 <div class="col-md-8 col-12">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4zGCi3zopn2o_TNs3JU18b7GjJKEE_ZvW15Vwfjv4sXFIVQROwOAixqUtkwICmNhShbc&usqp=CAU" alt="Preview" id="imagePreview" class="preview-image img-thumbnail mt-3">
+                    <div id="preview-container"></div>
                 </div>
             </div>
         </div>
@@ -46,18 +63,30 @@
 
 <script>
     $(document).ready(function () {
-        console.log("Document is ready."); // Add this line for checking
-        // Display image preview on file input change
-        $('#docketImage').change(function () {
-            const file = this.files[0];
+       $('#docketImage').change(function () {
+            console.log('here')
+            var file = this.files[0];
             if (file) {
-                const reader = new FileReader();
+              var fileType = file.type;
+              var validImageTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+              var validPdfType = 'application/pdf';
+      
+              if (validImageTypes.includes(fileType)) {
+                // Display image preview
+                var reader = new FileReader();
                 reader.onload = function (e) {
-                    $('#imagePreview').attr('src', e.target.result).show();
-                }
+                  $('#preview-container').html('<img src="' + e.target.result + '" alt="Image Preview">');
+                };
                 reader.readAsDataURL(file);
-            } else {
-                $('#imagePreview').hide();
+              } else if (fileType === validPdfType) {
+                // Display PDF preview
+                $('#preview-container').html('<embed id="pdf-preview" src="' + URL.createObjectURL(file) + '" type="' + validPdfType + '">');
+                $('#pdf-preview').show();
+              } else {
+                alert('Invalid file type. Please upload a JPG, PNG, or PDF file.');
+                $('#docketImage').val('');
+                $('#preview-container').empty();
+              }
             }
         });
     });
