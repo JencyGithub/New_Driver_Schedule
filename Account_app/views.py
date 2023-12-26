@@ -375,6 +375,14 @@ def uploadDocketSave(request, id):
     
     return redirect('Account:assignedJobShow')
 
+def timeOfStart(request):
+    return render(request, 'Trip_details/pre-startForm.html')
+
+
+@csrf_protect 
+def timeOfStartSave(request):
+    return redirect('Account:assignedJobShow')
+    
 
 @csrf_protect
 @api_view(['POST'])

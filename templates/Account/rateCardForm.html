@@ -94,13 +94,13 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-xl-4 col-md-6">
                                     <label for="rate_card_name">Rate Card Name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if rateCard %}{{rateCard.rate_card_name}}{% endif %}" {% if rateCard %} readonly {% endif %} type="text" name="rate_card_name" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
+                                        <input class="form-control" value="{% if rateCard %}{{rateCard.rate_card_name}}{% endif %}" {% if rateCard %}readonly{% endif %} type="text" name="rate_card_name" required='required' style="padding: 0.25rem 0.2rem;" id="rate_card_name">
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
                                     <label for="startDate">Start Date :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if rateCard %}{{startDate}}{% endif %}" {% if rateCard %} readonly {% endif %} type="date" name="startDate" required='required' style="padding: 0.25rem 0.2rem;" onchange="setEndDate(this,'endDate')" id="startDate">
+                                        <input class="form-control" value="{% if rateCard %}{{startDate}}{% endif %}" {% if rateCard %}readonly{% endif %} type="date" name="startDate" required='required' style="padding: 0.25rem 0.2rem;" id="startDate" onchange="setEndDate(this,'endDate')">
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
@@ -811,7 +811,7 @@ request {% endblock %} {% block headStyle %}
 <!-- /page content -->
 {% endblock %}
 
-{% block footerStyle %}
+{% block footerStyleEnd %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
@@ -891,12 +891,13 @@ request {% endblock %} {% block headStyle %}
         let oldRateCardStartDate = $(`#${dataRow.id}`).val()
         $(`#${endDateId}`).attr('min', oldRateCardStartDate);
         $(`#${endDateId}`).removeAttr('readonly')
-    }
+    };
 
     function getOldRateCards(){
         let oldRateCardStartDate = $(`#oldRateCardStartDate`).val()
         let oldRateCardEndDate = $(`#oldRateCardEndDate`).val()
-        console.log({{ rateCard.id }})
+        let rateCardId = {{ rateCard.id }}
+        // console.log({{ rateCard.id }})
 
         $.ajax({
             url: "/account/getOld/rateCards/",
@@ -904,7 +905,7 @@ request {% endblock %} {% block headStyle %}
             data: {
                 'startDate' : oldRateCardStartDate,
                 'endDate' : oldRateCardEndDate,
-                'rateCardId' : {{ rateCard.id }}
+                'rateCardId' : rateCardId
             },
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -921,7 +922,7 @@ request {% endblock %} {% block headStyle %}
                 $('#rateCard').removeAttr('disabled')
             },
         });
-    }
+    };
 </script>
 
 {% endblock %}
