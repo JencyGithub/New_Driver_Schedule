@@ -158,8 +158,8 @@ line_no = 0
 with open(file_path, 'r') as file:
     for line in file: 
         line_no += 1 
-        if line_no == 187:
-            pass
+        # if line_no == 187:
+        #     pass
         if re.search(carter_no, line.replace(",",'').replace('Carter No:','').replace('"','').strip()):
             if earnings_carter_list != None and key != None and earnings_carter_list != []:
                 earnings_carter_list.append(earnings_temp)

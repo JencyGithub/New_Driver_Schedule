@@ -60,6 +60,7 @@ urlpatterns = [
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
+    path('getRateCard/', views.getRateCard, name='getRateCard'),
     
     # dockument 
     path('document/', views.documentView, name="documentView"),
