@@ -79,7 +79,8 @@ class PreStart(models.Model):
     vehiclePaper = models.BooleanField(default = False)
     curDate = models.DateTimeField(default=timezone.now())
     comment = models.CharField(max_length = 1024, default='', null=True)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, default = None)
     
 
     def __str__(self):
-        return str(self.fitForWork)
+        return str("Driver is " + ("Fit" if self.fitForWork == True else "Not Fit"))

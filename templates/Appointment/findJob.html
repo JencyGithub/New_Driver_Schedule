@@ -62,11 +62,14 @@
                         <td>{{ job.Title }}</td>
                         <td>{{ job.Start_Date_Time }}</td>
                         <td>{{ job.End_Date_Time }}</td>
-                        <td>
-                          <a href="{% url 'Appointment:appointmentFormUpdateView' id=job.id %}" title="view">
-                            <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                        <td class="d-flex justify-content-around">
+                          <a href="{% url 'Appointment:appointmentFormView' id=job.id %}" title="View appointment">
+                            <i class="fa-regular fa-eye" style="font-size:1.3rem"></i>
                           </a>
-                      </td>
+                          <a href="{% url 'Appointment:appointmentFormUpdateView' id=job.id update=1 %}" title="Edit appointment">
+                            <i class="fa-solid fa-file-pen" style="font-size:1.3rem"></i>
+                          </a>
+                        </td>
                       </tr>
                       {% endfor %}
                     </tbody>

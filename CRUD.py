@@ -1,5 +1,6 @@
 from Account_app.models import *
 from GearBox_app.models import *
+from Appointment_app.models import *
 from datetime import datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User , Group
@@ -20,7 +21,7 @@ model_mapping = {
     'DriverTrip' : DriverTrip,
     'DriverDocket' : DriverDocket,
     'RCTI' : RCTI,
-    # 'Location' : Location,
+    'PreStart' : PreStart,
     'PublicHoliday':PublicHoliday,
     'User' : User ,
     'Surcharge' : Surcharge
