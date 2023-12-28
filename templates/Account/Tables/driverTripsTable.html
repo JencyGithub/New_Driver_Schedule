@@ -130,33 +130,17 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {% if boralTrip %}
-                      {% for boralTrip in boralTrip %}
+                      {% if trips %}
+                      {% for trip in trips %}
                       <tr>
                         {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
-                        <td>{{ boralTrip.truckNo }}</td>
-                        <td>{{ boralTrip.clientName.name }}</td>
-                        {% comment %} <td>{{ boralTrip.driverId.name }}</td> {% endcomment %}
-                        <td>{{ boralTrip.shiftDate }}</td>
-                        <td>{{ boralTrip.numberOfLoads }}</td>
+                        <td>{{ trip.truckNo }}</td>
+                        <td>{{ trip.clientName.name }}</td>
+                        {% comment %} <td>{{ trip.driverId.name }}</td> {% endcomment %}
+                        <td>{{ trip.shiftDate }}</td>
+                        <td>{{ trip.numberOfLoads }}</td>
                         <td>
-                            <a href="{% url 'Account:DriverTripEdit' id=boralTrip.id%}" title="update">
-                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                            </a>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                      {% endif %}
-                      {% if holcimTrip %}
-                      {% for holcimTrip in holcimTrip %}
-                      <tr>
-                        {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
-                        <td>{{ holcimTrip.truckNo }}</td>
-                        <td>holcim</td>
-                        <td>{{ holcimTrip.shiftDate }}</td>
-                        <td>{{ holcimTrip.numberOfLoads }}</td>
-                        <td>
-                            <a href="{% url 'Account:HolcimDocketView' id=holcimTrip.id%}" title="update">
+                            <a href="{% url 'Account:DriverTripEdit' id=trip.id%}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                         </td>

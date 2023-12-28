@@ -166,9 +166,10 @@ admin.site.register(DriverTrip,DriverTrip_)
 
 class clientTripAdmin(admin.ModelAdmin):
     # inlines = [WaitingTimeCost_ ,TransferKMSCost_]
-    list_display = ["docketNumber","truckNo"]
+    list_display = ["docketNumber","truckNo","clientName"]
     
     search_fields = ["docketNumber","truckNo"]
+     
      
 admin.site.register(RCTI, clientTripAdmin)
 

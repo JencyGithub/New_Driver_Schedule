@@ -101,13 +101,13 @@
             <ul class="nav child_menu">
               <li><a>Employees<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a>Drivers<span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
+                    <li><a href="{% url 'gearBox:driversTable'%}">Drivers</a>
+                      {% comment %} <ul class="nav child_menu">
                         <li class="sub_menu"><a href="{% url 'Account:driverentry'%}">Driver Entry</a>
                         </li>
                         <li><a href="{% url 'gearBox:driversTable'%}">Existing Drivers</a>
                         </li>
-                      </ul>
+                      </ul> {% endcomment %}
                     </li>
                   </li>
                   <li><a href="#">Admin Staff</a>

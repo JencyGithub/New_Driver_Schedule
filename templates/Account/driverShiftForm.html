@@ -99,7 +99,7 @@
                                     <label for="clientId">Client Name</label>
                                     <div class="field item form-group">
                                         <select class="form-control" id="clients" name="clients">
-                                            <option value="" disabled selected>Select Client Name</option>
+                                            <option value="" >All</option>
                                             {% for client in clients %}
                                             <option value="{{ client.name }}">{{ client.name }}</option>
                                             {% endfor %}

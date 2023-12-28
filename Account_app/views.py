@@ -614,9 +614,14 @@ def rctiSave(request):
     if not invoiceFile:
         return HttpResponse("No file uploaded")
     try:
+        folderName = None
         newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
         if clientName == 'boral':
-            location = 'static/Account/RCTI/tempRCTIInvoice'
+            folderName = 'tempRCTIInvoice'
+        elif clientName == 'holcim':
+            folderName = 'RCTIInvoice'
+            
+        location = f'static/Account/RCTI/{folderName}'
         # elif clientName == 'holcim':
         #     location = 'static/Account/RCTI/RCTIInvoice'
 
@@ -633,14 +638,15 @@ def rctiSave(request):
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
             elif clientName == 'holcim':
-                return HttpResponse('work in progress')
-                # with open("File_name_file.txt",'w+',encoding='utf-8') as f:
-                #     file_name = f.write(newFileName)
+                # return HttpResponse('work in progress')
+                with open("File_name_file.txt",'w+',encoding='utf-8') as f:
+                    file_name = f.write(newFileName)
                     
-                # colorama.AnsiToWin32.stream = None
-                # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                # cmd = ["python", "manage.py", "runscript", 'holcim.py']
-                # subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'holcimUtils','--continue-on-error']
+                
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success( request, "Please wait 5 minutes. The data conversion process continues")
         return redirect(request.META.get('HTTP_REFERER'))
 
@@ -1956,20 +1962,34 @@ def DriverShiftForm(request,id):
 def ShiftDetails(request,id):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    clientName = request.POST.get('clients')
+    clientNameObj = Client.objects.filter(name=request.POST.get('clients')).first()
     id_ = id
-    boralTrip =None
-    holcimTrip =None
-    if id ==0:
-        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    elif id ==1:
-        if clientName == 'boral':
-            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-        elif clientName == 'holcim':
-            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+    trips =None
+    if id == 0:
+        if clientNameObj:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False , clientName = clientNameObj)
         else:
-            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    elif id == 1:
+        if clientNameObj:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True , clientName = clientNameObj)
+        else:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #     if clientName == 'boral':
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    #     elif clientName == 'holcim':
+    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
+    #     else:
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
+    # elif id ==1:
+    #     if clientName == 'boral':
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #     elif clientName == 'holcim':
+    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate) ,verified = True)
+    #     else:
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = True)
         # return HttpResponse(holcimTrip.driverName)
            
 
@@ -1979,11 +1999,11 @@ def ShiftDetails(request,id):
         messages.warning( request, "Invalid Request")
         return redirect(request.META.get('HTTP_REFERER'))
     params = {
-        'boralTrip': boralTrip,
-        'holcimTrip':holcimTrip,
+        'trips': trips,
         'startDate': startDate,
         'endDate': endDate,
         'id_': id_,
+        
         }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
     
