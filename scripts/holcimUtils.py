@@ -8,6 +8,7 @@ with open('File_name_file.txt','r')as f:
     fileName = f.read()
     
 with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
+    rctiErrorObj = RctiErrors()
     csv_reader = csv.reader(f)
     clientName = Client.objects.filter(name = 'holcim').first()
     finalList = []
@@ -68,6 +69,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     rctiObj.paidQty = data[3]
                     rctiObj.unit = data[4]
                     rctiObj.noOfKm = data[5]
+                    rctiObj.destination = data[6]
                     rctiObj.cubicMiAndKmsCost = data[8]
                     rctiObj.cartageTotal = data[8]
                     dataList = data[9:]
@@ -75,18 +77,24 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                         if 'standby' in dataList[0].lower():
                             rctiObj.standByPerHalfHourDuration = dataList[1]
                             rctiObj.standByTotal =dataList[1]
-                        elif 'sat' in dataList[0].lower():
-                            rctiObj.surcharge_fixed_weekendCost = dataList[1]
-                            rctiObj.surcharge_fixed_weekendTotal = dataList[1]
+                        elif 'sat' in dataList[0].lower() or 'mon-fri' in dataList[0].lower():
+                            rctiObj.surchargeCost = dataList[1]
+                            rctiObj.surchargeTotal = dataList[1]
                         elif 'wait' in dataList[0].lower():
                             rctiObj.waitingTimeCost = dataList[1]
                             rctiObj.waitingTimeTotal = dataList[1]
                         elif 'blowback' in dataList[0].lower():
                             rctiObj.blowBackCost = dataList[1]
                             rctiObj.blowBackTotal = dataList[1]
-                        elif 'mon-fri' in dataList[0].lower():
-                            rctiObj.surcharge_fixed_weekdayCost = dataList[1]
-                            rctiObj.surcharge_fixed_weekdayTotal = dataList[1]
+                        elif 'topup' in dataList[0].lower().replace(' ',''):
+                            rctiErrorObj.clientName = 'boral'
+                            rctiErrorObj.docketNumber = rctiObj.docketNumber
+                            rctiErrorObj.docketDate = rctiObj.docketDate
+                            rctiErrorObj.errorDescription = "Manage Top-up."
+                            rctiErrorObj.fileName = fileName
+                            rctiErrorObj.data = str(data)
+                            rctiErrorObj.save()
+                            
                         elif 'trucktrf' in dataList[0].lower():
                             rctiObj.transferKMCost = dataList[1]
                             rctiObj.transferKMTotal = dataList[1]

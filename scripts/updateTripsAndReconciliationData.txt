@@ -1,1 +1,1 @@
-15,2023-09-01,2023-10-01,
+5,2023-01-01,2023-12-31,waiting_time_grace_in_minutes,chargeable_waiting_time_starts_after,

@@ -75,7 +75,7 @@ if boralMatchingData:
                     tripObj = DriverTrip.objects.get(pk=tripObjID)
                     
                     basePlant = BasePlant.objects.filter(basePlant = data[24].strip().upper()).first() 
-                    surCharge = Surcharge.objects.filter(surcharge_Name = 'Nosurcharge').first()
+                    surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
                         
                     docketObj = DriverDocket()                
 

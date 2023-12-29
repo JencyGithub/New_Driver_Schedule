@@ -147,7 +147,7 @@ request {% endblock %} {% block headStyle %}
                                             style="padding: 0.25rem 0.2rem;" id="km_cost">
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3">
+                                {% comment %} <div class="col-md-3 col-sm-3">
                                     <label for="costParameters_surcharge_type">Surcharge Type :<span
                                             class="required">*</span></label>
                                     <div class="field item form-group">
@@ -156,12 +156,6 @@ request {% endblock %} {% block headStyle %}
                                             <option value="{{surcharge.id}}" {% if costParameters.surcharge_type_id == surcharge.id %}selected{% endif %}>{{surcharge.surcharge_Name}}</option>
                                             {% endfor%}
                                         </select>
-
-                                        {% comment %} <input class="form-control" type="number" name="costParameters_surcharge_fixed_normal_cost"
-                                        value="{% if costParameters %}{{costParameters.surcharge_fixed_normal_cost}}{% endif %}" 
-                                            {% if costParameters %} readonly {% endif %}
-                                            required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="surcharge_fixed_normal_cost"> {% endcomment %}
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
@@ -174,7 +168,7 @@ request {% endblock %} {% block headStyle %}
                                             required='required' style="padding: 0.25rem 0.2rem;"
                                             id="surcharge_cost">
                                     </div>
-                                </div>
+                                </div> {% endcomment %}
 
                                 <!-- transfer_cost,return_load_cost,return_km_cost,standby_time_slot_size,standby_cost_per_slot -->
 
@@ -688,7 +682,7 @@ request {% endblock %} {% block headStyle %}
                     <!-- End Grace  -->
 
                     <!--Start OnLease Name  -->
-                    <div class="x_panel">
+                    {% comment %} <div class="x_panel">
                         <div class="x_title">
                             <h2> Wet Hire Rates :-</h2>
                             <div class="clearfix"></div>
@@ -795,9 +789,49 @@ request {% endblock %} {% block headStyle %}
                             </div>
                         </div>
 
-                    </div>
+                    </div> {% endcomment %}
                     <!-- End OnLease Form  -->
 
+                    <!-- Start Surcharge  -->
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2> Surcharge Form :-</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">         
+                            <div class="custom-continer">
+                                {% if rateCardSurcharges %}
+                                {%for surcharge in rateCardSurcharges %}
+                                <div class="col-xl-4 col-md-6">
+                                    <label for="{{surcharge.id}}">{{surcharge.surcharge.surcharge_Name}} :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="number"
+                                        name="{{surcharge.id}}"
+                                        value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
+                                        {% if surcharge %} readonly {% endif %}
+                                        required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                    </div>
+                                </div>
+                                {% endfor%}
+                                {% elif surchargesEntry %}
+                                {%for surcharge in surchargesEntry %}
+                                <div class="col-xl-4 col-md-6">
+                                    <label for="{{surcharge.id}}">{{surcharge.surcharge_Name}} :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control"  type="number"
+                                        name="{{surcharge.id}}"
+                                        value = "0"
+                                        
+                                        required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                    </div>
+                                </div>
+                                {% endfor%}
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Surcharge -->
 
                     <div class="col-md-12 text-right" id="submitBtn">
                         {% if not rateCard %}

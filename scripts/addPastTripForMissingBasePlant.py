@@ -94,7 +94,7 @@ basePlantName = f.read()
 #                 #     continue
 #                     # Modification ends
                 
-#                 surCharge = Surcharge.objects.filter(surcharge_Name = 'Nosurcharge').first()
+#                 surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
                     
 #                 docketObj = DriverDocket()                
 

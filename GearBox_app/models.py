@@ -57,8 +57,8 @@ class CostParameters(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     loading_cost_per_cubic_meter = models.FloatField(default=0)
     km_cost = models.FloatField(default=0)
-    surcharge_type = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
-    surcharge_cost = models.FloatField(default=0)
+    # surcharge_type = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
+    # surcharge_cost = models.FloatField(default=0)
     transfer_cost = models.FloatField(default=0)
     return_load_cost = models.FloatField(default=0)     # change name added
     return_km_cost = models.FloatField(default=0)       # new added
@@ -79,6 +79,8 @@ class RateCardSurchargeValue(models.Model):
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
 
+    def __str__(self) -> str:
+        return str(self.rate_card_name)
 class ThresholdDayShift(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     threshold_amount_per_day_shift = models.FloatField(default=0)
