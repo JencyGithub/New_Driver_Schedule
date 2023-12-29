@@ -22,10 +22,10 @@
                     {% for job in jobs %}
                         <div class="col-md-3 col-sm-3 mt-2 ">
                             <div class="card rounded-0 text-dark bg-light mb-3">
-                                <div class="card-header text-uppercase rounded-0 {% if job.lateForStart %} bg-danger {% elif job.Status == 'Assigned' %} bg-default {% elif job.Status == 'Dispatched' %} bg-success {% elif job.Status == 'Complete' %} bg-secondary {% endif %}  ">
+                                <div class="card-header text-uppercase rounded-0 {% if job.lateForStart %} bg-danger {% elif job.Status == 'Assigned' and job.notAcceptable == True %} bg-warning {% elif job.Status == 'Assigned' %} bg-default {% elif job.Status == 'Dispatched' %} bg-success {% elif job.Status == 'Complete' %} bg-dark {% endif %}  ">
                                    <a href="{% url 'Account:singleJobView' id=job.id%}"> <h5  class="card-title d-inline-block text-white text-uppercase pt-1">{{job.Title}}</h5></a>
                                    {% if not job.lateForStart %}
-                                    {% if job.Status == 'Assigned' %}
+                                    {% if job.Status == 'Assigned' and job.notAcceptable != True  %}
                                     <a href="{% url 'Account:assignedJobAccept' id=job.id%}" class="accept-job float-end"><i class="fa-solid fa-circle-check px-1 text-white" title="Accept" ></i></a>                                   
                                     {% elif job.Status == 'Dispatched' %}
                                     <a href="{% url 'Account:finishJob' id=job.id %}" class="accept-job float-end"><i class="fa-solid fa-check-double px-1 text-white" title="Complete" ></i></a>

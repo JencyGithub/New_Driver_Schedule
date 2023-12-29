@@ -198,14 +198,20 @@ def assignedJobShow(request):
     if preStart_data:
         appointmentObjs = Appointment.objects.filter(Start_Date_Time__date=today,appointmentdriver__driverName__name=driverObj.name).order_by('Start_Date_Time')
         indian_timezone = pytz.timezone('Asia/Kolkata')
-        check_time = datetime.now(tz=indian_timezone) - timedelta(minutes=20)
+        
+        currentTime = datetime.now(tz=indian_timezone)
+        
         
         for obj in appointmentObjs:
-            if obj.Status is not "Complete" and  str(obj.Start_Date_Time) < str(check_time):
-                obj.lateForStart = True       
+            maxTime = obj.Start_Date_Time + timedelta(minutes=20)
+            minTime = obj.Start_Date_Time - timedelta(minutes=20)
+            # print(f"startTime:{obj.Start_Date_Time}, max:{maxTime}, min:{minTime}, Current:{datetime.now(tz=indian_timezone)}\n")
+            if obj.Status is not "Complete" and  str(currentTime) > str(maxTime):
+                obj.lateForStart = True   
+            elif obj.Status is not "Complete" and  str(currentTime) < str(minTime): 
+                obj.notAcceptable = True  
                 
         params = {'jobs':appointmentObjs}
-
         return render(request, 'Trip_details/assignedJobs.html',params)
     else:
         messages.error(request,'Please fill up Pre-start first.')
@@ -218,16 +224,13 @@ def assignedJobAccept(request,id):
     driverObj = Driver.objects.filter(name = request.user.username).first()
     driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
     jobs = 0
-    
     today_date = timezone.now().date()
-
     preStart_data = PreStart.objects.filter(curDate__date=today_date, driver=driverObj).first()
     
     if preStart_data:
         for obj in driverAppointments:
             if obj.appointmentId.Status == "Dispatched":
                 jobs += 1 
-        
         if jobs > 0 :
             messages.error(request,'Please finish your current job before starting a new one.')
             return redirect(request.META.get('HTTP_REFERER'))
@@ -246,12 +249,15 @@ def singleJobView(request,id):
     job = Appointment.objects.filter(pk=id).first()
     driver = AppointmentDriver.objects.filter(appointmentId = job).first()
     truck = AppointmentTruck.objects.filter(appointmentId = job).first()
-   
     indian_timezone = pytz.timezone('Asia/Kolkata')
-    check_time = datetime.now(tz=indian_timezone) - timedelta(minutes=20)
-    
-    if str(job.Start_Date_Time) < str(check_time):
-        job.lateForStart = True 
+    currentTime = datetime.now(tz=indian_timezone)
+    maxTime = job.Start_Date_Time + timedelta(minutes=20)
+    minTime = job.Start_Date_Time - timedelta(minutes=20)
+
+    if job.Status is not "Complete" and  str(currentTime) > str(maxTime):
+        job.lateForStart = True   
+    if job.Status is not "Complete" and  str(currentTime) < str(minTime): 
+        job.notAcceptable = True   
     
     params = {
         'job':job,
@@ -406,26 +412,30 @@ def timeOfStart(request):
 @csrf_protect 
 def timeOfStartSave(request):
     driver = Driver.objects.filter(email=request.user.email).first()
-    preStart_data = PreStart.objects.filter(curDate__date=timezone.now().date(), driver=driver).first()
+    if driver:
+        preStart_data = PreStart.objects.filter(curDate__date=timezone.now().date(), driver=driver).first()
 
-    if not preStart_data:
-        dataSet = {
-            'fitForWork' : True if request.POST.get('fitForWork') == 'Yes' else False,
-            'vehicleStatus' : True if request.POST.get('vehicleStatus') == 'Yes' else False,
-            'vehiclePaper' : True if request.POST.get('papersReady') == 'Yes' else False,
-            'comment' : request.POST.get('comment').strip(),
-            'driver' : Driver.objects.filter(email=request.user.email).first()
-        }    
-    
-        insert = insertIntoTable(tableName='PreStart',dataSet=dataSet)
-        if insert == True:
-            messages.success(request, "Pre-start filled up.")
-            return redirect('Account:assignedJobShow')
+        if not preStart_data:
+            dataSet = {
+                'fitForWork' : True if request.POST.get('fitForWork') == 'Yes' else False,
+                'vehicleStatus' : True if request.POST.get('vehicleStatus') == 'Yes' else False,
+                'vehiclePaper' : True if request.POST.get('papersReady') == 'Yes' else False,
+                'comment' : request.POST.get('comment').strip(),
+                'driver' : driver
+            }  
+        
+            insert = insertIntoTable(tableName='PreStart',dataSet=dataSet)
+            if insert == True:
+                messages.success(request, "Pre-start filled up.")
+                return redirect('Account:assignedJobShow')
+            else:
+                messages.error(request, "something went wrong, please try again")
+                return redirect(request.META.get('HTTP_REFERER'))
         else:
-            messages.error(request, "something went wrong, please try again")
+            messages.error(request, "You already filled Pre-start.")
             return redirect(request.META.get('HTTP_REFERER'))
     else:
-        messages.error(request, "You already filled Pre-start.")
+        messages.error(request, "You have no access for fill up Pre-start.")
         return redirect(request.META.get('HTTP_REFERER'))
 
     
