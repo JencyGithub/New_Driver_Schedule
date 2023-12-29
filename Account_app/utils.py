@@ -49,12 +49,14 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
     # if re.match(docket_pattern, given_line[0]):
     #     None
     if checkDate(given_line[0]):
-        given_line.insert(0,previous_line[1])
+        if previous_line:
+            given_line.insert(0,previous_line[1])
     elif checkDate(given_line[1]):
         pass
     else:     
-        given_line.insert(0,previous_line[2])
-        given_line.insert(0,previous_line[1])
+        if previous_line:
+            given_line.insert(0,previous_line[2])
+            given_line.insert(0,previous_line[1])
     
     
     if ' ' in given_line[2]:
@@ -157,8 +159,8 @@ line_no = 0
 with open(file_path, 'r') as file:
     for line in file: 
         line_no += 1 
-        if line_no == 187:
-            pass
+        # if line_no == 187:
+        #     pass
         if re.search(carter_no, line.replace(",",'').replace('Carter No:','').replace('"','').strip()):
             if earnings_carter_list != None and key != None and earnings_carter_list != []:
                 earnings_carter_list.append(earnings_temp)

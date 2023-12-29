@@ -293,6 +293,13 @@ def truckConnectionSave(request,id):
     return redirect('gearBox:truckTable')
 
     # Document 
+@csrf_protect
+def getRateCard(request):
+    clientId = request.POST.get('clientName')
+    clientName = Client.objects.filter(pk = clientId).first()
+    rateCardList = RateCard.objects.filter(clientName = clientName).values()
+    print(rateCardList)
+    return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
 def documentView(request):
     return render(request,'GearBox/truck/table/document.html')

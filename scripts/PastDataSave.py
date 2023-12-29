@@ -143,7 +143,7 @@ def run():
                             continue
                             # Modification ends
                         
-                        surCharge = Surcharge.objects.filter(surcharge_Name = 'Nosurcharge').first()
+                        surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
                             
                         docketObj = DriverDocket()                
 
@@ -234,13 +234,13 @@ def run():
                             docketObj.returnToYard = True if data[16].lower() == 'yes' else False
                             docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
                             docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
-                            docketObj.waitingTimeStart = 0 if str(data[11]).lower() == '' else data[11]
-                            docketObj.waitingTimeEnd = 0 if str(data[12]).lower() == '' else data[12]
-                            docketObj.totalWaitingInMinute = totalWaitingTime
+                            docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11], '%H:%M:%S').time()) 
+                            docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12], '%H:%M:%S').time())
+                            # docketObj.totalWaitingInMinute = totalWaitingTime
                             docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
                             docketObj.standByStartTime = 0 if str(data[20]).lower() == '' else data[20]
                             docketObj.standByEndTime = 0 if str(data[21]).lower() == '' else data[21]
-                            docketObj.standBySlot = standBySlot
+                            # docketObj.standBySlot = standBySlot
                             docketObj.comment = data[17]
                             # modification for adding blow back and replacement.
                             if data[19].strip().replace(' ','') != None:

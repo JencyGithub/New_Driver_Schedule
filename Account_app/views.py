@@ -179,7 +179,7 @@ def formsSave(request):
                 docketFile='static/img/docketFiles/' + Docket_file[i],
                 basePlant=BasePlantVal
             )
-            docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'Nosurcharge')[0]
+            docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
             docket_.save()
 
     del request.session['data']
@@ -368,7 +368,7 @@ def uploadDocketSave(request, id):
         docketObj.tripId = tripObj
         docketObj.shiftDate = startDateObj.date()
 
-        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = "Nosurcharge").first()
+        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = "No Surcharge").first()
 
         tripObj.numberOfLoads += 1
         tripObj.save()
@@ -622,9 +622,14 @@ def rctiSave(request):
     if not invoiceFile:
         return HttpResponse("No file uploaded")
     try:
+        folderName = None
         newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
         if clientName == 'boral':
-            location = 'static/Account/RCTI/tempRCTIInvoice'
+            folderName = 'tempRCTIInvoice'
+        elif clientName == 'holcim':
+            folderName = 'RCTIInvoice'
+            
+        location = f'static/Account/RCTI/{folderName}'
         # elif clientName == 'holcim':
         #     location = 'static/Account/RCTI/RCTIInvoice'
 
@@ -641,14 +646,15 @@ def rctiSave(request):
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
             elif clientName == 'holcim':
-                return HttpResponse('work in progress')
-                # with open("File_name_file.txt",'w+',encoding='utf-8') as f:
-                #     file_name = f.write(newFileName)
+                # return HttpResponse('work in progress')
+                with open("File_name_file.txt",'w+',encoding='utf-8') as f:
+                    file_name = f.write(newFileName)
                     
-                # colorama.AnsiToWin32.stream = None
-                # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                # cmd = ["python", "manage.py", "runscript", 'holcim.py']
-                # subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'holcimUtils','--continue-on-error']
+                
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success( request, "Please wait 5 minutes. The data conversion process continues")
         return redirect(request.META.get('HTTP_REFERER'))
 
@@ -1124,6 +1130,21 @@ def DriverTripEditForm(request, id):
         i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
         i.count_ = count_
         count_ += 1
+        
+        # i.waitingTimeStart = timeConverterFromTableToPageFormate(i.waitingTimeStart)
+        # i.waitingTimeEnd = timeConverterFromTableToPageFormate(i.waitingTimeEnd)
+        i.waitingTimeStart = str(datetime.strptime(i.waitingTimeStart, '%H:%M:%S').time())
+        i.waitingTimeEnd = str(datetime.strptime(i.waitingTimeEnd, '%H:%M:%S').time())
+        # print(type(i.waitingTimeEnd),i.waitingTimeEnd,i.docketNumber)
+        # print(type(i.waitingTimeStart),i.waitingTimeStart,i.docketNumber)
+        i.totalWaitingInMinute =DriverTripCheckWaitingTime(i.docketNumber,i.shiftDate)
+        i.standBySlot = DriverTripCheckStandByTotal(i.docketNumber,i.shiftDate)
+        print(i.waitingTimeStart)
+        print(i.waitingTimeEnd)     
+        print(i.docketNumber)
+        print(i.shiftDate)
+        
+    # return HttpResponse('here')
     base_plant = BasePlant.objects.all()
 
     params = {
@@ -1194,7 +1215,7 @@ def driverEntryUpdate(request, ids):
         docketObj.waitingTimeStart = request.POST.get(
             f'waitingTimeStart{count_}')
         docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
-        docketObj.totalWaitingInMinute = request.POST.get(f'totalWaitingInMinute{count_}')
+        # docketObj.totalWaitingInMinute = request.POST.get(f'totalWaitingInMinute{count_}')
         
         docketObj.surcharge_duration = request.POST.get(
             f'surcharge_duration{count_}')
@@ -1203,13 +1224,14 @@ def driverEntryUpdate(request, ids):
         docketObj.standByStartTime = request.POST.get(
             f'standByStartTime{count_}')
         docketObj.standByEndTime = request.POST.get(f'standByEndTime{count_}')
-        docketObj.standBySlot = request.POST.get(f'standBySlot{count_}')
-        
+        # docketObj.standBySlot = request.POST.get(f'standBySlot{count_}')
+        # print(request.POST.get(f'standBySlot{count_}'))
         docketObj.others = request.POST.get(f'others{count_}')
         docketObj.comment = request.POST.get(f'comment{count_}')
         count_ += 1
-        docketObj.save()
         
+        docketObj.save()
+    # return HttpResponse('here')
         if driver_trip.verified:
             docketObj.shiftDate= datetime.strptime(docketObj.shiftDate, "%Y-%m-%d").date()
             driverDocketNumber = docketObj.docketNumber
@@ -1476,8 +1498,8 @@ def rateCardTable(request,clientId = None):
 
 
 def rateCardForm(request, id=None , clientId=None):
-    rateCard = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = tds = startDate = endDate = None
-    surcharges = Surcharge.objects.all()
+    rateCard = rateCardSurcharges = surchargesEntry = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = tds = startDate = endDate = None
+    surchargesEntry =Surcharge.objects.all()
     rateCardDates = []
     if id:
         rateCard = RateCard.objects.get(pk=id)
@@ -1498,15 +1520,17 @@ def rateCardForm(request, id=None , clientId=None):
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
-
+            rateCardSurcharges =RateCardSurchargeValue.objects.filter(rate_card_name= rateCard.id, start_date=oldRateCardStartDate, end_date= oldRateCardEndDate)
+            
         else:
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
+            rateCardSurcharges =RateCardSurchargeValue.objects.filter(rate_card_name= rateCard.id, start_date=costParameters['start_date'], end_date= costParameters['end_date'])
 
         # onLease = OnLease.objects.filter(rate_card_name = rateCard.id, end_date = None).values().first()
-        
+
         startDate = dateConverterFromTableToPageFormate(costParameters['start_date'])
         endDate = dateConverterFromTableToPageFormate(costParameters['end_date'])
 
@@ -1518,7 +1542,8 @@ def rateCardForm(request, id=None , clientId=None):
         'thresholdNightShift': thresholdNightShift,
         'grace': grace,
         'tds': tds,
-        'surcharges': surcharges,
+        'rateCardSurcharges': rateCardSurcharges,
+        'surchargesEntry': surchargesEntry,
         'startDate' : startDate,
         'endDate' : endDate,
         'rateCardDates' : rateCardDates,
@@ -1547,6 +1572,9 @@ def checkOnOff(val_):
 @csrf_protect
 @api_view(['POST'])
 def rateCardSave(request, id=None, edit=0):
+
+        # surcharge.id = request.POST.get('surcharge.id')
+        # print(surcharge.surcharge_Name)
     # return HttpResponse(request.POST.get('clientName'))
     # print(type(request.POST.get('costParameters_start_date')))
     # return HttpResponse('work')
@@ -1554,7 +1582,7 @@ def rateCardSave(request, id=None, edit=0):
     rateCardID = None
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    
+    surchargeEntry = Surcharge.objects.all()
     if not id:
         rateCard = RateCard()
         rateCard.rate_card_name=request.POST.get('rate_card_name')
@@ -1574,6 +1602,12 @@ def rateCardSave(request, id=None, edit=0):
             existingThresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingThresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingGrace = Grace.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
+            rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
+            for surcharge in rateCardSurchargeObj:
+                surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
+                surcharge.start_date = startDate
+                surcharge.end_date = endDate
+                surcharge.save()
 
             if existingCostParameter or existingThresholdDayShift or existingThresholdNightShift or existingGrace:
                 messages.error(request, "Rate card rates already exist between given date.")
@@ -1614,7 +1648,7 @@ def rateCardSave(request, id=None, edit=0):
         # oldOnLease.save()
 
     # CostParameters
-    surchargeObj = Surcharge.objects.get(pk=request.POST.get('costParameters_surcharge_type'))
+    # surchargeObj = Surcharge.objects.get(pk=request.POST.get('costParameters_surcharge_type'))
     updatedValues= []
     
     #  Get object according to type of save
@@ -1623,19 +1657,33 @@ def rateCardSave(request, id=None, edit=0):
         thresholdDayShifts = ThresholdDayShift()
         thresholdNightShifts = ThresholdNightShift()
         grace = Grace()
+        
+        for surcharge in surchargeEntry:
+            rateCardSurchargeObj = RateCardSurchargeValue() 
+            rateCardSurchargeObj.rate_card_name = rateCardID
+            rateCardSurchargeObj.surcharge = surcharge
+            rateCardSurchargeObj.surchargeValue = request.POST.get(f'{surcharge.id}')
+            rateCardSurchargeObj.start_date = startDate
+            rateCardSurchargeObj.end_date = endDate
+            rateCardSurchargeObj.save()
+        
     else:
         costParameters = CostParameters.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
         thresholdDayShifts = ThresholdDayShift.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
         thresholdNightShifts = ThresholdNightShift.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
         grace = Grace.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
+        rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
+        for surcharge in rateCardSurchargeObj:
+            surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
+            surcharge.start_date = startDate
+            surcharge.end_date = endDate
+            surcharge.save()
 
         # Edit Reconciliation and Past trips
         # Cost parameters
         
         updatedValues.append('costParameters_loading_cost_per_cubic_meter') if costParameters.loading_cost_per_cubic_meter != float(request.POST.get('costParameters_loading_cost_per_cubic_meter')) else None
         updatedValues.append('costParameters_km_cost') if costParameters.km_cost != float(request.POST.get('costParameters_km_cost')) else None
-        updatedValues.append('costParameters_surcharge_type') if costParameters.surcharge_type.surcharge_Name != surchargeObj.surcharge_Name else None
-        updatedValues.append('costParameters_surcharge_cost') if costParameters.surcharge_cost != float(request.POST.get('costParameters_surcharge_cost')) else None
         updatedValues.append('costParameters_transfer_cost') if costParameters.transfer_cost != float(request.POST.get('costParameters_transfer_cost')) else None
         updatedValues.append('costParameters_return_load_cost') if costParameters.return_load_cost != float(request.POST.get('costParameters_return_load_cost')) else None
         updatedValues.append('costParameters_return_km_cost') if costParameters.return_km_cost != float(request.POST.get('costParameters_return_km_cost')) else None
@@ -1692,8 +1740,6 @@ def rateCardSave(request, id=None, edit=0):
     costParameters.rate_card_name=rateCardID
     costParameters.loading_cost_per_cubic_meter=float(request.POST.get('costParameters_loading_cost_per_cubic_meter'))
     costParameters.km_cost=float(request.POST.get('costParameters_km_cost'))
-    costParameters.surcharge_type=surchargeObj
-    costParameters.surcharge_cost=float(request.POST.get('costParameters_surcharge_cost'))
     costParameters.transfer_cost=float(request.POST.get('costParameters_transfer_cost'))
     costParameters.return_load_cost=float(request.POST.get('costParameters_return_load_cost'))
     costParameters.return_km_cost=float(request.POST.get('costParameters_return_km_cost'))
@@ -1703,7 +1749,7 @@ def rateCardSave(request, id=None, edit=0):
     costParameters.call_out_fees=float(request.POST.get('costParameters_call_out_fees'))
     costParameters.demurrage_fees=float(request.POST.get('costParameters_demurrage_fees'))
     costParameters.cancellation_fees=float(request.POST.get('costParameters_cancellation_fees'))
-    costParameters.start_date=startDate
+    costParameters.start_date=startDate  
     costParameters.end_date=endDate
     costParameters.save()
 
@@ -1758,6 +1804,8 @@ def rateCardSave(request, id=None, edit=0):
     grace.end_date=endDate
     grace.save()
     
+
+    
     updatedValues.insert(0,rateCardID.id)
     updatedValues.insert(1,startDate)
     updatedValues.insert(2,endDate)
@@ -1796,17 +1844,6 @@ def rateCardSave(request, id=None, edit=0):
 
     messages.success(request, 'Data successfully add ')
     return redirect('gearBox:clientTable')
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1964,20 +2001,34 @@ def DriverShiftForm(request,id):
 def ShiftDetails(request,id):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    clientName = request.POST.get('clients')
+    clientNameObj = Client.objects.filter(name=request.POST.get('clients')).first()
     id_ = id
-    boralTrip =None
-    holcimTrip =None
-    if id ==0:
-        driver_trip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    elif id ==1:
-        if clientName == 'boral':
-            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-        elif clientName == 'holcim':
-            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+    trips =None
+    if id == 0:
+        if clientNameObj:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False , clientName = clientNameObj)
         else:
-            boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-            holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate)).values()
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    elif id == 1:
+        if clientNameObj:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True , clientName = clientNameObj)
+        else:
+            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #     if clientName == 'boral':
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    #     elif clientName == 'holcim':
+    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
+    #     else:
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
+    # elif id ==1:
+    #     if clientName == 'boral':
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #     elif clientName == 'holcim':
+    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate) ,verified = True)
+    #     else:
+    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
+    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = True)
         # return HttpResponse(holcimTrip.driverName)
            
 
@@ -1987,11 +2038,11 @@ def ShiftDetails(request,id):
         messages.warning( request, "Invalid Request")
         return redirect(request.META.get('HTTP_REFERER'))
     params = {
-        'boralTrip': boralTrip,
-        'holcimTrip':holcimTrip,
+        'trips': trips,
         'startDate': startDate,
         'endDate': endDate,
         'id_': id_,
+        
         }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
     

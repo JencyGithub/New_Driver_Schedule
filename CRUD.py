@@ -9,6 +9,18 @@ def dateConverterFromTableToPageFormate(date):
     formated_data = str(date).split()[0]
     return formated_data
 
+def timeDifference(startTime,endTime):
+    start_datetime = datetime.strptime(startTime, '%H:%M:%S')
+    end_datetime = datetime.strptime(endTime, '%H:%M:%S')
+    time_difference_minutes = (end_datetime - start_datetime).total_seconds() / 60
+# Calculate the difference in minutes
+    return  time_difference_minutes
+
+    
+    # if len(time[0]) <= 1:
+    #     data = '0'+time[0]+'-'+time[1]+''+time[2]
+    #     return data
+    
 model_mapping = {
     'Client' : Client,
     'AdminTruck' : AdminTruck,

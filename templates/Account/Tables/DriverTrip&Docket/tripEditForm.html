@@ -254,7 +254,7 @@
                                             style="padding: 0.25rem 0.2rem;" id="returnKm{{item.count_}}" readonly>
                                     </div>
                                 </div>
-
+                                {% comment %} {{item.waitingTimeStart}} {% endcomment %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="waitingTimeStart{{item.count_}}">Waiting Time Start :<span
                                             class="required">*</span></label>
@@ -266,7 +266,7 @@
                                 </div>
 
                                 {% comment %} totalWaitingInMinute waitingTimeEnd surcharge_type {% endcomment %}
-                                
+                                {% comment %} {{item.waitingTimeEnd}} {% endcomment %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="waitingTimeEnd{{item.count_}}">Waiting Time End :<span
                                             class="required">*</span></label>
@@ -337,7 +337,7 @@
                                     <div class="field item form-group">
                                         <input class="form-control" readonly  type="number"
                                             name="standBySlot{{item.count_}}" required='required'
-                                            style="padding: 0.25rem 0.2rem;" id="standBySlot{{item.count_}}" value="{% if docketData.standBySlot %}{{docketData.standBySlot}}{% else %}0{% endif %}">
+                                            style="padding: 0.25rem 0.2rem;" id="standBySlot{{item.count_}}" value="{% if driverDocket %}{{item.standBySlot}}{% else %}0{% endif %}">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">

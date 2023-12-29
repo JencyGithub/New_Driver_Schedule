@@ -94,6 +94,36 @@ class DriverDocket(models.Model):
     others = models.FloatField(default=0)
     comment = models.CharField(max_length=255, null=True, default='None')
     
+    # Holcim 
+    # jobNo = models.FloatField(default=0)
+    # orderNo = models.FloatField(default=0)
+    # status = models.CharField(max_length=200)
+    # ticketedDate = models.DateField(null=True, default=None)
+    # ticketedTime = models.TimeField(null=True, blank=True)
+    # load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # loadComplete = models.CharField(max_length=200)
+    # toJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # timeToDepart = models.FloatField(default=0)
+    # onJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # timeToSite = models.FloatField(default=0)
+    # beginUnload = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # waitingTime = models.FloatField(default=0)
+    # endPour = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # wash = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # toPlant = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # timeOnSite = models.FloatField(default=0)
+    # atPlant = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    # leadDistance = models.FloatField(default=0)
+    # returnDistance = models.FloatField(default=0)
+    # totalDistance = models.FloatField(default=0)
+    # totalTime = models.FloatField(default=0)
+    # waitTimeBetweenJob = models.FloatField(default=0)
+    # driverName = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    # quantity = models.FloatField(default=0)
+    # slump = models.FloatField(default=0)
+    # waterAdded = models.FloatField(max_length=200)
+    
+    
     def __str__(self) -> str:
         return str(self.docketNumber)
 
@@ -121,6 +151,10 @@ class RCTI(models.Model):
     cartageGSTPayable = models.FloatField(default=0)
     cartageTotalExGST = models.FloatField(default=0)
     cartageTotal = models.FloatField(default=0)
+    # Holcim 
+    unit = models.CharField(default='', max_length=10)
+    paidQty = models.FloatField(default=0)
+    
     
     transferKM = models.FloatField(default=0)
     transferKMCost = models.FloatField(default=0)
@@ -140,7 +174,7 @@ class RCTI(models.Model):
     waitingTimeSCHEDTotalExGST = models.FloatField(default=0)
     waitingTimeSCHEDTotal = models.FloatField(default=0)
     
-    waitingTimeInMinutes = models.FloatField(max_length=255,default=0)
+    waitingTimeInMinutes = models.FloatField(default=0)
     waitingTimeCost = models.FloatField(default=0)
     waitingTimeGSTPayable = models.FloatField(default=0)
     waitingTimeTotalExGST = models.FloatField(default=0)
@@ -159,15 +193,43 @@ class RCTI(models.Model):
     minimumLoadGSTPayable = models.FloatField(default=0)
     minimumLoadTotalExGST = models.FloatField(default=0)
     minimumLoadTotal = models.FloatField(default=0)
+
+    # Holcim 
+    blowBack= models.FloatField(default=0)
+    blowBackCost = models.FloatField(default=0)
+    blowBackGSTPayable = models.FloatField(default=0)
+    blowBackTotalExGST = models.FloatField(default=0)
+    blowBackTotal = models.FloatField(default=0)
     
-    surcharge_fixed_normal = models.FloatField(default=0)
-    surcharge_fixed_sunday = models.FloatField(default=0)
-    surcharge_fixed_public_holiday = models.FloatField(default=0)
-    surcharge_per_cubic_meters_normal = models.FloatField(default=0)
-    surcharge_per_cubic_meters_sunday = models.FloatField(default=0)
-    surcharge_per_cubic_meters_public_holiday = models.FloatField(default=0)
-    surcharge_duration = models.FloatField(default=0)
-    surchargeUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=6)
+    
+    # surcharge_fixed_weekend= models.FloatField(default=0)
+    # surcharge_fixed_weekendCost = models.FloatField(default=0)
+    # surcharge_fixed_weekendGSTPayable = models.FloatField(default=0)
+    # surcharge_fixed_weekendTotalExGST = models.FloatField(default=0)
+    # surcharge_fixed_weekendTotal = models.FloatField(default=0)
+    
+    # surcharge_fixed_weekday= models.FloatField(default=0)
+    # surcharge_fixed_weekdayCost = models.FloatField(default=0)
+    # surcharge_fixed_weekdayGSTPayable = models.FloatField(default=0)
+    # surcharge_fixed_weekdayTotalExGST = models.FloatField(default=0)
+    # surcharge_fixed_weekdayTotal = models.FloatField(default=0)
+    
+    callOut= models.FloatField(default=0)
+    callOutCost = models.FloatField(default=0)
+    callOutGSTPayable = models.FloatField(default=0)
+    callOutTotalExGST = models.FloatField(default=0)
+    callOutTotal = models.FloatField(default=0)
+    
+    # surcharge_fixed_normal = models.FloatField(default=0)
+    # surcharge_fixed_sunday = models.FloatField(default=0)
+    # surcharge_fixed_public_holiday = models.FloatField(default=0)
+    # surcharge_per_cubic_meters_normal = models.FloatField(default=0)
+    # surcharge_per_cubic_meters_sunday = models.FloatField(default=0)
+    # surcharge_per_cubic_meters_public_holiday = models.FloatField(default=0)
+    # surcharge_duration = models.FloatField(default=0)
+    # surchargeUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=6)
+    surcharge = models.FloatField(default=0)
+    surchargeCost = models.FloatField(default=0)
     surchargeGSTPayable = models.FloatField(default=0)
     surchargeTotalExGST = models.FloatField(default=0)
     surchargeTotal = models.FloatField(default=0)
@@ -317,7 +379,7 @@ class RctiExpense(models.Model):
     def __str__(self):
         return str(self.docketNumber)
     
-
+# model rename  holcimTripReport
 class HolcimTrip(models.Model):
     truckNo = models.PositiveBigIntegerField(default=0)
     shiftDate = models.DateField(null=True, default=None)
@@ -326,6 +388,7 @@ class HolcimTrip(models.Model):
     def __str__(self):
         return str(self.id)
     
+# model rename  holcimDocketReport
 class HolcimDocket(models.Model):
     truckNo =  models.FloatField(default=0)
     tripId = models.ForeignKey(HolcimTrip, on_delete=models.CASCADE)
