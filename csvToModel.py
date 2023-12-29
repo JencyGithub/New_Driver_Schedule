@@ -40,17 +40,21 @@ docket_pattern = r'^\d{8}$|^\d{6}$'
 
 
 def insertIntoModel(dataList,file_name):
-    
     try:
         errorSolve = dataList
-        RCTIobj = None
-        try:
-            existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
-            if str(existingDocket.docketDate) == dateConvert(dataList[2]):
-                RCTIobj = existingDocket
-        except:
+        
+        RCTIobj =  RCTI.objects.filter(docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
+        if not RCTIobj:
             RCTIobj = RCTI()
+            
+        # try:
+        #     existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
+        #     if str(existingDocket.docketDate) == dateConvert(dataList[2]):
+        #         RCTIobj = existingDocket
+        # except:
+        #     RCTIobj = RCTI()
     
+
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
         RCTIobj.clientName = Client.objects.filter(name = 'boral').first()
         if re.match(docket_pattern ,str(dataList[1])):
@@ -64,16 +68,26 @@ def insertIntoModel(dataList,file_name):
                 description = dump[2].lower().strip()
                 if 'top up' in description:
                     # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
-                    RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
-                    RCTIobj.docketYard = dump[1]
+                    # RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
+                    # RCTIobj.docketYard = dump[1]
                     
-                    RCTIobj.others = dump[2]
-                    RCTIobj.othersCost = convertIntoFloat(dump[6])
-                    RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
-                    RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
-                    RCTIobj.othersTotal = convertIntoFloat(dump[9])
-                    dataList = dataList[10:]
-                    continue
+                    # RCTIobj.others = dump[2]
+                    # RCTIobj.othersCost = convertIntoFloat(dump[6])
+                    # RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
+                    # RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
+                    # RCTIobj.othersTotal = convertIntoFloat(dump[9])
+                    # dataList = dataList[10:]
+                    rctiErrorObj = RctiErrors( 
+                                        clientName = 'boral',
+                                        docketNumber = RCTIobj.docketNumber,
+                                        docketDate = RCTIobj.docketDate,
+                                        errorDescription = "Manage Top-up.",
+                                        fileName = file_name,
+                                        data = str(errorSolve)
+                    )
+                    rctiErrorObj.save()
+                    return
+
                     
                 RCTIobj.docketDate = dateConvert(dump[0])
                 if dump[1] not in BasePlant_:
@@ -132,12 +146,19 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.standByGSTPayable = convertIntoFloat(dump[-2])
                     RCTIobj.standByTotalExGST = convertIntoFloat(dump[-3])
                     RCTIobj.standByTotal = convertIntoFloat(dump[-1])
-                elif "surcharge after hours" in description:
-                    RCTIobj.surcharge_duration = convertIntoFloat(dump[4])
-                    if "mon-fri" in description and "each" in str(dump[5].lower()):
-                        RCTIobj.surcharge_fixed_normal = convertIntoFloat(dump[6])
-                    elif "sat" in description and 'mon' in description and "each" in str(dump[5].lower()):
-                        RCTIobj.surcharge_fixed_sunday = convertIntoFloat(dump[6])
+                # elif "surcharge after hours" in description:
+                #     RCTIobj.surcharge_duration = convertIntoFloat(dump[4])
+                #     if "mon-fri" in description and "each" in str(dump[5].lower()):
+                #         RCTIobj.surcharge_fixed_normal = convertIntoFloat(dump[6])
+                #     elif "sat" in description and 'mon' in description and "each" in str(dump[5].lower()):
+                #         RCTIobj.surcharge_fixed_sunday = convertIntoFloat(dump[6])
+                #     RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
+                #     RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
+                #     RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])
+
+                elif "surcharge" in description:
+                    RCTIobj.surcharge = convertIntoFloat(dump[4])
+                    RCTIobj.surchargeCost = convertIntoFloat(dump[6])
                     RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
                     RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
                     RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])

@@ -463,6 +463,7 @@ class HolcimDocket_(admin.ModelAdmin):
 
 admin.site.register(HolcimDocket,HolcimDocket_)
 
+admin.site.register(RateCardSurchargeValue)
 
 class HolcimTrip_(admin.ModelAdmin):
 

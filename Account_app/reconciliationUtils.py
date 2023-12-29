@@ -98,36 +98,37 @@ def checkMinLoadCost(driverDocketNumber,docketDate):
         return -404.0 
 
 def checkSurcharge(driverDocketNumber,docketDate, costDict = costDict):
-    try:
+    return 0
+    # try:
         
-        # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
-        date_= docketDate
+    #     # date_= datetime.strptime(docketDate, "%Y-%m-%d").date()
+    #     date_= docketDate
 
-        driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+    #     driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
         
-        if 'nosurcharge' in driverDocketObj.surcharge_type.surcharge_Name.lower():
-            return 0
+    #     if 'nosurcharge' in driverDocketObj.surcharge_type.surcharge_Name.lower():
+    #         return 0
         
-        if 'fixed' in  driverDocketObj.surcharge_type.surcharge_Name.lower():
-            tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
-            adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
-            clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
+    #     if 'fixed' in  driverDocketObj.surcharge_type.surcharge_Name.lower():
+    #         tripObj = DriverTrip.objects.filter(pk = driverDocketObj.tripId.id).first()
+    #         adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+    #         clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj,startDate__lte = date_,endDate__gte = date_, clientId = tripObj.clientName).first()
             
-            rateCard = clientTruckConnectionObj.rate_card_name
-            costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
+    #         rateCard = clientTruckConnectionObj.rate_card_name
+    #         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
           
-            surchargeAmount = round(costParameterObj.surcharge_cost,2)
-            if surchargeAmount is None:
-                return 0
-            else :
-                return surchargeAmount
-        else:
-            return 0
+    #         surchargeAmount = round(costParameterObj.surcharge_cost,2)
+    #         if surchargeAmount is None:
+    #             return 0
+    #         else :
+    #             return surchargeAmount
+    #     else:
+    #         return 0
             
 
-    except Exception as e :
-        # print(f'{driverDocketNumber}Surcharge : {e}')
-        return -404.0
+    # except Exception as e :
+    #     # print(f'{driverDocketNumber}Surcharge : {e}')
+    #     return -404.0
         
 def checkWaitingTime(driverDocketNumber,docketDate):
     try:
@@ -377,3 +378,42 @@ def checkMissingComponents(reconciliationReportObj):
 
     
     
+def DriverTripCheckWaitingTime(driverDocketNumber,docketDate):
+    date_= docketDate
+    driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+    tripObj = DriverTrip.objects.filter(pk=driverDocketObj.tripId.id).first()
+    if tripObj:
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
+        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
+        driverDocketObj.waitingTimeStart = str(datetime.strptime(driverDocketObj.waitingTimeStart, '%H:%M:%S').time())
+        driverDocketObj.waitingTimeEnd = str(datetime.strptime(driverDocketObj.waitingTimeEnd, '%H:%M:%S').time())
+        
+        totalWaitingTime = timeDifference(driverDocketObj.waitingTimeStart,driverDocketObj.waitingTimeEnd)
+        
+        if float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
+            totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
+            if totalWaitingTime < 0:
+                totalWaitingTime = 0    
+        else:
+            totalWaitingTime = 0
+        return totalWaitingTime
+def DriverTripCheckStandByTotal(driverDocketNumber,docketDate):
+    date_= docketDate
+    driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
+    tripObj = DriverTrip.objects.filter(pk=driverDocketObj.tripId.id).first()
+    
+    if tripObj:
+        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
+        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCardObj).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
+
+        totalStandByTime = getTimeDifference(driverDocketObj.standByStartTime,driverDocketObj.standByEndTime)
+        standBySlot = 0
+        if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
+            totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
+            standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+        return standBySlot
