@@ -21,8 +21,8 @@
                 <tr>
                 <th class="py-2">Status </th>
                 <td class="py-2">
-                    <span class="badge  {% if job.lateForStart %}bg-danger{% elif job.Status == 'Assigned' %}bg-default{% elif job.Status == 'Dispatched' %}bg-success{% endif %}">
-                       {% if job.lateForStart %}Missed{% elif job.Status == "Assigned" %}Pending{% elif job.Status == "Dispatched" %}In Progress{% endif %}
+                    <span class="badge  {% if job.lateForStart %}bg-danger {% elif job.Status == 'Assigned' and job.notAcceptable == True %} bg-warning {% elif job.Status == 'Assigned' %}bg-default{% elif job.Status == 'Dispatched' %}bg-success{% elif job.Status == 'Complete' %}bg-dark{% endif %}">
+                       {% if job.lateForStart %}Missed{% elif job.Status == "Assigned" %}Pending{% elif job.Status == "Dispatched" %}In Progress{% elif job.Status == 'Complete' %}Complete{% endif %}
                     </span>
                 </td>
                 </tr>
@@ -94,7 +94,7 @@
     {% if job.Status == "Assigned" %}<hr>{% endif %}
 </div>
 
-{% if job.Status == "Assigned" and not job.lateForStart  %}
+{% if job.Status == "Assigned" and not job.lateForStart and job.notAcceptable != True %}
 <div class="container my-3">
     <div class="row">
         <div class="col-md-12 text-right">

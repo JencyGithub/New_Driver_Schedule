@@ -51,13 +51,14 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
     if checkDate(given_line[0]):
         if previous_line:
             given_line.insert(0,previous_line[1])
+        if previous_line:
+            given_line.insert(0,previous_line[1])
     elif checkDate(given_line[1]):
         pass
-    else:     
-        if previous_line:
+    else:  
+        if previous_line:   
             given_line.insert(0,previous_line[2])
             given_line.insert(0,previous_line[1])
-    
     
     if ' ' in given_line[2]:
         given_line.insert(2,'NOT SELECTED')

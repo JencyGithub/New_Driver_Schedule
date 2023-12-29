@@ -305,7 +305,7 @@ def driver_download_csv(modeladmin, request, queryset):
 
 class Driver_(admin.ModelAdmin):
     # inlines = [LeaveReqAdminDriver]
-    list_display = ["driverId", "name", 'phone']
+    list_display = ["driverId", "name", 'phone', 'password']
     search_fields = ["driverId",'name']
     # actions = [driver_download_csv]
 

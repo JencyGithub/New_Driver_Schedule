@@ -14,7 +14,7 @@
 <!-- page content -->
 <div class="right_col" role="main">
     <div class="clearfix"></div>
-    <form action="{% if not data %}{% url "Appointment:appointmentFormSave" %}{% endif %}" method="POST" novalidate enctype="multipart/form-data">
+    <form action="{% if not data %}{% url "Appointment:appointmentFormSave" %}{% else %}{% url "Appointment:appointmentFormUpdateSave" id=data.id %}{% endif %}" method="POST" novalidate enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-9 col-sm-9">
@@ -145,7 +145,7 @@
                             <div class="col-md-4 col-sm-4">
                                 <label for="stopName">Client name :<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <select name="stopName" required class="form-select form-control" id="stopName"  {% if data %}disabled{% endif %}>
+                                    <select name="stopName" required class="form-select form-control" id="stopName"  {% if data %}disabled{% endif %} >
                                         {% for client in clients %}
                                         <option value="{{client.clientId}}" {% if data.stop.clientId == client.clientId %}selected{% endif %}>{{client.clientId}}-{{client.name}}</option>
                                         {% endfor %}
@@ -154,15 +154,17 @@
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="driverName">Driver name :<span class="required">*</span></label>
+                                <b class="text-danger">{{appointmentDriver.driverName.name}}</b>
                                 <span class="float-right">
                                     <input type="checkbox" name="addDriver" id="addDriver" style="cursor: pointer;" disabled onchange="openBox(this,'driverName')" {% if appointmentDriver %}checked{% endif %}>
-                                    <!-- <label class="float-right text-primary" for="addDriver">Add driver</label> -->
                                 </span>
-
+                               
                                 <div class="field item form-group">
-                                    <select name="driverName" class="form-select form-control" id="driverName" required disabled>
+                                    <select name="driverName" class="form-select form-control" id="driverName" required {% if not data or data.Status == 'Complete' %}disabled{% endif %}>
+                                        <option value="" disabled selected> Select driver </option>
                                         {% if data %}
                                             {% for driver in availableDriversList %}
+                                            
                                             <option value="{{driver.driverId}}" {% if appointmentDriver.driverName.driverId == driver.driverId%}selected{% endif %}>{{driver.driverId}}-{{driver.name}}</option>
                                             {% endfor %}
                                         {% endif %}
@@ -171,15 +173,17 @@
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="truckNo">Truck No :<span class="required">*</span></label>
+                                <b class="text-danger"> {{appointmentTruck}}</b>
+
                                 <span class="float-right">
                                     <input type="checkbox" name="addTruck" id="addTruck" style="cursor: pointer;" disabled onchange="openBox(this,'truckNo')" {% if appointmentTruck %}checked{% endif %}>
-                                    <!-- <label class="float-right text-primary" for="addTruck">Add Truck</label> -->
                                 </span>
                                 <div class="field item form-group">
-                                    <select name="truckNo" class="form-select form-control" id="truckNo" required disabled>
+                                    <select name="truckNo" class="form-select form-control" id="truckNo" required {% if not data or data.Status == 'Complete' %}disabled{% endif %}>
+                                        <option value="" disabled selected> Select Truck </option>
                                         {% if data %}
                                             {% for truck in availableTrucksList %}
-                                            <option value="{{truck.adminTruckNumner}}">{{truck.adminTruckNumber}}</option>
+                                            <option value="{{truck.adminTruckNumber}}">{{truck.adminTruckNumber}}</option>
                                             {% endfor %}
                                         {% endif %}
                                     </select>
@@ -241,7 +245,7 @@
                     </div>
                 </div> 
             </div>
-            {% if not data %}
+            {% if not data or update == 1 %}
                 <div class="col-md-12 text-right p-0">
                     <button type='reset' style="margin: 0px;" class="btn btn-outline-dark px-4">Reset</button>
                     <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
