@@ -3,7 +3,12 @@
 {% block title %} | Edit Deports {% endblock %}
 {% block headStyle %}
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
-
+<style>
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <style>
     .cuatom-continer {
@@ -62,7 +67,7 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="basePlant">Name:<span class="required">*</span></label>
-                                    <input class="form-control" type="text" name="basePlant" required  value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" id="basePlant">
+                                    <input class="form-control" type="text" name="basePlant" required  value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" id="city">
                                 </div>
                             </div>
                             <div class="col-sm-4">
@@ -91,14 +96,14 @@
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label for="lat">Lat:<span class="required">*</span></label>
-                                    <input class="form-control" type="number" name="lat" required  value="{% if basePlant %}{{ basePlant.lat }}{% endif %}" id="lat">
+                                    <label for="lat">Latitude:<span class="required">*</span></label>
+                                    <input class="form-control" type="number" name="lat" required  value="{% if basePlant %}{{ basePlant.lat }}{% endif %}" id="latitude">
                                 </div>
                             </div>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <label for="long">Long:<span class="required">*</span></label>
-                                    <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="long">
+                                    <label for="long">Longitude:<span class="required">*</span></label> <a href="#" class="text-danger" onclick="showMap()"> Map</a>
+                                    <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="longitude">
                                 </div>
                             </div>
                         </div>
@@ -110,6 +115,18 @@
                     </div>
                 </div>
             </div>
+                <div class="x_panel">
+                    <h2>Map</h2>
+                    <div class="x_title">
+                    </div>
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <div class="row">
+                                <div id="map"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
@@ -126,6 +143,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    function showMap() {
+        // Get values from the form
+        var cityName = document.getElementById('city').value;
+        var latitude = parseFloat(document.getElementById('latitude').value);
+        var longitude = parseFloat(document.getElementById('longitude').value);
 
+        // Create a LatLng object
+        var cityLatLng = new google.maps.LatLng(latitude, longitude);
+
+        // Create a map centered at the specified coordinates
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: cityLatLng,
+            zoom: 12
+        });
+
+        // Create a marker for the city
+        var marker = new google.maps.Marker({
+            position: cityLatLng,
+            map: map,
+            title: cityName
+        });
+    }
+</script>
 {% endblock %}
 {% endblock %}

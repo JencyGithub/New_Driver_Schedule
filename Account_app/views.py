@@ -906,10 +906,6 @@ def driverDocketEntrySave(request, ids, errorId=None):
         DriverDocketObj.standByEndTime = request.POST.get('standByEndTime')
         DriverDocketObj.standBySlot = request.POST.get('standBySlot')
         DriverDocketObj.comment = request.POST.get('comment')
-        # print(DriverDocketObj.standBySlot,DriverDocketObj.docketNumber,DriverDocketObj.shiftDate)
-        # driverStandByCost = checkStandByTotal(DriverDocketObj.docketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
-        # driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
-        # return HttpResponse(driverStandByCost)
         DriverDocketObj.save()
         driver_dockets = DriverDocket.objects.filter(tripId=driver_trip_id)
 
@@ -918,47 +914,48 @@ def driverDocketEntrySave(request, ids, errorId=None):
         driver_trip_id.numberOfLoads = no_of_loads
 
         driver_trip_id.save()
-        # if errorId:
-        #     DriverDocketObj.shiftDate = datetime.strptime(DriverDocketObj.shiftDate, "%Y-%m-%d").date()
-        #     driverDocketNumber = DriverDocketObj.docketNumber
-        #     reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = DriverDocketObj.shiftDate ).first()
+        if errorId:
+            DriverDocketObj.shiftDate = datetime.strptime(DriverDocketObj.shiftDate, "%Y-%m-%d").date()
+            driverDocketNumber = DriverDocketObj.docketNumber
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = DriverDocketObj.shiftDate ).first()
                     
-        #     if not  reconciliationDocketObj :
-        #         reconciliationDocketObj = ReconciliationReport()
-        #     reconciliationDocketObj.driverId = driver_trip_id.id  
-        #     reconciliationDocketObj.clientId = driver_trip_id.id 
-        #     reconciliationDocketObj.truckId = driver_trip_id.truckNo 
+            if not  reconciliationDocketObj :
+                reconciliationDocketObj = ReconciliationReport()
+            reconciliationDocketObj.driverId = driver_trip_id.id  
+            reconciliationDocketObj.clientId = driver_trip_id.id 
+            reconciliationDocketObj.truckId = driver_trip_id.truckNo 
                 
-        #     driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverSurchargeCost = checkSurcharge(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # return HttpResponse(driverSurchargeCost)
-        #     driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,int(DriverDocketObj.standBySlot))
-        #     driverTransferKmCost = checkTransferCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverReturnKmCost = checkReturnCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # minLoad 
-        #     driverLoadDeficit = checkMinLoadCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # TotalCost 
-        #     driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
-        #     reconciliationDocketObj.docketNumber = driverDocketNumber  
-        #     reconciliationDocketObj.docketDate = DriverDocketObj.shiftDate  
-        #     reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
-        #     reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
-        #     reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
-        #     reconciliationDocketObj.driverStandByCost = driverStandByCost 
-        #     reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
-        #     reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
-        #     reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
-        #     reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
-        #     reconciliationDocketObj.fromDriver = True 
-        #     reconciliationDocketObj.save()
-        #     # missingComponents 
-        #     checkMissingComponents(reconciliationDocketObj)
+            driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,DriverDocketObj.shiftDate)
+            driverSurchargeCost = checkSurcharge(driverDocketNumber,DriverDocketObj.shiftDate)
+            # return HttpResponse(driverSurchargeCost)
+            driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,DriverDocketObj.shiftDate)
+            slotSize = DriverTripCheckStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate)
+            driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,slotSize)
+            driverTransferKmCost = checkTransferCost(driverDocketNumber,DriverDocketObj.shiftDate)
+            driverReturnKmCost = checkReturnCost(driverDocketNumber,DriverDocketObj.shiftDate)
+            # minLoad 
+            driverLoadDeficit = checkMinLoadCost(driverDocketNumber,DriverDocketObj.shiftDate)
+            # TotalCost 
+            driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+            reconciliationDocketObj.docketNumber = driverDocketNumber  
+            reconciliationDocketObj.docketDate = DriverDocketObj.shiftDate  
+            reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
+            reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
+            reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
+            reconciliationDocketObj.driverStandByCost = driverStandByCost 
+            reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
+            reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
+            reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
+            reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
+            reconciliationDocketObj.fromDriver = True 
+            reconciliationDocketObj.save()
+            # missingComponents 
+            checkMissingComponents(reconciliationDocketObj)
 
-        #     errorObj = PastTripError.objects.filter(pk =errorId).first()
-        #     print(errorObj)
-        #     errorObj.status = True
-        #     errorObj.save()
+            errorObj = PastTripError.objects.filter(pk =errorId).first()
+            print(errorObj)
+            errorObj.status = True
+            errorObj.save()
 
         url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
         messages.success(request, "Docket Added successfully")
@@ -1169,7 +1166,10 @@ def DriverTripEditForm(request, id):
     driver = Driver.objects.all()
     clientName = Client.objects.all()
     AdminTrucks = AdminTruck.objects.all()
-    driver_trip.shiftDate = dateConverterFromTableToPageFormate(driver_trip.shiftDate)
+    driver_trip.shiftDate = str(driver_trip.shiftDate)
+    driver_trip.startTime =str(datetime.strptime(driver_trip.startTime, '%H:%M:%S').time())
+    
+
     driver_docket = DriverDocket.objects.filter(tripId=id)
     surcharges = Surcharge.objects.all()
     count_ = 1
@@ -1177,21 +1177,11 @@ def DriverTripEditForm(request, id):
         i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
         i.count_ = count_
         count_ += 1
-        
-        # i.waitingTimeStart = timeConverterFromTableToPageFormate(i.waitingTimeStart)
-        # i.waitingTimeEnd = timeConverterFromTableToPageFormate(i.waitingTimeEnd)
-        i.waitingTimeStart = str(datetime.strptime(i.waitingTimeStart, '%H:%M:%S').time())
-        i.waitingTimeEnd = str(datetime.strptime(i.waitingTimeEnd, '%H:%M:%S').time())
-        # print(type(i.waitingTimeEnd),i.waitingTimeEnd,i.docketNumber)
-        # print(type(i.waitingTimeStart),i.waitingTimeStart,i.docketNumber)
+
         i.totalWaitingInMinute =DriverTripCheckWaitingTime(i.docketNumber,i.shiftDate)
         i.standBySlot = DriverTripCheckStandByTotal(i.docketNumber,i.shiftDate)
-        print(i.waitingTimeStart)
-        print(i.waitingTimeEnd)     
-        print(i.docketNumber)
-        print(i.shiftDate)
+        print(i.standBySlot)
         
-    # return HttpResponse('here')
     base_plant = BasePlant.objects.all()
 
     params = {
@@ -1296,7 +1286,8 @@ def driverEntryUpdate(request, ids):
             driverSurchargeCost = checkSurcharge(driverDocketNumber,docketObj.shiftDate)
             # return HttpResponse(driverSurchargeCost)
             driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,docketObj.shiftDate)
-            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate,docketObj.standBySlot)
+            slotSize = DriverTripCheckStandByTotal(driverDocketNumber,docketObj.shiftDate)
+            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate,slotSize)
             driverTransferKmCost = checkTransferCost(driverDocketNumber,docketObj.shiftDate)
             driverReturnKmCost = checkReturnCost(driverDocketNumber,docketObj.shiftDate)
             # minLoad 

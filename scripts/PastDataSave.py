@@ -193,10 +193,10 @@ def run():
                             
                             # print("GRACE found")
                             
-                            if int(data[13]) > int(graceObj.waiting_time_grace_in_minutes):
-                                totalWaitingTime = int(data[13]) - graceObj.waiting_time_grace_in_minutes
-                            else:
-                                totalWaitingTime = 0
+                            # if int(data[13]) > int(graceObj.waiting_time_grace_in_minutes):
+                            #     totalWaitingTime = int(data[13]) - graceObj.waiting_time_grace_in_minutes
+                            # else:
+                            #     totalWaitingTime = 0
                             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard).first()
 
                             if not costParameterObj:
@@ -215,16 +215,16 @@ def run():
                                 continue
                                 
                             # print("COST PARAMETER found!!!")
-                            if str(data[20]).lower() != '' or str(data[21]).lower() != '':
-                                start = datetime.strptime(str(data[20]),'%H:%M:%S')
-                                end = datetime.strptime(str(data[21]),'%H:%M:%S')
-                                totalStandByTime = ((end-start).total_seconds())/60
-                                # totalStandByTime = getTimeDifference(data[20],data[21])
-                                if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
-                                    totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
-                                    standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
-                            else:
-                                standBySlot = 0
+                            # if str(data[20]).lower() != '' or str(data[21]).lower() != '':
+                            #     start = datetime.strptime(str(data[20]),'%H:%M:%S')
+                            #     end = datetime.strptime(str(data[21]),'%H:%M:%S')
+                            #     totalStandByTime = ((end-start).total_seconds())/60
+                            #     # totalStandByTime = getTimeDifference(data[20],data[21])
+                            #     if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
+                            #         totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
+                            #         standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+                            # else:
+                            #     standBySlot = 0
                                 
                             docketObj.shiftDate = ' ' if str(data[0]).lower() == '' else res_
                             docketObj.tripId = tripObj
@@ -238,8 +238,8 @@ def run():
                             docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12], '%H:%M:%S').time())
                             # docketObj.totalWaitingInMinute = totalWaitingTime
                             docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
-                            docketObj.standByStartTime = 0 if str(data[20]).lower() == '' else data[20]
-                            docketObj.standByEndTime = 0 if str(data[21]).lower() == '' else data[21]
+                            docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20], '%H:%M:%S').time())
+                            docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21], '%H:%M:%S').time())
                             # docketObj.standBySlot = standBySlot
                             docketObj.comment = data[17]
                             # modification for adding blow back and replacement.
@@ -265,9 +265,8 @@ def run():
                             driverLoadAndKmCost = checkLoadAndKmCost(int(docketObj.docketNumber),docketObj.shiftDate)
                             driverSurchargeCost = checkSurcharge(int(docketObj.docketNumber),docketObj.shiftDate)
                             driverWaitingTimeCost = round(docketObj.totalWaitingInMinute * costParameterObj.waiting_cost_per_minute,2) 
-                            driverStandByCost = round(costParameterObj.standby_cost_per_slot * docketObj.standBySlot,2)
-                            # driverWaitingTimeCost = checkWaitingTime(int(docketObj.docketNumber),docketObj.shiftDate)
-                            # driverStandByCost = checkStandByTotal(int(docketObj.docketNumber),docketObj.shiftDate)
+                            slotSize = DriverTripCheckStandByTotal(int(docketObj.docketNumber),docketObj.shiftDate)
+                            driverStandByCost = round(costParameterObj.standby_cost_per_slot * slotSize,2)
                             driverTransferKmCost = checkTransferCost(int(docketObj.docketNumber),docketObj.shiftDate)
                             driverReturnKmCost = checkReturnCost(int(docketObj.docketNumber),docketObj.shiftDate)
                                 
