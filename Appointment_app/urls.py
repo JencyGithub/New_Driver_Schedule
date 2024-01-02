@@ -23,8 +23,12 @@ app_name = 'Appointment'
 urlpatterns = [
     # Appointment
     path('appointmentForm/', views.appointmentForm,name="appointmentForm"),
-    path('appointmentForm/update/view/<int:id>/', views.appointmentForm,name="appointmentFormUpdateView"),
+    path('appointmentForm/view/<int:id>/', views.appointmentForm,name="appointmentFormView"),
     path('appointmentForm/save/', views.appointmentSave,name="appointmentFormSave"),
+    
+    path('appointmentForm/update/view/<int:id>/<int:update>/', views.appointmentForm,name="appointmentFormUpdateView"),
+    path('appointmentForm/update/save/<int:id>/', views.appointmentSave,name="appointmentFormUpdateSave"),
+    
     path('findJob/', views.findJob,name="findJob"),
     
     path('getTruckAndDriver/', views.getTruckAndDriver ,name="getTruckAndDriver"),

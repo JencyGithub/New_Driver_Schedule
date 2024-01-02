@@ -40,6 +40,11 @@ urlpatterns = [
     path('docket/save/<int:id>/', views.uploadDocketSave, name='uploadDocketSave'),
     
     
+    path('timeOfStart/view/', views.timeOfStart, name='timeOfStart'),
+    path('timeOfStart/save/', views.timeOfStartSave, name='timeOfStartSave'),
+    
+    
+    
 
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     

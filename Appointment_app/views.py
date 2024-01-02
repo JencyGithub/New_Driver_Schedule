@@ -26,7 +26,7 @@ def convertDateTimeForTemplate(provided_date_string):
     formatted_datetime = datetime_obj.strftime("%Y-%m-%dT%H:%M")
     return formatted_datetime
 
-def appointmentForm(request, id=None):
+def appointmentForm(request, id=None, update=None):
     currentUser = request.user
     drivers = Driver.objects.all()
     clients = Client.objects.all()
@@ -42,26 +42,22 @@ def appointmentForm(request, id=None):
         data.Start_Date_Time = convertDateTimeForTemplate(data.Start_Date_Time)
         data.End_Date_Time = convertDateTimeForTemplate(data.End_Date_Time)
         data.report_to_origin = convertDateTimeForTemplate(data.report_to_origin)
-        appointmentDriver = AppointmentDriver.objects.filter(appointmentId = data.id).first()
-        appointmentTruck = AppointmentTruck.objects.filter(appointmentId = data.id).first()
+        
+        appointmentDriver = AppointmentDriver.objects.filter(appointmentId = data.id).last()
+        appointmentTruck = AppointmentTruck.objects.filter(appointmentId = data.id).last()
 
         params['data'] = data
         params['appointmentDriver'] = appointmentDriver
         params['appointmentTruck'] = appointmentTruck
-        
-        
         
         unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(Start_Date_Time__gte = data.Start_Date_Time,Start_Date_Time__lte = data.End_Date_Time)|Q(End_Date_Time__gte = data.Start_Date_Time,End_Date_Time__lte = data.End_Date_Time))
         unavailableDriversQrySet = [] 
         unavailableTrucksQrySet = [] 
         
 
-        for obj in unavailableDriversAndTrucksQrySet:
-            # tempDriver = obj.driver
-            # tempTruck = AdminTruck.objects.filter(adminTruckNumber = obj.truckNo).first()
-            
-            tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).first()
-            tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).first()
+        for obj in unavailableDriversAndTrucksQrySet:            
+            tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).last()
+            tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).last()
             if tempDriver:
                 unavailableDriversQrySet.append({'driverId':tempDriver.driverName.driverId,'name':tempDriver.driverName.name})
             if tempTruck:
@@ -76,6 +72,7 @@ def appointmentForm(request, id=None):
         
         params['availableDriversList'] = availableDriversList
         params['availableTrucksList'] = availableTrucksList
+        params['update'] = update
         
         print(availableDriversList,availableTrucksList)
         
@@ -83,40 +80,49 @@ def appointmentForm(request, id=None):
     return render(request, 'Appointment/appointmentForm.html',params)
 
 @csrf_protect
-def appointmentSave(request):
-    client = Client.objects.filter(pk=request.POST.get('stopName')).first()
-    newOrigin = request.POST.get('originAddVal')
-    originObj = None
-    if newOrigin == 1:
-        originObj = BasePlant()
-        originObj.basePlant = request.POST.get('origin')
-        originObj.address = request.POST.get('originAddress')
-        originObj.phone = request.POST.get('originPhone')
-        originObj.personOnName = request.POST.get('originPersonOnName')
-        originObj.managerName = request.POST.get('originPersonOnName')
-        originObj.lat = request.POST.get('originLatitude')
-        originObj.long = request.POST.get('originLongitude')
-        originObj.save()
-    else:
-        originObj = BasePlant.objects.filter(basePlant=request.POST.get('origin').upper()).first()
-        
+def appointmentSave(request,id=None):
     appointmentObj = Appointment()
-    appointmentObj.Title = request.POST.get('title')
-    appointmentObj.Start_Date_Time = request.POST.get('startDateTime')
-    appointmentObj.End_Date_Time = request.POST.get('endDateTime')
-    appointmentObj.report_to_origin = request.POST.get('reportToOrigin')
-    appointmentObj.Recurring = request.POST.get('recurring')
-    appointmentObj.Staff_Notes = request.POST.get('staffNotes')
-    appointmentObj.Created_by = request.user
-    appointmentObj.stop = client
-    appointmentObj.Origin = originObj
-    appointmentObj.Status = 'Unassigned'
-    appointmentObj.shiftType = request.POST.get('shiftType')
-    appointmentObj.save()
+    if id:
+        appointmentObj = Appointment.objects.filter(pk=id).first()
+        messageStr = "Appointment Updated Successfully."
+    else:
+    # if not id:
+        client = Client.objects.filter(pk=request.POST.get('stopName').strip()).first()
+        newOrigin = request.POST.get('originAddVal').strip()
+        originObj = None
+        if newOrigin == 1:
+            originObj = BasePlant()
+            originObj.basePlant = request.POST.get('origin')
+            originObj.address = request.POST.get('originAddress')
+            originObj.phone = request.POST.get('originPhone')
+            originObj.personOnName = request.POST.get('originPersonOnName')
+            originObj.managerName = request.POST.get('originPersonOnName')
+            originObj.lat = request.POST.get('originLatitude')
+            originObj.long = request.POST.get('originLongitude')
+            originObj.save()
+        else:
+            originObj = BasePlant.objects.filter(basePlant=request.POST.get('origin').upper().strip()).first()
 
+        appointmentObj.Title = request.POST.get('title')
+        appointmentObj.Start_Date_Time = request.POST.get('startDateTime')
+        appointmentObj.End_Date_Time = request.POST.get('endDateTime')
+        appointmentObj.report_to_origin = request.POST.get('reportToOrigin')
+        appointmentObj.Recurring = request.POST.get('recurring')
+        appointmentObj.Staff_Notes = request.POST.get('staffNotes')
+        appointmentObj.Created_by = request.user
+        appointmentObj.stop = client
+        appointmentObj.Origin = originObj
+        appointmentObj.shiftType = request.POST.get('shiftType')
+        appointmentObj.Status = 'Unassigned'
+        appointmentObj.save()
+        messageStr = "Appointment added successfully."
+    
     driver = Driver.objects.filter(pk=request.POST.get('driverName')).first()
     if driver:
-        appointmentDriverObj = AppointmentDriver()
+        appointmentDriverObj = AppointmentDriver.objects.filter(appointmentId = appointmentObj.id).first()
+        if not appointmentDriverObj:
+            appointmentDriverObj = AppointmentDriver()
+            
         appointmentDriverObj.driverName = driver
         appointmentDriverObj.appointmentId = appointmentObj
         appointmentDriverObj.save()
@@ -124,7 +130,10 @@ def appointmentSave(request):
     truck = AdminTruck.objects.filter(adminTruckNumber=request.POST.get('truckNo')).first()
 
     if truck:
-        appointmentTruckObj = AppointmentTruck()
+        appointmentTruckObj = AppointmentTruck.objects.filter(appointmentId = appointmentObj.id).first()
+        if not appointmentTruckObj:
+            appointmentTruckObj = AppointmentTruck()
+            
         appointmentTruckObj.truckNo = truck
         appointmentTruckObj.appointmentId = appointmentObj
         appointmentTruckObj.save()
@@ -133,8 +142,9 @@ def appointmentSave(request):
         appointmentObj.Status = "Assigned"
         appointmentObj.save()
         
-    messages.success(request, "Form Successfully Filled Up.")
-    return redirect(request.META.get('HTTP_REFERER'))
+    messages.success(request, messageStr)
+
+    return redirect('Appointment:findJob')        
 
 def findJob(request):
     jobs = Appointment.objects.filter(scheduled = False)
