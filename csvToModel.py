@@ -41,31 +41,27 @@ docket_pattern = r'^\d{8}$|^\d{6}$'
 
 def insertIntoModel(dataList,file_name):
     try:
-        errorSolve = dataList
         
-        RCTIobj =  RCTI.objects.filter(docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
+        errorSolve = dataList
+        # if 'adjustmen' != str(dataList[1]).strip().lower():
+        RCTIobj =  RCTI.objects.filter(docketNumber=dataList[1],docketDate = dateConvert(dataList[2])).first()
         if not RCTIobj:
             RCTIobj = RCTI()
-            
-        # try:
-        #     existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
-        #     if str(existingDocket.docketDate) == dateConvert(dataList[2]):
-        #         RCTIobj = existingDocket
-        # except:
-        #     RCTIobj = RCTI()
-    
 
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
         RCTIobj.clientName = Client.objects.filter(name = 'boral').first()
-        if re.match(docket_pattern ,str(dataList[1])):
+        if re.match(docket_pattern ,str(dataList[1])) or 'adjustmen' == str(dataList[1]).strip().lower():
+
             RCTIobj.docketNumber = str(dataList[1])
             dataList = dataList[2:]
             basePlants = BasePlant.objects.all()
             BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
+            
             while dataList:
 
                 dump = dataList[:10]
                 description = dump[2].lower().strip()
+                
                 if 'top up' in description:
                     # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
                     # RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
@@ -222,7 +218,6 @@ def insertIntoModel(dataList,file_name):
             rctiErrorObj.save()
 
     except Exception as e:
-        # print(f"Error : {e}")
         rctiErrorObj = RctiErrors( 
                             clientName = 'boral',
                             docketNumber = RCTIobj.docketNumber,
@@ -248,7 +243,6 @@ def insertIntoExpenseModel(dataList , file_name):
                 
                 # if dataList[2] is not BasePlant_:
                 #     BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dataList[3]).upper())[0]
-                # print(dataList,len(dataList))
 
                 # if dataList[3] not in  BasePlant_:
                 #     rctiErrorObj = RctiErrors( 

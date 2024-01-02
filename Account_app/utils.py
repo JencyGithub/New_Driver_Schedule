@@ -51,13 +51,14 @@ def setLineExpense(given_line, previous_line, truckNo , filePath):
     if checkDate(given_line[0]):
         if previous_line:
             given_line.insert(0,previous_line[1])
+        if previous_line:
+            given_line.insert(0,previous_line[1])
     elif checkDate(given_line[1]):
         pass
-    else:     
-        if previous_line:
+    else:  
+        if previous_line:   
             given_line.insert(0,previous_line[2])
             given_line.insert(0,previous_line[1])
-    
     
     if ' ' in given_line[2]:
         given_line.insert(2,'NOT SELECTED')
@@ -124,7 +125,7 @@ file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 # file_path = 'static/Account/RCTI/tempRCTIInvoice/20231218124557@_!Boral-15-Apr-2023.csv'
 
 while(file_path[-4:] != '.csv'):
-    print("Your given file is not valid.")
+    # print("Your given file is not valid.")
     file_path = getFileName()
 
 # File name
