@@ -151,6 +151,7 @@ class RCTI(models.Model):
     cartageGSTPayable = models.FloatField(default=0)
     cartageTotalExGST = models.FloatField(default=0)
     cartageTotal = models.FloatField(default=0)
+    
     # Holcim 
     unit = models.CharField(default='', max_length=10)
     paidQty = models.FloatField(default=0)

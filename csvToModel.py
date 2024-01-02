@@ -9,6 +9,8 @@ def convertIntoFloat(str_):
     cleaned_string = str_.replace(' ','').replace(',','')
     return float(cleaned_string)
 
+def checkStr(data:str):
+    return data.lower().strip().replace(" ","")
 
 def checkDate(date_):
     pattern = r'\d{2}/\d{2}/\d{2}'
@@ -19,291 +21,234 @@ def dateConvert(date_):
     year_ = '20' + date_[-1]
     return year_ + '-' + date_[1] + '-' + date_[0]
 
-def insertTopUpRecord(list_, truckNo, docketNumber):
-    RCTIobj = RCTI()
-    excistingRCTI = RCTI.objects.filter(docketDate = dateConvert(list_[0].split()[-1]) , docketNumber = docketNumber).first()
-    if not excistingRCTI :
-        RCTIobj.docketNumber = docketNumber
-        RCTIobj.truckNo = truckNo
-    RCTIobj.docketDate = dateConvert(list_[0].split()[-1])
-    RCTIobj.docketYard = list_[1]
-    
-    RCTIobj.others = list_[2]
-    RCTIobj.othersCost = convertIntoFloat(list_[6])
-    RCTIobj.othersGSTPayable = list_[7]
-    RCTIobj.othersTotalExGST = list_[8]
-    RCTIobj.othersTotal = list_[9]
-    # RCTIobj.save()
-    return RCTIobj
-
 docket_pattern = r'^\d{8}$|^\d{6}$'
 
 
 def insertIntoModel(dataList,file_name):
+    RCTIobj = None
     try:
+        data_str = ','.join(dataList)
         errorSolve = dataList
+        rctiErrorObj = RctiErrors()
         
-        RCTIobj =  RCTI.objects.filter(docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
+        if 'topup' in (data_str).strip().lower().replace(' ',''):
+            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.docketNumber = None
+            rctiErrorObj.docketDate = None
+            rctiErrorObj.errorDescription = "Manage Top-up."
+            rctiErrorObj.fileName = file_name
+            rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.save()
+            return
+        if 'tolls' in (data_str).strip().lower().replace(' ',''):
+            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.docketNumber = None
+            rctiErrorObj.docketDate = None
+            rctiErrorObj.errorDescription = "Manage Tolls."
+            rctiErrorObj.fileName = file_name
+            rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.save()
+            return
+
+        RCTIobj =  RCTI.objects.filter(truckNo = float(dataList[0]) ,docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
+
         if not RCTIobj:
             RCTIobj = RCTI()
-            
-        # try:
-        #     existingDocket = RCTI.objects.get(docketNumber=int(dataList[1]))
-        #     if str(existingDocket.docketDate) == dateConvert(dataList[2]):
-        #         RCTIobj = existingDocket
-        # except:
-        #     RCTIobj = RCTI()
-    
-
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
         RCTIobj.clientName = Client.objects.filter(name = 'boral').first()
-        if re.match(docket_pattern ,str(dataList[1])):
-            RCTIobj.docketNumber = str(dataList[1])
-            dataList = dataList[2:]
-            basePlants = BasePlant.objects.all()
-            BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
-            while dataList:
+        
+        
+        dataList = dataList[1:]
+        
+        
+        while dataList:
+            if re.match(docket_pattern ,str(dataList[0])):
+                RCTIobj.docketNumber = str(dataList[0])
+                basePlants = BasePlant.objects.all()
+                BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
+                description = checkStr(dataList[3])
+                                    
+                RCTIobj.docketDate = dateConvert(dataList[1])
+                bp = dataList[2]
+                if dataList[2] not in BasePlant_:
+                    i = 0
+                    while len(bp) <= 10:
+                        # bp = bp + dataList[3].split()
+                        bp = dataList[2]
+                        temp = ''
+                        temp_data3 = dataList[3].split()
 
-                dump = dataList[:10]
-                description = dump[2].lower().strip()
-                if 'top up' in description:
-                    # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
-                    # RCTIobj.docketDate = dateConvert(dump[0].split()[-1])
-                    # RCTIobj.docketYard = dump[1]
-                    
-                    # RCTIobj.others = dump[2]
-                    # RCTIobj.othersCost = convertIntoFloat(dump[6])
-                    # RCTIobj.othersGSTPayable = convertIntoFloat(dump[7])
-                    # RCTIobj.othersTotalExGST = convertIntoFloat(dump[8])
-                    # RCTIobj.othersTotal = convertIntoFloat(dump[9])
-                    # dataList = dataList[10:]
-                    rctiErrorObj = RctiErrors( 
-                                        clientName = 'boral',
-                                        docketNumber = RCTIobj.docketNumber,
-                                        docketDate = RCTIobj.docketDate,
-                                        errorDescription = "Manage Top-up.",
-                                        fileName = file_name,
-                                        data = str(errorSolve)
-                    )
-                    rctiErrorObj.save()
-                    return
+                        for j in range(i):
+                            temp = temp + temp_data3[j] + ' '
+                        temp = temp.strip()
 
-                    
-                RCTIobj.docketDate = dateConvert(dump[0])
-                if dump[1] not in BasePlant_:
-                    rctiErrorObj = RctiErrors( 
-                                        clientName = 'boral',
-                                        docketNumber = RCTIobj.docketNumber,
-                                        docketDate = RCTIobj.docketDate,
-                                        errorDescription = "Earning Depot/Location does not exist.",
-                                        fileName = file_name,
-                                        data = str(errorSolve)
-                    )
-                    rctiErrorObj.save()
-                    dataList = dataList[10:]
-                    return
+                        bp = bp + ' ' + temp
+                        if bp in BasePlant_:
+                            dataList[2] = bp
+                            RCTIobj.docketYard = dataList[2]
+                            # print(RCTIobj.docketNumber,RCTIobj.docketYard)
+                            break
+                        i = i + 1
+                    else :
+                        rctiErrorObj.clientName = 'boral'
+                        rctiErrorObj.docketNumber = RCTIobj.docketNumber
+                        rctiErrorObj.docketDate = RCTIobj.docketDate
+                        rctiErrorObj.errorDescription = "Earning Depot/Location does not exist."
+                        rctiErrorObj.fileName = file_name
+                        rctiErrorObj.data = str(errorSolve)
+                        rctiErrorObj.save()
+                        return
                 else:
-                    # BasePlant_ = BasePlant.objects.filter(basePlant = str(dump[1]).upper()).first()
-                    RCTIobj.docketYard = dump[1]
+                    RCTIobj.docketYard = dataList[2] 
                 
-                if "truck transfer" in description:
-                    RCTIobj.transferKM = convertIntoFloat(dump[4])
-                    RCTIobj.transferKMCost = convertIntoFloat(dump[6])
-                    RCTIobj.transferKMGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.transferKMTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.transferKMTotal = convertIntoFloat(dump[-1])
+                if "trucktransfer" in description:
+                    RCTIobj.transferKM = convertIntoFloat(dataList[5])
+                    RCTIobj.transferKMCost = convertIntoFloat(dataList[7])
+                    RCTIobj.transferKMTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.transferKMGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.transferKMTotal = convertIntoFloat(dataList[10])
                 elif "cartage" in description:
-                    RCTIobj.noOfKm = convertIntoFloat(dump[3])
-                    RCTIobj.cubicMl = convertIntoFloat(dump[4])
-                    RCTIobj.cubicMiAndKmsCost = convertIntoFloat(dump[6])
+                    RCTIobj.noOfKm = convertIntoFloat(dataList[4])
+                    RCTIobj.cubicMl = convertIntoFloat(dataList[5])
+                    RCTIobj.cubicMiAndKmsCost = convertIntoFloat(dataList[7])
                     RCTIobj.destination = description.split('cartage')[0]
-                    RCTIobj.cartageGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.cartageTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.cartageTotal = convertIntoFloat(dump[-1])
-                elif "return" in description:
-                    RCTIobj.returnKm = convertIntoFloat(dump[4])
-                    RCTIobj.returnPerKmPerCubicMeterCost = convertIntoFloat(dump[6])
-                    RCTIobj.returnKmGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.returnKmTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.returnKmTotal = convertIntoFloat(dump[-1])
-                elif "waiting time" in description:
-                    RCTIobj.waitingTimeInMinutes = convertIntoFloat(dump[4])
-                    RCTIobj.waitingTimeCost = convertIntoFloat(dump[6])
-                    RCTIobj.waitingTimeGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.waitingTimeTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.waitingTimeTotal = convertIntoFloat(dump[-1])
-                elif "minimum load" in description:
-                    RCTIobj.minimumLoad = convertIntoFloat(dump[4])
-                    RCTIobj.loadCost = convertIntoFloat(dump[6])
-                    RCTIobj.minimumLoadGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.minimumLoadTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.minimumLoadTotal = convertIntoFloat(dump[-1])
-                elif "standby" in description:
-                    RCTIobj.standByNoSlot = convertIntoFloat(dump[4])
-                    RCTIobj.standByUnit = 'slot' if str(
-                        dump[5].lower()) == 'each' else 'minute'
-                    RCTIobj.standByPerHalfHourDuration = convertIntoFloat(dump[6])
-                    RCTIobj.standByGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.standByTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.standByTotal = convertIntoFloat(dump[-1])
-                # elif "surcharge after hours" in description:
-                #     RCTIobj.surcharge_duration = convertIntoFloat(dump[4])
-                #     if "mon-fri" in description and "each" in str(dump[5].lower()):
-                #         RCTIobj.surcharge_fixed_normal = convertIntoFloat(dump[6])
-                #     elif "sat" in description and 'mon' in description and "each" in str(dump[5].lower()):
-                #         RCTIobj.surcharge_fixed_sunday = convertIntoFloat(dump[6])
-                #     RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
-                #     RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
-                #     RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])
-
+                    RCTIobj.cartageTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.cartageGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.cartageTotal = convertIntoFloat(dataList[10])
+                elif "returnperkm" in description:
+                    RCTIobj.returnKm = convertIntoFloat(dataList[5])
+                    RCTIobj.returnPerKmPerCubicMeterCost = convertIntoFloat(dataList[7])
+                    RCTIobj.returnKmTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.returnKmGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.returnKmTotal = convertIntoFloat(dataList[10])
+                elif "waitingtime" in description:
+                    RCTIobj.waitingTimeInMinutes = convertIntoFloat(dataList[5])
+                    RCTIobj.waitingTimeCost = convertIntoFloat(dataList[7])
+                    RCTIobj.waitingTimeTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.waitingTimeGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.waitingTimeTotal = convertIntoFloat(dataList[10])
+                elif "minimumload" in description:
+                    RCTIobj.minimumLoad = convertIntoFloat(dataList[5])
+                    RCTIobj.loadCost = convertIntoFloat(dataList[7])
+                    RCTIobj.minimumLoadTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.minimumLoadGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.minimumLoadTotal = convertIntoFloat(dataList[10])
+                elif "standbyper" in description:
+                    RCTIobj.standByNoSlot = convertIntoFloat(dataList[5])
+                    RCTIobj.standByUnit = 'slot' if str(dataList[6].lower()) == 'each' else 'minute'
+                    RCTIobj.standByPerHalfHourDuration = convertIntoFloat(dataList[7])
+                    RCTIobj.standByTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.standByGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.standByTotal = convertIntoFloat(dataList[10])
                 elif "surcharge" in description:
-                    RCTIobj.surcharge = convertIntoFloat(dump[4])
-                    RCTIobj.surchargeCost = convertIntoFloat(dump[6])
-                    RCTIobj.surchargeGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.surchargeTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.surchargeTotal = convertIntoFloat(dump[-1])
-                elif "waiting time sched" in description:
-                    RCTIobj.waitingTimeSCHED = convertIntoFloat(dump[4])
-                    RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dump[6])
-                    RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dump[-2])
-                    RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dump[-3])
-                    RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dump[-1])
-                     
-                # surcharge_fixed_public_holiday
-                # surcharge_per_cubic_meters_normal
-                # surcharge_per_cubic_meters_sunday
-                # surcharge_per_cubic_meters_public_holiday
+                    RCTIobj.surcharge = convertIntoFloat(dataList[5])
+                    RCTIobj.surchargeCost = convertIntoFloat(dataList[7])
+                    RCTIobj.surchargeTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.surchargeGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.surchargeTotal = convertIntoFloat(dataList[10])
+                elif "waitingtimesched" in description:
+                    RCTIobj.waitingTimeSCHED = convertIntoFloat(dataList[5])
+                    RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dataList[7])
+                    RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dataList[10])
+                else:
+                    with open('csvToModelSkip.txt','a')as f:
+                        f.write('earnings' + file_name + str(dataList)+'\n')
+                dataList = dataList[11:]
+            
+        RCTIobj.save()
+            
+        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+        rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
 
-                # others
-                # othersCost
-
-                # ------------------------------------------
-
-                RCTIobj.GSTPayable = convertIntoFloat(dump[8])
-                RCTIobj.TotalExGST = convertIntoFloat(dump[7])
-                RCTIobj.Total = convertIntoFloat(dump[9])
-
-                dataList = dataList[10:]
-            RCTIobj.save()
-            
-            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
-            rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
-            
-            # rctiTotalCost =   RCTIobj.cartageTotal + RCTIobj.waitingTimeTotal + RCTIobj.transferKMTotal  +  RCTIobj.returnKmTotal + RCTIobj.standByTotal +RCTIobj.minimumLoadTotal
-            
-            if not reconciliationDocketObj :
-                reconciliationDocketObj = ReconciliationReport()
-            
-            reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
-            reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-            reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-            # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-            reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
-            reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
-            reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
-            # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-            reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
-            reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
-            reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
-            reconciliationDocketObj.fromRcti = True 
-            
-            reconciliationDocketObj.save()
-            checkMissingComponents(reconciliationDocketObj)
-            
-        else:
-            rctiErrorObj = RctiErrors( 
-                            clientName = 'boral',
-                            docketNumber = dataList[1],
-                            docketDate = RCTIobj.docketDate,
-                            errorDescription = 'To be adjusted manually by admin team',
-                            fileName = file_name,
-                            data = str(errorSolve)
-        )
-            rctiErrorObj.save()
+        if not reconciliationDocketObj :
+            reconciliationDocketObj = ReconciliationReport()
+        
+        reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
+        reconciliationDocketObj.docketDate =  RCTIobj.docketDate
+        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
+        # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
+        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
+        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
+        # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
+        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
+        reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+        reconciliationDocketObj.fromRcti = True 
+        
+        reconciliationDocketObj.save()
+        checkMissingComponents(reconciliationDocketObj)
+        return
 
     except Exception as e:
-        # print(f"Error : {e}")
-        rctiErrorObj = RctiErrors( 
-                            clientName = 'boral',
-                            docketNumber = RCTIobj.docketNumber,
-                            docketDate = RCTIobj.docketDate,
-                            errorDescription = e,
-                            fileName = file_name,
-                            data = str(errorSolve)
-        )
-        rctiErrorObj.save()
+        rctiErrorObj.clientName = 'boral'
+        rctiErrorObj.docketNumber = dataList[1]
+        rctiErrorObj.docketDate =  dataList[2]
+        rctiErrorObj.errorDescription = e
+        rctiErrorObj.fileName = file_name
+        rctiErrorObj.data = str(errorSolve)
+        rctiErrorObj.save() 
         pass
 
 def insertIntoExpenseModel(dataList , file_name):
     errorSolve = dataList
-    basePlants = BasePlant.objects.all()
-    BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
-    if dataList and len(dataList) > 10:
+    if dataList:
         try:
             rctiExpenseObj = RctiExpense()
             if checkDate(dataList[2]):
                 rctiExpenseObj.truckNo = str(dataList[0])
                 rctiExpenseObj.docketNumber = str(dataList[1])
                 rctiExpenseObj.docketDate = dateConvert(dataList[2])
-                
-                # if dataList[2] is not BasePlant_:
-                #     BasePlant_ = BasePlant.objects.get_or_create(basePlant = str(dataList[3]).upper())[0]
-                # print(dataList,len(dataList))
-
-                # if dataList[3] not in  BasePlant_:
-                #     rctiErrorObj = RctiErrors( 
-                #                         docketNumber = rctiExpenseObj.docketNumber,
-                #                         docketDate = rctiExpenseObj.docketDate,
-                #                         errorDescription = "Expense Depot/Location does not exist.",
-                #                         fileName = file_name,
-                #                         data = str(dataList))
-                #     rctiErrorObj.save()
-                #     pass
-                # else:
-                #     BasePlant_ = BasePlant.objects.filter(basePlant = str(dataList[1]).upper()).first()
-
                 rctiExpenseObj.docketYard = str(dataList[3]).upper()
                 rctiExpenseObj.description = str(dataList[4])
                 rctiExpenseObj.paidKm =  0
-                rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[6])
-                rctiExpenseObj.unit =  dataList[7]
-                rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[8])
+                rctiExpenseObj.invoiceQuantity =  convertIntoFloat(dataList[5])
+                rctiExpenseObj.unit =  dataList[6]
+                rctiExpenseObj.unitPrice =  convertIntoFloat(dataList[7])
+                rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[8])
                 rctiExpenseObj.gstPayable =  convertIntoFloat(dataList[9])
-                rctiExpenseObj.totalExGST =  convertIntoFloat(dataList[10])
-                rctiExpenseObj.total =  convertIntoFloat(dataList[11])
+                rctiExpenseObj.total =  convertIntoFloat(dataList[10])
                 rctiExpenseObj.save()
+                return
         except Exception as e:
-            rctiErrorObj = RctiErrors( 
-                            docketNumber = rctiExpenseObj.docketNumber,
-                            docketDate = rctiExpenseObj.docketDate,
-                            errorDescription = e,
-                            fileName = file_name,
-                            data = str(errorSolve)
-            )
-            rctiErrorObj.save()
+            rctiErrorObj = RctiErrors() 
+            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.docketNumber = dataList[1]
+            rctiErrorObj.docketDate =  dataList[2]
+            rctiErrorObj.errorDescription = e
+            rctiErrorObj.fileName = file_name
+            rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.save() 
+            return           
+    else:
+        with open('csvToModelSkip.txt','a')as f:
+            f.write('expenses' + file_name + str(dataList)+'\n')
+        return
+       
+       
+with open("File_name_file.txt", 'r') as f:
+    file_names = f.read().split('<>')   
             
+earningFileName = file_names[0].strip()
+expenseFileName = file_names[1].strip()
+
 try:
-    with open("File_name_file.txt", 'r') as f:
-        file_name = f.read()
-    # file_name = file_name.strip()
-    file_name = file_name.split('<>')
-    
-    # file_name = 'converted_20231030113104@_!pdf1.csv'
-    convertFileName = file_name[0].split('@_!')[1]
+    earningFile = open(f'static/Account/RCTI/RCTIInvoice/{earningFileName}', 'r')
+    earningReader = csv.reader(earningFile)
+    for earningData in earningReader:
+        insertIntoModel(earningData,earningFileName)      
 
-    file = open(f'static/Account/RCTI/RCTIInvoice/{file_name[0].strip()}', 'r')
-    reader = csv.reader(file)
-    next(reader)
+except Exception as e:
+    with open ('Earning_error.txt','a') as f:
+        f.write(str(e))
 
-    for row in reader:
-        insertIntoModel(row,convertFileName)
-
-    # Expense 
-    fileExpense = open(f'static/Account/RCTI/RCTIInvoice/{file_name[1].strip()}', 'r')
-    reader = csv.reader(fileExpense)
-    for row in reader:
-        insertIntoExpenseModel(row , convertFileName)
-        
+try:
+    expenseFile = open(f'static/Account/RCTI/RCTIInvoice/{expenseFileName}', 'r')
+    expenseReader = csv.reader(expenseFile)
+    for expenseData in expenseReader:
+        insertIntoExpenseModel(expenseData,expenseFileName)
 except Exception as e:
     with open ('Expense_error.txt','a') as f:
         f.write(str(e))
