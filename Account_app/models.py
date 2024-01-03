@@ -61,8 +61,10 @@ class DriverTrip(models.Model):
     shiftDate = models.DateField(null=True, default=None)
     startTime = models.CharField(max_length=200)
     endTime = models.CharField(max_length=200)
+    dispute = models.BooleanField(default = False)
     loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
+    comment2 = models.CharField(max_length=200, default='None')
 
     def __str__(self) -> str:
         return str(self.id)
@@ -285,18 +287,19 @@ class PastTripError(models.Model):
 class ReconciliationReport(models.Model):
     docketNumber = models.CharField( max_length=10,default='')
     docketDate = models.DateField(default=None, null= True, blank=True)
-    
+    clientName =  models.CharField(max_length=20,default='')
     driverId = models.PositiveIntegerField(default=0)
     clientId = models.PositiveIntegerField(default=0)
     truckId = models.PositiveIntegerField(default=0)
     
-    # 0:reconciliation, 1:Short Paid
+    # 0:reconciliation, 1:Short Paid 2: Top up solved
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
     escalationType = models.CharField(max_length=20,default='')
     # 0:not escalate, 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
     escalationStep = models.PositiveIntegerField(default=0)
+    escalationAmount = models.PositiveIntegerField(default=0)
 
     
     fromDriver = models.BooleanField(default=False)

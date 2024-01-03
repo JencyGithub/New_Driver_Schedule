@@ -168,6 +168,7 @@ def insertIntoModel(dataList,file_name):
         reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
         reconciliationDocketObj.docketDate =  RCTIobj.docketDate
         reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
+        reconciliationDocketObj.clientName =  'boral'
         # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
         reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
         reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST

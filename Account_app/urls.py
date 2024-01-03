@@ -173,5 +173,15 @@ urlpatterns = [
     path('rctiHolcimForm/<int:holcimDocketId>/', views.rctiForm, name='rctiHolcimForm'), 
     path('rctiHolcimFormSave/', views.rctiHolcimFormSave, name='rctiHolcimFormSave'), 
     
+    
+    
+    # Top Up 
+    path('TopUp/Form/<int:id>', views.topUpForm, name='topUpForm'), 
+    path('TopUp/View/<int:id>/<int:topUpDocket>', views.topUpForm, name='topUpView'), 
+    # Ajax 
+    path('TopUp/Solve', views.topUpSolve, name='topUpSolve'),
+
+    
+    
 
 ]

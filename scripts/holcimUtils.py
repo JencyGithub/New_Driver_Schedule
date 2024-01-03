@@ -1,30 +1,35 @@
 import re,csv
-from Account_app.models import *
-from GearBox_app.models import *
-from Appointment_app.models import *
+# from Account_app.models import *
+# from GearBox_app.models import *
+# from Appointment_app.models import *
 from datetime import datetime
 
-with open('File_name_file.txt','r')as f:
-    fileName = f.read()
-    
+def checkStr(data:str):
+    return data.lower().strip().replace(" ","")
+
+# with open('File_name_file.txt','r')as f:
+#     fileName = f.read()
+fileName = '1_January_2023_PNR (1).csv'
 with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
-    rctiErrorObj = RctiErrors()
+    # rctiErrorObj = RctiErrors()
     csv_reader = csv.reader(f)
-    clientName = Client.objects.filter(name = 'holcim').first()
+    # clientName = Client.objects.filter(name = 'holcim').first()
     finalList = []
     prepared = []
     tempData = []
     lineCount = 0
     datePattern = r'\d{2}\.\d{2}\.\d{4}'
     docketPattern = r'(\d{8}[a-zA-Z]{0,2})'
+    fileDetails = []
     try:
         for row in csv_reader:
             lineCount += 1
-            if lineCount == 3117:
-                print()
+            
             if '@' in row[0]:
                 row[0]=row[0].replace(' @ ','@')
             splitRow = row[0].split()
+            if 'abn' in checkStr(row[0]):
+                fileDetails.insert(0,)
             splitRow = list(filter(lambda x: x.strip() != '', splitRow))
             if len(splitRow) > 0:
                 if re.fullmatch(datePattern, splitRow[0].strip()) and re.fullmatch(docketPattern, splitRow[1].strip()):
@@ -48,69 +53,78 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             prepared.extend(tempData[2:])
                         else:
                             finalList.append(prepared)
-                            
-
                             prepared = tempData
                     else:
                         prepared = tempData
                     tempData = []
-                        
+                else:
+                    with open('holcimUtils.txt','a')as f:
+                        f.write('pattern not match'+ str(row) +'\n')
+            else:
+                with open('holcimUtils.txt','a')as f:
+                    f.write('len is 0'+ str(row) +'\n')
+                          
         finalList.append(prepared)
-        for data in finalList:
-            try:
-                if len(data) > 5:
-                    rctiObj = RCTI()
-                    rctiObj.clientName = clientName
-                    rctiObj.docketNumber = data[1]
-                    rctiObj.docketDate =  datetime.strptime(data[0], '%d.%m.%Y').date()
+        # for data in finalList:
+        #     try:
+        #         if len(data) > 5:
+        #             rctiObj = RCTI()
+        #             rctiObj.clientName = clientName
+        #             rctiObj.docketNumber = data[1]
+        #             rctiObj.docketDate =  datetime.strptime(data[0], '%d.%m.%Y').date()
 
                     
-                    rctiObj.cubicMl = data[2]
-                    rctiObj.paidQty = data[3]
-                    rctiObj.unit = data[4]
-                    rctiObj.noOfKm = data[5]
-                    rctiObj.destination = data[6]
-                    rctiObj.cubicMiAndKmsCost = data[8]
-                    rctiObj.cartageTotal = data[8]
-                    dataList = data[9:]
-                    while dataList:
-                        if 'standby' in dataList[0].lower():
-                            rctiObj.standByPerHalfHourDuration = dataList[1]
-                            rctiObj.standByTotal =dataList[1]
-                        elif 'sat' in dataList[0].lower() or 'mon-fri' in dataList[0].lower():
-                            rctiObj.surchargeCost = dataList[1]
-                            rctiObj.surchargeTotal = dataList[1]
-                        elif 'wait' in dataList[0].lower():
-                            rctiObj.waitingTimeCost = dataList[1]
-                            rctiObj.waitingTimeTotal = dataList[1]
-                        elif 'blowback' in dataList[0].lower():
-                            rctiObj.blowBackCost = dataList[1]
-                            rctiObj.blowBackTotal = dataList[1]
-                        elif 'topup' in dataList[0].lower().replace(' ',''):
-                            rctiErrorObj.clientName = 'boral'
-                            rctiErrorObj.docketNumber = rctiObj.docketNumber
-                            rctiErrorObj.docketDate = rctiObj.docketDate
-                            rctiErrorObj.errorDescription = "Manage Top-up."
-                            rctiErrorObj.fileName = fileName
-                            rctiErrorObj.data = str(data)
-                            rctiErrorObj.save()
+        #             rctiObj.cubicMl = data[2]
+        #             rctiObj.paidQty = data[3]
+        #             rctiObj.unit = data[4]
+        #             rctiObj.noOfKm = data[5]
+        #             rctiObj.destination = data[6]
+        #             rctiObj.cubicMiAndKmsCost = data[8]
+        #             rctiObj.cartageTotal = data[8]
+        #             dataList = data[9:]
+        #             while dataList:
+        #                 if 'standby' in dataList[0].lower():
+        #                     rctiObj.standByPerHalfHourDuration = dataList[1]
+        #                     rctiObj.standByTotal =dataList[1]
+        #                 elif 'sat' in dataList[0].lower() or 'mon-fri' in dataList[0].lower():
+        #                     rctiObj.surchargeCost = dataList[1]
+        #                     rctiObj.surchargeTotal = dataList[1]
+        #                 elif 'wait' in dataList[0].lower():
+        #                     rctiObj.waitingTimeCost = dataList[1]
+        #                     rctiObj.waitingTimeTotal = dataList[1]
+        #                 elif 'blowback' in dataList[0].lower():
+        #                     rctiObj.blowBackCost = dataList[1]
+        #                     rctiObj.blowBackTotal = dataList[1]
+        #                 elif 'topup' in dataList[0].lower().replace(' ',''):
+        #                     rctiErrorObj.clientName = 'boral'
+        #                     rctiErrorObj.docketNumber = rctiObj.docketNumber
+        #                     rctiErrorObj.docketDate = rctiObj.docketDate
+        #                     rctiErrorObj.errorDescription = "Manage Top-up."
+        #                     rctiErrorObj.fileName = fileName
+        #                     rctiErrorObj.data = str(data)
+        #                     rctiErrorObj.save()
                             
-                        elif 'trucktrf' in dataList[0].lower():
-                            rctiObj.transferKMCost = dataList[1]
-                            rctiObj.transferKMTotal = dataList[1]
-                        elif 'return' in dataList[0].lower():
-                            rctiObj.returnPerKmPerCubicMeterCost = dataList[1]
-                            rctiObj.returnKmTotal = dataList[1]
-                        elif 'callout' in dataList[0].lower():
-                            rctiObj.callOutCost = dataList[1]
-                            rctiObj.callOutTotal = dataList[1]
-                        dataList = dataList[2:]
-                    
-                    rctiObj.save()
-                else:
-                    print(f'data:{data}') 
-            except Exception as e:
-                print(f'Inside Error:{e}')
+        #                 elif 'trucktrf' in dataList[0].lower():
+        #                     rctiObj.transferKMCost = dataList[1]
+        #                     rctiObj.transferKMTotal = dataList[1]
+        #                 elif 'return' in dataList[0].lower():
+        #                     rctiObj.returnPerKmPerCubicMeterCost = dataList[1]
+        #                     rctiObj.returnKmTotal = dataList[1]
+        #                 elif 'callout' in dataList[0].lower():
+        #                     rctiObj.callOutCost = dataList[1]
+        #                     rctiObj.callOutTotal = dataList[1]
+        #                 else:
+        #                     with open('holcim.txt','a')as f:
+        #                         f.write('len is 0'+ str(dataList) +'\n')
+        #                 dataList = dataList[2:]
+                        
+        #             rctiObj.save()
+        #         else:
+        #             print(f'data:{data}') 
+        #     except Exception as e:
+        #         print(f'Inside Error:{e}')
+    
+    
     except Exception as e:
         print(f'Error:{e}')
         

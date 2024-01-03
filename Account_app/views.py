@@ -2164,3 +2164,36 @@ def driverShiftCsv(request):
     myFile.close()
     return FileResponse(open(f'static/Account/DriverTripCsvDownload/{csv_filename}', 'rb'), as_attachment=True)
 
+def topUpForm(request,id , topUpDocket = None):
+    escalationData = None
+    rctiError = None
+    client = Client.objects.all()
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    clientName = request.POST.get('clientName')
+
+    rctiError = RctiErrors.objects.filter(pk=id).first()
+    if topUpDocket:
+        escalationData = ReconciliationReport.objects.filter(clientName = clientName , docketDate__gte =startDate ,docketDate__lte = endDate , escalationType = 1, reconciliationType = 0).values()
+
+    params = {
+        'errorId':rctiError,
+        'escalationData':escalationData,
+        'client':client,
+        'topUpDocket': topUpDocket
+    }
+    return render(request,'Account/topUpForm.html',params)
+
+def topUpSolve(request):
+    errorId  = request.GET.get('topUpId')
+    dockets = request.GET.getlist('dockets[]')
+    for docket in dockets:
+        getDocket = ReconciliationReport.objects.filter(pk = docket).first()
+        getDocket.reconciliationType = 2
+        getDocket.save()
+    rctiError = RctiErrors.objects.filter(pk=errorId).first()
+    rctiError.status = True
+    rctiError.save()
+        
+    return JsonResponse({'status': True})
+    

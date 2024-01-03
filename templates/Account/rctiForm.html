@@ -238,7 +238,8 @@
                                 {% comment %} <td> {% if error.status is False %} <a href="#" onclick="wip()" class="btn btn-sm btn-info"> Resolve</i></a>{% endif%}</td> {% endcomment %}
                                 {% if 'Earning Depot/Location does not exist' in error.errorDescription %}
                                 <a href="{% url 'Account:basePlantAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
-
+                                {% elif 'Manage Top-up' in error.errorDescription %}
+                                <a href="{% url 'Account:topUpForm' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-danger"> Top up  </a>
                                 {% else %}
                                 <a href="{% url 'Account:rctiErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a> 
                                 
