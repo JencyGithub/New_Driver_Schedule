@@ -25,73 +25,70 @@ def index(request):
     return render(request, 'Account/dashboard.html')
 
 def getForm1(request):
-    driverObj = Driver.objects.filter(name = request.user.username).first()
-    today = date.today()
-
-    preStart_data = PreStart.objects.filter(curDate__date=today, driver=driverObj).first()
-    if preStart_data:
-        if request.user.is_authenticated:
-            params = {}
-            user_email = request.user.email
-            client_names = Client.objects.values_list('name', flat=True).distinct()
-            admin_truck_no = AdminTruck.objects.values_list('adminTruckNumber', flat=True).distinct()
-            client_truck_no = ClientTruckConnection.objects.values_list('clientTruckId', flat=True).distinct()
-
-            params = {
-                'client_ids': client_names,
-                'admin_truck_no': admin_truck_no,
-                'client_truck_no': client_truck_no,
-            }
-            
-            driver_id = drivers = None
-            driver = Driver.objects.filter(email=user_email).first()
-            if driver:
-                driver_id = str(driver.driverId) + '-' + str(driver.name)
-
-                # Get today's trip            
+    if request.user.is_authenticated:
+        curUserData = Driver.objects.filter(name = request.user.username).first()
+        params = {}
+        driver = Driver.objects.filter(email=request.user.email).first()
+        if driver:
+            driver_id = str(driver.driverId) + '-' + str(driver.name)
+            preStart_data = PreStart.objects.filter(curDate__date=date.today(), driver=driver).first()
+            if preStart_data:
                 existingTodayTrip = DriverTrip.objects.filter(driverId=driver, partially=True).first()
                 if existingTodayTrip:
                     existingTodayTrip.shiftDate = dateConverterFromTableToPageFormate(existingTodayTrip.shiftDate)
                     params['existingTodayTrip'] = existingTodayTrip
-                
+            
+                params['driver_ids'] = driver_id
             else:
-                drivers = Driver.objects.all()
-            params['driver_ids'] = driver_id  
-            params['drivers'] = drivers
-            return render(request, 'Trip_details/form1.html', params)
+                messages.error(request,'Please fill up Pre-start first.')
+                return redirect('Account:timeOfStart') 
         else:
-            return redirect('login')
+            params['client_ids'] =  Client.objects.values_list('name', flat=True).distinct()
+            params['admin_truck_no'] =  AdminTruck.objects.values_list('adminTruckNumber', flat=True).distinct()
+            params['client_truck_no'] =  ClientTruckConnection.objects.values_list('clientTruckId', flat=True).distinct()
+            params['drivers'] = Driver.objects.all()
+            
+        return render(request, 'Trip_details/form1.html', params)
     else:
-        messages.error(request,'Please fill up Pre-start first.')
-        return redirect('Account:timeOfStart') 
+        return redirect('login')
 
-def getForm2(request):
-    params = {
-        'loads': [i+1 for i in range(int(request.session['data'].get('numberOfLoads')))]
-    }
+
+def getForm2(request, id=None):
+    if not id:
+        params = {
+            'loads': [i+1 for i in range(int(request.session['data'].get('numberOfLoads')))]
+        }
+    else:
+        dockets = DriverDocket.objects.filter(tripId=id)
+        params = {
+            'dockets': dockets
+        }
+        
     return render(request, 'Trip_details/Form2.html', params)
 
 def createFormSession(request):
-    clientName = request.POST.get('clientName')
     loadSheet = request.FILES.get('loadSheet')
+    
     if loadSheet:
-
         load_sheet_folder_path = 'Temp_Load_Sheet'
-        fileName = loadSheet.name
-        time = (str(timezone.now())).replace(':', '').replace(
-            '-', '').replace(' ', '').split('.')
-        time = time[0]
+        fileName = loadSheet.name.replace(" ", "").replace("\t", "")
+        time = getCurrentTimeInString()
 
-        load_sheet_new_filename = 'Load_Sheet' + time + \
-            '!_@' + fileName.replace(" ", "").replace("\t", "")
-
+        load_sheet_new_filename = 'Load_Sheet' + time + '!_@' + fileName
         lfs = FileSystemStorage(location=load_sheet_folder_path)
         lfs.save(load_sheet_new_filename, loadSheet)
-
+        
+    driverId = request.POST.get('driverId').split('-')[0]
+    truckNo = request.POST.get('truckNum').split('-')[0]
+    driverObj = Driver.objects.filter(pk=driverId).first()
+    existingTodayTrip = DriverTrip.objects.filter(driverId=driverObj, shiftDate=request.POST.get('shiftDate'), truckNo=truckNo, partially=True).first()
+        
+    if not existingTodayTrip:
+        clientName = request.POST.get('clientName')
         data = {
             'driverId': request.POST.get('driverId').split('-')[0],
             'clientName': clientName,
-            'truckNum': request.POST.get('truckNum').split('-')[0],
+            'truckNum': truckNo,
             'startTime': request.POST.get('startTime'),
             'endTime': request.POST.get('endTime'),
             'shiftDate': request.POST.get('shiftDate'),
@@ -101,13 +98,12 @@ def createFormSession(request):
             'comments': request.POST.get('comments')
         }
 
-    data['docketGiven'] = True if Client.objects.get(
-        name=clientName).docketGiven else False
-
-    request.session['data'] = data
-    # request.session.set_expiry(5)
-
-    return formsSave(request) if Client.objects.get(name=clientName).docketGiven else redirect('Account:getForm2')
+        data['docketGiven'] = True if Client.objects.get(name=clientName).docketGiven else False
+        request.session['data'] = data
+        
+        return formsSave(request) if Client.objects.get(name=clientName).docketGiven else redirect('Account:getForm2')
+    else:
+        return redirect('Account:existingForm2', id=existingTodayTrip.id)
 
 
 # @csrf_protect
@@ -413,7 +409,7 @@ def timeOfStart(request):
 def timeOfStartSave(request):
     driver = Driver.objects.filter(email=request.user.email).first()
     if driver:
-        preStart_data = PreStart.objects.filter(curDate__date=timezone.now().date(), driver=driver).first()
+        preStart_data = PreStart.objects.filter(curDate__date=datetime.now().date(), driver=driver).first()
 
         if not preStart_data:
             dataSet = {
@@ -421,6 +417,7 @@ def timeOfStartSave(request):
                 'vehicleStatus' : True if request.POST.get('vehicleStatus') == 'Yes' else False,
                 'vehiclePaper' : True if request.POST.get('papersReady') == 'Yes' else False,
                 'comment' : request.POST.get('comment').strip(),
+                'curDate' : datetime.now(),
                 'driver' : driver
             }  
         

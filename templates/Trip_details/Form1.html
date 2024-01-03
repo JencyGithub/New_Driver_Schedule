@@ -244,11 +244,14 @@
                 </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-lg-3 mb-1">
                 <textarea placeholder="Comments" name="comments" class="form-control">{{ request.session.data.comments|default_if_none:'' }}</textarea>
             </div>
             <div class="row">
-                <div class="col-md-9 col-sm-9"></div>
+                <div class="col-md-9 col-sm-9 pb-4">
+                    <input type="checkbox" name="dispute" id="dispute" class="w-auto">
+                    <label for="dispute" class="text-secondary" style="cursor: pointer;">Dispute</label>
+                </div>
                 <div class="col-md-3 col-sm-3 col-xs-12">
                     <div class="form-footer">
                         <input type="submit" id="nextBtn" value="Next"

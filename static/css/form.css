@@ -132,6 +132,7 @@
     background-color: #fff;
     color: #2A3F54;
     cursor: pointer;
+    padding-top: 0.5em;
 }
 
 #signUpForm .text-active {

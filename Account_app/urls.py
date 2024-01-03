@@ -25,6 +25,7 @@ urlpatterns = [
     # Driver trip path
     path('Form1/', views.getForm1, name='getForm1'),
     path('Form2/', views.getForm2, name='getForm2'),
+    path('existing/Form2/<int:id>/', views.getForm2, name='existingForm2'),
     
     path('createFormSession/',views.createFormSession, name='createFormSession'),
     path('formsSave/', views.formsSave, name='formsSave'),
