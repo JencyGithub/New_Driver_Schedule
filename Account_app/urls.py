@@ -37,6 +37,9 @@ urlpatterns = [
     # path('jobs/open/', views.openJobShow, name='openJobShow'),
     path('jobs/finish/<int:id>/', views.finishJob, name='finishJob'),
 
+    path('holcim/data/get/<int:id>/', views.getHolcimDataView, name='getHolcimTripDataView'),
+    path('holcim/data/save/<int:id>/', views.getHolcimDataSave, name='getHolcimTripDataSave'),
+    
     path('docket/upload/<int:id>/', views.uploadDocketView, name='uploadDocketView'),
     path('docket/save/<int:id>/', views.uploadDocketSave, name='uploadDocketSave'),
     

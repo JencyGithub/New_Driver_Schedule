@@ -186,10 +186,10 @@
                     <div class="step">
                         <div class="mb-3">
                             <label for="shiftType">Shift Type :</label>
-                            <select id="shiftType" class="form-select bg-white" name="shiftType" {% if existingTodayTrip %}disabled{% endif %}>
-                                <option value="" selected disabled>Select Shift Type</option>
-                                <option value="Day"  {% if existingTodayTrip.shiftType == "Day" %} selected{% endif %}>Day</option>
-                                <option value="Night"  {% if existingTodayTrip.shiftType == "Night" %} selected{% endif %}>Night</option>
+                            <select id="shiftType" class="form-select bg-white" name="shiftType" {% if existingTodayTrip %}readonly{% endif %}>
+                                <option selected disabled>Select Shift Type</option>
+                                <option value="Day" {% if existingTodayTrip.shiftType == "Day" %} selected{% endif %}>Day</option>
+                                <option value="Night" {% if existingTodayTrip.shiftType == "Night" %} selected{% endif %}>Night</option>
                             </select>
                             <i class="fa" aria-hidden="true"></i>
                             <li class="errorMsg"></li>
@@ -245,11 +245,11 @@
             </div>
 
             <div class="mb-lg-3 mb-1">
-                <textarea placeholder="Comments" name="comments" class="form-control">{{ request.session.data.comments|default_if_none:'' }}</textarea>
+                <textarea placeholder="Comments" name="comments" class="form-control"></textarea>
             </div>
             <div class="row">
                 <div class="col-md-9 col-sm-9 pb-4">
-                    <input type="checkbox" name="dispute" id="dispute" class="w-auto">
+                    <input type="checkbox" name="dispute" id="dispute" class="w-auto" value="dispute">
                     <label for="dispute" class="text-secondary" style="cursor: pointer;">Dispute</label>
                 </div>
                 <div class="col-md-3 col-sm-3 col-xs-12">
