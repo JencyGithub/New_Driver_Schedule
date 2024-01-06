@@ -477,6 +477,8 @@ admin.site.register(AppointmentTruck)
 admin.site.register(AppointmentDriver)
 
 admin.site.register(PreStart)
+admin.site.register(RctiReport)
+admin.site.register(RctiAdjustment)
 
 
 

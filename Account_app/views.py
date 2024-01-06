@@ -674,26 +674,85 @@ def rctiSave(request):
             folderName = 'RCTIInvoice'
             
         location = f'static/Account/RCTI/{folderName}'
-        # elif clientName == 'holcim':
-        #     location = 'static/Account/RCTI/RCTIInvoice'
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
         if clientName == 'boral' and save_data == '1':
             cmd = ["python", "Account_app/utils.py", newFileName]
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            
+        fileDetails = [] 
+        date_ = 0
+        total = 0
+        clientNameID  = Client.objects.filter(name = clientName).first()
         if save_data == '1':
             if clientName == 'boral':
-                colorama.AnsiToWin32.stream = None
-                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
-                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+                with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
+                    fileData = csv.reader(f)
+                    for data in fileData:
+                        data = data[0]
+                        dataList = data.split()
+                        if 'documentnumber' in data.lower().strip().replace(" ",""):
+                            date_ += 1
+                        elif 'date' in data.lower().strip().replace(" ","") and date_ == 1 :
+                            fileDetails.insert(0,str(invoiceFile))
+                            fileDetails.insert(1,dataList[-1])
+                        elif 'totalexcludinggst' in data.lower().strip().replace(" ","") and date_ == 1:
+                            fileDetails.insert(2,float(dataList[-1].replace(",","").replace('$','')))
+                        elif 'gstpayable' in data.lower().strip().replace(" ","") and date_ == 1:
+                            fileDetails.insert(3,float(dataList[-1].replace(",","").replace('$','')))
+                        elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
+                            fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
+                            date_ = 0
+                date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+                rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
+                if rctiReport:
+                    messages.error(request, "This file already exists!")
+                    return redirect(request.META.get('HTTP_REFERER'))
+                else:
+                    rctiReport = RctiReport()
+                    rctiReport.fileName = fileDetails[0]
+                    rctiReport.clientName = clientNameID
+                    rctiReport.reportDate = date_object
+                    rctiReport.gstPayable = fileDetails[2]
+                    rctiReport.totalExGST = fileDetails[3]
+                    rctiReport.total = fileDetails[4]
+                    rctiReport.save()
+                    with open('rctiReportId.txt','w')as f:
+                        f.write(str(rctiReport.id))
+                    colorama.AnsiToWin32.stream = None
+                    os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                    cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
+                    subprocess.Popen(cmd, stdout=subprocess.PIPE)
             elif clientName == 'holcim':
-                # return HttpResponse('work in progress')
+                with open( f'static/Account/RCTI/RCTIInvoice/{newFileName}' , 'r') as f:
+                    fileData = csv.reader(f)
+                    for row in fileData:
+                        row = row[0]
+                        splitRow = row.split()
+                        if 'grosscartageincomestatement' in row.lower().strip().replace(" ","") and len(fileDetails) == 0:
+                            fileDetails.insert(0,str(invoiceFile))
+                            fileDetails.insert(1,splitRow[-2])
+                        elif 'totalforvendor' in row.lower().strip().replace(" ",""):
+                            total = 1
+                        elif total == 1:
+                            fileDetails.insert(2,float(splitRow[-1].replace(',','')))
+                            total = 0
+                date_object = datetime.strptime(fileDetails[1], '%d.%m.%Y').date()
+                rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
+                if rctiReport:
+                    messages.error(request, "This file entry already exists!")
+                    return redirect(request.META.get('HTTP_REFERER'))
+                else:
+                    rctiReport = RctiReport()
+                    rctiReport.reportDate = date_object
+                    rctiReport.fileName =  fileDetails[0]
+                    rctiReport.clientName = clientNameID
+                    rctiReport.total = fileDetails[-1]
+                    rctiReport.save()
+                    with open('rctiReportId.txt','w')as f:
+                        f.write(str(rctiReport.id))
                 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
                     file_name = f.write(newFileName)
-                    
                 colorama.AnsiToWin32.stream = None
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'holcimUtils','--continue-on-error']
@@ -733,7 +792,9 @@ def expanseForm(request, id = None):
 
 @csrf_protect
 def expanseSave(request):
+    clientNameObj = Client.filter(name = 'boral').first()
     RctiExpenseObj = RctiExpense()
+    RctiExpenseObj.clientName  = clientNameObj
     RctiExpenseObj.truckNo = request.POST.get('truckNo')
     RctiExpenseObj.docketNumber = request.POST.get('docketNumber')
     RctiExpenseObj.docketDate = request.POST.get('docketDate')
@@ -975,29 +1036,36 @@ def rctiTable(request):
     
     startDate_ = request.POST.get('startDate')
     endDate_ = request.POST.get('endDate')
-    basePlant_ = request.POST.get('basePlant')
-    docketYard = BasePlant.objects.filter(id = basePlant_).first()
+    clientName = request.POST.get('clientName')
+    clientNameObj = Client.objects.filter(name=clientName).first()
     dataType = request.POST.get('RCTI')
     holcimData =None
-    # holcimStartDate_ = datetime.combine(datetime.strptime(startDate_, '%Y-%m-%d'), time())
-    # holcimEndDate_ = datetime.combine(datetime.strptime(endDate_, '%Y-%m-%d'), time())
-  
-    # try:
-    #     holcimData = None
-    if basePlant_:
+    rctiData = None
+    # return HttpResponse(clientNameObj)
+    # print(clientNameObj)
+    if clientNameObj:
         if dataType== 'rctiDocket':
-            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard).values()
-            # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
-            # rctiData = list(chain(rctiData, holcimData))
-        elif dataType == 'rctiExpense':
-            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard).values()
+            # return HttpResponse('here')
+            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_), clientName = clientNameObj)
+        else:
+            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), clientName = clientNameObj)
     else:
-        if dataType== 'rctiDocket':
-            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_)).values()
-            # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_)).values()
-            # rctiData = list(chain(rctiData, holcimData))
-        elif dataType == 'rctiExpense':
-            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_)).values()
+            rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_))
+        
+    # if basePlant_:
+    #     if dataType== 'rctiDocket':
+    #         rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard)
+    #         # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_))
+    #         # rctiData = list(chain(rctiData, holcimData))
+    #     elif dataType == 'rctiExpense':
+    #         rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard)
+    # else:
+    #     if dataType== 'rctiDocket':
+    #         rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_))
+    #         # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_))
+    #         # rctiData = list(chain(rctiData, holcimData))
+    #     elif dataType == 'rctiExpense':
+    #         rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_))
     
     params = {
         'RCTIs': rctiData,

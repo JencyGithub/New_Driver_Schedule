@@ -4,9 +4,11 @@ from Account_app.reconciliationUtils import *
 import time
 
 def convertIntoFloat(str_):
+    
     if '(' in str_:
         str_ = '-'+str_.strip('()')
     cleaned_string = str_.replace(' ','').replace(',','')
+
     return float(cleaned_string)
 
 def checkStr(data:str):
@@ -24,28 +26,21 @@ def dateConvert(date_):
 docket_pattern = r'^\d{8}$|^\d{6}$'
 
 
-def insertIntoModel(dataList,file_name):
+def insertIntoModel(dataList,file_name , rctiReportId):
     RCTIobj = None
+    rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
     try:
         data_str = ','.join(dataList)
-        errorSolve = dataList
+        errorSolve = str(dataList) + '@_!'+ str(rctiReportId)
         rctiErrorObj = RctiErrors()
         
-        if 'topup' in (data_str).strip().lower().replace(' ',''):
+        # minimum Payment for top up 
+        if len(dataList) == 1:
             rctiErrorObj.clientName = 'boral'
             rctiErrorObj.docketNumber = None
             rctiErrorObj.docketDate = None
-            rctiErrorObj.errorDescription = "Manage Top-up."
-            rctiErrorObj.fileName = file_name
-            rctiErrorObj.data = str(errorSolve)
-            rctiErrorObj.save()
-            return
-        if 'tolls' in (data_str).strip().lower().replace(' ',''):
-            rctiErrorObj.clientName = 'boral'
-            rctiErrorObj.docketNumber = None
-            rctiErrorObj.docketDate = None
-            rctiErrorObj.errorDescription = "Manage Tolls."
-            rctiErrorObj.fileName = file_name
+            rctiErrorObj.errorDescription = "Manually Manage."
+            rctiErrorObj.fileName = file_name.split('@_!')[-1]
             rctiErrorObj.data = str(errorSolve)
             rctiErrorObj.save()
             return
@@ -100,8 +95,25 @@ def insertIntoModel(dataList,file_name):
                         return
                 else:
                     RCTIobj.docketYard = dataList[2] 
-                
-                if "trucktransfer" in description:
+                    # 10653,25639177,03/08/22,BROOKVALE,"1078, OXFORD FALLS RD OXFORD FALLSCARTAGE OTHER PER KM PER CU M",10.0000,1.0000,CUBICME,-245.5700,-245.57,-24.56,-270.13
+                if convertIntoFloat(dataList[10]) < 0:
+                    rctiAdjustmentObj = RctiAdjustment()
+                    rctiAdjustmentObj.truckNo = RCTIobj.truckNo
+                    rctiAdjustmentObj.docketNumber = dataList[0]
+                    rctiAdjustmentObj.docketDate = dateConvert(dataList[1])
+                    rctiAdjustmentObj.docketYard = dataList[2]
+                    rctiAdjustmentObj.clientName = RCTIobj.clientName
+                    rctiAdjustmentObj.rctiReport = rctiReportObj
+                    rctiAdjustmentObj.description = dataList[3]
+                    rctiAdjustmentObj.noOfKm = convertIntoFloat(dataList[4])
+                    rctiAdjustmentObj.invoiceQuantity = convertIntoFloat(dataList[5])
+                    rctiAdjustmentObj.unit = dataList[6]
+                    rctiAdjustmentObj.unitPrice = convertIntoFloat(dataList[7])
+                    rctiAdjustmentObj.totalExGST = convertIntoFloat(dataList[8])
+                    rctiAdjustmentObj.GSTPayable = convertIntoFloat(dataList[9])
+                    rctiAdjustmentObj.Total = convertIntoFloat(dataList[10])
+                    rctiAdjustmentObj.save()
+                elif "trucktransfer" in description:
                     RCTIobj.transferKM = convertIntoFloat(dataList[5])
                     RCTIobj.transferKMCost = convertIntoFloat(dataList[7])
                     RCTIobj.transferKMTotalExGST = convertIntoFloat(dataList[8])
@@ -111,7 +123,7 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.noOfKm = convertIntoFloat(dataList[4])
                     RCTIobj.cubicMl = convertIntoFloat(dataList[5])
                     RCTIobj.cubicMiAndKmsCost = convertIntoFloat(dataList[7])
-                    RCTIobj.destination = description.split('cartage')[0]
+                    RCTIobj.destination = dataList[3].split('CARTAGE')[0]
                     RCTIobj.cartageTotalExGST = convertIntoFloat(dataList[8])
                     RCTIobj.cartageGSTPayable = convertIntoFloat(dataList[9])
                     RCTIobj.cartageTotal = convertIntoFloat(dataList[10])
@@ -153,10 +165,15 @@ def insertIntoModel(dataList,file_name):
                     RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dataList[9])
                     RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dataList[10])
                 else:
-                    with open('csvToModelSkip.txt','a')as f:
-                        f.write('earnings' + file_name + str(dataList)+'\n')
+                    RCTIobj.otherDescription += dataList[3]
+                    RCTIobj.others = RCTIobj.others + convertIntoFloat(dataList[5])
+                    RCTIobj.othersCost = RCTIobj.othersCost + convertIntoFloat(dataList[7])
+                    RCTIobj.othersGSTPayable = RCTIobj.othersGSTPayable + convertIntoFloat(dataList[8])
+                    RCTIobj.othersTotalExGST = RCTIobj.othersTotalExGST + convertIntoFloat(dataList[9])
+                    RCTIobj.othersTotal =  RCTIobj.othersTotal +convertIntoFloat(dataList[10])
+                    
                 dataList = dataList[11:]
-            
+        RCTIobj.rctiReport = rctiReportObj
         RCTIobj.save()
             
         reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
@@ -185,8 +202,8 @@ def insertIntoModel(dataList,file_name):
 
     except Exception as e:
         rctiErrorObj.clientName = 'boral'
-        rctiErrorObj.docketNumber = dataList[1]
-        rctiErrorObj.docketDate =  dataList[2]
+        rctiErrorObj.docketNumber = dataList[0]
+        rctiErrorObj.docketDate =  dataList[1]
         rctiErrorObj.errorDescription = e
         rctiErrorObj.fileName = file_name
         rctiErrorObj.data = str(errorSolve)
@@ -199,6 +216,8 @@ def insertIntoExpenseModel(dataList , file_name):
         try:
             rctiExpenseObj = RctiExpense()
             if checkDate(dataList[2]):
+                clientNameObj = Client.filter(name = 'boral').first()
+                rctiExpenseObj.clientName  = clientNameObj
                 rctiExpenseObj.truckNo = str(dataList[0])
                 rctiExpenseObj.docketNumber = str(dataList[1])
                 rctiExpenseObj.docketDate = dateConvert(dataList[2])
@@ -232,6 +251,9 @@ def insertIntoExpenseModel(dataList , file_name):
 with open("File_name_file.txt", 'r') as f:
     file_names = f.read().split('<>')   
             
+with open("rctiReportId.txt", 'r') as f:
+    rctiReportId = f.read()  
+    
 earningFileName = file_names[0].strip()
 expenseFileName = file_names[1].strip()
 
@@ -239,7 +261,7 @@ try:
     earningFile = open(f'static/Account/RCTI/RCTIInvoice/{earningFileName}', 'r')
     earningReader = csv.reader(earningFile)
     for earningData in earningReader:
-        insertIntoModel(earningData,earningFileName)      
+        insertIntoModel(earningData,earningFileName,rctiReportId)      
 
 except Exception as e:
     with open ('Earning_error.txt','a') as f:

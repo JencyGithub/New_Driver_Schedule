@@ -61,7 +61,7 @@ def setTopUp(dataList:list):
     return dataList[:2] + [''] + [' '.join(dataList[2:-6])] + [''] + dataList[-6:]
 
 args = sys.argv[-1]
-# args = '20240101051041@_!Boral-15-Feb-2023.csv'
+# args = '20240105051933@_!Boral-30-Jun-2023.csv'
 
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 # file_path = args
@@ -92,13 +92,14 @@ docketDate = None
 lineCount = 0
 ignoreKeywords = ["docketdeliverysourcedescription", "no.datekm'squantity", "vendor", "pobox", "page", "document", "date:"]
 extraDescriptions = ['kmpercum','cum','m','percum','perkmpercum','perkmpercuum', 'otherperkmpercum','avem']
+errorsList = ['topup','adjustmen','jindabyneaccomodation','blowback','minimumpayment']
 
 with open (file_path, 'r') as f:
     fileData = csv.reader(f)
     for data in fileData:
         lineCount+=1
-        if lineCount == 2579:
-            pass
+        # if lineCount == 2579:
+        #     pass
         data = data[0]
         if any(key in checkStr(data) for key in ignoreKeywords):
             continue
@@ -135,7 +136,7 @@ with open (file_path, 'r') as f:
         dataList = data.split()
         try:
             if dataList:
-                if 'topup' in checkStr(data):
+                if  any( value in checkStr(data)  for value in errorsList) :
                     if re.match(docket_pattern,dataList[0]):
                         
                         if len(previousLine) > 0:

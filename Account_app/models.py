@@ -132,7 +132,41 @@ class DriverDocket(models.Model):
     class Meta:
         unique_together = (('docketNumber', 'shiftDate','tripId'),)
 
+class RctiReport(models.Model):
+    reportDate = models.DateField()
+    gstPayable = models.FloatField(default=0)
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE ,default = None)
+    totalExGST = models.FloatField(default=0)
+    total = models.FloatField(default=0)
+    fileName = models.CharField(max_length=255 , default='')
+    
+    def __str__(self) -> str:
+        return str(self.id)
+    
+    class Meta:
+        unique_together = (('reportDate', 'total','fileName'))
 
+class RctiAdjustment(models.Model):
+    truckNo = models.FloatField(default=0)
+    docketNumber = models.CharField(max_length=10,default='')
+    docketDate = models.DateField()
+    docketYard = models.CharField(default='', max_length=255)
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
+    rctiReport = models.ForeignKey(RctiReport,on_delete=models.CASCADE , default =None)
+    description = models.CharField(max_length=255,default='')
+    noOfKm = models.FloatField(default=0)
+    invoiceQuantity = models.FloatField(default=0)
+    unit = models.CharField(max_length=10,default='')
+    unitPrice= models.FloatField(default=0)
+    totalExGST = models.FloatField(default=0)
+    GSTPayable = models.FloatField(default=0)
+    Total = models.FloatField(default=0)
+    
+    def __str__(self) -> str:
+        return str(self.docketNumber)
+    
+    # class Meta:
+    #     unique_together = (('docketNumber', 'docketDate','rctiReport','truckNo'))
 class RCTI(models.Model):
     
     UNIT_CHOICES = (
@@ -141,11 +175,11 @@ class RCTI(models.Model):
     )
 
     truckNo = models.FloatField(default=0)
-    docketNumber = models.CharField( max_length=10,default='')
+    docketNumber = models.CharField(max_length=10,default='')
     docketDate = models.DateField()
     docketYard = models.CharField(default='', max_length=255)
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
-
+    rctiReport = models.ForeignKey(RctiReport,on_delete=models.CASCADE , default =None)
     noOfKm = models.FloatField(default=0)
     cubicMl = models.FloatField(default=0)
     cubicMiAndKmsCost= models.FloatField(default=0)
@@ -237,7 +271,8 @@ class RCTI(models.Model):
     surchargeTotalExGST = models.FloatField(default=0)
     surchargeTotal = models.FloatField(default=0)
    
-    others = models.CharField(max_length=255,default= '', null= True , blank=True)
+    otherDescription = models.CharField(max_length=500,default= '', null= True , blank=True)
+    others = models.CharField(max_length=255,default= 0, null= True , blank=True)
     othersCost = models.FloatField(default=0)
     othersGSTPayable = models.FloatField(default=0)
     othersTotalExGST = models.FloatField(default=0)
@@ -246,7 +281,7 @@ class RCTI(models.Model):
     def _str_(self) -> str:
         return str(self.docketNumber) + str(self.truckNo)
 
-
+    
 # -----------------------------------
 # Holiday section
 # -----------------------------------
@@ -367,6 +402,7 @@ class RctiErrors(models.Model):
 # Rcti Expense section
 # -----------------------------------
 class RctiExpense(models.Model):
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE ,default = None)
     truckNo = models.CharField(max_length=10, default='')
     docketNumber = models.CharField( max_length=10,default='')
     docketDate = models.DateField()
