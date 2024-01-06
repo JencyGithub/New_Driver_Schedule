@@ -30,36 +30,41 @@ function setEndDateTime(dataRow){
     $('#endDateTime').removeAttr('readonly')
 }
 
+$('#startDateTime').on('change',function(){
+    setTruckAndDriver(this);
+});
+
 function setTruckAndDriver(dataRow){
     startDateTime = $("#startDateTime").val()
     endDateTime = $("#endDateTime").val()
     console.log(startDateTime,endDateTime);
-    $.ajax({
-        url: "/appointment/getTruckAndDriver/",
-        method: "POST",
-        data: {
-            'startDateTime' : startDateTime,
-            'endDateTime' : endDateTime
-        },
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        },
-        success: function (data) {
-            console.log(data.availableTrucksList[0]['adminTruckNumber'])
-            data.availableTrucksList.forEach(function (item) {
-                $("#truckNo").append(
-                  '<option value="' + item['adminTruckNumber'] + '">' + item['adminTruckNumber'] + "</option>"
-                );
-            });
-            data.availableDriversList.forEach(function (item) {
-                $("#driverName").append(
-                  '<option value="' + item['driverId'] + '">' + item['driverId']+'-' + item['name'] + "</option>"
-                );
-            });
-            $('#addDriver').removeAttr('disabled')
-            $('#addTruck').removeAttr('disabled')
-        },
-    });
+    if(startDateTime && endDateTime){
+        $.ajax({
+            url: "/appointment/getTruckAndDriver/",
+            method: "POST",
+            data: {
+                'startDateTime' : startDateTime,
+                'endDateTime' : endDateTime
+            },
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                data.availableTrucksList.forEach(function (item) {
+                    $("#truckNo").append(
+                      '<option value="' + item['adminTruckNumber'] + '">' + item['adminTruckNumber'] + "</option>"
+                    );
+                });
+                data.availableDriversList.forEach(function (item) {
+                    $("#driverName").append(
+                      '<option value="' + item['driverId'] + '">' + item['driverId']+'-' + item['name'] + "</option>"
+                    );
+                });
+                $('#addDriver').removeAttr('disabled')
+                $('#addTruck').removeAttr('disabled')
+            },
+        });
+    }
 }
 
 function checkOrigin(){

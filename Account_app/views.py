@@ -26,7 +26,6 @@ def index(request):
 
 def getForm1(request):
     if request.user.is_authenticated:
-        curUserData = Driver.objects.filter(name = request.user.username).first()
         params = {}
         driver = Driver.objects.filter(email=request.user.email).first()
         if driver:
@@ -52,7 +51,6 @@ def getForm1(request):
     else:
         return redirect('login')
 
-
 def getForm2(request, id=None):
     if not id:
         params = {
@@ -68,7 +66,16 @@ def getForm2(request, id=None):
 
 def createFormSession(request):
     loadSheet = request.FILES.get('loadSheet')
+    driverId = request.POST.get('driverId').split('-')[0]
+    truckNo = request.POST.get('truckNum').split('-')[0]
+    driverObj = Driver.objects.filter(pk=driverId).first()
+    existingTodayTrip = DriverTrip.objects.filter(driverId=driverObj, shiftDate=request.POST.get('shiftDate'), truckNo=truckNo, partially=True).first()
+    if existingTodayTrip:
+        existingTodayTrip.dispute = True if request.POST.get('dispute') == 'dispute' else False
+        existingTodayTrip.save()
     
+    data = {}  
+    clientName = request.POST.get('clientName')
     if loadSheet:
         load_sheet_folder_path = 'Temp_Load_Sheet'
         fileName = loadSheet.name.replace(" ", "").replace("\t", "")
@@ -77,14 +84,7 @@ def createFormSession(request):
         load_sheet_new_filename = 'Load_Sheet' + time + '!_@' + fileName
         lfs = FileSystemStorage(location=load_sheet_folder_path)
         lfs.save(load_sheet_new_filename, loadSheet)
-        
-    driverId = request.POST.get('driverId').split('-')[0]
-    truckNo = request.POST.get('truckNum').split('-')[0]
-    driverObj = Driver.objects.filter(pk=driverId).first()
-    existingTodayTrip = DriverTrip.objects.filter(driverId=driverObj, shiftDate=request.POST.get('shiftDate'), truckNo=truckNo, partially=True).first()
-        
-    if not existingTodayTrip:
-        clientName = request.POST.get('clientName')
+           
         data = {
             'driverId': request.POST.get('driverId').split('-')[0],
             'clientName': clientName,
@@ -92,24 +92,27 @@ def createFormSession(request):
             'startTime': request.POST.get('startTime'),
             'endTime': request.POST.get('endTime'),
             'shiftDate': request.POST.get('shiftDate'),
-            'loadSheet': load_sheet_new_filename,
             'shiftType': request.POST.get('shiftType'),
             'numberOfLoads': request.POST.get('numberOfLoads'),
-            'comments': request.POST.get('comments')
+            'comments': request.POST.get('comments'),
         }
-
-        data['docketGiven'] = True if Client.objects.get(name=clientName).docketGiven else False
-        request.session['data'] = data
         
-        return formsSave(request) if Client.objects.get(name=clientName).docketGiven else redirect('Account:getForm2')
-    else:
+    data['docketGiven'] = not Client.objects.get(name=clientName).docketGiven,
+    data['docketGiven'] =  not Client.objects.get(name=clientName).docketGiven,
+    data['loadSheet'] = load_sheet_new_filename
+    
+    request.session['data'] = data
+       
+    if Client.objects.get(name=clientName).docketGiven:
+        return redirect('Account:formsSave') 
+    elif existingTodayTrip:
         return redirect('Account:existingForm2', id=existingTodayTrip.id)
-
+    else:
+        return redirect('Account:getForm2')
 
 # @csrf_protect
 # @api_view(['POST'])
 def formsSave(request):
-
     driverId = request.session['data']['driverId']
     clientName = Client.objects.get(name=request.session['data']['clientName'])
     shiftType = request.session['data']['shiftType']
@@ -121,74 +124,71 @@ def formsSave(request):
     loadSheet = request.session['data']['loadSheet']
     comment = request.session['data']['comments']
     temp_loadSheet = ''
-    Docket_no = []
-    Docket_file = []
-    time = (str(timezone.now())).replace(':', '').replace(
-        '-', '').replace(' ', '').split('.')
-    time = time[0]
-
-    if not request.session['data']['docketGiven']:
-        for i in range(1, int(numberOfLoads)+1):
-
-            key = f"docketNumber[{i}]"
-            docket_number = request.POST.get(key)
-            Docket_no.append(docket_number)
-            key_files = f"docketFile[{i}]"
-
-            docket_files = request.FILES.get(key_files)
-
-            temp_loadSheet = temp_loadSheet + '-' + docket_number
-
-            if docket_files:
-                fileName = docketFileSave(
-                    docket_files, docket_number, returnVal='file_name')
-
-                Docket_file.append(fileName)
-
-    if not os.path.exists('static/img/finalloadSheet/' + loadSheet):
-        shutil.move('Temp_Load_Sheet/' + loadSheet,
-                    'static/img/finalloadSheet/' + loadSheet)
-
+    Docket_no, Docket_file = [], []
+    time = getCurrentTimeInString()
     driver = Driver.objects.get(driverId=driverId)
+    comment2 = request.POST.get('comments')
+    
+    existingTodayTrip = DriverTrip.objects.filter(driverId=driver, shiftDate=shiftDate, truckNo=truckNo, partially=True).first()
+        
+    if not os.path.exists('static/img/finalloadSheet/' + loadSheet):
+        shutil.move('Temp_Load_Sheet/' + loadSheet, 'static/img/finalloadSheet/' + loadSheet)
+        
+    if not existingTodayTrip:
+        if not request.session['data']['docketGiven']:
+            for i in range(1, int(numberOfLoads)+1):
+                key = f"docketNumber[{i}]"
+                docket_number = request.POST.get(key)
+                Docket_no.append(docket_number)
+                key_files = f"docketFile[{i}]"
+                docket_files = request.FILES.get(key_files)
+                temp_loadSheet = temp_loadSheet + '-' + docket_number
+                if docket_files:
+                    fileName = docketFileSave(docket_files, docket_number, returnVal='file_name')
+                    Docket_file.append(fileName)
 
-    trip = DriverTrip(
-        driverId=driver,
-        clientName=clientName,
-        shiftType=shiftType,
-        numberOfLoads=numberOfLoads,
-        truckNo=truckNo,
-        startTime=startTime,
-        endTime=endTime,
-        loadSheet='static/img/finalloadSheet/' + loadSheet,  # Use the filename or None
-        comment=comment,
-        shiftDate=shiftDate
-    )
-    trip.save()
+        tripObj = DriverTrip()
+        tripObj.driverId=driver
+        tripObj.clientName=clientName
+        tripObj.shiftType=shiftType
+        tripObj.numberOfLoads=numberOfLoads
+        tripObj.truckNo=truckNo
+        tripObj.startTime=startTime
+        tripObj.endTime=endTime
+        tripObj.loadSheet = f'static/img/finalloadSheet/{loadSheet}'
+        tripObj.comment=comment
+        tripObj.shiftDate=shiftDate  
+        tripObj.save()
 
-    if not request.session['data']['docketGiven']:
-        BasePlantVal = BasePlant.objects.get_or_create(basePlant="NOT SELECTED")[0]
-        for i in range(len(Docket_no)):
-            docket_ = DriverDocket(
-                tripId=trip,
-                # Use the specific value from the list
-                docketNumber=Docket_no[i],
-                # Use the specific value from the list
-                docketFile='static/img/docketFiles/' + Docket_file[i],
-                basePlant=BasePlantVal
-            )
-            docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
-            docket_.save()
+        if not request.session['data']['docketGiven']:
+            BasePlantVal = BasePlant.objects.get_or_create(basePlant="NOT SELECTED")[0]
+            for i in range(len(Docket_no)):
+                docket_ = DriverDocket(
+                    tripId=tripObj,
+                    docketNumber=Docket_no[i],
+                    docketFile='static/img/docketFiles/' + Docket_file[i],
+                    basePlant=BasePlantVal
+                )
+                docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
+                docket_.save()
 
+    else:
+        existingTodayTrip.loadSheet = f'static/img/finalloadSheet/{loadSheet}'
+        existingTodayTrip.comment=comment
+        existingTodayTrip.shiftDate=shiftDate        
+        existingTodayTrip.partially = False
+        existingTodayTrip.comment2 = comment2
+        existingTodayTrip.save()
+        
     del request.session['data']
 
-    messages.success(request, " Form Successfully Filled Up")
+    messages.success(request, "Form Successfully Filled Up")
     return redirect('index')
 
 
 def assignedJobShow(request):
     driverObj = Driver.objects.filter(name = request.user.username).first()
     today = date.today()
-
     preStart_data = PreStart.objects.filter(curDate__date=today, driver=driverObj).first()
 
     if preStart_data:
@@ -196,16 +196,16 @@ def assignedJobShow(request):
         indian_timezone = pytz.timezone('Asia/Kolkata')
         
         currentTime = datetime.now(tz=indian_timezone)
-        
-        
+
         for obj in appointmentObjs:
-            maxTime = obj.Start_Date_Time + timedelta(minutes=20)
-            minTime = obj.Start_Date_Time - timedelta(minutes=20)
-            # print(f"startTime:{obj.Start_Date_Time}, max:{maxTime}, min:{minTime}, Current:{datetime.now(tz=indian_timezone)}\n")
-            if obj.Status is not "Complete" and  str(currentTime) > str(maxTime):
-                obj.lateForStart = True   
-            elif obj.Status is not "Complete" and  str(currentTime) < str(minTime): 
-                obj.notAcceptable = True  
+            if obj.Status != "Dispatched":
+                maxTime = obj.Start_Date_Time + timedelta(minutes=20)
+                minTime = obj.Start_Date_Time - timedelta(minutes=20)
+                # print(f"startTime:{obj.Start_Date_Time}, max:{maxTime}, min:{minTime}, Current:{datetime.now(tz=indian_timezone)}\n")
+                if obj.Status != "Complete" and  str(currentTime) > str(maxTime):
+                    obj.lateForStart = True   
+                elif obj.Status != "Complete" and  str(currentTime) < str(minTime): 
+                    obj.notAcceptable = True  
                 
         params = {'jobs':appointmentObjs}
         return render(request, 'Trip_details/assignedJobs.html',params)
@@ -250,9 +250,9 @@ def singleJobView(request,id):
     maxTime = job.Start_Date_Time + timedelta(minutes=20)
     minTime = job.Start_Date_Time - timedelta(minutes=20)
 
-    if job.Status is not "Complete" and  str(currentTime) > str(maxTime):
+    if job.Status != "Complete" and  str(currentTime) > str(maxTime):
         job.lateForStart = True   
-    if job.Status is not "Complete" and  str(currentTime) < str(minTime): 
+    if job.Status != "Complete" and  str(currentTime) < str(minTime): 
         job.notAcceptable = True   
     
     params = {
@@ -279,30 +279,12 @@ def finishJob(request, id):
     if id:
         appObj = Appointment.objects.filter(pk=id).first()
         if not appObj.stop.docketGiven:
-            return redirect('Account:uploadDocketView' , id)
+            return redirect('Account:uploadDocketView', id)
         else:
-            appObj.Status = "Dispatched"
-            appObj.save()    
-        
-            # For get all assigned job
-            driverObj = Driver.objects.filter(name = request.user.username).first()
-            driverAppointments = AppointmentDriver.objects.filter(driverName = driverObj)
-            jobs = []
-            for obj in driverAppointments:
-                print(obj.appointmentId.Status)
-                if obj.appointmentId.Status == "Assigned":
-                    jobs.append(obj.appointmentId)
-                    
-            params = {'jobs':jobs}
-            
-            return render(request, 'Trip_details/assignedJobs.html',params)
-
-    # return redirect('Account:assignedJobAccept')
-
+            return redirect('Account:getHolcimTripDataView', id)
 
 @login_required
 def uploadDocketView(request,id):
-    
     params = {'id':id}
     return render(request, 'Trip_details/uploadDocket.html',params)
 
@@ -311,13 +293,12 @@ def uploadDocketSave(request, id):
     appointmentObj = Appointment.objects.filter(pk=id).first()
     startDateObj = datetime.strptime(str(appointmentObj.Start_Date_Time), "%Y-%m-%d %H:%M:%S%z")
     endDateObj = datetime.strptime(str(appointmentObj.End_Date_Time), "%Y-%m-%d %H:%M:%S%z")
-
     AppointmentTruckObject = AppointmentTruck.objects.filter(appointmentId = appointmentObj).first()
 
     docketFile = request.FILES.get('docketImage')
     docketNumber = request.POST.get('docketNumber')
+    comment = request.POST.get('comment')
     driverObj = Driver.objects.filter(name = request.user.username).first()
-    
     
     # Trip save start
     tripObj = DriverTrip.objects.filter(driverId = driverObj, shiftDate=startDateObj.date(),clientName = appointmentObj.stop).first()
@@ -375,6 +356,7 @@ def uploadDocketSave(request, id):
             docketObj.docketFile = docketFileSave(docketFile, docketNumber)
         
         docketObj.basePlant = appointmentObj.Origin
+        docketObj.comment = comment
         docketObj.tripId = tripObj
         docketObj.shiftDate = startDateObj.date()
 
@@ -391,6 +373,69 @@ def uploadDocketSave(request, id):
     appointmentObj.save()
     messages.success(request, "Docket Updated")
     
+    return redirect('Account:assignedJobShow')
+
+@login_required
+def getHolcimDataView(request,id):
+    params = {'id':id}
+    return render(request, 'Trip_details/getHolcimData.html',params)
+
+@login_required
+def getHolcimDataSave(request,id):
+    appointmentObj = Appointment.objects.filter(pk=id).first()
+    startDateObj = datetime.strptime(str(appointmentObj.Start_Date_Time), "%Y-%m-%d %H:%M:%S%z")
+    endDateObj = datetime.strptime(str(appointmentObj.End_Date_Time), "%Y-%m-%d %H:%M:%S%z")
+    AppointmentTruckObject = AppointmentTruck.objects.filter(appointmentId = appointmentObj).first()
+    driverObj = Driver.objects.filter(name = request.user.username).first()
+    
+    tripObj = DriverTrip.objects.filter(driverId = driverObj, shiftDate=startDateObj.date(),clientName = appointmentObj.stop).first()
+    if not tripObj:
+        tripObj = DriverTrip()
+        tripObj.driverId = driverObj
+        tripObj.clientName = appointmentObj.stop
+        tripObj.shiftType = appointmentObj.shiftType
+        tripObj.truckNo = AppointmentTruckObject.truckNo.adminTruckNumber
+        tripObj.numberOfLoads = 1
+        tripObj.shiftDate = startDateObj.date()
+    else:
+        tripObj.numberOfLoads += 1
+
+    tripObj.partially = True
+    startTime = tripObj.startTime
+    endTime = tripObj.endTime
+    time_pattern = re.compile(r'^\d{2}:\d{2}$')
+    
+    if time_pattern.match(startTime):
+        startTime = startTime+":00"
+    if time_pattern.match(endTime):
+        startTime = startTime+":00"
+    
+    # Set startTime  
+    if not startTime:
+        tripObj.startTime = startDateObj.time()
+    else:
+        if not isinstance(startTime, datetime):
+            startTime = datetime.strptime(startTime, "%H:%M:%S")
+        if startTime.time() < startDateObj.time():
+            tripObj.startTime = startDateObj.time()
+    # Set startTime  
+
+    # Set endTime 
+    if not endTime:
+        tripObj.endTime = endDateObj.time()
+    else:
+        if not isinstance(endTime, datetime):
+            endTime = datetime.strptime(endTime, "%H:%M:%S")
+        if endTime.time() < endDateObj.time():
+            tripObj.endTime = endDateObj.time()
+    # Set endTime
+    
+    tripObj.save()    
+    # Trip save end
+
+    appointmentObj.Status = "Complete"
+    appointmentObj.save()
+    messages.success(request, "Docket Updated")
     return redirect('Account:assignedJobShow')
 
 def timeOfStart(request):
