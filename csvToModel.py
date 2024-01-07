@@ -4,11 +4,13 @@ from Account_app.reconciliationUtils import *
 import time
 
 def convertIntoFloat(str_):
-    
     if '(' in str_:
         str_ = '-'+str_.strip('()')
     cleaned_string = str_.replace(' ','').replace(',','')
-
+    
+    if not len(cleaned_string) > 0:
+        return 0
+    
     return float(cleaned_string)
 
 def checkStr(data:str):
@@ -95,7 +97,6 @@ def insertIntoModel(dataList,file_name , rctiReportId):
                         return
                 else:
                     RCTIobj.docketYard = dataList[2] 
-                    # 10653,25639177,03/08/22,BROOKVALE,"1078, OXFORD FALLS RD OXFORD FALLSCARTAGE OTHER PER KM PER CU M",10.0000,1.0000,CUBICME,-245.5700,-245.57,-24.56,-270.13
                 if convertIntoFloat(dataList[10]) < 0:
                     rctiAdjustmentObj = RctiAdjustment()
                     rctiAdjustmentObj.truckNo = RCTIobj.truckNo
@@ -216,7 +217,7 @@ def insertIntoExpenseModel(dataList , file_name):
         try:
             rctiExpenseObj = RctiExpense()
             if checkDate(dataList[2]):
-                clientNameObj = Client.filter(name = 'boral').first()
+                clientNameObj = Client.objects.filter(name = 'boral').first()
                 rctiExpenseObj.clientName  = clientNameObj
                 rctiExpenseObj.truckNo = str(dataList[0])
                 rctiExpenseObj.docketNumber = str(dataList[1])

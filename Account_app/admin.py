@@ -414,7 +414,7 @@ admin.site.register(PastTripError,PastTripError_)
 
 
 class ReconciliationReportAdmin(admin.ModelAdmin):
-    list_display = ["docketNumber","reconciliationType"]
+    list_display = ["docketNumber","reconciliationType","docketDate"]
     search_fields = ["docketNumber"]
 
 admin.site.register(ReconciliationReport , ReconciliationReportAdmin)
@@ -479,6 +479,9 @@ admin.site.register(AppointmentDriver)
 admin.site.register(PreStart)
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
+
+admin.site.register(Escalation)
+admin.site.register(EscalationMail)
 
 
 

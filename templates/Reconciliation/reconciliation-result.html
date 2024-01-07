@@ -72,7 +72,9 @@
                                                     <td class="{% if item.driverTotalCost == item.rctiTotalCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverTotalCost}} / {{ item.rctiTotalCost }} </td>
                                                     <td class="text-danger">{{ item.missingComponent }} </td>
                                                     
-                                                    <td><a href="{% if item.escalationStep == 2 %} {% url 'Account:reconciliationEscalationForm2' id=item.id %} {% elif item.escalationStep == 3 %} {% url 'Account:reconciliationEscalationForm3' id=item.id %} {% elif item.escalationStep == 4 %} {% url 'Account:reconciliationEscalationForm4' id=item.id %} {% else %} {% url 'Account:reconciliationEscalationForm' id=item.id %} {% endif %}" class="btn btn-sm btn-default">Escalation</a></td>
+                                                    {% comment %} <td><a href="{% if item.escalationStep == 2 %} {% url 'Account:reconciliationEscalationForm2' id=item.id %} {% elif item.escalationStep == 3 %} {% url 'Account:reconciliationEscalationForm3' id=item.id %} {% elif item.escalationStep == 4 %} {% url 'Account:reconciliationEscalationForm4' id=item.id %} {% else %} {% url 'Account:reconciliationEscalationForm' id=item.id %} {% endif %}" class="btn btn-sm btn-default">Escalation</a></td> {% endcomment %}
+                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default">Escalation</a></td>
+
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

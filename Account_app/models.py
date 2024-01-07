@@ -3,6 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator,RegexVal
 from datetime import date
 from django.utils import timezone
 from GearBox_app.models import *
+from django.contrib.auth.models import User
+
 
 
 # -----------------------------------
@@ -167,6 +169,7 @@ class RctiAdjustment(models.Model):
     
     # class Meta:
     #     unique_together = (('docketNumber', 'docketDate','rctiReport','truckNo'))
+    
 class RCTI(models.Model):
     
     UNIT_CHOICES = (
@@ -314,13 +317,12 @@ class PastTripError(models.Model):
         return str(self.docketNumber)
     
     
-    
 # -----------------------------------
 # Reconciliation model
 # -----------------------------------
     
 class ReconciliationReport(models.Model):
-    docketNumber = models.CharField( max_length=10,default='')
+    docketNumber = models.CharField(max_length=10, default='')
     docketDate = models.DateField(default=None, null= True, blank=True)
     clientName =  models.CharField(max_length=20,default='')
     driverId = models.PositiveIntegerField(default=0)
@@ -331,12 +333,12 @@ class ReconciliationReport(models.Model):
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
-    escalationType = models.CharField(max_length=20,default='')
-    # 0:not escalate, 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
-    escalationStep = models.PositiveIntegerField(default=0)
-    escalationAmount = models.PositiveIntegerField(default=0)
+    # escalationType = models.CharField(max_length=20,default='')
+    # # 0:not escalate, 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
+    # escalationStep = models.PositiveIntegerField(default=0)
+    # escalationAmount = models.PositiveIntegerField(default=0)
+    # errorId = models.PositiveIntegerField(default=None)
 
-    
     fromDriver = models.BooleanField(default=False)
     fromRcti = models.BooleanField(default=False)
     
@@ -380,6 +382,45 @@ class ReconciliationReport(models.Model):
         return str(self.docketNumber)
     
 
+    
+# -----------------------------------
+# Escalation Mail section
+# -----------------------------------
+
+
+
+class Escalation(models.Model):
+    docketNumber = models.CharField(max_length=10, default=None)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    escalationDate = models.DateField(default=None, null=True)
+    escalationType = models.CharField(max_length=20,default='')
+    remark = models.CharField(max_length=1024, default='')
+    clientName = models.ForeignKey(Client, on_delete=models.CASCADE, default=None)
+    
+    # 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
+    escalationStep = models.PositiveIntegerField(default=1)
+    escalationAmount = models.IntegerField(default=0)
+    errorId = models.PositiveIntegerField(default=None, null=True)
+    
+    def __str__(self) -> str:
+        return str(self.docketNumber + ' ' + self.escalationDate + ' ' + self.escalationType)
+    
+    
+class EscalationMail(models.Model):
+    mailType = [('Send', 'Send'),('Receive', 'Receive'),]
+    
+    escalationId = models.ForeignKey(Escalation, on_delete=models.CASCADE, default=None)
+    userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    mailTo = models.CharField(default=None, max_length=50)
+    mailFrom = models.CharField(default=None, max_length=50)
+    mailDescription = models.CharField(default=None, max_length=1024)    
+    mailType = models.CharField(max_length=20, choices=mailType, default='Send')
+    mailDate = models.DateField(default=None, null=True)
+    mailCount = models.PositiveBigIntegerField(default=1)
+    
+    def __str__(self) -> str:
+        return str(self.docketId + ' ' + self.mailTo + ' ' + self.mailFrom)
+    
     
 # -----------------------------------
 # Rcti Error section

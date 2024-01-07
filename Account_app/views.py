@@ -1518,19 +1518,27 @@ def reconciliationSetMark(request):
     return JsonResponse({'status': True})
 
 def reconciliationEscalationForm(request,id):
-    data = ReconciliationReport.objects.filter(pk=id).first()
-    data.docketDate = dateConverterFromTableToPageFormate(data.docketDate)
-    clientName = Client.objects.filter(pk=data.clientId).first()
-    driverDocket = DriverDocket.objects.filter(docketNumber = data.docketNumber).first()
-    data.escalationStep = 1
-    data.save()
-
+    reconciliationObj = ReconciliationReport.objects.filter(pk=id).first()
+    docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
+    if docketObj:
+        docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
+    indian_timezone = pytz.timezone('Asia/Kolkata')
+    currentDate = datetime.now(tz=indian_timezone).date
+    escalationObj = Escalation()
+    clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
+    escalationObj.docketNumber = reconciliationObj.docketNumber
+    escalationObj.userId = request.user
+    escalationObj.escalationDate = datetime.now().date()
+    escalationObj.escalationType = currentDate
+    escalationObj.clientName = clientObj
+    escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
+    escalationObj.save()
+    
     params = {
-        'data':data, 
-        'client':clientName,
-        'driverDocket' : driverDocket,
-        'id':id
+        'escalationObj' : escalationObj,
+        'docketObj' : docketObj
     }
+    
     return render(request, 'Reconciliation/escalation-form.html',params)
 
 @csrf_protect

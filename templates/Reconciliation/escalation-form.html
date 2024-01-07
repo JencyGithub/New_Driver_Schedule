@@ -50,7 +50,8 @@
                             </li>
                         </ul>
                         
-                        <form  action = "{% url 'Account:reconciliationEscalationForm2' id=id %}" method="POST" class="form-horizontal form-label-left">
+                        {% comment %} <form  action = "{% url 'Account:reconciliationEscalationForm2' id=id %}" method="POST" class="form-horizontal form-label-left"> {% endcomment %}
+                        <form  action = "#" method="POST" class="form-horizontal form-label-left">
                             {% csrf_token%}
 
                             <div class="form-group row">
@@ -59,7 +60,7 @@
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
                                     <input type="number" id="docketNumber" name="docketNumber"
-                                        required="required" class="form-control " value={{data.docketNumber}}
+                                        required="required" class="form-control" value={{escalationObj.docketNumber}}
                                         readonly>
                                 </div>
                             </div>
@@ -69,7 +70,7 @@
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
                                     <input type="date" id="docketDate" name="docketDate" required="required"
-                                        class="form-control " readonly value="{{data.docketDate}}">
+                                        class="form-control " readonly value="{{docketObj.docketDate}}">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -77,17 +78,15 @@
                                     class="col-form-label col-md-3 col-sm-3 label-align">Client name</label>
                                 <div class="col-md-6 col-sm-6 ">
                                     <input id="clientName" class="form-control col" type="text"
-                                        name="clientName" readonly value="{{client.name}}">
+                                        name="clientName" readonly value="{{escalationObj.clientName}}">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align">Docket
                                     image:</label>
                                 <div class="col-md-6 col-sm-6">
-                                    {% if driverDocket.docketFile %}
-                                    <a href="/{{driverDocket.docketFile}}"
-                                        class="d-inline-block mt-2 text-primary" target="_blanck">Docket image
-                                        here</a>
+                                    {% if docketObj.docketFile %}
+                                    <a href="/{{docketObj.docketFile}}" class="d-inline-block mt-2 text-primary" target="_blanck">Docket image here</a>
                                     {% else %}
                                     <p>Docket image not uploaded.</p>
                                     {% endif %}
