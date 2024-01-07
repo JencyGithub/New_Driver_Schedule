@@ -392,6 +392,7 @@ class ReconciliationReport(models.Model):
 class Escalation(models.Model):
     escalationType = [('External', 'External'),('Internal', 'Internal'),]
     docketNumber = models.CharField(max_length=10, default=None)
+    docketDate = models.DateField(default=None, null=True)
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
     escalationType = models.CharField(max_length=20,choices=escalationType, default='External')
@@ -414,6 +415,7 @@ class EscalationMail(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     mailTo = models.CharField(default=None, max_length=50)
     mailFrom = models.CharField(default=None, max_length=50)
+    mailSubject = models.CharField(default=None, max_length=255)
     mailDescription = models.CharField(default=None, max_length=1024)    
     mailType = models.CharField(max_length=20, choices=mailType, default='Send')
     mailDate = models.DateField(default=None, null=True)
@@ -434,7 +436,7 @@ class RctiErrors(models.Model):
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)
     data = models.CharField(max_length=1024,default='')
-    # 0:Earning, 1:Expanse
+    # 0:Earning, 1:Expanse 2 : earning top up manually managed error
     errorType = models.PositiveIntegerField(default=0)
     
     def __str__(self) -> str:

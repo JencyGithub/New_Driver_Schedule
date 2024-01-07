@@ -45,6 +45,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             rctiErrorObj.fileName = file_name.split('@_!')[-1]
             rctiErrorObj.data = str(errorSolve)
             rctiErrorObj.save()
+            rctiErrorObj.errorType = 2
             return
 
         RCTIobj =  RCTI.objects.filter(truckNo = float(dataList[0]) ,docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
