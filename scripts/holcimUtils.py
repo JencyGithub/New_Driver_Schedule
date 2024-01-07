@@ -49,6 +49,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 rctiErrorObj.errorDescription = "Manually Manage."
                 rctiErrorObj.fileName = fileName.split('@_!')[-1]
                 rctiErrorObj.data = str(errorSolve)
+                rctiErrorObj.errorType = 1
                 rctiErrorObj.save()
             elif len(splitRow) > 0:
                 if re.fullmatch(datePattern, splitRow[0].strip()) and re.fullmatch(docketPattern, splitRow[1].strip()):
@@ -63,6 +64,8 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             rctiErrorObj.errorDescription = "Manually Manage."
                             rctiErrorObj.fileName = fileName.split('@_!')[-1]
                             rctiErrorObj.data = str(errorSolve)
+                            rctiErrorObj.errorType = 1
+                            
                             rctiErrorObj.save()
                             continue
                         else:
@@ -84,6 +87,8 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             rctiErrorObj.errorDescription = "Manually Manage."
                             rctiErrorObj.fileName = fileName.split('@_!')[-1]
                             rctiErrorObj.data = str(errorSolve)
+                            rctiErrorObj.errorType = 1
+                            
                             rctiErrorObj.save()
                             continue
                         else:

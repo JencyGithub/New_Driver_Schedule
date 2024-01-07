@@ -499,9 +499,9 @@ def getTrucks(request):
 
 
 def rcti(request):
-    rctiErrors = RctiErrors.objects.filter(status = False  , errorType = 0).values()
-    rctiSolve = RctiErrors.objects.filter(status = True , errorType = 0).values()
-    rctiManually = RctiErrors.objects.filter(status = False , errorType = 2).values()
+    rctiErrors = RctiErrors.objects.filter(status = False).values()
+    rctiSolve = RctiErrors.objects.filter(status = True).values()
+    rctiManually = RctiErrors.objects.filter(status = False , errorType = 1).values()
     client = Client.objects.all()
     BasePlant_ = BasePlant.objects.all()
     # return render(request, 'Account/rctiCsvForm.html', {'basePlants': BasePlant_})

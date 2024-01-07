@@ -44,8 +44,8 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             rctiErrorObj.errorDescription = "Manually Manage."
             rctiErrorObj.fileName = file_name.split('@_!')[-1]
             rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.errorType = 1
             rctiErrorObj.save()
-            rctiErrorObj.errorType = 2
             return
 
         RCTIobj =  RCTI.objects.filter(truckNo = float(dataList[0]) ,docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
