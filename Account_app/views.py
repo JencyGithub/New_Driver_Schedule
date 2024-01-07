@@ -1518,6 +1518,7 @@ def reconciliationSetMark(request):
     return JsonResponse({'status': True})
 
 def reconciliationEscalationForm(request,id):
+    
     reconciliationObj = ReconciliationReport.objects.filter(pk=id).first()
     docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
     if docketObj:
@@ -1526,13 +1527,16 @@ def reconciliationEscalationForm(request,id):
     currentDate = datetime.now(tz=indian_timezone).date()
     
     clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
-    escalationObj = Escalation()
-    escalationObj.docketNumber = reconciliationObj.docketNumber
-    escalationObj.userId = request.user
-    escalationObj.escalationDate = currentDate
-    escalationObj.clientName = clientObj
-    escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
-    escalationObj.save()
+    escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
+
+    if not escalationObj:
+        escalationObj = Escalation()
+        escalationObj.docketNumber = reconciliationObj.docketNumber
+        escalationObj.userId = request.user
+        escalationObj.escalationDate = currentDate
+        escalationObj.clientName = clientObj
+        escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
+        escalationObj.save()
     
     params = {
         'escalationObj' : escalationObj,
@@ -1543,9 +1547,9 @@ def reconciliationEscalationForm(request,id):
 
 @csrf_protect
 def reconciliationEscalationForm2(request, id):
-    return HttpResponse(id)
-    
-    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
+    escalationObj = Escalation.objects.filter(pk=id).first()
+    reconciliationData = ReconciliationReport.objects.filter(docketNumber = escalationObj.docketNumber).first()
+
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
     waitingTimeCostDifference= reconciliationData.driverWaitingTimeCost - reconciliationData.rctiWaitingTimeCost
@@ -1555,11 +1559,13 @@ def reconciliationEscalationForm2(request, id):
     standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
     loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
     totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
-    reconciliationData.escalationStep = 2
-    reconciliationData.save()
+
+    if escalationObj.escalationStep < 2:
+        escalationObj.escalationStep = 2
+        escalationObj.save()
 
     params = {
-        'id':id,
+        'escalationObj':escalationObj,
         'data': reconciliationData,
         'loadKmCostDifference':round(loadKmCostDifference,2),
         'surchargeCostDifference':round(surchargeCostDifference,2),
@@ -1573,15 +1579,22 @@ def reconciliationEscalationForm2(request, id):
     }
     return render(request, 'Reconciliation/escalation-form2.html',params)
 
-
 @csrf_protect
 def reconciliationEscalationForm3(request ,id):
     escalationType = request.POST.get('escalation')
-    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
-    reconciliationData.escalationStep = 3
-    if escalationType:
-        reconciliationData.escalationType = escalationType
-    reconciliationData.save()
+    
+    escalationObj = Escalation.objects.filter(pk=id).first()
+    if escalationObj.escalationStep <= 3:
+        escalationObj.escalationStep = 3
+    if escalationType == 'internal':
+        escalationObj.escalationType = 'Internal'
+    escalationObj.save()
+    
+    
+    # reconciliationData = ReconciliationReport.objects.filter(docketNumber = escalationObj.docketNumber).first()
+    
+    # return HttpResponse(escalationType)
+    # reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
 
     params = {
         'id':id,

@@ -1506,6 +1506,15 @@ body .container.body .right_col {
 	color: #fff
 }
 
+.bg-default{
+	background-color: #34495e;
+	color: white;
+}
+.bg-default-sky{
+	background-color: #2b3d4e8f;
+	color: white;
+}
+
 .container {
 	width: 100%;
 	padding: 0;

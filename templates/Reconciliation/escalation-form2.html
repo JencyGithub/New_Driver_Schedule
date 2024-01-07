@@ -54,7 +54,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            <form  action = "{% url 'Account:reconciliationEscalationForm3' id=id %}" method="POST" class="form-horizontal form-label-left">
+                            <form  action = "{% url 'Account:reconciliationEscalationForm3' id=escalationObj.id %}" method="POST" class="form-horizontal form-label-left">
                                 {% csrf_token%}
 
 
@@ -164,7 +164,7 @@
                                     </div>
                                 </div>
                                 <div class="float-right">
-                                    <a href="{% url 'Account:reconciliationEscalationForm' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
+                                    <a href="{% url 'Account:reconciliationEscalationForm' id=data.id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
                                     <button type="submit" class="buttonNext btn btn-success">Next</button>
                                 </div>
                             </form>

@@ -382,13 +382,9 @@ class ReconciliationReport(models.Model):
         return str(self.docketNumber)
     
 
-    
 # -----------------------------------
 # Escalation Mail section
 # -----------------------------------
-
-
-
 class Escalation(models.Model):
     escalationType = [('External', 'External'),('Internal', 'Internal'),]
     

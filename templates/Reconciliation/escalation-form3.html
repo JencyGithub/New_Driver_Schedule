@@ -59,48 +59,122 @@
                                     </a>
                                 </li>
                             </ul>
-                             
-                            <form action="{% url 'Account:reconciliationEscalationForm4' id=id %}" method="POST" novalidate id="reconciliationForm">
-                                {% csrf_token %}
+                                {% if escalationType == 'internal' %}
+                                    <form action="{% url 'Account:reconciliationEscalationForm4' id=id %}" method="POST" novalidate id="reconciliationForm">
+                                        {% csrf_token %}
 
-                                <!-- <h5>Internal Escalation</h5> -->
-                             
-                                <div class="field item form-group">
-                                    <label class="col-form-label col-md-3 col-sm-3  label-align">Remark<span class="required">*</span></label>
-                                    <div class="col-md-6 col-sm-6">
-                                        <textarea required="required" name='comment' id="comment" class="form-control" data-validate-length-range="20" placeholder="Minimum 20 characters" rows="3"></textarea></div>
-                                </div>
-                                
-                                <div class="col-md-12 text-right">
-                                    <a href="{% url 'Account:reconciliationEscalationForm2' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
-                                    <button type="submit" class="buttonNext btn btn-success">Next</button>
-                                </div>
-                            </form>
-
-
-                            <!-- <form  action = "{% url 'Account:reconciliationEscalationForm4' id=id %}" method="POST" class="form-horizontal form-label-left" novalidate>
-                                {% csrf_token%}
-
-                                {%if escalationType == 'internal' %}
-                                <div class="form-group row">
-                                    <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                        for="first-name" for="comment">Comment<span class="required">*</span>
-                                    </label>
-                                    <div class="col-md-6 col-sm-6 ">
-                                        <textarea name="comment" class="form-control" id="comment" cols="10" rows="2" required="required"></textarea>
-
+                                        <!-- <h5>Internal Escalation</h5> -->
+                                    
+                                        <div class="field item form-group">
+                                            <label class="col-form-label col-md-3 col-sm-3  label-align">Remark<span class="required">*</span></label>
+                                            <div class="col-md-6 col-sm-6">
+                                                <textarea required="required" name='comment' id="comment" class="form-control" data-validate-length-range="20" placeholder="Minimum 20 characters" rows="3"></textarea></div>
+                                        </div>
+                                        
+                                        <div class="col-md-12 text-right">
+                                            <a href="{% url 'Account:reconciliationEscalationForm2' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
+                                            <button type="submit" class="buttonNext btn btn-success">Next</button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                <h4>Recent conversations:</h4>
+                                    <div style="max-height: 60vh; overflow-y: auto;" class="border rounded px-3 py-1">
+                                        <div class="container-fluid">
+                                            <div class="row my-2">
+                                                <div class="col-md-7 col-12 rounded p-3 my-2 bg-light">
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">To :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">From :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Subject :</span>
+                                                        <span>Escalation for Docket number 102402</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Description :</span>
+                                                        <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Omnis fuga incidunt rerum expedita exercitationem! Quibusdam doloribus ullam iusto perspiciatis, veritatis suscipit. Aut dignissimos alias ex temporibus illum cumque, non aliquid quaerat, accusamus illo harum nobis suscipit sunt explicabo minima optio fuga amet recusandae ad molestiae, sed consequuntur. Cumque cupiditate numquam consectetur voluptatibus. Ex architecto fuga eum molestias temporibus quod minima nobis doloremque magni deserunt. Voluptate exercitationem deleniti tenetur optio sint harum officia aliquam cumque fugiat, suscipit quaerat et a eum.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 col-12 rounded p-3 my-2 bg-default-sky ml-auto">
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">To :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">From :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Subject :</span>
+                                                        <span>Escalation for Docket number 102402</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Description :</span>
+                                                        <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Omnis fuga incidunt rerum expedita exercitationem! Quibusdam doloribus ullam iusto perspiciatis, veritatis suscipit. Aut dignissimos alias ex temporibus illum cumque, non aliquid quaerat, accusamus illo harum nobis suscipit sunt explicabo minima optio fuga amet recusandae ad molestiae, sed consequuntur. Cumque cupiditate numquam consectetur voluptatibus. Ex architecto fuga eum molestias temporibus quod minima nobis doloremque magni deserunt. Voluptate exercitationem deleniti tenetur optio sint harum officia aliquam cumque fugiat, suscipit quaerat et a eum.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 col-12 rounded p-3 my-2 bg-light">
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">To :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">From :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Subject :</span>
+                                                        <span>Escalation for Docket number 102402</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Description :</span>
+                                                        <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Omnis fuga incidunt rerum expedita exercitationem! Quibusdam doloribus ullam iusto perspiciatis, veritatis suscipit. Aut dignissimos alias ex temporibus illum cumque, non aliquid quaerat, accusamus illo harum nobis suscipit sunt explicabo minima optio fuga amet recusandae ad molestiae, sed consequuntur. Cumque cupiditate numquam consectetur voluptatibus. Ex architecto fuga eum molestias temporibus quod minima nobis doloremque magni deserunt. Voluptate exercitationem deleniti tenetur optio sint harum officia aliquam cumque fugiat, suscipit quaerat et a eum.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 col-12 rounded p-3 my-2 bg-light">
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">To :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">From :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Subject :</span>
+                                                        <span>Escalation for Docket number 102402</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Description :</span>
+                                                        <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Omnis fuga incidunt rerum expedita exercitationem! Quibusdam doloribus ullam iusto perspiciatis, veritatis suscipit. Aut dignissimos alias ex temporibus illum cumque, non aliquid quaerat, accusamus illo harum nobis suscipit sunt explicabo minima optio fuga amet recusandae ad molestiae, sed consequuntur. Cumque cupiditate numquam consectetur voluptatibus. Ex architecto fuga eum molestias temporibus quod minima nobis doloremque magni deserunt. Voluptate exercitationem deleniti tenetur optio sint harum officia aliquam cumque fugiat, suscipit quaerat et a eum.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 col-12 rounded p-3 my-2 bg-default-sky ml-auto">
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">To :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bolder text-default">From :</span>
+                                                        <span>lishosbnindsai415@gmail.com</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Subject :</span>
+                                                        <span>Escalation for Docket number 102402</span>
+                                                    </div>
+                                                    <div>
+                                                        <span class="font-weight-bold text-default">Description :</span>
+                                                        <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Omnis fuga incidunt rerum expedita exercitationem! Quibusdam doloribus ullam iusto perspiciatis, veritatis suscipit. Aut dignissimos alias ex temporibus illum cumque, non aliquid quaerat, accusamus illo harum nobis suscipit sunt explicabo minima optio fuga amet recusandae ad molestiae, sed consequuntur. Cumque cupiditate numquam consectetur voluptatibus. Ex architecto fuga eum molestias temporibus quod minima nobis doloremque magni deserunt. Voluptate exercitationem deleniti tenetur optio sint harum officia aliquam cumque fugiat, suscipit quaerat et a eum.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                {%else%}
-                                <h2>{{escalationType}}</h2>
-                                {%endif%}
-
-
-                                <div class="float-right">
-                                    <a href="{% url 'Account:reconciliationEscalationForm2' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
-                                    <button type="submit" class="buttonNext btn btn-success">Next</button>
-                                </div>
-                            </form> -->
+                                {% endif %}
 
                         </div>
                         <!-- End SmartWizard Content -->
