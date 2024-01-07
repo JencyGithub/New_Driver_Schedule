@@ -390,6 +390,8 @@ class ReconciliationReport(models.Model):
 
 
 class Escalation(models.Model):
+    escalationType = [('External', 'External'),('Internal', 'Internal'),]
+    
     docketNumber = models.CharField(max_length=10, default=None)
     docketDate = models.DateField(default=None, null=True)
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
