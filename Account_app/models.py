@@ -390,10 +390,11 @@ class ReconciliationReport(models.Model):
 
 
 class Escalation(models.Model):
+    escalationType = [('External', 'External'),('Internal', 'Internal'),]
     docketNumber = models.CharField(max_length=10, default=None)
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
-    escalationType = models.CharField(max_length=20,default='')
+    escalationType = models.CharField(max_length=20,choices=escalationType, default='External')
     remark = models.CharField(max_length=1024, default='')
     clientName = models.ForeignKey(Client, on_delete=models.CASCADE, default=None)
     
@@ -403,7 +404,7 @@ class Escalation(models.Model):
     errorId = models.PositiveIntegerField(default=None, null=True)
     
     def __str__(self) -> str:
-        return str(self.docketNumber + ' ' + self.escalationDate + ' ' + self.escalationType)
+        return str(self.docketNumber) + ' ' + str(self.escalationType)
     
     
 class EscalationMail(models.Model):
@@ -419,7 +420,7 @@ class EscalationMail(models.Model):
     mailCount = models.PositiveBigIntegerField(default=1)
     
     def __str__(self) -> str:
-        return str(self.docketId + ' ' + self.mailTo + ' ' + self.mailFrom)
+        return str(self.docketId) + ' ' + str(self.mailTo) + ' ' + str(self.mailFrom)
     
     
 # -----------------------------------
@@ -437,7 +438,7 @@ class RctiErrors(models.Model):
     errorType = models.PositiveIntegerField(default=0)
     
     def __str__(self) -> str:
-        return str(self.docketNumber +' '+ self.errorDescription)
+        return str(self.docketNumber) +' '+ str(self.errorDescription)
 
 # -----------------------------------
 # Rcti Expense section

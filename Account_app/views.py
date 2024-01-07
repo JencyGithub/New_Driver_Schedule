@@ -2289,13 +2289,14 @@ def topUpForm(request,id , topUpDocket = None):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
     clientName = request.POST.get('clientName')
-
     rctiError = RctiErrors.objects.filter(pk=id).first()
     if topUpDocket:
         escalationData = ReconciliationReport.objects.filter(clientName = clientName , docketDate__gte =startDate ,docketDate__lte = endDate , escalationType = 1, reconciliationType = 0).values()
-
+    formName = None 
+    formName = 'Top Up' if rctiError.data else None
     params = {
         'errorId':rctiError,
+        'formName':formName,
         'escalationData':escalationData,
         'client':client,
         'topUpDocket': topUpDocket

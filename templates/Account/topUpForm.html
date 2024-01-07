@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Top Up form{% endblock %}
+{% block title %} | {{formName}} form{% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -43,7 +43,7 @@
             <div class="x_panel">
                 <form action="{% url 'Account:topUpView' id=errorId.id topUpDocket=1 %}" method="POST" id="reconciliationForm">
                 <div class="x_title">
-                    <h2>Top Up Form</h2>
+                    <h2>{{formName}} Form</h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -62,15 +62,9 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4">
-                                <label for="clientName">Client Name :<span
-                                        class="required">*</span></label>
+                                <label for="endDate">Client Name:<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <select name="clientName" class="form-control" required id="clientName">
-                                      <option value="" selected disabled >Choose Client Name</option>
-                                        {%for client in client %}
-                                        <option value="{{client.name}}">{{client.name}}</option>
-                                        {% endfor%}
-                                    </select>
+                                    <input class="form-control date" type="text" value="{{errorId.clientName}}" disabled name="clientName" id="clientName">
                                 </div>
                               </div>
 
