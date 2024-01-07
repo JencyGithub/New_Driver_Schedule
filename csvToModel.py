@@ -44,6 +44,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             rctiErrorObj.errorDescription = "Manually Manage."
             rctiErrorObj.fileName = file_name.split('@_!')[-1]
             rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.errorType = 1
             rctiErrorObj.save()
             return
 

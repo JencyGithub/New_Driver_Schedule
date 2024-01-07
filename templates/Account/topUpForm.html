@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Top Up form{% endblock %}
+{% block title %} | {{formName}} form{% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -43,7 +43,7 @@
             <div class="x_panel">
                 <form action="{% url 'Account:topUpView' id=errorId.id topUpDocket=1 %}" method="POST" id="reconciliationForm">
                 <div class="x_title">
-                    <h2>Top Up Form</h2>
+                    <h2>{{formName}} Form</h2>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -62,15 +62,9 @@
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4">
-                                <label for="clientName">Client Name :<span
-                                        class="required">*</span></label>
+                                <label for="endDate">Client Name:<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <select name="clientName" class="form-control" required id="clientName">
-                                      <option value="" selected disabled >Choose Client Name</option>
-                                        {%for client in client %}
-                                        <option value="{{client.name}}">{{client.name}}</option>
-                                        {% endfor%}
-                                    </select>
+                                    <input class="form-control date" type="text" value="{{errorId.clientName}}" disabled name="clientName" id="clientName">
                                 </div>
                               </div>
 
@@ -89,7 +83,32 @@
             <div class="x_title">
                 <h2>Top Up Data</h2>
                 <div class="float-right">
-                    <button class="btn btn-sm btn-default submit" value="Mark as complete">Complete</button>
+                    {% comment %} <button class="btn btn-sm btn-default " value="Mark as complete">Complete</button> {% endcomment %}
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-sm btn-default" id="complete"> 
+                        <!-- data-toggle="modal" data-target="#exampleModal" -->
+                        Complete
+                    </button>
+  
+                <!-- Modal -->
+                <div class="modal fade" id="Mymodel" tabindex="-1" role="dialog" aria-labelledby="MymodelLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="MymodelLabel">{{formName}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                        <label for="Remark"> Remark</label>
+                        <textarea name="remark" id="Remark" class="form-control" cols="10" rows="5"></textarea>
+                        <button type="submit" class="btn btn-default submit float-right mt-2">Save</button>
+                        </div>
+                        
+                    </div>
+                    </div>
+                </div>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -97,7 +116,8 @@
                     <table id="dataTable" class="table table-striped table-bordered">
                         <thead>
                             <th></th>
-                            <th>Docket number</th>
+                            <th>Docket Number</th>
+                            <th>Docket Date</th>
                             <th>Escalation Amount</th>
                         </thead>
                         <tbody>
@@ -106,6 +126,7 @@
                                 <tr>
                                     <td>{{ data.id }}</td>
                                     <td><a href="#"class="">{{ data.docketNumber }}</a></td>
+                                    <td><a href="#"class="">{{ data.docketDate }}</a></td>
                                     <td>{{ data.escalationAmount }}</td>
                                     
                                 </tr>
@@ -157,35 +178,67 @@
             }
         }]
     });
-    $('.submit').on('click', function () {
+    
+    $('#complete').on('click', function () {
         var selectedRows = table.column(0).checkboxes.selected();
+        var remark = $('#Remark').val();
     
         var rowDockets = [];
         $.each(selectedRows, function(key, docket){
             rowDockets.push(docket);
         });
-    
-        if(rowDockets.length > 0){ // Check if any rows are selected
-            $.ajax({
-                type: "GET",
-                url: "/account/TopUp/Solve",
-                data: {
-                    dockets: rowDockets,
-                    topUpId: {{errorId.id}},
-                },
-                success: function (data) {
-                    console.log(data.status);
-
-                    if (data.status) {
-                        window.location.href = "/account/Rcti";
-                    } else {
-                        // Handle other cases if needed
-                        alertify.error('Error occurred. Please try again.');
-
-                    }
-                }
-            });
+        if(rowDockets.length > 0)
+        {
+            $('#Mymodel').modal({
+                show: true
+            }); 
+        
         }
+        else{
+            alertify.error('Please select minimum one docket.');
+            
+        }
+
+    });
+    $('.submit').on('click', function () {
+        var selectedRows = table.column(0).checkboxes.selected();
+        var remark = $('#Remark').val();
+    
+        var rowDockets = [];
+        $.each(selectedRows, function(key, docket){
+            rowDockets.push(docket);
+        });
+        console.log(remark)
+
+        if(remark != ''){
+            if(rowDockets.length > 0){ // Check if any rows are selected
+                $.ajax({
+                    type: "GET",
+                    url: "/account/TopUp/Solve",
+                    data: {
+                        dockets: rowDockets,
+                        remark: remark,
+                        topUpId: {{ errorId.id }},
+                    },
+                    success: function (data) {
+                        console.log(data.status);
+    
+                        if (data.status) {
+                            window.location.href = "/account/Rcti";
+                           // alertify.success('Successfully add.');
+    
+                        } else {
+                            // Handle other cases if needed
+                            alertify.error('Error occurred. Please try again.');
+    
+                        }
+                    }
+                });
+            };
+        }else{
+            $('#Mymodel textarea').css('border','1px solid red');
+        }
+    
     });
 });
 </script>

@@ -501,6 +501,7 @@ def getTrucks(request):
 def rcti(request):
     rctiErrors = RctiErrors.objects.filter(status = False).values()
     rctiSolve = RctiErrors.objects.filter(status = True).values()
+    rctiManually = RctiErrors.objects.filter(status = False , errorType = 1).values()
     client = Client.objects.all()
     BasePlant_ = BasePlant.objects.all()
     # return render(request, 'Account/rctiCsvForm.html', {'basePlants': BasePlant_})
@@ -2303,14 +2304,15 @@ def topUpForm(request,id , topUpDocket = None):
     client = Client.objects.all()
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    clientName = request.POST.get('clientName')
-
     rctiError = RctiErrors.objects.filter(pk=id).first()
+    clientNameObj = Client.objects.filter(name = rctiError.clientName).first()
     if topUpDocket:
-        escalationData = ReconciliationReport.objects.filter(clientName = clientName , docketDate__gte =startDate ,docketDate__lte = endDate , escalationType = 1, reconciliationType = 0).values()
-
+        escalationData = Escalation.objects.filter(clientName = clientNameObj , escalationDate__range = (startDate , endDate ), escalationType = 'External', escalationStep = 3).values()
+    formName = None 
+    formName = 'Top Up' if rctiError.data else None
     params = {
         'errorId':rctiError,
+        'formName':formName,
         'escalationData':escalationData,
         'client':client,
         'topUpDocket': topUpDocket
@@ -2319,10 +2321,13 @@ def topUpForm(request,id , topUpDocket = None):
 
 def topUpSolve(request):
     errorId  = request.GET.get('topUpId')
+    remark  = request.GET.get('remark')
     dockets = request.GET.getlist('dockets[]')
     for docket in dockets:
-        getDocket = ReconciliationReport.objects.filter(pk = docket).first()
-        getDocket.reconciliationType = 2
+        getDocket = Escalation.objects.filter(pk = docket).first()
+        getDocket.escalationStep = 4
+        getDocket.remark = remark
+        getDocket.errorId = errorId
         getDocket.save()
     rctiError = RctiErrors.objects.filter(pk=errorId).first()
     rctiError.status = True
