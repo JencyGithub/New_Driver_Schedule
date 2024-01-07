@@ -1524,13 +1524,13 @@ def reconciliationEscalationForm(request,id):
     if docketObj:
         docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
     indian_timezone = pytz.timezone('Asia/Kolkata')
-    currentDate = datetime.now(tz=indian_timezone).date
-    escalationObj = Escalation()
+    currentDate = datetime.now(tz=indian_timezone).date()
+    
     clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
+    escalationObj = Escalation()
     escalationObj.docketNumber = reconciliationObj.docketNumber
     escalationObj.userId = request.user
-    escalationObj.escalationDate = datetime.now().date()
-    escalationObj.escalationType = currentDate
+    escalationObj.escalationDate = currentDate
     escalationObj.clientName = clientObj
     escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
     escalationObj.save()
@@ -1543,7 +1543,9 @@ def reconciliationEscalationForm(request,id):
     return render(request, 'Reconciliation/escalation-form.html',params)
 
 @csrf_protect
-def reconciliationEscalationForm2(request ,id):
+def reconciliationEscalationForm2(request, id):
+    return HttpResponse(id)
+    
     reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost

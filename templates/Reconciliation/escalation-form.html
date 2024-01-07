@@ -51,7 +51,7 @@
                         </ul>
                         
                         {% comment %} <form  action = "{% url 'Account:reconciliationEscalationForm2' id=id %}" method="POST" class="form-horizontal form-label-left"> {% endcomment %}
-                        <form  action = "#" method="POST" class="form-horizontal form-label-left">
+                        <form  action = "{% url 'Account:reconciliationEscalationForm2' id=escalationObj.id %}" method="POST" class="form-horizontal form-label-left">
                             {% csrf_token%}
 
                             <div class="form-group row">
