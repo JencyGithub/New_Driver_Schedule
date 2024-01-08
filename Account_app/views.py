@@ -1524,8 +1524,9 @@ def reconciliationEscalationForm(request,id):
     docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
     if docketObj:
         docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
-    indian_timezone = pytz.timezone('Asia/Kolkata')
-    currentDate = datetime.now(tz=indian_timezone).date()
+
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDate = datetime.now(tz=currentTimezone).date()
     
     clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
     escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
@@ -1536,8 +1537,10 @@ def reconciliationEscalationForm(request,id):
         escalationObj.userId = request.user
         escalationObj.escalationDate = currentDate
         escalationObj.clientName = clientObj
+        escalationObj.docketDate = reconciliationObj.docketDate
         escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
         escalationObj.save()
+        
     
     params = {
         'escalationObj' : escalationObj,
@@ -1549,7 +1552,7 @@ def reconciliationEscalationForm(request,id):
 @csrf_protect
 def reconciliationEscalationForm2(request, id):
     escalationObj = Escalation.objects.filter(pk=id).first()
-    reconciliationData = ReconciliationReport.objects.filter(docketNumber = escalationObj.docketNumber).first()
+    reconciliationData = ReconciliationReport.objects.filter(docketNumber=escalationObj.docketNumber, docketDate=escalationObj.docketDate).first()
 
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
@@ -1582,35 +1585,93 @@ def reconciliationEscalationForm2(request, id):
 
 @csrf_protect
 def reconciliationEscalationForm3(request ,id):
-    escalationType = request.POST.get('escalation')
-    
+    params = {}
     escalationObj = Escalation.objects.filter(pk=id).first()
-    if escalationObj.escalationStep <= 3:
-        escalationObj.escalationStep = 3
-    if escalationType == 'internal':
+    escalationObj.escalationStep = 3
+    if request.POST.get('escalation') == 'internal':
         escalationObj.escalationType = 'Internal'
+    elif request.POST.get('escalation') == 'external':
+        escalationObj.escalationType = 'External'
     escalationObj.save()
     
+    if escalationObj.escalationType == 'External':
+        oldMail = EscalationMail.objects.filter(escalationId=escalationObj).order_by('mailCount')
+        params['oldMail'] = oldMail
+        
+    params['escalationObj']=escalationObj
     
-    # reconciliationData = ReconciliationReport.objects.filter(docketNumber = escalationObj.docketNumber).first()
-    
-    # return HttpResponse(escalationType)
-    # reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
-
-    params = {
-        'id':id,
-        'escalationType':escalationType
-    }
     return render(request, 'Reconciliation/escalation-form3.html',params)
+
+@csrf_protect
+def reconciliationEscalationMailAdd(request, id):
+    escalationObj = Escalation.objects.filter(pk=id).first()
+    mailTo = request.POST.get('mailTo')
+    mailFrom = request.POST.get('mailFrom')
+    mailSubject = request.POST.get('mailSubject')
+    mailDescription = request.POST.get('mailDescription')
+    mailType = request.POST.get('mailType')
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDate = datetime.now(tz=currentTimezone).date()
+    oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
+    
+    
+    escalationMailObj = EscalationMail()
+    escalationMailObj.escalationId = escalationObj
+    escalationMailObj.userId = request.user
+    escalationMailObj.mailTo = mailTo
+    escalationMailObj.mailFrom = mailFrom 
+    escalationMailObj.mailSubject = mailSubject
+    escalationMailObj.mailDescription = mailDescription
+    escalationMailObj.mailType = mailType
+    escalationMailObj.mailDate = currentDate
+    escalationMailObj.mailCount = oldMailCount + 1    
+
+    mailFile = request.FILES.get('mailAttechment')
+    if mailFile:
+        time = getCurrentTimeInString()
+        attachmentPath = 'static/img/mailAttachment'
+        fileName = mailFile.name
+        convertedFileName = time + '!_@' + fileName
+        pfs = FileSystemStorage(location=attachmentPath)
+        pfs.save(convertedFileName, mailFile)
+        escalationMailObj.mailAttachment = f'static/img/mailAttachment/{convertedFileName}'
+    
+    escalationMailObj.save()
+    messages.success(request, "Mail added successfully.")
+    return redirect(request.META.get('HTTP_REFERER'))
+
 @csrf_protect
 def reconciliationEscalationForm4(request ,id):
-    reconciliationData = ReconciliationReport.objects.filter(pk = id).first()
-    reconciliationData.escalationStep = 4
-    reconciliationData.save()
+    escalationObj = Escalation.objects.filter(pk=id).first()
+
+    remark = request.POST.get('remark')
+    if remark:
+        escalationObj.remark = remark
+        
+    if escalationObj.escalationStep <= 4:
+        escalationObj.escalationStep = 4
+        
+    escalationObj.save()
     params = {
-        'id':id
+        'escalationObj':escalationObj
     }
     return render(request, 'Reconciliation/escalation-form4.html',params)
+    
+    
+@csrf_protect
+def reconciliationEscalationComplete(request, id):
+    escalationObj = Escalation.objects.filter(pk=id).first()
+    # return HttpResponse(escalationObj.remark)
+    escalationObj.escalationStep = 5
+    escalationObj.save()
+    
+    # set short paid 
+    reconciliationData = ReconciliationReport.objects.filter(docketNumber=escalationObj.docketNumber, docketDate=escalationObj.docketDate).first()
+    reconciliationData.reconciliationType = 1
+    reconciliationData.save()
+    
+    messages.success(request, "Escalation completed successfully.")
+    return redirect(request.META.get('HTTP_REFERER'))
     
 # ```````````````````````````````````
 # Public holiday
@@ -2335,3 +2396,25 @@ def topUpSolve(request):
         
     return JsonResponse({'status': True})
     
+def report(request):
+    return render(request,'Account/report.html')
+
+@csrf_protect
+def reportSave(request):
+    primaryFile = request.FILES.get('primaryFile')
+    secondaryFile = request.FILES.get('secondaryFile')
+
+    if primaryFile:
+        time = getCurrentTimeInString()
+        primaryFileName = time + "@_!" + (str(primaryFile.name)).replace(' ','')
+        location = f'static/Account/RCTI/Report'
+        lfs = FileSystemStorage(location=location)
+        lfs.save(primaryFileName, primaryFile)
+    if secondaryFile:
+        time = getCurrentTimeInString()
+        secondaryFileName = time + "@_!" + (str(secondaryFile.name)).replace(' ','')
+        location = f'static/Account/RCTI/Report'
+        lfs = FileSystemStorage(location=location)
+        lfs.save(secondaryFileName, secondaryFile)
+    messages.success(request,'Successfully save')
+    return redirect(request.META.get('HTTP_REFERER'))

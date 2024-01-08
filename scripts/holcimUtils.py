@@ -23,7 +23,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     lineCount = 0
     datePattern = r'\d{2}\.\d{2}\.\d{4}'
     
-    docketPattern = r'(\d{8}[a-zA-Z]{0,2})'
+    docketPattern = r'(\d{5,11}[a-zA-Z]{0,2})'
     truckNo = None
     total = 0
     fileDetails = []
@@ -123,22 +123,25 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
             
             try:
-                if len(data) > 5:
+                if len(data) > 0:
                     rctiObj = RCTI()
                     rctiObj.clientName = clientName
                     rctiObj.truckNo =data[0]
                     rctiObj.docketNumber = data[2]
                     rctiObj.docketDate =  datetime.strptime(data[1], '%d.%m.%Y').date()
 
-                    
-                    rctiObj.cubicMl = data[3]
-                    rctiObj.paidQty = data[4]
-                    rctiObj.unit = data[5]
-                    rctiObj.noOfKm = data[6]
-                    rctiObj.destination = data[7]
-                    rctiObj.cubicMiAndKmsCost = data[9]
-                    rctiObj.cartageTotal = data[9]
-                    dataList = data[10:]
+                    if len(data) > 5:
+                        rctiObj.cubicMl = data[3]
+                        rctiObj.paidQty = data[4]
+                        rctiObj.unit = data[5]
+                        rctiObj.noOfKm = data[6]
+                        rctiObj.destination = data[7]
+                        rctiObj.cubicMiAndKmsCost = data[9]
+                        rctiObj.cartageTotal = data[9]
+                        dataList = data[10:]
+                    else:
+                        dataList = data[3:]
+                        
                     while dataList:
                         if 'standby' in dataList[0].lower():
                             rctiObj.standByPerHalfHourDuration = dataList[1]
@@ -170,15 +173,19 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                         elif 'callout' in dataList[0].lower():
                             rctiObj.callOutCost = dataList[1]
                             rctiObj.callOutTotal = dataList[1]
+                        else:
+                            rctiObj.otherDescription = dataList[0]
+                            rctiObj.othersCost = dataList[1]
+                            rctiObj.othersTotal = dataList[1]
                         dataList = dataList[2:]
                     rctiObj.rctiReport = rctiReportObj
                     rctiObj.save()
                 else:
                     with open('holcim.txt','a')as f:
-                        f.write('skip'+ str(dataList) +'\n')
+                        f.write('skip'+ str(data) +'\n')
             except Exception as e:
                 with open('holcim.txt','a')as f:
-                    f.write('error' +str(e) + str(dataList) +'\n')
+                    f.write('error' +str(e) + str(data) +'\n')
 
     except Exception as e:
         with open('holcim.txt','a')as f:

@@ -396,7 +396,7 @@ class Escalation(models.Model):
     remark = models.CharField(max_length=1024, default='')
     clientName = models.ForeignKey(Client, on_delete=models.CASCADE, default=None)
     
-    # 1:1st step, 2:2nd step, 3:3rd step, 4:escalation complete
+    # 1:1st step, 2:2nd step, 3:3rd step, 4:4th step, 5:complete
     escalationStep = models.PositiveIntegerField(default=1)
     escalationAmount = models.IntegerField(default=0)
     errorId = models.PositiveIntegerField(default=None, null=True)
@@ -414,12 +414,13 @@ class EscalationMail(models.Model):
     mailFrom = models.CharField(default=None, max_length=50)
     mailSubject = models.CharField(default=None, max_length=255)
     mailDescription = models.CharField(default=None, max_length=1024)    
+    mailAttachment = models.FileField(default=None, null=True, blank=True)    
     mailType = models.CharField(max_length=20, choices=mailType, default='Send')
     mailDate = models.DateField(default=None, null=True)
     mailCount = models.PositiveBigIntegerField(default=1)
     
     def __str__(self) -> str:
-        return str(self.docketId) + ' ' + str(self.mailTo) + ' ' + str(self.mailFrom)
+        return str(self.escalationId) + ' ' + str(self.mailDate)
     
     
 # -----------------------------------

@@ -19,7 +19,7 @@
 
                         <!-- Smart Wizard -->
                         <div id="wizard" class="form_wizard wizard_horizontal">
-                            <ul class="wizard_steps anchor">
+                            <ul class="wizard_steps anchor p-0">
                                 <li>
                                     <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                         <span class="step_no">1</span>
@@ -53,18 +53,18 @@
                                     </a>
                                 </li>
                             </ul>
-                            <form  action = "#" method="POST" class="form-horizontal form-label-left">
-                                {% csrf_token%}
-
-                                <h2>form 4 </h2>
-
-
-                                <div class="float-right">
-                                    <a href="{% url 'Account:reconciliationEscalationForm3' id=id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
-                                    <button type="submit" class="buttonNext btn btn-success">Finish</button>
-                                </div>
-                            </form>
-
+                            {% if escalationObj.escalationStep == 5 %}
+                                <h5 class="text-center my-5"><i class="fa-solid fa-circle-dot mr-2"></i> This Docket is complete.</h5>
+                            {% else %}
+                                <form  action="{% url 'Account:reconciliationEscalationComplete' id=escalationObj.id %}" method="POST" class="form-horizontal form-label-left">
+                                    {% csrf_token%}
+                                    <h5 class="text-center my-5"><i class="fa-solid fa-circle-dot mr-2"></i> Do you want to complete this docket? If yes than click on Finish button.</h5>
+                                    <div class="float-right">
+                                        <a href="{% url 'Account:reconciliationEscalationForm3' id=escalationObj.id %}" class="buttonPrevious buttonDisabled btn btn-primary">Previous</a>
+                                        <button type="submit" class="buttonNext btn btn-success">Finish</button>
+                                    </div>
+                                </form>
+                            {% endif %} 
                         </div>
                         <!-- End SmartWizard Content -->
                     </div>

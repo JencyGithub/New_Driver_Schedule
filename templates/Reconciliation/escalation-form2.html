@@ -20,7 +20,7 @@
 
                         <!-- Smart Wizard -->
                         <div id="wizard" class="form_wizard wizard_horizontal">
-                            <ul class="wizard_steps anchor">
+                            <ul class="wizard_steps anchor p-0">
                                 <li>
                                     <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                         <span class="step_no">1</span>
@@ -62,9 +62,9 @@
                                     <div class="row">
                                         <div class="col-md-12 col-sm-12">
                                             <div class="float-right">
-                                                <input type="radio" id="internal" name="escalation" value="internal">
+                                                <input type="radio" id="internal" name="escalation" value="internal" {% if escalationObj.escalationType == 'Internal' %}checked{% endif %}>
                                                 <label for="internal">Internal Escalation</label> &nbsp;
-                                                <input type="radio" checked name="escalation" value="external" id="external">
+                                                <input type="radio" {% if escalationObj.escalationType == 'External' or escalationObj.escalationType == ''  %}checked{% endif %} name="escalation" value="external" id="external">
                                                 <label for="external" >External Escalation</label>
                                             </div>
                                             <table class="table">

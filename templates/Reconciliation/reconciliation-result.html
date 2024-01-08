@@ -73,7 +73,7 @@
                                                     <td class="text-danger">{{ item.missingComponent }} </td>
                                                     
                                                     {% comment %} <td><a href="{% if item.escalationStep == 2 %} {% url 'Account:reconciliationEscalationForm2' id=item.id %} {% elif item.escalationStep == 3 %} {% url 'Account:reconciliationEscalationForm3' id=item.id %} {% elif item.escalationStep == 4 %} {% url 'Account:reconciliationEscalationForm4' id=item.id %} {% else %} {% url 'Account:reconciliationEscalationForm' id=item.id %} {% endif %}" class="btn btn-sm btn-default">Escalation</a></td> {% endcomment %}
-                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default">Escalation</a></td>
+                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default" target="_blank">Escalation</a></td>
 
                                                 </tr>
                                             {% endfor %}

@@ -133,10 +133,12 @@ urlpatterns = [
 
 
     # path('docketView/<int:ids>/<int:driverDocketNumber>', views.driverDocketEntry, name='docketView'),      
-    path('reconciliationEscalationForm/<int:id>/', views.reconciliationEscalationForm, name='reconciliationEscalationForm'),
-    path('reconciliationEscalationForm2/<int:id>/', views.reconciliationEscalationForm2, name='reconciliationEscalationForm2'),
-    path('reconciliationEscalationForm3/<int:id>/', views.reconciliationEscalationForm3, name='reconciliationEscalationForm3'),
-    path('reconciliationEscalationForm4/<int:id>/', views.reconciliationEscalationForm4, name='reconciliationEscalationForm4'),
+    path('reconciliationEscalation/form/<int:id>/', views.reconciliationEscalationForm, name='reconciliationEscalationForm'),
+    path('reconciliationEscalation/form2/<int:id>/', views.reconciliationEscalationForm2, name='reconciliationEscalationForm2'),
+    path('reconciliationEscalation/form3/<int:id>/', views.reconciliationEscalationForm3, name='reconciliationEscalationForm3'),
+    path('reconciliationEscalation/add/mail/<int:id>/', views.reconciliationEscalationMailAdd, name='reconciliationEscalationMailAdd'),
+    path('reconciliationEscalation/form4/<int:id>/', views.reconciliationEscalationForm4, name='reconciliationEscalationForm4'),
+    path('reconciliationEscalation/complete/<int:id>/', views.reconciliationEscalationComplete, name='reconciliationEscalationComplete'),
 
     # Public holiday
     path('publicHoliday/', views.publicHoliday, name='publicHoliday'),
@@ -184,6 +186,13 @@ urlpatterns = [
     path('TopUp/View/<int:id>/<int:topUpDocket>', views.topUpForm, name='topUpView'), 
     # Ajax 
     path('TopUp/Solve', views.topUpSolve, name='topUpSolve'),
+    
+    
+    # Report Holcim
+    path('Report/', views.report, name='report'),
+    path('Report/Save', views.reportSave, name='reportSave'),
+    
+    
 
     
     
