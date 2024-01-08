@@ -185,7 +185,10 @@ urlpatterns = [
     # Ajax 
     path('TopUp/Solve', views.topUpSolve, name='topUpSolve'),
 
-    
+    # EscalationForm 
+    path('Escalation/Form', views.EscalationForm, name='EscalationForm'),
+    path('Escalation/Table', views.EscalationTable, name='EscalationTable'),
+    path('Escalation/Form/View/<int:id>', views.EscalationForm, name='EscalationFormView'),
     
 
 ]

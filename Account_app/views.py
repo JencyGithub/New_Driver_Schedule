@@ -2322,3 +2322,23 @@ def topUpSolve(request):
         
     return JsonResponse({'status': True})
     
+def EscalationTable(request):
+    escalationObj  = Escalation.objects.all()
+    params ={
+        'escalationObj':escalationObj
+    }
+    return render(request,'Account/Tables/escalationTable.html' , params)
+def EscalationForm(request ,id = None):
+    escalationObj  = None
+    clientObj = Client.objects.all()
+    if id:
+        escalationObj  = Escalation.objects.filter(pk = id).first()
+        # escalationObj.docketDate = escalationObj.docketDate.strftime('%d-%m-%Y')
+        print(type(escalationObj.docketDate), escalationObj.docketDate)
+        # return HttpResponse(escalationObj.docketDate)
+        
+    params ={
+        'escalationObj':escalationObj,
+        'clientObj':clientObj
+    }
+    return render(request , 'Account/escalationForm.html' , params)
