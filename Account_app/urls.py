@@ -194,7 +194,10 @@ urlpatterns = [
     
     
 
-    
+    # EscalationForm 
+    path('Escalation/Form', views.EscalationForm, name='EscalationForm'),
+    path('Escalation/Table', views.EscalationTable, name='EscalationTable'),
+    path('Escalation/Form/View/<int:id>', views.EscalationForm, name='EscalationFormView'),
     
 
 ]
