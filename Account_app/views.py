@@ -2153,6 +2153,7 @@ def pastTripSave(request):
                 cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
             elif clientName == 'holcim':
+                return HttpResponse('work in progress')
                 colorama.AnsiToWin32.stream = None
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'holcim','--continue-on-error']
@@ -2416,6 +2417,14 @@ def reportSave(request):
         location = f'static/Account/RCTI/Report'
         lfs = FileSystemStorage(location=location)
         lfs.save(secondaryFileName, secondaryFile)
+        
+    with open("File_name_file.txt",'w+',encoding='utf-8') as f:
+        f.write(f'{primaryFileName}<>{secondaryFileName}')
+        f.close()
+    colorama.AnsiToWin32.stream = None
+    os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+    cmd = ["python", "manage.py", "runscript", 'holcim','--continue-on-error']
+    subprocess.Popen(cmd, stdout=subprocess.PIPE)
     messages.success(request,'Successfully save')
     return redirect(request.META.get('HTTP_REFERER'))
 

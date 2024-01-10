@@ -311,6 +311,8 @@ class PastTripError(models.Model):
     errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)
     fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
     status = models.BooleanField(default=False)
+    # 0 : pastTrip error  1: Report Error 
+    errorType = models.FloatField(default=0) 
     data = models.CharField(max_length=1024, default=' ')
 
     def __str__(self):
@@ -472,13 +474,13 @@ class HolcimTrip(models.Model):
     
 # model rename  holcimDocketReport
 class HolcimDocket(models.Model):
+    # secondary File 
     truckNo =  models.FloatField(default=0)
     tripId = models.ForeignKey(HolcimTrip, on_delete=models.CASCADE)
     jobNo = models.FloatField(default=0)
     orderNo = models.FloatField(default=0)
     status = models.CharField(max_length=200)
-    ticketedDate = models.DateField(null=True, default=None)
-    ticketedTime = models.TimeField(null=True, blank=True)
+    ticketed = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     loadComplete = models.CharField(max_length=200)
     toJob = models.CharField(max_length= 100 , default=None, null= True, blank=True)
@@ -500,10 +502,29 @@ class HolcimDocket(models.Model):
     driverName = models.ForeignKey(Driver, on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
     slump = models.FloatField(default=0)
-    waterAdded = models.FloatField(max_length=200)
+    waterAdded = models.FloatField(default=0)
+    
+    
+    # primary File 
+    docketDate = models.DateField(null=True, default=None)
+    materialCode = models.CharField(max_length= 100 , default=None, null= True, blank=True)
+    basePlant = models.ForeignKey(BasePlant, on_delete=models.CASCADE , default=None)
+    customerName = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    address = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    loadSize = models.FloatField(default =0)
+    timeOnSite = models.FloatField(default=0)
+    distanceInKm = models.FloatField(default=0)
+    requestedKm = models.FloatField(default=0)
+    reasonRequested = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    returnedQty = models.FloatField(default=0)
+    dischargeLocation = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    additionalKm = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    status = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    
+
     
     def __str__(self):
         return str(self.jobNo)
     
     class Meta:
-        unique_together = (('jobNo', 'ticketedDate','tripId'))
+        unique_together = (('jobNo', 'docketDate','tripId'))
