@@ -12,19 +12,28 @@
             <li class="nav-item active">
               <a class="nav-link" aria-current="page" href="{% url 'index' %}">Home</a>
             </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'Account:getForm1'%}">Driver Trip</a>
+              <a class="nav-link" href="{% url "Account:mapFormView" %}">Start Shift</a>
             </li>
+            
             {% comment %} <li class="nav-item">
               <a class="nav-link" href="{% url 'Account:openJobShow'%}">Open Jobs</a>
             </li> {% endcomment %}
+
+
+            {% comment %} <li class="nav-item">
+              <a class="nav-link" href="{% url 'Account:getForm1'%}">Driver Trip</a>
+            </li>
             
             <li class="nav-item">
               <a class="nav-link" href="{% url 'Account:assignedJobShow'%}">Assigned Jobs</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url "Account:timeOfStart" %}">Time of request</a>
-            </li>
+            </li> {% endcomment %}
+
+
             <li class="nav-item dropdown">
               <a class="nav-link" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                 aria-expanded="false">

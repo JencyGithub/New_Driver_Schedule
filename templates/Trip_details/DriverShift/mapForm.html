@@ -1,0 +1,80 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Shift form{% endblock title %}
+
+{% block headStyle %} 
+    <style>
+        /* Add your additional styles here */
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .custom-map-control-button {
+            background-color: #fff;
+            border: 0;
+            border-radius: 2px;
+            box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            padding: 0 0.5em;
+            font: 400 18px Roboto, Arial, sans-serif;
+            overflow: hidden;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .custom-map-control-button:hover {
+            background: rgb(235, 235, 235);
+        }
+    </style>
+{% endblock headStyle %}
+
+{% block content %}
+<div class="container mt-2" id="container">
+    <div class="card border-0">
+        <div class="card-body">
+            <h5 class="card-title text-uppercase text-default">Start Shift</h5>
+            <hr>   
+            <div class="row">
+                <div class="col-md-8 my-2" style="min-height:25rem;">
+                    <div id="map"></div>
+                </div>
+                <div class="col-md-4 my-2">
+                    <form action="{% url "Account:mapDataSave" %}" method="POST">
+                        {% csrf_token %}
+                        <div class="my-1">
+                            <label for="longitude">Longitude</label>
+                            <input type="text" name="longitude" id="longitude" class="form-control" readonly>
+                        </div>
+                        <div class="my-1">
+                            <label for="latitude">Latitude</label>
+                            <input type="text" name="latitude" id="latitude" class="form-control" readonly>
+                        </div>
+                        <div class="my-1">
+                            <label for="date">Date</label>
+                            <input type="date" name="date" id="date" class="form-control" value="{{date}}" readonly>
+                        </div>
+                        <div class="my-1">
+                            <label for="time">Time</label>
+                            <input type="time" name="time" id="time" class="form-control" value="{{time}}" readonly>
+                        </div>
+                        <div class="my-2">
+                            <input type="submit" class="btn btn-default float-end " value="submit">
+                        </div>
+                    </form>
+                </div>
+            </div>  
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block footerStyleEnd %}
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGJUlSnh56niZZH-YrdDW2q71A4FygrxU&callback=initMap&v=weekly" defer></script>
+    {% comment %} <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0Cg6vn5hKUGmbtjKZp8ljaLRGSA0Cb1I&callback=initMap&v=weekly" defer></script> {% endcomment %}
+    
+    <script src="{% static 'js/mapSetting.js' %}"></script>
+{% endblock footerStyleEnd %}

@@ -481,6 +481,72 @@ def timeOfStartSave(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     
+def mapFormView(request):
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDate = datetime.now(tz=currentTimezone)
+    params = {
+        'date':dateConverterFromTableToPageFormate(currentDate),
+        'time':str(currentDate.time()).split('.')[0],
+    }
+    return render(request, 'Trip_details/DriverShift/mapForm.html', params)
+
+@csrf_protect
+def mapDataSave(request):
+    params = {}
+    lat = request.POST.get('latitude')
+    lng = request.POST.get('longitude')
+    date = request.POST.get('date')
+    time = request.POST.get('time')
+    
+    shiftObj = DriverShift.objects.filter(shiftDate=date, startTime=time).first()
+    if not shiftObj:
+        shiftObj = DriverShift()
+
+    shiftObj.latitude = lat
+    shiftObj.longitude = lng
+    shiftObj.shiftDate = date
+    shiftObj.startTime = time
+    # shiftObj.endTime = 
+    shiftObj.driverId = Driver.objects.filter(name=request.user.username).first().driverId
+    shiftObj.save()
+    
+    existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endTime=None).first()
+    if existingTrip:
+        truckConnectionObj = ClientTruckConnection.objects.filter(pk=existingTrip.truckConnectionId).first()
+        params['clientName'] = Client.objects.filter(pk=existingTrip.clientId).first()
+        params['truckNum'] = str(truckConnectionObj.truckNumber) + '-' + str(truckConnectionObj.clientTruckId)
+
+    else:
+        client_ids = Client.objects.all()
+        params['client_ids'] = client_ids
+    
+    params['shiftObj'] = shiftObj
+            
+    return render(request, 'Trip_details/DriverShift/clientForm.html', params)
+
+@csrf_protect
+def clientAndTruckDataSave(request, id):
+    shiftObj = DriverShift.objects.filter(pk=id).first()
+    clientName = request.POST.get('clientId')
+    truckNum = request.POST.get('truckNum').split('-')
+    adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
+    clientTruckNum = truckNum[1]
+    clientObj = Client.objects.filter(name=clientName).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentTime = datetime.now(tz=currentTimezone).time()
+    
+    
+    tripObj = DriverShiftTrip.objects.filter(shiftId=id, clientId=clientObj.clientId, truckConnectionId=truckConnectionObj.id).first()
+    if not tripObj:
+        tripObj = DriverShiftTrip()
+    tripObj.shiftId = id
+    tripObj.startTime = currentTime
+    tripObj.clientId = clientObj.clientId
+    tripObj.truckConnectionId = truckConnectionObj.id
+    tripObj.save()
+       
+    return render(request, 'Trip_details/DriverShift/clientForm.html')
 
 @csrf_protect
 @api_view(['POST'])
@@ -488,13 +554,11 @@ def getTrucks(request):
     clientName = request.POST.get('clientName')
     client = Client.objects.get(name=clientName)
     truckList = []
-    truck_connections = ClientTruckConnection.objects.filter(
-        clientId=client.clientId)
+    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId)
     docket = client.docketGiven
 
     for truck_connection in truck_connections:
-        truckList.append(str(truck_connection.truckNumber) +
-                         '-' + str(truck_connection.clientTruckId))
+        truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
     return JsonResponse({'status': True, 'trucks': truckList, 'docket': docket})
 
 

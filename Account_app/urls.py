@@ -22,7 +22,8 @@ app_name = 'Account'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    # Driver trip path
+    
+    # Driver trip path start
     path('Form1/', views.getForm1, name='getForm1'),
     path('Form2/', views.getForm2, name='getForm2'),
     path('existing/Form2/<int:id>/', views.getForm2, name='existingForm2'),
@@ -46,6 +47,19 @@ urlpatterns = [
     
     path('timeOfStart/view/', views.timeOfStart, name='timeOfStart'),
     path('timeOfStart/save/', views.timeOfStartSave, name='timeOfStartSave'),
+    
+    
+    path('mapForm/view/', views.mapFormView, name='mapFormView'),
+    path('mapForm/save/', views.mapDataSave, name='mapDataSave'),
+    
+    path('clientAndTruck/save/<int:id>/', views.clientAndTruckDataSave, name='clientAndTruckDataSave'),
+    
+    
+    
+    
+    # Driver trip path end
+    
+    
     
     
     

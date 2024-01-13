@@ -49,6 +49,75 @@ class BasePlant(models.Model):
 #         return str(self.location)
 
 # -----------------------------------
+# New Trips Section start
+# -----------------------------------
+
+
+class DriverShift(models.Model):
+    verified = models.BooleanField(default=False)
+    shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')))
+    latitude = models.CharField(max_length=20, null=True, blank=True)
+    longitude = models.CharField(max_length=20, null=True, blank=True)
+    shiftDate = models.DateField(null=True, blank=True)
+    startTime = models.TimeField(null=True, blank=True)
+    endTime = models.TimeField(null=True, blank=True)
+    driverId = models.IntegerField(null=True, blank=True)
+    
+    def __str__(self) -> str:
+        return str(self.shiftDate)
+    
+
+class DriverShiftTrip(models.Model):
+    shiftId = models.IntegerField(null=True, blank=True)
+    startTime = models.TimeField(null=True, blank=True)
+    endTime = models.TimeField(null=True, blank=True)
+    clientId = models.IntegerField(null=True, blank=True)
+    truckConnectionId = models.IntegerField(null=True, blank=True)
+    dispute = models.BooleanField(default = False)
+    numberOfLoads = models.FloatField(default=0)
+    loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
+    comment = models.CharField(max_length=200, default='None')
+    
+    def __str__(self) -> str:
+        return str(self.clientId) + str(self.startTime) + str(self.endTime) 
+    
+    
+class DriverShiftDocket(models.Model):
+    tripId = models.PositiveIntegerField(null=True, blank=True)
+    docketNumber = models.CharField(max_length=20, default='', null=True, blank=True)
+    docketFile = models.FileField(upload_to='static/img/docketFiles', null=True, blank=True)
+    basePlant = models.PositiveIntegerField(null=True, blank=True)
+    noOfKm = models.FloatField(default=0)
+    transferKM = models.FloatField(default=0)
+    returnToYard = models.BooleanField(default=False)
+    tippingToYard = models.BooleanField(default=False)
+    returnQty = models.FloatField(default=0)
+    returnKm = models.FloatField(default=0)
+    waitingTimeStart = models.TimeField(default='', null=True, blank=True)
+    waitingTimeEnd = models.TimeField(default='', null=True, blank=True)
+    totalWaitingInMinute = models.FloatField(default=0)
+    surchargeType = models.IntegerField(null=True, blank=True)
+    surcharge_duration = models.FloatField(default=0)
+    cubicMl = models.FloatField(default=0)
+    standByStartTime = models.TimeField(default='', null=True, blank=True)
+    standByEndTime = models.TimeField(default='', null=True, blank=True)
+    standBySlot = models.PositiveIntegerField(default=0, null=True)
+    minimumLoad = models.FloatField(default=0)
+    others = models.FloatField(default=0)
+    comment = models.CharField(max_length=255, null=True, default='')
+
+    def __str__(self) -> str:
+        return str(self.docketNumber)
+   
+
+# -----------------------------------
+# New Trips Section end
+# -----------------------------------
+ 
+    
+    
+
+# -----------------------------------
 # Trips section
 # -----------------------------------
 

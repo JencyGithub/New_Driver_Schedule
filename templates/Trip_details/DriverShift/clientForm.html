@@ -1,0 +1,80 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Driver Trip Form 1{% endblock title %}
+
+{% block headStyle %} 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />      
+    <style>
+        .select2.select2-container{
+            width:100%!important;
+        }
+        .select2-selection.select2-selection--single{
+            height:auto!important;
+        } 
+        .select2-selection__rendered{
+            padding:0.5rem!important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: auto!important;
+            top: 1.4em!important;
+            right: 0.8em!important;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container mt-2" id="container">
+    <div class="card border-0">
+        <div class="card-body">
+            <h5 class="card-title text-uppercase text-default">Start Shift</h5>
+            <hr>  
+            <form action="{% url 'Account:clientAndTruckDataSave' id=shiftObj.id %}" method="POST" id="clientForm">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="col-md-12">
+                            <label for="clientId">Client:<label>
+                        </div>
+                        <div class="col-md-12">
+                            {% if clientName %}
+                                <input type="text" value="{{clientName}}" class="form-control"  name="clientId" id="clientId" readonly>
+                            {% else %}
+                                <select name="clientId" class="form-control" id="clientId" required>
+                                    <option value="" disabled selected>Select Client Name</option>
+                                    {% for client_name in client_ids %}
+                                    <option value="{{ client_name }}">{{ client_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div>
+                            <label for="truckNum">Truck:<label>
+                        </div>
+                            {% if truckNum %}
+                                <input type="text" value="{{truckNum}}" class="form-control"  name="truckNum" id="truckNum" readonly>
+                            {% else %}
+                                <select id="truckNum" class="form-control" disabled name="truckNum" required>
+                                    <option value="">Select an Item</option>
+                                </select>
+                            {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <input type="submit" id="submit" value="Next" class="btn btn-default responsive-btn float-end w-100 mt-4" style="padding:.6rem 0;"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block footerStyleEnd %}
+
+    <!-- select2 for searching dropdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+        integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static "js/clientForm.js" %}"></script>
+    
+{% endblock  %}

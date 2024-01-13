@@ -484,4 +484,9 @@ admin.site.register(Escalation)
 admin.site.register(EscalationMail)
 
 
+admin.site.register(DriverShift)
+admin.site.register(DriverShiftTrip)
+admin.site.register(DriverShiftDocket)
+
+
 
