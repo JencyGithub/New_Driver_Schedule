@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil ,os ,subprocess ,csv
+import shutil, os, subprocess, csv, pytz
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime
 from django.core.files.storage import FileSystemStorage
@@ -213,5 +213,68 @@ def getOriginDetails(request):
         
 
 
+def preStartTableView(request):
+    preStarts = PreStart.objects.all()
+    params = {'preStarts':preStarts}
+    return render(request, 'Appointment/preStartTable.html', params)
 
+def preStartForm(request, id=None):
+    if id:
+        data = PreStart.objects.filter(pk=id).first()
+        questions = PreStartQuestion.objects.filter(preStartId=data.id)
+        params = {
+            'data' : data,
+            'questions' : questions,
+            'queLen' : len(questions)    
+        }
+    else:
+        params = {}
+    return render(request, 'Appointment/preStartForm.html', params)
+
+@csrf_protect
+def preStartSave(request):
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDateTime = datetime.now(tz=currentTimezone)
+    preStartName = request.POST.get('preStartName')
+    questionCount = request.POST.get('queCount')
+    
+    preStartObj = PreStart()
+    preStartObj.preStartName = preStartName
+    preStartObj.createdDate = currentDateTime
+    preStartObj.save()
+    for question in range(1,int(questionCount)):
+        questionObj = PreStartQuestion()
+        questionObj.preStartId = preStartObj
+        questionObj.questionText = request.POST.get(f'q{question}txt')
+        questionObj.questionType = request.POST.get(f'q{question}type')
+        
+        queTxt1 = request.POST.get(f'q{question}o1')
+        queTxt2 = request.POST.get(f'q{question}o2')
+        queTxt3 = request.POST.get(f'q{question}o3')
+        queTxt4 = request.POST.get(f'q{question}o4')
+        wantFile = request.POST.get(f'wantFile{question}')
+        
+        questionObj.optionTxt1 = queTxt1
+        
+        if queTxt2:
+            questionObj.optionTxt2 = request.POST.get(f'q{question}o2')
+        if queTxt3:
+            questionObj.optionTxt3 = request.POST.get(f'q{question}o3')
+        if queTxt4:
+            questionObj.optionTxt4 = request.POST.get(f'q{question}o4')
+
+        if wantFile == f'q{question}o1wantFile':
+            questionObj.wantFile1 = True
+        elif wantFile == f'q{question}o2wantFile':
+            questionObj.wantFile2 = True
+        elif wantFile == f'q{question}o3wantFile':
+            questionObj.wantFile3 = True
+        elif wantFile == f'q{question}o4wantFile':
+            questionObj.wantFile4 = True
+            
+        questionObj.save()
+
+    messages.success(request, "Pre-start added.")
+    return redirect('Appointment:preStartTableView')
+    
 

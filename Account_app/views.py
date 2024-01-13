@@ -546,7 +546,9 @@ def clientAndTruckDataSave(request, id):
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
        
-    return render(request, 'Trip_details/DriverShift/clientForm.html')
+    return HttpResponse('here')
+    
+    # return render(request, 'Trip_details/DriverShift/clientForm.html')
 
 @csrf_protect
 @api_view(['POST'])

@@ -35,5 +35,14 @@ urlpatterns = [
     path('getOriginDetails/', views.getOriginDetails ,name="getOriginDetails"),
     
     
+    path('pre-start/table/view/', views.preStartTableView ,name="preStartTableView"),
+
+    
+    path('pre-start/view/<int:id>/', views.preStartForm ,name="preStartView"),
+    
+    path('pre-start/form/view/', views.preStartForm ,name="preStartForm"),
+    path('pre-start/form/save/', views.preStartSave ,name="preStartSave"),
+    
+    
     
 ]

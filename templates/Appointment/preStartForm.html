@@ -1,0 +1,133 @@
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Pre-start form{% endblock %}
+
+{% block headStyle %}
+
+{% endblock %}
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <form action="{% if data %}#{% else %}{% url 'Appointment:preStartSave' %}{% endif %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>{% if data %}Edit{% else %}Add{% endif %} Pre-start</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="preStartName" class="label-align">Pre-start name:<span class="required">*</span></label>
+                                            <input class="form-control" name="preStartName" required="required" id="preStartName" type="text" value="{% if data %}{{data.preStartName}}{% endif %}" {% if data %}readonly{% endif %} />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="queCount" class="label-align">Question count:<span class="required">*</span></label>
+                                            {% if not questions %}
+                                            <span class="form-check-label float-right text-primary" id="addQuestions" style="cursor:pointer;">Add questions +</span>
+                                            {% endif %}
+                                            <input class="form-control" name="queCount" required="required" id="queCount" type="number" autocomplete="off" value="{{queLen}}" {% if data %}readonly{% endif %}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="questionsContainer">
+                {% if questions %}
+                    {% for  question in questions %}
+                    
+                        <div class="x_panel mt-2">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}txt" class="label-align">Question {{forloop.counter}}:<span class="required">*</span></label>
+                                            <input class="form-control" name="q{{forloop.counter}}txt" required="required" id="q{{forloop.counter}}txt" value="{{question.questionText}}" type="text" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}type" class="label-align">Question Type:<span class="required">*</span></label>
+                                            <select name="q{{forloop.counter}}type" id="q{{forloop.counter}}type" class="form-control" required="required" disabled>
+                                                <option value="Driver related" {% if question.questionType == 'Driver related' %}selected{% endif %}>Driver related</option>
+                                                <option value="Vehicle related" {% if question.questionType == 'Vehicle related' %}selected{% endif %}>Vehicle related</option>
+                                                <option value="Other" {% if question.questionType == 'Other' %}selected{% endif %}>Other</option>                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}o1" class="label-align">Option 1:<span class="required">*</span></label>
+                                            <div class="form-check float-right">
+                                                <input class="form-check-input" type="radio" value="q{{forloop.counter}}o1wantFile" id="q{{forloop.counter}}o1wantFile" name="wantFile{{forloop.counter}}" {% if question.wantFile1 %}checked{% endif %} disabled>
+                                                <label class="form-check-label {% if question.wantFile1 %}text-info{% endif %}" for="q{{forloop.counter}}o1wantFile">
+                                                    Want file
+                                                </label>
+                                            </div>
+                                            <input class="form-control" name="q{{forloop.counter}}o1" required="required" id="q{{forloop.counter}}o1" type="text" autocomplete="off" readonly value="{{question.optionTxt1}}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}o2" class="label-align">Option 2:</label>
+                                            <div class="form-check float-right">
+                                                <input class="form-check-input" type="radio" value="q{{forloop.counter}}o2wantFile" id="q{{forloop.counter}}o2wantFile" name="wantFile{{forloop.counter}}" {% if question.wantFile2 %}checked{% endif %} disabled>
+                                                <label class="form-check-label {% if question.wantFile2 %}text-info{% endif %}" for="q{{forloop.counter}}o2wantFile">
+                                                    Want file
+                                                </label>
+                                            </div>
+                                            <input class="form-control" name="q{{forloop.counter}}o2" id="q{{forloop.counter}}o2" type="text" autocomplete="off" value="{{question.optionTxt2}}" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}o3" class="label-align">Option 3:</label>
+                                            <div class="form-check float-right">
+                                                <input class="form-check-input" type="radio" value="q{{forloop.counter}}o3wantFile" id="q{{forloop.counter}}o3wantFile" name="wantFile{{forloop.counter}}" {% if question.wantFile3 %}checked{% endif %}disabled>
+                                                <label class="form-check-label {% if question.wantFile3 %}text-info{% endif %}" for="q{{forloop.counter}}o3wantFile">
+                                                    Want file
+                                                </label>
+                                            </div>
+                                            <input class="form-control" name="q{{forloop.counter}}o3" id="q{{forloop.counter}}o3" type="text" autocomplete="off" value="{{question.optionTxt3}}" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="q{{forloop.counter}}o4" class="label-align">Option 4:</label>
+                                            <div class="form-check float-right">
+                                                <input class="form-check-input" type="radio" value="q{{forloop.counter}}o4wantFile" id="q{{forloop.counter}}o4wantFile" name="wantFile{{forloop.counter}}" {% if question.wantFile4 %}checked{% endif %} disabled>
+                                                <label class="form-check-label {% if question.wantFile4 %}text-info{% endif %}" for="q{{forloop.counter}}o4wantFile">
+                                                    Want file
+                                                </label>
+                                            </div>
+                                            <input class="form-control" name="q{{forloop.counter}}o4" id="q{{forloop.counter}}o4" type="text" autocomplete="off" value="{{question.optionTxt4}}" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <input type="hidden" class="btn btn-default float-right" value="Submit" id="submit">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script src="{% static 'js/preStartForm.js' %}"></script>
+
+{% endblock %}
