@@ -34,11 +34,11 @@ def run():
             email_addresses = [user.email for user in users]
             # print(usernames,email_addresses)
             try:
-                    
-                if dump[2] == M_pattern and dump[1].strip().replace(' ','') not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
+                driverName = dump[1].lower().strip().replace(' ','').replace('-','').replace('(','').replace(')','')
+                if dump[2] == M_pattern and driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
                     DriverObj = Driver()
                     DriverObj.driverId = dump[0]
-                    DriverObj.name = dump[1].strip().replace(' ','').lower()
+                    DriverObj.name = driverName.lower()
                     DriverObj.phone = dump[2] 
                     DriverObj.email = dump[3].strip().replace(' ','')
                     DriverObj.password = dump[4].strip()
@@ -55,10 +55,10 @@ def run():
                     user_.set_password(DriverObj.password)
                     user_.save()
                     DriverObj.save()
-                            
+                else:
+                    with open("Driver_skip.txt", 'a')as f:
+                        f.write(str(dump)+'\n')
             except Exception as e:
-                pass
-                # print(e)
                 with open("Driver_reg_file.txt", 'a')as f:
                     f.write(str(e)+str(data)+'\n')
             

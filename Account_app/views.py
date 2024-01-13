@@ -948,7 +948,7 @@ def driverEntrySave(request):
         subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(
             request, "Please wait 5 minutes. The data conversion process continues")
-        return redirect('Account:index')
+        return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
 

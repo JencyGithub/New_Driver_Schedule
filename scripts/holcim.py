@@ -272,6 +272,3 @@ for index , row in secondaryData.iterrows():
             )
             pastTripErrorObj.save()
 
-        
-             
-                
