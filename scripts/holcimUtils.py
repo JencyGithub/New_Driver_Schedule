@@ -109,15 +109,15 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     tempData = []
                 else:
                     with open('holcimUtils.txt','a')as f:
-                        f.write('pattern not match'+ str(row) +'\n')
+                        f.write('pattern not match'+ str(row) + fileName.split('@_!')[-1] +'\n')
             else:
                 with open('holcimUtils.txt','a')as f:
-                    f.write('len is 0'+ str(row) +'\n')
+                    f.write('len is 0'+ str(row) + fileName.split('@_!')[-1] +'\n')
                           
         finalList.append([truckNo] + prepared)
     except Exception as e:
-        with open('holcim.txt','a')as f:
-            f.write('convert Error' +str(e) +'\n')
+        with open('holcimUtils.txt','a')as f:
+            f.write('convert Error' +str(e) + fileName.split('@_!')[-1]  +'\n')
     try:
         for data in finalList:
             rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
@@ -182,14 +182,14 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     rctiObj.save()
                 else:
                     with open('holcim.txt','a')as f:
-                        f.write('skip'+ str(data) +'\n')
+                        f.write('skip'+ str(data) + fileName.split('@_!')[-1]  +'\n')
             except Exception as e:
                 with open('holcim.txt','a')as f:
-                    f.write('error' +str(e) + str(data) +'\n')
+                    f.write('error' +str(e) + str(data) +  fileName.split('@_!')[-1] +'\n')
 
     except Exception as e:
         with open('holcim.txt','a')as f:
-            f.write('outside error' +str(e) +'\n')
+            f.write('outside error' +str(e) +  fileName.split('@_!')[-1] + '\n')
         
         
 
