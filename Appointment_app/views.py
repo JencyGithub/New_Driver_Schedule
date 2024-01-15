@@ -278,3 +278,46 @@ def preStartSave(request):
     return redirect('Appointment:preStartTableView')
     
 
+def questionAddView(request, id):
+    preStartObj = PreStart.objects.filter(pk=id).first()
+
+    params = {'data':preStartObj}
+    return render(request, 'Appointment/addPre-startQuestion.html', params)
+    
+@csrf_protect
+def questionAddSave(request, id):
+    preStartObj = PreStart.objects.filter(pk=id).first()
+    questionObj = PreStartQuestion()
+    questionObj.preStartId = preStartObj
+    
+    questionObj.questionText = request.POST.get("quetxt")
+    questionObj.questionType = request.POST.get("quetype")
+    
+    queTxt1 = request.POST.get('opt1')
+    queTxt2 = request.POST.get('opt2')
+    queTxt3 = request.POST.get('opt3')
+    queTxt4 = request.POST.get('opt4')
+    wantFile = request.POST.get('wantFile')
+    questionObj.optionTxt1 = queTxt1
+    
+    if queTxt2:
+        questionObj.optionTxt2 = queTxt2
+    if queTxt3:
+        questionObj.optionTxt3 = queTxt3
+    if queTxt4:
+        questionObj.optionTxt4 = queTxt4
+        
+    if wantFile == 'opt1wantFile':
+        questionObj.wantFile1 = True
+    elif wantFile == 'opt2wantFile':
+        questionObj.wantFile2 = True
+    elif wantFile == 'opt3wantFile':
+        questionObj.wantFile3 = True
+    elif wantFile == 'opt4wantFile':
+        questionObj.wantFile4 = True
+        
+    questionObj.save()
+    
+    messages.success(request, "Question added.")
+    return redirect('Appointment:preStartTableView')
+

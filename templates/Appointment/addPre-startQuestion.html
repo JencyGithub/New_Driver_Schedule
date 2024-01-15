@@ -1,0 +1,119 @@
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Add Question form{% endblock %}
+
+{% block headStyle %}
+
+{% endblock %}
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <form action="{% url 'Appointment:questionAddSave' id=data.id %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>Add Question</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="preStartName" class="label-align">Pre-start name:<span class="required">*</span></label>
+                                            <input class="form-control" name="preStartName" required="required" id="preStartName" type="text" value="{% if data %}{{data.preStartName}}{% endif %}" {% if data %}readonly{% endif %} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="questionsContainer">
+                <div class="x_panel mt-2">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="quetxt" class="label-align">Question :<span class="required">*</span></label>
+                                    <input class="form-control" name="quetxt" required="required" id="quetxt" type="text"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="quetype" class="label-align">Question Type:<span class="required">*</span></label>
+                                    <select name="quetype" id="quetype" class="form-control" required="required" >
+                                        <option value="Driver related">Driver related</option>
+                                        <option value="Vehicle related">Vehicle related</option>
+                                        <option value="Other">Other</option>                                                
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="opt1" class="label-align">Option 1:<span class="required">*</span></label>
+                                    <div class="form-check float-right">
+                                        <input class="form-check-input" type="radio" value="opt1wantFile" id="opt1wantFile" name="wantFile">
+                                        <label class="form-check-label" for="opt1wantFile">
+                                            Want file
+                                        </label>
+                                    </div>
+                                    <input class="form-control" name="opt1" required="required" id="opt1" type="text" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="opt2" class="label-align">Option 2:</label>
+                                    <div class="form-check float-right">
+                                        <input class="form-check-input" type="radio" value="opt2wantFile" id="opt2wantFile" name="wantFile">
+                                        <label class="form-check-label" for="opt2wantFile">
+                                            Want file
+                                        </label>
+                                    </div>
+                                    <input class="form-control" name="opt2" id="opt2" type="text" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="opt3" class="label-align">Option 3:</label>
+                                    <div class="form-check float-right">
+                                        <input class="form-check-input" type="radio" value="opt3wantFile" id="opt3wantFile" name="wantFile">
+                                        <label class="form-check-label" for="opt3wantFile">
+                                            Want file
+                                        </label>
+                                    </div>
+                                    <input class="form-control" name="opt3" id="opt3" type="text" autocomplete="off"/>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="opt4" class="label-align">Option 4:</label>
+                                    <div class="form-check float-right">
+                                        <input class="form-check-input" type="radio" value="opt4wantFile" id="opt4wantFile" name="wantFile">
+                                        <label class="form-check-label" for="opt4wantFile">
+                                            Want file
+                                        </label>
+                                    </div>
+                                    <input class="form-control" name="opt4" id="opt4" type="text" autocomplete="off"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+            <input type="submit" class="btn btn-default float-right" value="Submit" id="submit">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script src="{% static 'js/preStartForm.js' %}"></script>
+
+{% endblock %}
