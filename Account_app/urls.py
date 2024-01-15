@@ -53,6 +53,8 @@ urlpatterns = [
     path('mapForm/save/', views.mapDataSave, name='mapDataSave'),
     
     path('clientAndTruck/save/<int:id>/', views.clientAndTruckDataSave, name='clientAndTruckDataSave'),
+
+    path('checkQuestion/requirement/', views.checkQuestionRequired, name='checkQuestionRequired'),
     
     
     

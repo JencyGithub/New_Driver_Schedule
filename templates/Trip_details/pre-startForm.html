@@ -4,74 +4,270 @@
 
 {% block headStyle %}
 <style>
-    .form-group{
-        margin: .5rem 0;
-    }
-    .card {
-        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-        background-color: #fff;
-        border: none;
+    #formSection .mcq-card {
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     }
 
+    #formSection ul li {
+        list-style: none;
+        padding: .2rem;
+    }
+
+
+    input::file-selector-button {
+        padding: 0 0.4em;
+        font-size: .8rem;
+        border: thin solid grey;
+        border-radius: 3px;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #4b729961!important;
+    }
 </style>
 {% endblock %}
 {% block content %}
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <form action="{% url 'Account:timeOfStartSave' %}" method="post" id="checklistForm" class="card p-4">
-                {% csrf_token %}
-                <div>
-                    <h4 class="card-title text-uppercase text-default fw-bold">Pre-start Form</h4>
-                </div>
-                <hr>
-                <div class="form-group">
-                    <label class="fw-bold">1. Are you fit for work?</label><br>
-                    <label class="mr-3"><input type="radio" name="fitForWork" value="Yes" required> Yes</label>
-                    <label><input type="radio" name="fitForWork" value="No" required> No</label>
-                </div>
-                <div class="form-group">
-                    <label class="fw-bold">2. Is your vehicle all right?</label><br>
-                    <label class="mr-3"><input type="radio" name="vehicleStatus" value="Yes" required> Yes</label>
-                    <label><input type="radio" name="vehicleStatus" value="No" required> No</label>
-                </div>
-                <div class="form-group">
-                    <label class="fw-bold">3. Are all the papers of the vehicle ready?</label><br>
-                    <label class="mr-3"><input type="radio" name="papersReady" value="Yes" required> Yes</label>
-                    <label><input type="radio" name="papersReady" value="No" required> No</label>
-                </div>
-                <div class="form-group">
-                    <label for="comment" class="fw-bold">4. Comment</label>
-                    <textarea class="form-control" id="comment" name="comment"></textarea>
-                </div>
-                <div class="row mt-2">
-                    <div class="w-auto ms-auto">
-                        <input type="submit" class="btn btn-sm btn-default px-5 float-end" value="Submit">
+<div class="container" id="formSection">
+    <div class="row">
+        <div class="col-md-1"></div>
+        
+        <div class="col-md-10 py-5">
+            <!-- For validation -->
+            <!-- <form action="#" method="post" id="preStartForm" onsubmit="return validateForm()"> -->
+            <form action="#" method="post" id="preStartForm">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#driverRelated" aria-expanded="true" aria-controls="driverRelated">
+                            Driver Releted 
+                        </button>
+                      </h2>
+                      <div id="driverRelated" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            {% for question in preStartQuestions %}
+                                {% if question.questionType == "Driver related" %}
+                                    <div class="mcq-card">
+                                        <p>{{question.questionText}}</p>
+                                        <div class="row">
+                                            <div class="col-md-6 col-12">
+                                                <ul class="mcq-list p-0">
+                                                    {% if question.optionTxt1 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o1" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o1">{{question.optionTxt1}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt2 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o2" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o2">{{question.optionTxt2}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt3 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o3" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o3">{{question.optionTxt3}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt4 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o4" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o4">{{question.optionTxt4}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6 col-12" id="requiredSection{{question.id}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vehicleRelated" aria-expanded="false" aria-controls="vehicleRelated">
+                            Vehicle Releted
+                        </button>
+                      </h2>
+                      <div id="vehicleRelated" class="accordion-collapse collapse " aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            {% for question in preStartQuestions %}
+                                {% if question.questionType == "Vehicle related" %}
+                                    <div class="mcq-card">
+                                        <p>{{question.questionText}}</p>
+                                        <div class="row">
+                                            <div class="col-md-6 col-12">
+                                                <ul class="mcq-list p-0">
+                                                    {% if question.optionTxt1 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o1" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o1">{{question.optionTxt1}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt2 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o2" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o2">{{question.optionTxt2}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt3 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o3" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o3">{{question.optionTxt3}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt4 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o4" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o4">{{question.optionTxt4}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6 col-12" id="requiredSection{{question.id}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#other" aria-expanded="false" aria-controls="other">
+                          Others
+                        </button>
+                      </h2>
+                      <div id="other" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                           
+                            {% for question in preStartQuestions %}
+                                {% if question.questionType == "Other" %}
+                                    <div class="mcq-card">
+                                        <p>{{question.questionText}}</p>
+                                        <div class="row">
+                                            <div class="col-md-6 col-12">
+                                                <ul class="mcq-list p-0">
+                                                    {% if question.optionTxt1 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o1" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o1">{{question.optionTxt1}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt2 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o2" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o2">{{question.optionTxt2}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt3 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o3" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o3">{{question.optionTxt3}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                    {% if question.optionTxt4 is not None %}
+                                                    <li class="mcq-li">
+                                                        <input type="radio" id="q{{forloop.counter}}o4" name="selector{{forloop.counter}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})">
+                                                        <label for="q{{forloop.counter}}o4">{{question.optionTxt4}}</label>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6 col-12" id="requiredSection{{question.id}}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      </div>
                     </div>
                 </div>
+                <textarea name="comment" id="comment" rows="3" class="form-control my-2" placeholder="Additional comment"></textarea>
+                <button type="submit" class="btn btn-default float-end float-right">Submit</button>
             </form>
         </div>
+        <div class="col-md-1"></div>
+
     </div>
 </div>
 
 {% endblock %}
 {% block footerStyleEnd %}
 <script>
+    
+    /*
+    //  Validation code --------------------------------------------------------------------------------------------------------------------------- 
+
     $(document).ready(function () {
-        $('#checklistForm').submit(function (event) {
-
-            var fitForWork = $('input[name="fitForWork"]:checked').val();
-            var vehicleStatus = $('input[name="vehicleStatus"]:checked').val();
-            var papersReady = $('input[name="papersReady"]:checked').val();
-
-            var comment = $('#comment').val();
-
-            if ((fitForWork === 'No' || vehicleStatus === 'No' || papersReady === 'No') && comment.trim() === '') {
-                $("#comment").css('border','1px solid red')
-                event.preventDefault();
+        function validateForm() {
+          // Loop through each question
+          for (let i = 1; i <= 9; i++) {
+            const selectorName = `selector${i}`;
+            const commentName = `c${i}o${$(`input[name=${selectorName}]:checked`).val() || ''}`;
+            console.log(commentName)
+    
+            // Check if an option is selected
+            if (!$(`input[name=${selectorName}]:checked`).length) {
+              alert(`Please select an option for question ${i}.`);
+              return false;
             }
+    
+            // Check if a comment is provided where required
+            const commentTextarea = $(`#${commentName}`);
+            if (commentTextarea.length && !commentTextarea.val().trim()) {
+              alert(`Please add a comment for question ${i}.`);
+              return false;
+            }
+          }
+    
+          // Check if file inputs are filled where required
+          const fileInputs = $('input[type=file][required]');
+          for (const fileInput of fileInputs) {
+            if (!fileInput.files.length) {
+              alert('Please upload a file for the questions with file inputs.');
+              return false;
+            }
+          }
+    
+          // Additional validation can be added here if needed
+    
+          // If all validations pass, submit the form
+          return true;
+        }
+    
+        $('#preStartForm').submit(function () {
+          return validateForm();
         });
     });
+    //  --------------------------------------------------------------------------------------------------------------------------- 
+    */
+    
+    function checkRequired(optionNumber, questionNumber, questionId){
+        $.ajax({
+            url: "/account/checkQuestion/requirement/",
+            data: {
+                questionId: questionId,
+                optionNumber:optionNumber
+            },
+            success: function (data) {
+                $(`#requiredSection${questionId}`).empty()
+                if(data.status){
+                    let elementText = ''
+                    elementText = `<input type="file" name="f${questionNumber}o${optionNumber}" id="f${questionNumber}o${optionNumber}" required="">`
+                    elementText += ` <textarea name="c${questionNumber}o${optionNumber}" id="c${questionNumber}o${optionNumber}" class="form-control mt-2" placeholder="Add comment" rows="2" required=""></textarea>`
+                    $(`#requiredSection${questionId}`).append(elementText)
+                }
+            },
+        });        
+    }
+
+    
 </script>
 {% endblock %}

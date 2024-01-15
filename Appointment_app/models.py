@@ -130,7 +130,7 @@ class PreStartQuestion(models.Model):
     
     
     def __str__(self):
-        return str(self.questionText) + str(self.preStartId.preStartName)
+        return str(self.questionText) + '------' + str(self.preStartId)
     
     
     
