@@ -203,6 +203,7 @@ class ClientTruckConnection(models.Model):
     truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
     truckType = models.CharField(max_length=254 , choices=TRUCK_TYPE_CHOICES, default='Embedded')
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
+    pre_start_name = models.PositiveIntegerField(default=0)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE)
     clientTruckId = models.PositiveIntegerField(default=0)  
     # clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  

@@ -210,24 +210,31 @@ def truckTable(request):
 def truckForm(request, id=None):
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
+    preStarts = PreStart.objects.all()
     data=connections = None
     count_ = 1
     if id:
         data = AdminTruck.objects.get(pk=id)
         connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
-
+        # return HttpResponse(connections)
+        
         for i in connections:
             i['count'] = count_
             count_ += 1
+            preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
+            i['pre_start_name'] = preStartObj.preStartName
+            # return HttpResponse(i['pre_start_name'])
             i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
             if i['endDate']:
                 i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
                 
+        # return HttpResponse(connections)
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'data' : data,
         'connections' : connections,
+        'preStarts':preStarts
     }
     return render(request,'GearBox/truck/truckForm.html',params)
 
@@ -246,11 +253,14 @@ def truckFormSave(request):
 def truckConnectionForm(request, id):
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
+    preStarts = PreStart.objects.all()
+    
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'truckType' : request.POST.get('truckType'),
-        'id' : id
+        'id' : id,
+        'preStarts':preStarts
     }
     return render(request,'GearBox/clientTruckConnectionForm.html',params)
 
@@ -264,6 +274,7 @@ def truckConnectionSave(request,id):
         'truckNumber' : adminTruck,
         'rate_card_name' : rateCard,
         'clientId' : client,
+        'pre_start_name': request.POST.get('pre_start_name'),
         'clientTruckId' : request.POST.get('clientTruckNumber'),
         'truckType' : request.POST.get('truckType'),
         'startDate' : request.POST.get('startDate'),

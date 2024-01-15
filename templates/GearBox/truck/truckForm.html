@@ -450,6 +450,13 @@
                                         </select>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
+                                        <label for="pre_start_name{{connection.count}}">Pre start <span class="required">*</span></label>
+                                        <input class="form-control" value="{% if connection %}{{connection.pre_start_name}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="pre_start_name{{count}}" required='required' style="padding: 0.25rem 0.2rem;" id="pre_start_name{{count}}">
+                                    </div>
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-4">
                                         <label for="clientId{{connection.count}}"> Client name <span class="required">*</span></label>
                                         <select name="clientId{{connection.count}}" class="form-control" id="clientId{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
                                             {% for client in clientIds%}
@@ -457,8 +464,6 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-md-4 col-sm-4">
                                         <label for="truckType{{connection.count}}"> Truck type<span class="required" >*</span></label>
                                         <select name="truckType{{connection.count}}" class="form-control" id="truckType{{connection.count}}" {% if connection %}disabled{% endif %}>
@@ -470,6 +475,9 @@
                                         <label for="startDate{{connection.count}}"> Start date<span class="required">*</span></label>
                                         <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.startDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="startDate{{connection.count}}" required='required' style="padding: 0.25rem 0.2rem;" id="startDate{{connection.count}}">
                                     </div>
+                                    
+                                </div>
+                                <div class="row">
                                     <div class="col-md-4 col-sm-4">
                                         <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
                                         <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}" required='required' style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
