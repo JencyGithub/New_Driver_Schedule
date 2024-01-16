@@ -398,7 +398,7 @@ admin.site.register(PublicHoliday)
 
 class RctiErrors_(admin.ModelAdmin):
 
-    list_display = ['docketNumber',"status","docketDate","errorDescription"]
+    list_display = ['docketNumber',"status","docketDate","data"]
     search_fields = ["docketNumber"]
 
 

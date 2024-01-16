@@ -1,42 +1,196 @@
-pattern not match['Holcim Australia Pty Ltd']
-pattern not match['ABN:      87099732297                                                                                                                                                               Page 1 of 4']
-pattern not match['Area:     42                                                                          GROSS CARTAGE INCOME STATEMENT                                                                15.02.2023 11:50:28']
-pattern not match['Owner:       321220          KIRAT HAULAGE PTY LTD']
-pattern not match['22 HAMISH AVENUE']
-pattern not match['PAKENHAM']
-pattern not match['Payment Cut-Off Date:        02.02.2023']
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                              Adjustment Reason']
-pattern not match['\x0cHolcim Australia Pty Ltd']
-pattern not match['ABN:      87099732297                                                                                                                                                             Page 2 of 4']
-pattern not match['Area:     42                                                                          GROSS CARTAGE INCOME STATEMENT                                                              15.02.2023 11:50:28']
-pattern not match['Owner:       321220          KIRAT HAULAGE PTY LTD']
-pattern not match['22 HAMISH AVENUE']
-pattern not match['PAKENHAM']
-pattern not match['Payment Cut-Off Date:        02.02.2023']
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                              Adjustment Reason']
-pattern not match['Total Income:             11,902.37']
-pattern not match['Total GST Paid:           1,190.24']
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                             Amount (AUD)']
-pattern not match['54            271.200        286.40     M3       785                                13,092.61']
-pattern not match['\x0cHolcim Australia Pty Ltd']
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 3 of 4']
-pattern not match['Area:     42                                                                            GROSS CARTAGE INCOME STATEMENT                                                           15.02.2023 11:50:28']
-pattern not match['Owner:       321220          KIRAT HAULAGE PTY LTD']
-pattern not match['22 HAMISH AVENUE']
-pattern not match['PAKENHAM']
-pattern not match['Payment Cut-Off Date:        02.02.2023']
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                            Adjustment Reason']
-pattern not match['\x0cHolcim Australia Pty Ltd']
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 4 of 4']
-pattern not match['Area:     42                                                                            GROSS CARTAGE INCOME STATEMENT                                                           15.02.2023 11:50:28']
-pattern not match['Owner:       321220          KIRAT HAULAGE PTY LTD']
-pattern not match['22 HAMISH AVENUE']
-pattern not match['PAKENHAM']
-pattern not match['Payment Cut-Off Date:        02.02.2023']
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                           Adjustment Reason']
-pattern not match['Total Income:             22,274.66']
-pattern not match['Total GST Paid:           2,227.47']
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']
-pattern not match['64            2,475.640      2,475.64   TO    3,067                                 24,502.13']
-pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty   Units   Km/Zone                             Amount (AUD)']
-pattern not match['118           2,746.840      2,762.04   TO      3852                                37,594.74']
+pattern not match['Holcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 1 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                    10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                               Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               30.55']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             3.06']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                          Page 2 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                        GROSS CARTAGE INCOME STATEMENT             10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643           XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:       02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty      Paid Qty   Units   KM/Zone   Description            Amount (AUD)   Delivery Address             Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                          Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['43            248.900       257.60     M3       684                             33.61']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                              Page 3 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                           Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               1,244.66']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             124.47']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                               Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['9             51.800         52.20      M3        47                                  1,369.13']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                            Page 4 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                              10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                             Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               17.31']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             1.73']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                               Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['28            159.800        164.80     M3       459                                  19.04']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                              Page 5 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                                              10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                                              Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            6.84']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          0.68']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['10            47.800         52.40      M3       160                               7.52']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                          Page 6 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                                          10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                                          Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            0.69']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          0.07']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['1             3.000          3.00       M3        25                               0.76']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 7 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                    10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                               Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                          Page 8 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                                          10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                                          Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            28.07']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          2.81']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['39            231.700        236.60     M3       664                               30.88']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                               Page 9 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               5,225.48']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             522.55']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                               Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['40            195.500        207.10     M3       315                                  5,748.03']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                             Page 10 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                               10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               5,015.79']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             501.58']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                               Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['35            183.300        193.90     M3       322                                  5,517.37']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                 Page 11 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                   10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                              Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                     Page 12 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                     10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                     Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            17.30']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          1.73']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['41            246.300        252.30     M3       537                               19.03']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 13 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                    10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                               Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                      Page 14 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                                      10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                                      Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            32.02']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          3.20']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['36            239.700        240.70     M3       665                               35.22']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                Page 15 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                  10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                              Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:               16.26']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:             1.63']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                               Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['29            182.200        185.90     M3       422                                  17.89']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                Page 16 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                         GROSS CARTAGE INCOME STATEMENT                                                                  10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:       321643          XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                              Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                                     Page 17 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                           GROSS CARTAGE INCOME STATEMENT                                     10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description              Amount (AUD)   Delivery Address                                     Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Income:            29.42']1_January-2023_Xpress.csv
+pattern not match['Total GST Paid:          2.94']1_January-2023_Xpress.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                            Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['38            238.700        244.20     M3       660                               32.36']1_January-2023_Xpress.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']1_January-2023_Xpress.csv
+pattern not match['ABN:      87099732297                                                                                                                  Page 18 of 18']1_January-2023_Xpress.csv
+pattern not match['Area:     30                                                                          GROSS CARTAGE INCOME STATEMENT                   10.03.2023 12:20:24']1_January-2023_Xpress.csv
+pattern not match['Owner:     321643            XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['G01 651 DONCASTER ROAD']1_January-2023_Xpress.csv
+pattern not match['DONCASTER']1_January-2023_Xpress.csv
+pattern not match['Payment Cut-Off Date:        02.02.2023']1_January-2023_Xpress.csv
+pattern not match['Adjustments for Vendor:      321643              XPRESS AGI HIRE PTY LTD']1_January-2023_Xpress.csv
+pattern not match['Date        Docket #       Load Qty       Paid Qty   Units   KM/Zone   Description                   Amount (AUD)   Delivery Address             Adjustment Reason']1_January-2023_Xpress.csv
+pattern not match['Total Adjustments:            276,230.05']1_January-2023_Xpress.csv
+pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty   Units   Km/Zone                                 Amount (AUD)']1_January-2023_Xpress.csv
+pattern not match['349           2,028.700      2,090.70   M3      4960                                    289,060.89']1_January-2023_Xpress.csv

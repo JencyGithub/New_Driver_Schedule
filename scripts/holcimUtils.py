@@ -3,6 +3,9 @@ from Account_app.models import *
 from GearBox_app.models import *
 from Appointment_app.models import *
 from datetime import datetime
+from Account_app.reconciliationUtils import *
+
+
 
 def checkStr(data:str):
     return data.lower().strip().replace(" ","")
@@ -12,7 +15,23 @@ with open("rctiReportId.txt", 'r') as f:
 fileName = None
 with open('File_name_file.txt','r')as f:
     fileName = f.read()
-# fileName = '20240105153603@_!KIRAT-march-2023.csv'
+    
+
+def convertIntoFloat(str_):
+    if '(' in str_:
+        str_ = '-'+str_.strip('()')
+    cleaned_string = str_.replace(' ','').replace(',','')
+    
+    if not len(cleaned_string) > 0:
+        return 0
+    
+    return float(cleaned_string)
+
+def checkStr(data:str):
+    return data.lower().strip().replace(" ","")
+    
+manuallyManaged = ["creekpayment","accommodation","topup","ampol","inspectionfailure","diwalisweets","missingdocketpayment"]
+
 with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     csv_reader = csv.reader(f)
     rctiErrorObj = RctiErrors()
@@ -24,13 +43,18 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     datePattern = r'\d{2}\.\d{2}\.\d{4}'
     
     docketPattern = r'(\d{5,11}[a-zA-Z]{0,2})'
+    docketPattern2 = r'(^G-\d{6})'
+
     truckNo = None
     total = 0
     fileDetails = []
     rctiRepoort = None
+    flag = False
+    strValue = ''
     
     try:
         for row in csv_reader:
+            
             lineCount += 1
             errorSolve = str(row) + '@_!'+ str(rctiReportId)
             if row[0].strip() in '':
@@ -41,6 +65,47 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             splitRow = list(filter(lambda x: x.strip() != '', splitRow))
             if 'paymentfortruck' in checkStr(row[0]):
                 truckNo = row[0].split(',')[-3]
+                
+                # for docket pattern = 'G-111111'
+            elif  re.fullmatch(datePattern, splitRow[0].strip()) and  re.fullmatch(docketPattern2, str(splitRow[1].strip())):
+                rctiErrorObj = RctiErrors()
+                rctiErrorObj.clientName = 'holcim'
+                rctiErrorObj.docketNumber = None
+                rctiErrorObj.docketDate = None
+                rctiErrorObj.errorDescription = "Manually Manage."
+                rctiErrorObj.fileName = fileName.split('@_!')[-1]
+                rctiErrorObj.data = str(errorSolve)
+                rctiErrorObj.errorType = 1
+                rctiErrorObj.save()
+                # for top up in docketnumber  
+            elif  re.fullmatch(datePattern, splitRow[0].strip()) and  'topup' in row[0].lower() :
+                rctiErrorObj = RctiErrors()
+                rctiErrorObj.clientName = 'holcim'
+                rctiErrorObj.docketNumber = None
+                rctiErrorObj.docketDate = None
+                rctiErrorObj.errorDescription = "Manually Manage."
+                rctiErrorObj.fileName = fileName.split('@_!')[-1]
+                rctiErrorObj.data = str(errorSolve)
+                rctiErrorObj.errorType = 1
+                rctiErrorObj.save()
+                
+            elif  any( value in checkStr(row[0])  for value in manuallyManaged):
+                flag = True
+                strValue = row[0]
+            elif flag and 'gst' in checkStr(row[0]):
+                rctiErrorObj = RctiErrors()
+                rctiErrorObj.clientName = 'holcim'
+                rctiErrorObj.docketNumber = None
+                rctiErrorObj.docketDate = None
+                rctiErrorObj.errorDescription = "Manually Manage."
+                rctiErrorObj.fileName = fileName.split('@_!')[-1]
+                rctiErrorObj.data = str(strValue) + str(errorSolve)
+                rctiErrorObj.errorType = 1
+                rctiErrorObj.save()
+                strValue = ''
+                flag = False
+            
+            # docket number pattern 
             elif  re.fullmatch(datePattern, splitRow[0].strip()) and len(splitRow[1].strip()) > 8:
                 rctiErrorObj = RctiErrors()
                 rctiErrorObj.clientName = 'holcim'
@@ -75,7 +140,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             tempData.insert(4,splitRow[4].strip())
                             tempData.insert(5,splitRow[5].strip())
                             tempData.insert(6,splitRow[6].strip())
-                            tempData.insert(7,splitRow[7].strip())
+                            tempData.insert(7,splitRow[7].strip().replace(',',''))
                             tempData.insert(6,' '.join(splitRow[8:]))
                         
                     except:
@@ -118,79 +183,109 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     except Exception as e:
         with open('holcimUtils.txt','a')as f:
             f.write('convert Error' +str(e) + fileName.split('@_!')[-1]  +'\n')
-    try:
-        for data in finalList:
-            rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
             
-            try:
-                if len(data) > 0:
-                    rctiObj = RCTI()
-                    rctiObj.clientName = clientName
-                    rctiObj.truckNo =data[0]
-                    rctiObj.docketNumber = data[2]
-                    rctiObj.docketDate =  datetime.strptime(data[1], '%d.%m.%Y').date()
+            
+    for data in finalList:
+        rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
+        try:
+            
+            if len(data) > 0:
+                rctiObj = RCTI()
+                rctiObj.clientName = clientName
+                rctiObj.truckNo =data[0]
+                rctiObj.docketNumber = data[2]
+                rctiObj.docketDate =  datetime.strptime(data[1], '%d.%m.%Y').date()
 
-                    if len(data) > 5:
-                        rctiObj.cubicMl = data[3]
-                        rctiObj.paidQty = data[4]
-                        rctiObj.unit = data[5]
-                        rctiObj.noOfKm = data[6]
-                        rctiObj.destination = data[7]
-                        rctiObj.cubicMiAndKmsCost = data[9]
-                        rctiObj.cartageTotal = data[9]
-                        dataList = data[10:]
-                    else:
-                        dataList = data[3:]
-                        
-                    while dataList:
-                        if 'standby' in dataList[0].lower():
-                            rctiObj.standByPerHalfHourDuration = dataList[1]
-                            rctiObj.standByTotal =dataList[1]
-                        elif 'sat' in dataList[0].lower() or 'mon-fri' in dataList[0].lower():
-                            rctiObj.surchargeCost = dataList[1]
-                            rctiObj.surchargeTotal = dataList[1]
-                        elif 'wait' in dataList[0].lower():
-                            rctiObj.waitingTimeCost = dataList[1]
-                            rctiObj.waitingTimeTotal = dataList[1]
-                        elif 'blowback' in dataList[0].lower():
-                            rctiObj.blowBackCost = dataList[1]
-                            rctiObj.blowBackTotal = dataList[1]
-                        elif 'topup' in dataList[0].lower().replace(' ',''):
-                            rctiErrorObj.clientName = 'boral'
-                            rctiErrorObj.docketNumber = rctiObj.docketNumber
-                            rctiErrorObj.docketDate = rctiObj.docketDate
-                            rctiErrorObj.errorDescription = "Manage Top-up."
-                            rctiErrorObj.fileName = fileName
-                            rctiErrorObj.data = str(data)
-                            rctiErrorObj.save()
-                            
-                        elif 'trucktrf' in dataList[0].lower():
-                            rctiObj.transferKMCost = dataList[1]
-                            rctiObj.transferKMTotal = dataList[1]
-                        elif 'return' in dataList[0].lower():
-                            rctiObj.returnPerKmPerCubicMeterCost = dataList[1]
-                            rctiObj.returnKmTotal = dataList[1]
-                        elif 'callout' in dataList[0].lower():
-                            rctiObj.callOutCost = dataList[1]
-                            rctiObj.callOutTotal = dataList[1]
-                        else:
-                            rctiObj.otherDescription = dataList[0]
-                            rctiObj.othersCost = dataList[1]
-                            rctiObj.othersTotal = dataList[1]
-                        dataList = dataList[2:]
-                    rctiObj.rctiReport = rctiReportObj
-                    rctiObj.save()
+                if len(data) > 5:
+                    rctiObj.cubicMl = data[3]
+                    rctiObj.paidQty = data[4]
+                    rctiObj.unit = data[5]
+                    rctiObj.noOfKm = data[6]
+                    rctiObj.destination = data[7]
+                    rctiObj.cubicMiAndKmsCost = data[9]
+                    rctiObj.cartageTotal = data[9]
+                    dataList = data[10:]
                 else:
-                    with open('holcim.txt','a')as f:
-                        f.write('skip'+ str(data) + fileName.split('@_!')[-1]  +'\n')
-            except Exception as e:
+                    dataList = data[3:]
+                    
+                while dataList:
+                    if 'standby' in dataList[0].lower():
+                        rctiObj.standByPerHalfHourDuration = dataList[1]
+                        rctiObj.standByTotal =dataList[1]
+                    elif 'sat' in dataList[0].lower() or 'mon-fri' in dataList[0].lower():
+                        rctiObj.surchargeCost = dataList[1]
+                        rctiObj.surchargeTotal = dataList[1]
+                    elif 'wait' in dataList[0].lower():
+                        rctiObj.waitingTimeCost = dataList[1]
+                        rctiObj.waitingTimeTotal = dataList[1]
+                    elif 'blowback' in dataList[0].lower():
+                        rctiObj.blowBackCost = dataList[1]
+                        rctiObj.blowBackTotal = dataList[1]
+                    elif 'topup' in dataList[0].lower().replace(' ',''):
+                        rctiErrorObj.clientName = 'boral'
+                        rctiErrorObj.docketNumber = rctiObj.docketNumber
+                        rctiErrorObj.docketDate = rctiObj.docketDate
+                        rctiErrorObj.errorDescription = "Manage Top-up."
+                        rctiErrorObj.fileName = fileName
+                        rctiErrorObj.data = str(data)
+                        rctiErrorObj.save()
+                        
+                    elif 'trucktrf' in dataList[0].lower():
+                        rctiObj.transferKMCost = dataList[1]
+                        rctiObj.transferKMTotal = dataList[1]
+                    elif 'return' in dataList[0].lower():
+                        rctiObj.returnPerKmPerCubicMeterCost = dataList[1]
+                        rctiObj.returnKmTotal = dataList[1]
+                    elif 'callout' in dataList[0].lower():
+                        rctiObj.callOutCost = dataList[1]
+                        rctiObj.callOutTotal = dataList[1]
+                    else:
+                        rctiObj.otherDescription += dataList[0]
+                        rctiObj.othersCost = dataList[1] + convertIntoFloat(dataList[1])
+                        rctiObj.othersTotal = dataList[1] + convertIntoFloat(dataList[1])
+                    dataList = dataList[2:]
+                rctiObj.rctiReport = rctiReportObj
+                rctiObj.save()
+                
+                rctiObjData = RCTI.objects.filter(docketNumber = rctiObj.docketNumber , docketDate = rctiObj.docketDate ).first()
+                reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = rctiObj.docketNumber , docketDate = rctiObj.docketDate ).first()
+                rctiTotalCost =   rctiObjData.cartageTotal + rctiObjData.waitingTimeTotal + rctiObjData.transferKMTotal + rctiObjData.standByTotal + rctiObjData.surchargeTotal + rctiObjData.callOutTotal + rctiObjData.blowBackTotal + rctiObjData.othersTotal
+                if not reconciliationDocketObj :
+                    reconciliationDocketObj = ReconciliationReport()
+        
+                reconciliationDocketObj.docketNumber =  rctiObjData.docketNumber
+                reconciliationDocketObj.truckId = rctiObjData.truckNo if reconciliationDocketObj.truckId == 0  else reconciliationDocketObj.truckId
+                reconciliationDocketObj.docketDate =  rctiObjData.docketDate
+                reconciliationDocketObj.rctiLoadAndKmCost =  rctiObjData.cartageTotal
+                reconciliationDocketObj.clientName =  'holcim'
+                reconciliationDocketObj.rctiWaitingTimeCost = rctiObjData.waitingTimeTotal
+                reconciliationDocketObj.rctiTransferKmCost = rctiObjData.transferKMTotal
+                reconciliationDocketObj.rctiStandByCost =  rctiObjData.standByTotal
+                reconciliationDocketObj.rctiSurchargeCost =  rctiObjData.surchargeTotal
+                reconciliationDocketObj.rctiCallOut =  rctiObjData.callOutTotal
+                reconciliationDocketObj.rctiBlowBack =  rctiObjData.blowBackTotal
+                reconciliationDocketObj.rctiOtherCost =  rctiObjData.othersTotal
+                reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2) 
+                reconciliationDocketObj.fromRcti = True 
+                
+                reconciliationDocketObj.save()
+                checkMissingComponents(reconciliationDocketObj)
+            else:
                 with open('holcim.txt','a')as f:
-                    f.write('error' +str(e) + str(data) +  fileName.split('@_!')[-1] +'\n')
+                    f.write('skip'+ ''.join(data) + fileName.split('@_!')[-1]  +'\n')
+        except Exception as e:
+            with open('holcim.txt','a')as f:
+                f.write('error' +str(e) + ''.join(data) +  fileName.split('@_!')[-1] +'\n')
+            rctiErrorObj = RctiErrors()
+            rctiErrorObj.clientName = 'holcim'
+            rctiErrorObj.docketNumber = None
+            rctiErrorObj.docketDate = None
+            rctiErrorObj.errorDescription = "Manually Manage."
+            rctiErrorObj.fileName = fileName.split('@_!')[-1]
+            rctiErrorObj.data = ''.join(data)
+            rctiErrorObj.errorType = 1
+            rctiErrorObj.save()
 
-    except Exception as e:
-        with open('holcim.txt','a')as f:
-            f.write('outside error' +str(e) +  fileName.split('@_!')[-1] + '\n')
-        
-        
+    
 
 

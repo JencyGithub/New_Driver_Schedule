@@ -22,7 +22,7 @@
                         <div class="x_panel">
                             <div class="x_title">
                                 <h2> {% if rcti %} View RCTI {% elif docketData%} View Holcim {% else %} Add RCTI {% endif  %}:-</h2>
-                                {% if docketData is None and rcti is None %}
+                                {% comment %} {% if not rcti%}
                                 <div class="float-right">
                                     <form action="{% url 'Account:rctiFormSave' %}" method="post" id="rctiForm">
                                         <select class="form-control" id="clientName" name="clientName">
@@ -32,7 +32,7 @@
                                         </select>
                                     </form>
                                 </div>
-                                {%endif%}
+                                {%endif%} {% endcomment %}
                                 <div class="clearfix"></div>
                             </div>
                             </div>
@@ -49,7 +49,7 @@
                                             <a class="nav-link active" id="v-pills-truckNo-tab" data-toggle="pill" href="#v-pills-truckNo" role="tab"
                                                 aria-controls="v-pills-truckNo" aria-selected="true">Truck No</a>
                                             <a class="nav-link" id="v-pills-noOfKm-tab" data-toggle="pill" href="#v-pills-noOfKm"
-                                                role="tab" aria-controls="v-pills-noOfKm" aria-selected="false">No of KM</a>
+                                                role="tab" aria-controls="v-pills-noOfKm" aria-selected="false">Cubic</a>
                                             <a class="nav-link" id="v-pills-transferKM-tab" data-toggle="pill" href="#v-pills-transferKM"
                                                 role="tab" aria-controls="v-pills-transferKM" aria-selected="false">Transfer KM</a>
                                             <a class="nav-link" id="v-pills-returnKm-tab" data-toggle="pill" href="#v-pills-returnKm"
@@ -62,8 +62,10 @@
                                                 role="tab" aria-controls="v-pills-standByNoSlot" aria-selected="false">Stand by per half hour cost</a>
                                             <a class="nav-link" id="v-pills-minimumLoad-tab" data-toggle="pill" href="#v-pills-minimumLoad"
                                                 role="tab" aria-controls="v-pills-minimumLoad" aria-selected="false">Minimum load</a>
-                                            <a class="nav-link" id="v-pills-surcharge_fixed_normal-tab" data-toggle="pill" href="#v-pills-surcharge_fixed_normal"
-                                                role="tab" aria-controls="v-pills-surcharge_fixed_normal" aria-selected="false">Surcharge fixed normal</a>
+                                            <a class="nav-link" id="v-pills-blow_back-tab" data-toggle="pill" href="#v-pills-blow_back"
+                                                role="tab" aria-controls="v-pills-blow_back" aria-selected="false">Blow Back</a>
+                                            <a class="nav-link" id="v-pills-call_out-tab" data-toggle="pill" href="#v-pills-call_out"
+                                                role="tab" aria-controls="v-pills-call_out" aria-selected="false">Call Out</a>
                                             <a class="nav-link" id="v-pills-others-tab" data-toggle="pill" href="#v-pills-others"
                                                 role="tab" aria-controls="v-pills-others" aria-selected="false">Others</a>
                                             {% if rcti %}
@@ -110,65 +112,56 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="noOfKm" >Number of km :<span class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                    
-                                                                    style="padding: 0.25rem 0.2rem;" value="{{  rcti.noOfKm  }}"
-                                                                    {% if rcti %} readonly {% endif  %} >
+                                                                <label for="noOfKm">No Of KM:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="noOfKm"  value="{{ rcti.noOfKm }}" id="noOfKm" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="cubicMl" >Cubic Ml :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                        
-                                                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.cubicMl  }}"
-                                                                        {% if rcti %} readonly {% endif  %} >
+                                                                <label for="unit">Unit:<span class="required">*</span></label>
+                                                                <input class="form-control" type="text" name="unit"  value="{{ rcti.unit }}" id="unit" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="cubicMiAndKmsCost" >Cubic MI and Kms cost :<span
-                                                                    class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                        
-                                                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.cubicMiAndKmsCost  }}"
-                                                                    {% if rcti %} readonly {% endif  %} >
+                                                                <label for="cubicMl">Cubic Ml (load qty):<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="cubicMl"  value="{{ rcti.cubicMl }}" id="cubicMl" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="destination">Destination :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="text"
-                                                                        style="padding: 0.25rem 0.2rem;" value="{{ rcti.destination  }}"
-                                                                    {% if rcti %} readonly {% endif  %} >
+                                                                <label for="paidQty">Paid Qty:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="paidQty"  value="{{ rcti.paidQty }}" id="paidQty" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="cartageGSTPayable">Cartage GST payable :<span
-                                                                    class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                        
-                                                                        style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageGSTPayable  }}"
-                                                                    {% if rcti %} readonly {% endif  %}>
+                                                                <label for="cubicMiAndKmsCost">Cubic Mi and KMs Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="cubicMiAndKmsCost"  value="{{ rcti.cubicMiAndKmsCost }}" id="cubicMiAndKmsCost" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
-                                                                <label for="cartageTotalExGST">Cartage total exclude GST :<span
-                                                                    class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                    
-                                                                    style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageTotalExGST  }}"
-                                                                {% if rcti %} readonly {% endif  %}>
+                                                            <div class="form-group">
+                                                                <label for="destination">Destination:<span class="required">*</span></label>
+                                                                <input class="form-control" type="text" name="destination"  value="{{ rcti.destination }}" id="destination" {% if rcti %} readonly {% endif %}>
+                                                            </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="cartageTotal">Cartage Total :<span class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                    
-                                                                    style="padding: 0.25rem 0.2rem;" value="{{  rcti.cartageTotal  }}"
-                                                                {% if rcti %} readonly {% endif  %}>
+                                                                <label for="cartageGSTPayable">Cartage GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="cartageGSTPayable"  value="{{ rcti.cartageGSTPayable }}" id="cartageGSTPayable" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="cartageTotalExGST">Cartage total Ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="cartageTotalExGST"  value="{{ rcti.cartageTotalExGST }}" id="cartageTotalExGST" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="cartageTotal">Cartage total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="cartageTotal"  value="{{ rcti.cartageTotal }}" id="cartageTotal" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
@@ -462,101 +455,79 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_normal">Surcharge fixed normal :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                         style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surcharge_fixed_normal  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="blowBack">Blow Back:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBack" value="{{ rcti.blowBack }}" id="blowBack" {% if rcti%} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_sunday">Surcharge fixed sunday :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                         style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surcharge_fixed_sunday  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="blowBackCost">Blow Back Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackCost" value="{{ rcti.blowBackCost }}" id="blowBackCost"
+                                                                    {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_public_holiday">Surcharge fixed public holiday :<span
-                                                                    class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                     style="padding: 0.25rem 0.2rem;"
-                                                                    value="{{  rcti.surcharge_fixed_public_holiday  }}"
-                                                                    {% if rcti %} readonly {% endif  %}>
+                                                                <label for="blowBackGSTPayable">Blow Back GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackGSTPayable" value="{{ rcti.blowBackGSTPayable }}"
+                                                                    id="blowBackGSTPayable" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_normal">Surcharge per cubic meters normal :<span
-                                                                    class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                     style="padding: 0.25rem 0.2rem;"
-                                                                    value="{{  rcti.surcharge_per_cubic_meters_normal  }}"
-                                                                {% if rcti %} readonly {% endif  %}>
+                                                                <label for="blowBackTotalExGST">Blow Back total ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackTotalExGST" value="{{ rcti.blowBackTotalExGST }}"
+                                                                    id="blowBackTotalExGST" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_sunday">Surcharge per cubic meters sunday :<span
-                                                                    class="required">*</span></label>
-                                                                <input class="form-control" type="number"
-                                                                     style="padding: 0.25rem 0.2rem;"
-                                                                    value="{{  rcti.surcharge_per_cubic_meters_sunday  }}"
-                                                                {% if rcti %} readonly {% endif  %}>
+                                                                <label for="blowBackTotal">Blow Back Total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackTotal" value="{{ rcti.blowBackTotal }}"
+                                                                    id="blowBackTotal" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_public_holiday">Surcharge per cubic meters public holiday
-                                                                    :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number"
-                                                                    required
-                                                                        style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surcharge_per_cubic_meters_public_holiday  }}"
-                                                                    {% if rcti %} readonly {% endif  %}>
-                                                                </div>
-                                                        </div>
-                                                        <div class="col-sm-4">
-                                                            <div class="form-group">
-                                                                <label for="surcharge_duration">Surcharge duration :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number" 
-                                                                         style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surcharge_duration  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="callOut">callOut:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOut" value="{{ rcti.callOut }}" id="callOut" {% if rcti %}
+                                                                    readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeUnit">Surcharge unit :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="text"
-                                                                        style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surchargeUnit  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="callOutCost">callOut Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutCost" value="{{ rcti.callOutCost }}" id="callOutCost" {%if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeGSTPayable">Surcharge GST payable :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number" 
-                                                                         style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surchargeGSTPayable  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="callOutGSTPayable">callOut GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutGSTPayable" value="{{ rcti.callOutGSTPayable }}"
+                                                                    id="callOutGSTPayable" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeTotalExGST">Surcharge total exclude GST :<span
-                                                                    class="required">*</span></label>
-                                                                <input class="form-control" type="number" 
-                                                                     style="padding: 0.25rem 0.2rem;"
-                                                                    value="{{  rcti.surchargeTotalExGST  }}" {% if rcti %} readonly {% endif  %}>
+                                                                <label for="callOutTotalExGST">callOut total ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutTotalExGST" value="{{ rcti.callOutTotalExGST }}"
+                                                                    id="callOutTotalExGST" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeTotal">Surcharge total :<span class="required">*</span></label>
-                                                                    <input class="form-control" type="number" 
-                                                                         style="padding: 0.25rem 0.2rem;"
-                                                                        value="{{  rcti.surchargeTotal  }}" {% if rcti %} readonly {% endif  %}>
-                                                                </div>
+                                                                <label for="callOutTotal">callOut Total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutTotal" value="{{ rcti.callOutTotal }}" id="callOutTotal"
+                                                                    {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group ">
+                                                                <label for="otherDescription">otherDescription :<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" required
+                                                                    style="padding: 0.25rem 0.2rem;"
+                                                                    value="{{  rcti.otherDescription  }}" {% if rcti %} readonly {% endif  %}>
+                                                            </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group ">
@@ -620,17 +591,17 @@
                                                                 <input class="form-control" type="number" name="truckNo"  value="{{ rcti.truckNo }}" id="truckNo" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
-                                                        {% comment %} <div class="col-sm-4">
+                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="truckNo"><span class="required">*</span></label>
-                                                                <select class="form-control" id="clientName" name="clientName">
+                                                                <label for="truckNo"><span class="required">clientName*</span></label>
+                                                                <select class="form-control" {% if rcti %} readonly {% endif %} id="clientName" name="clientName">
                                                                     <option value="" disabled selected>Select Client Name</option>
                                                                     {% for clientName in clientNames %}
-                                                                    <option value="{{ clientName.name }}">{{ clientName.name }}</option>
+                                                                    <option value="{{ clientName.id }}" {% if clientName.name == rcti.clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
-                                                        </div> {% endcomment %}
+                                                        </div> 
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="docketNumber">Docket number:<span class="required">*</span></label>
@@ -664,8 +635,20 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="cubicMl">Cubic Ml:<span class="required">*</span></label>
+                                                                <label for="unit">Unit:<span class="required">*</span></label>
+                                                                <input class="form-control" type="text" name="unit"  value="{{ rcti.unit }}" id="unit" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="cubicMl">Cubic Ml (load qty):<span class="required">*</span></label>
                                                                 <input class="form-control" type="number" name="cubicMl"  value="{{ rcti.cubicMl }}" id="cubicMl" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="paidQty">Paid Qty:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="paidQty"  value="{{ rcti.paidQty }}" id="paidQty" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
@@ -698,6 +681,8 @@
                                                                 <input class="form-control" type="number" name="cartageTotal"  value="{{ rcti.cartageTotal }}" id="cartageTotal" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
+                                                        
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -929,74 +914,75 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade" id="v-pills-surcharge_fixed_normal" role="tabpanel"
-                                                aria-labelledby="v-pills-surcharge_fixed_normal-tab">
+                                            <div class="tab-pane fade" id="v-pills-blow_back" role="tabpanel"
+                                                aria-labelledby="v-pills-blow_back-tab">
                                                 <div class="x_content">
                                                     <div class="custom-container">
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_normal">Surcharge fixed normal:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_fixed_normal"  value="{{ rcti.surcharge_fixed_normal }}" id="surcharge_fixed_normal" {% if rcti %} readonly {% endif %}>
+                                                                <label for="blowBack">Blow Back:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBack"  value="{{ rcti.blowBack }}" id="blowBack" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_sunday">Surcharge fixed sunday:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_fixed_sunday"  value="{{ rcti.surcharge_fixed_sunday }}" id="surcharge_fixed_sunday" {% if rcti %} readonly {% endif %}>
+                                                                <label for="blowBackCost">Blow Back Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackCost"  value="{{ rcti.blowBackCost }}" id="blowBackCost" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_fixed_public_holiday">Surcharge fixed public holiday:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_fixed_public_holiday"  value="{{ rcti.surcharge_fixed_public_holiday }}" id="surcharge_fixed_public_holiday" {% if rcti %} readonly {% endif %}>
+                                                                <label for="blowBackGSTPayable">Blow Back GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackGSTPayable"  value="{{ rcti.blowBackGSTPayable }}" id="blowBackGSTPayable" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_normal">Surcharge per cubic meters normal:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_per_cubic_meters_normal"  value="{{ rcti.surcharge_per_cubic_meters_normal }}" id="surcharge_per_cubic_meters_normal" {% if rcti %} readonly {% endif %}>
+                                                                <label for="blowBackTotalExGST">Blow Back total ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackTotalExGST"  value="{{ rcti.blowBackTotalExGST }}" id="blowBackTotalExGST" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_sunday">Surcharge per cubic meters sunday:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_per_cubic_meters_sunday"  value="{{ rcti.surcharge_per_cubic_meters_sunday }}" id="surcharge_per_cubic_meters_sunday" {% if rcti %} readonly {% endif %}>
+                                                                <label for="blowBackTotal">Blow Back Total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="blowBackTotal"  value="{{ rcti.blowBackTotal }}" id="blowBackTotal" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="v-pills-call_out" role="tabpanel"
+                                                aria-labelledby="v-pills-call_out-tab">
+                                                <div class="x_content">
+                                                    <div class="custom-container">
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="callOut">callOut:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOut"  value="{{ rcti.callOut }}" id="callOut" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_per_cubic_meters_public_holiday">Surcharge per cubic meters public holiday:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_per_cubic_meters_public_holiday"  value="{{ rcti.surcharge_per_cubic_meters_public_holiday }}" id="surcharge_per_cubic_meters_public_holiday" {% if rcti %} readonly {% endif %}>
+                                                                <label for="callOutCost">callOut Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutCost"  value="{{ rcti.callOutCost }}" id="callOutCost" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surcharge_duration">Surcharge duration:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surcharge_duration"  value="{{ rcti.surcharge_duration }}" id="surcharge_duration" {% if rcti %} readonly {% endif %}>
+                                                                <label for="callOutGSTPayable">callOut GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutGSTPayable"  value="{{ rcti.callOutGSTPayable }}" id="callOutGSTPayable" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeUnit">Surcharge unit:<span class="required">*</span></label>
-                                                                <input class="form-control" type="text" name="surchargeUnit"  value="{{ rcti.surchargeUnit }}" id="surchargeUnit" {% if rcti %} readonly {% endif %}>
+                                                                <label for="callOutTotalExGST">callOut total ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutTotalExGST"  value="{{ rcti.callOutTotalExGST }}" id="callOutTotalExGST" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="surchargeGSTPayable">Surcharge GST payable:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surchargeGSTPayable"  value="{{ rcti.surchargeGSTPayable }}" id="surchargeGSTPayable" {% if rcti %} readonly {% endif %}>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-4">
-                                                            <div class="form-group">
-                                                                <label for="surchargeTotalExGST">Surcharge total Ex GST:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surchargeTotalExGST"  value="{{ rcti.surchargeTotalExGST }}" id="surchargeTotalExGST" {% if rcti %} readonly {% endif %}>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-4">
-                                                            <div class="form-group">
-                                                                <label for="surchargeTotal">Surcharge total:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="surchargeTotal"  value="{{ rcti.surchargeTotal }}" id="surchargeTotal" {% if rcti %} readonly {% endif %}>
+                                                                <label for="callOutTotal">callOut Total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="callOutTotal"  value="{{ rcti.callOutTotal }}" id="callOutTotal" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1006,6 +992,10 @@
                                                 <div class="x_content">
                                                     <div class="custom-container">
                                                         <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="otherDescription">otherDescription:<span class="required">*</span></label>
+                                                                <input class="form-control" type="text" name="otherDescription"  value="{{ rcti.otherDescription }}" id="otherDescription" {% if rcti %} readonly {% endif %}>
+                                                            </div>
                                                             <div class="form-group">
                                                                 <label for="others">Others:<span class="required">*</span></label>
                                                                 <input class="form-control" type="number" name="others"  value="{{ rcti.others }}" id="others" {% if rcti %} readonly {% endif %}>
@@ -1042,7 +1032,9 @@
                                     </div>
                                     
                                 </div>
+                                {% if not rcti %} 
                                 <input class="btn btn-default float-right above " id="boralSub" type="submit" value="submit" >
+                                {% endif %}
                             </form>
 
                         </div>

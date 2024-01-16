@@ -405,6 +405,10 @@ def checkMissingComponents(reconciliationReportObj):
         components += 'Stand By Cost' + ', '
     if reconciliationReportObj.driverLoadDeficit > 0 and reconciliationReportObj.rctiLoadDeficit == 0:
         components += 'Load Deficit Cost' + ', '
+    if reconciliationReportObj.driverBlowBack > 0 and reconciliationReportObj.rctiBlowBack == 0:
+        components += 'Blow Back Cost' + ', '
+    if reconciliationReportObj.driverCallOut > 0 and reconciliationReportObj.rctiCallOut == 0:
+        components += 'Call Out Cost' + ', '
     reconciliationReportObj.missingComponent = components
     reconciliationReportObj.save()
 

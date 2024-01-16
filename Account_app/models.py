@@ -296,7 +296,6 @@ class RCTI(models.Model):
     standByTotalExGST = models.FloatField(default=0)
     standByTotal = models.FloatField(default=0)
     
-    
     minimumLoad = models.FloatField(default=0)
     loadCost = models.FloatField(default=0)
     minimumLoadGSTPayable = models.FloatField(default=0)
@@ -310,33 +309,12 @@ class RCTI(models.Model):
     blowBackTotalExGST = models.FloatField(default=0)
     blowBackTotal = models.FloatField(default=0)
     
-    
-    # surcharge_fixed_weekend= models.FloatField(default=0)
-    # surcharge_fixed_weekendCost = models.FloatField(default=0)
-    # surcharge_fixed_weekendGSTPayable = models.FloatField(default=0)
-    # surcharge_fixed_weekendTotalExGST = models.FloatField(default=0)
-    # surcharge_fixed_weekendTotal = models.FloatField(default=0)
-    
-    # surcharge_fixed_weekday= models.FloatField(default=0)
-    # surcharge_fixed_weekdayCost = models.FloatField(default=0)
-    # surcharge_fixed_weekdayGSTPayable = models.FloatField(default=0)
-    # surcharge_fixed_weekdayTotalExGST = models.FloatField(default=0)
-    # surcharge_fixed_weekdayTotal = models.FloatField(default=0)
-    
     callOut= models.FloatField(default=0)
     callOutCost = models.FloatField(default=0)
     callOutGSTPayable = models.FloatField(default=0)
     callOutTotalExGST = models.FloatField(default=0)
     callOutTotal = models.FloatField(default=0)
-    
-    # surcharge_fixed_normal = models.FloatField(default=0)
-    # surcharge_fixed_sunday = models.FloatField(default=0)
-    # surcharge_fixed_public_holiday = models.FloatField(default=0)
-    # surcharge_per_cubic_meters_normal = models.FloatField(default=0)
-    # surcharge_per_cubic_meters_sunday = models.FloatField(default=0)
-    # surcharge_per_cubic_meters_public_holiday = models.FloatField(default=0)
-    # surcharge_duration = models.FloatField(default=0)
-    # surchargeUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=6)
+
     surcharge = models.FloatField(default=0)
     surchargeCost = models.FloatField(default=0)
     surchargeGSTPayable = models.FloatField(default=0)
@@ -444,7 +422,15 @@ class ReconciliationReport(models.Model):
     # minimum load
     driverLoadDeficit = models.FloatField(default=0)
     rctiLoadDeficit = models.FloatField(default=0)
-
+    
+    # Blow Back
+    driverBlowBack = models.FloatField(default=0)
+    rctiBlowBack = models.FloatField(default=0)
+    
+    # Call Out
+    driverCallOut = models.FloatField(default=0)
+    rctiCallOut = models.FloatField(default=0)
+    
     # Total 
     driverTotalCost = models.FloatField(default=0)
     rctiTotalCost = models.FloatField(default=0)

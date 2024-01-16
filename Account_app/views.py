@@ -598,12 +598,12 @@ def rctiForm(request, id= None , holcimDocketId = None):
     if id:
         rcti = RCTI.objects.filter(pk=id).first()
         rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
-    elif holcimDocketId:
-        holcimDocket = HolcimDocket.objects.filter(pk = holcimDocketId).first()
+    # elif holcimDocketId:
+    #     holcimDocket = HolcimDocket.objects.filter(pk = holcimDocketId)
     params = {
         'rcti': rcti,
         'clientNames':clientName,
-        'docketData':holcimDocket,
+        # 'docketData':holcimDocket,
         'Driver':drivers,
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
@@ -615,13 +615,15 @@ def convertIntoFloat(str):
 @csrf_protect
 def rctiFormSave(request):
     RCTIobj = RCTI()
-    clientObj = Client.objects.filter(name='boral').first()
+    clientObj = Client.objects.filter(pk = request.POST.get('clientName')).first()
     RCTIobj.truckNo = request.POST.get('truckNo')
     RCTIobj.clientName = clientObj
     RCTIobj.docketNumber = request.POST.get('docketNumber')
     RCTIobj.docketDate = request.POST.get('docketDate')
     RCTIobj.docketYard = request.POST.get('docketYard')
     RCTIobj.noOfKm = request.POST.get('noOfKm')
+    RCTIobj.unit = request.POST.get('unit')
+    RCTIobj.paidQty = request.POST.get('paidQty')
     RCTIobj.cubicMl = request.POST.get('cubicMl')
     RCTIobj.cubicMiAndKmsCost = request.POST.get('cubicMiAndKmsCost')
     RCTIobj.destination = request.POST.get('destination')
@@ -659,17 +661,16 @@ def rctiFormSave(request):
     RCTIobj.minimumLoadGSTPayable = request.POST.get('minimumLoadGSTPayable')
     RCTIobj.minimumLoadTotalExGST = request.POST.get('minimumLoadTotalExGST')
     RCTIobj.minimumLoadTotal = request.POST.get('minimumLoadTotal')
-    RCTIobj.surcharge_fixed_normal = request.POST.get('surcharge_fixed_normal')
-    RCTIobj.surcharge_fixed_sunday = request.POST.get('surcharge_fixed_sunday')
-    RCTIobj.surcharge_fixed_public_holiday = request.POST.get('surcharge_fixed_public_holiday')
-    RCTIobj.surcharge_per_cubic_meters_normal = request.POST.get('surcharge_per_cubic_meters_normal')
-    RCTIobj.surcharge_per_cubic_meters_sunday = request.POST.get('surcharge_per_cubic_meters_sunday')
-    RCTIobj.surcharge_per_cubic_meters_public_holiday = request.POST.get('surcharge_per_cubic_meters_public_holiday')
-    RCTIobj.surcharge_duration = request.POST.get('surcharge_duration')
-    RCTIobj.surchargeUnit = request.POST.get('surchargeUnit')
-    RCTIobj.surchargeGSTPayable = request.POST.get('surchargeGSTPayable')
-    RCTIobj.surchargeTotalExGST = request.POST.get('surchargeTotalExGST')
-    RCTIobj.surchargeTotal = request.POST.get('surchargeTotal')
+    RCTIobj.blowBack = request.POST.get('blowBack')
+    RCTIobj.blowBackCost = request.POST.get('blowBackCost')
+    RCTIobj.blowBackGSTPayable = request.POST.get('blowBackGSTPayable')
+    RCTIobj.blowBackTotalExGST = request.POST.get('blowBackTotalExGST')
+    RCTIobj.blowBackTotal = request.POST.get('blowBackTotal')
+    RCTIobj.callOut = request.POST.get('callOut')
+    RCTIobj.callOutCost = request.POST.get('callOutCost')
+    RCTIobj.callOutGSTPayable = request.POST.get('callOutGSTPayable')
+    RCTIobj.callOutTotalExGST = request.POST.get('callOutTotalExGST')
+    RCTIobj.callOutTotal = request.POST.get('callOutTotal')
     RCTIobj.others = request.POST.get('others')
     RCTIobj.othersCost = request.POST.get('othersCost')
     RCTIobj.othersGSTPayable = request.POST.get('othersGSTPayable')
