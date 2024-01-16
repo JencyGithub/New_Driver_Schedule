@@ -526,7 +526,7 @@ def mapDataSave(request):
 
 @csrf_protect
 def clientAndTruckDataSave(request, id):
-    shiftObj = DriverShift.objects.filter(pk=id).first()
+    # shiftObj = DriverShift.objects.filter(pk=id).first()
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
@@ -546,9 +546,35 @@ def clientAndTruckDataSave(request, id):
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
        
-    return HttpResponse('here')
+    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id)
+    params = {'preStartQuestions':preStartQuestions}
     
-    # return render(request, 'Trip_details/DriverShift/clientForm.html')
+    return render(request, 'Trip_details/pre-startForm.html',params)
+
+def checkQuestionRequired(request):
+    status = False
+    questionId = request.GET.get('questionId')
+    optionNumber = request.GET.get('optionNumber')
+    questionObj = PreStartQuestion.objects.filter(pk=questionId).first()
+    
+    if int(optionNumber) == 1:
+        if questionObj.wantFile1 == True:
+            status = True
+    elif int(optionNumber) == 2:
+        print(int(optionNumber))
+        if questionObj.wantFile2 == True:
+            status = True
+    elif int(optionNumber) == 3:
+        if questionObj.wantFile3 == True:
+            status = True
+    elif int(optionNumber) == 4:
+        if questionObj.wantFile4 == True:
+            status = True
+        
+    return JsonResponse({'status': status})
+    
 
 @csrf_protect
 @api_view(['POST'])
