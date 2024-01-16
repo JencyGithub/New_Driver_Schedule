@@ -1,0 +1,86 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Shift Page{% endblock title %}
+
+{% block headStyle %}
+
+{% endblock headStyle %}
+
+{% block content %}
+<div class="container mt-2" id="container">
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5 class="card-title text-uppercase text-default">Current Status</h5>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-3 p-1">
+                            <a href="#" class="btn btn-sm btn-default w-100">Add Break</a>
+                        </div>
+                        <div class="col-md-3 p-1">
+                            <a href="#" class="btn btn-sm btn-default w-100">End Trip</a>
+                        </div>
+                        <div class="col-md-6 p-1">
+                            <a href="#" class="btn btn-sm btn-default w-100">Change Client/Truck</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-7">
+                    <h6 class="card-title text-uppercase text-default">Trip Details :</h6>
+                    <table class="table mt-3 mb-2">
+                        <tr>
+                            <th class="py-2">Client Name: </th>
+                            <td class="py-2 text-capitalize">{{ clientObj.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Shift start Time: </th>
+                            <td class="py-2"><span>{{ tripObj.startTime }}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Shift end Time </th>
+                            <td class="py-2"><span>{% if tripObj.endTime %}{{ tripObj.endTime }}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Truck number: </th>
+                            <td class="py-2"><span>{{ truckObj.clientTruckId }}</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <h6 class="card-title text-uppercase text-default">Shift Details :</h6>
+                    <table class="table mt-3 mb-2">
+                        <tr>
+                            <th class="py-2">Shift start Date: </th>
+                            <td class="py-2">{{shiftObj.shiftDate}}</td>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Shift start Time: </th>
+                            <td class="py-2"><span>{{shiftObj.startTime}}</span></td>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Shift end Time </th>
+                            <td class="py-2"><span>{% if shiftObj.endTime %}{{shiftObj.endTime}}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block footerStyleEnd %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGJUlSnh56niZZH-YrdDW2q71A4FygrxU&callback=initMap&v=weekly"
+    defer></script>
+
+{% endblock footerStyleEnd %}

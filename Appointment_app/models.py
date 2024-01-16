@@ -132,6 +132,31 @@ class PreStartQuestion(models.Model):
     def __str__(self):
         return str(self.questionText) + '------' + str(self.preStartId)
     
+
+class DriverPreStart(models.Model):
+    shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None, null=True)
+    tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None, null=True)
+    truckConnectionId =  models.ForeignKey(ClientTruckConnection, on_delete=models.CASCADE, default=None, null=True)
+    clientId =  models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True)
+    preStartId =  models.ForeignKey(PreStart, on_delete=models.CASCADE, default=None, null=True)
+    driverId =  models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
+    curDateTime = models.DateTimeField(default=None, null=True)
+    comment = models.CharField(max_length=2048, default='', null=True)
+
+    def __str__(self):
+        return str(self.driverId.name) + '-->' + str(self.curDateTime)
+    
+    
+class DriverPreStartQuestion(models.Model):
+    preStartId =  models.ForeignKey(DriverPreStart, on_delete=models.CASCADE, default=None, null=True)
+    questionId =  models.ForeignKey(PreStartQuestion, on_delete=models.CASCADE, default=None, null=True)
+    answer = models.CharField(max_length=255, default='', null=True)
+    answerFile = models.FileField(default=None, null=True)
+    comment = models.CharField(max_length=2048, default='', null=True)
+    
+    def __str__(self):
+        return str(self.questionId.questionText) + '-->' + str(self.answer)
+
     
     
    

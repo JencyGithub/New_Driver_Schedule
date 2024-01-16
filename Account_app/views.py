@@ -497,36 +497,28 @@ def mapDataSave(request):
     lng = request.POST.get('longitude')
     date = request.POST.get('date')
     time = request.POST.get('time')
-    
     shiftObj = DriverShift.objects.filter(shiftDate=date, startTime=time).first()
     if not shiftObj:
         shiftObj = DriverShift()
-
     shiftObj.latitude = lat
     shiftObj.longitude = lng
     shiftObj.shiftDate = date
     shiftObj.startTime = time
-    # shiftObj.endTime = 
     shiftObj.driverId = Driver.objects.filter(name=request.user.username).first().driverId
     shiftObj.save()
-    
     existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endTime=None).first()
     if existingTrip:
         truckConnectionObj = ClientTruckConnection.objects.filter(pk=existingTrip.truckConnectionId).first()
         params['clientName'] = Client.objects.filter(pk=existingTrip.clientId).first()
         params['truckNum'] = str(truckConnectionObj.truckNumber) + '-' + str(truckConnectionObj.clientTruckId)
-
     else:
         client_ids = Client.objects.all()
         params['client_ids'] = client_ids
-    
     params['shiftObj'] = shiftObj
-            
     return render(request, 'Trip_details/DriverShift/clientForm.html', params)
 
 @csrf_protect
 def clientAndTruckDataSave(request, id):
-    # shiftObj = DriverShift.objects.filter(pk=id).first()
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
@@ -536,7 +528,6 @@ def clientAndTruckDataSave(request, id):
     currentTimezone = pytz.timezone('Asia/Kolkata')
     currentTime = datetime.now(tz=currentTimezone).time()
     
-    
     tripObj = DriverShiftTrip.objects.filter(shiftId=id, clientId=clientObj.clientId, truckConnectionId=truckConnectionObj.id).first()
     if not tripObj:
         tripObj = DriverShiftTrip()
@@ -545,11 +536,13 @@ def clientAndTruckDataSave(request, id):
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
-       
     preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-
     preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id)
-    params = {'preStartQuestions':preStartQuestions}
+    params = {
+        'preStartQuestions':preStartQuestions,
+        'shiftId' : id,
+        'tripObj' : tripObj
+    }
     
     return render(request, 'Trip_details/pre-startForm.html',params)
 
@@ -575,6 +568,71 @@ def checkQuestionRequired(request):
         
     return JsonResponse({'status': status})
     
+@csrf_protect
+def DriverPreStartSave(request, tripId):
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
+    preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStartObj.id)
+    driverObj = Driver.objects.filter(name=request.user.username).first()
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDateTime = datetime.now(tz=currentTimezone)
+
+    driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
+    params = {
+        'tripObj' : tripObj,
+        'shiftObj' : shiftObj,
+        'clientObj' : truckConnectionObj.clientId,
+        'truckObj' : truckConnectionObj
+    }
+    if not driverPreStartObj:
+        driverPreStartObj = DriverPreStart()
+        driverPreStartObj.shiftId = shiftObj
+        driverPreStartObj.tripId = tripObj
+        driverPreStartObj.truckConnectionId = truckConnectionObj
+        driverPreStartObj.clientId = truckConnectionObj.clientId
+        driverPreStartObj.preStartId = preStartObj
+        driverPreStartObj.driverId = driverObj
+        driverPreStartObj.curDateTime = currentDateTime
+        driverPreStartObj.comment = request.POST.get('comment')
+        driverPreStartObj.save()
+
+        for question in preStartQuestions:
+            queFile, queComment = None, None
+            answerObj = DriverPreStartQuestion()
+            ansText = request.POST.get(f'selector{question.id}')
+            answerObj.preStartId = driverPreStartObj
+            answerObj.questionId = question
+            answerObj.answer = ansText
+
+            if ansText == question.optionTxt1 and question.wantFile1:
+                queFile =  request.FILES.get(f'f{question.id}o1')
+                queComment = request.POST.get(f'c{question.id}o1')
+            elif ansText == question.optionTxt2 and question.wantFile2:
+                queFile =  request.FILES.get(f'f{question.id}o2')
+                queComment = request.POST.get(f'c{question.id}o2')
+            elif ansText == question.optionTxt3 and question.wantFile3:
+                queFile =  request.FILES.get(f'f{question.id}o3')
+                queComment = request.POST.get(f'c{question.id}o3')
+            elif ansText == question.optionTxt4 and question.wantFile4:
+                queFile =  request.FILES.get(f'f{question.id}o4')
+                queComment = request.POST.get(f'c{question.id}o4')
+
+            if queFile:  
+                curTimeStr = getCurrentTimeInString()
+                path = 'static/img/preStartImages'
+                fileName = queFile.name
+                newFileName = 'Pre-start' + curTimeStr + '!_@' + fileName
+                pfs = FileSystemStorage(location=path)
+                pfs.save(newFileName, queFile)
+                answerObj.answerFile = f'{path}/{newFileName}'
+                answerObj.comment = queComment        
+            answerObj.save()
+            messages.success(request, "Pre-start successfully filled, you can start your shift.")
+
+    return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
+
 
 @csrf_protect
 @api_view(['POST'])

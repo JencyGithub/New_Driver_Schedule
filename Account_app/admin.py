@@ -490,4 +490,17 @@ admin.site.register(DriverShiftTrip)
 admin.site.register(DriverShiftDocket)
 
 
+# admin.site.register(DriverPreStart)
+# admin.site.register(DriverPreStartQuestion)
 
+
+
+class DriverPreStartQuestionInline(admin.StackedInline):
+    model = DriverPreStartQuestion
+    extra = 0
+    
+class DriverPreStartAdmin(admin.ModelAdmin):
+    list_display = ["driverId", "curDateTime"]
+    # search_fields = ["adminTruckNumber"]
+    inlines = [DriverPreStartQuestionInline]
+admin.site.register(DriverPreStart, DriverPreStartAdmin)

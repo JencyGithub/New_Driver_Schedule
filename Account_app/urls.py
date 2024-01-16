@@ -55,6 +55,7 @@ urlpatterns = [
     path('clientAndTruck/save/<int:id>/', views.clientAndTruckDataSave, name='clientAndTruckDataSave'),
 
     path('checkQuestion/requirement/', views.checkQuestionRequired, name='checkQuestionRequired'),
+    path('DriverPreStart/save/<int:tripId>/', views.DriverPreStartSave, name='DriverPreStartSave'),
     
     
     
