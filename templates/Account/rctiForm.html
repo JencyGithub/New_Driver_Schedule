@@ -252,10 +252,12 @@
                                 {% comment %} <td> {% if error.status is False %} <a href="#" onclick="wip()" class="btn btn-sm btn-info"> Resolve</i></a>{% endif%}</td> {% endcomment %}
                                 {% if 'Earning Depot/Location does not exist' in error.errorDescription %}
                                 <a href="{% url 'Account:basePlantAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
-                                {% elif 'Manually Manage.' in error.errorDescription %}
-                                <a href="{% url 'Account:topUpForm' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-danger"> Manually Solve  </a>
+                                {% elif 'Top Up.' in error.errorDescription or 'topup' in error.errorDescription or 'accommodation' in error.errorDescription %}
+                                <a href="{% url 'Account:topUpForm' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-danger"> 
+                                  {% if 'Top Up.' in error.errorDescription or 'topup' in error.errorDescription   %} Top Up
+                                {% elif 'accommodation' in error.errorDescription %} Accommodation {% endif %}</a>
                                 {% else %}
-                                <a href="{% url 'Account:rctiErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a> 
+                                <a href="{% url 'Account:rctiErrorForm' errorId=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a> 
                                 
                                  {% endif %}
                                 </td>
@@ -295,7 +297,7 @@
                               </tr>
                             </thead>
                             <tbody>
-                              {% for solve in rctiManually %}
+                              {% for solve in archiveError %}
                               <tr>
                                 <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                 <td>{{ solve.docketNumber }}</td>
@@ -335,16 +337,22 @@
                                 <th>DocketDate</th>
                                 <th>Solved Description</th>
                                 <th>FileName</th>
+                                <th>Action</th>
+
                               </tr>
                             </thead>
                             <tbody>
                               {% for solve in rctiSolve %}
                               <tr>
-                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                 <td>{{ solve.docketNumber }}</td>
                                 <td>{{solve.docketDate}}</td>
                                 <td>{{solve.errorDescription}}</td>
                                 <td>{{solve.fileName}}</td>
+                                <td>
+                                <a href="{% url 'Account:rctiErrorSolveView' solveId=solve.id %}" target="_blank"  title="solved" class="btn btn-sm btn-info">  View  </a> 
+
+                                </td>
                               </tr>
                               {% endfor %}
                             </tbody>

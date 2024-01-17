@@ -90,6 +90,7 @@ finalExpenseList = []
 docketNumber = None
 docketDate = None
 lineCount = 0
+check = False
 ignoreKeywords = ["docketdeliverysourcedescription", "no.datekm'squantity", "vendor", "pobox", "page", "document", "date:"]
 extraDescriptions = ['kmpercum','cum','m','percum','perkmpercum','perkmpercuum', 'otherperkmpercum','avem']
 errorsList = ['topup','adjustmen','jindabyneaccomodation','blowback','minimumpayment']
@@ -127,10 +128,12 @@ with open (file_path, 'r') as f:
         elif 'earnings' in checkStr(data):
             earningFlag = True
             expenseFlag = False
+            check = True
             continue
         elif 'expenses' in checkStr(data):
             earningFlag = False
             expenseFlag = True
+
             continue
             
         dataList = data.split()
@@ -164,7 +167,7 @@ with open (file_path, 'r') as f:
                         dataList[-2] =convertIntoFloat(dataList[-2])
                         dataList[-3] =convertIntoFloat(dataList[-3])
                         if re.match(docket_pattern,dataList[0]):
-                            
+                            check = False
                             if len(previousLine) > 0:
                                 if len(finalEarningList) > 0:
                                     for line in finalEarningList:
@@ -181,7 +184,12 @@ with open (file_path, 'r') as f:
                             
                             dataList = setEarningLine(dataList=dataList)
                         elif checkDate(dataList[0]):
-                            dataList = setEarningLine(dataList=dataList,dateGiven=True, docketNumber=docketNumber)
+                            if check:
+                                finalEarningList.append([data])
+                                check = False
+                                continue
+                            else:
+                                dataList = setEarningLine(dataList=dataList,dateGiven=True, docketNumber=docketNumber)
                         else:
                             if len(previousLine) > 0:
                                 dataList = setEarningLine(dataList=dataList,dateGiven=docketDate, docketNumber=docketNumber)
@@ -208,7 +216,6 @@ with open (file_path, 'r') as f:
                             elif any(checkStr(''.join(dataList)) == value for value in extraDescriptions):
                                 previousLine[-8] +=  ' ' + ' '.join(dataList)
                             else:
-                                # print('186',dataList)
                                 pass
                 elif expenseFlag:
                     try:
@@ -223,14 +230,11 @@ with open (file_path, 'r') as f:
                         finalExpenseList.append([truckNo] + dataList)
                         dataList = []
                     except:
-                        # print(f"138{dataList}\n")
                         pass
                 
                 else:
-                    # print(f"140: {dataList}\n")
                     pass
         except:
-            # print(f"163:{dataList}\n")
             pass
             
                      

@@ -234,7 +234,7 @@ for index , row in secondaryData.iterrows():
                 continue
             
             holcimDocketObj.orderNo  = 0 if str(row[2]) == 'nan' else row[2]
-            holcimDocketObj.status  = 0 if str(row[6]) == 'nan' else row[6]
+            # holcimDocketObj.status  = 0 if str(row[6]) == 'nan' else row[6]
             holcimDocketObj.ticketed  =  dateTimeConvert(row[8])
             holcimDocketObj.load  =   dateTimeConvert(row[13])
             holcimDocketObj.loadComplete  = 0 if str(row[15]) == 'nan' else row[15]

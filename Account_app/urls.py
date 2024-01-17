@@ -70,14 +70,17 @@ urlpatterns = [
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     
     path('Rcti/', views.rcti, name='rcti'), 
-    path('Rcti/Error/Solve/<int:id>', views.rctiErrorSolve, name='rctiErrorSolve'), 
+    # path('Rcti/Error/Solve/<int:id>', views.rctiErrorSolve, name='rctiErrorSolve'), 
     # Add RCTI manually
     path('rctiForm/', views.rctiForm, name='rctiFormAdd'), 
     path('rctiForm/save/', views.rctiFormSave, name='rctiFormSave'), 
+    path('rctiForm/save/<int:errorId>', views.rctiFormSave, name='rctiErrorFormSave'), 
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
     path('RctiSave/', views.rctiSave, name='rctiSave'), 
     path('uploded/rcti/', views.uplodedRCTI, name='UplodedRCTI'), 
     path('rcti/error/get/', views.getRctiError, name='getRctiError'), 
+    path('rcti/Error/Form/<int:errorId>/', views.rctiErrorForm, name='rctiErrorForm'), 
+    path('rcti/Error/Solve/View/<int:solveId>/', views.rctiErrorSolveView, name='rctiErrorSolveView'), 
     
     
     # Expanse entry manually
@@ -192,8 +195,8 @@ urlpatterns = [
     path('Driver/Shift/Details/<int:id>', views.ShiftDetails, name='ShiftDetails'),
     
     # Holcim 
-    path('Holcim/Docket/View<int:id>', views.HolcimDocketView, name='HolcimDocketView'),
-    path('rctiHolcimForm/<int:holcimDocketId>/', views.rctiForm, name='rctiHolcimForm'), 
+    path('Holcim/Docket/View/<int:id>', views.HolcimDocketView, name='HolcimDocketView'),
+    # path('rctiHolcimForm/<int:holcimDocketId>/', views.rctiForm, name='rctiHolcimForm'), 
     path('rctiHolcimFormSave/', views.rctiHolcimFormSave, name='rctiHolcimFormSave'), 
     
     

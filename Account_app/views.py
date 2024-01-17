@@ -649,46 +649,78 @@ def getTrucks(request):
 
 
 def rcti(request):
+
     rctiErrors = RctiErrors.objects.filter(status = False).values()
     rctiSolve = RctiErrors.objects.filter(status = True).values()
-    rctiManually = RctiErrors.objects.filter(status = False , errorType = 1).values()
     client = Client.objects.all()
     BasePlant_ = BasePlant.objects.all()
-    # return render(request, 'Account/rctiCsvForm.html', {'basePlants': BasePlant_})
-    # return HttpResponse(rctiErrors)
     params = {
         'rctiErrors' : rctiErrors,
         'rctiSolve' :rctiSolve,
+        # 'archiveError':archiveError,
         'client':client,
         'basePlants': BasePlant_
     }
     
     return render(request, 'Account/rctiForm.html',params)
 
-def rctiErrorSolve(request ,id): 
+# def rctiErrorSolve(request ,id): 
            
-    rctiErrorsObj = RctiErrors.objects.get(id = id)
-    rctiErrorsObj.status = True
-    rctiErrorsObj.save()
-    messages.success(request, "Docket status change ")
-    return redirect(request.META.get('HTTP_REFERER'))
+#     rctiErrorsObj = RctiErrors.objects.get(id = id)
+#     rctiErrorsObj.status = True
+#     rctiErrorsObj.save()
+#     messages.success(request, "Docket status change ")
+#     return redirect(request.META.get('HTTP_REFERER'))
     
 
-def rctiForm(request, id= None , holcimDocketId = None):
+def rctiForm(request, id= None):
     rcti = None
-    holcimDocket = None
+
     clientName = Client.objects.all()
-    drivers = Driver.objects.all()
+    rctiReport = RctiReport.objects.all()
+    basePlant = BasePlant.objects.all()
     if id:
         rcti = RCTI.objects.filter(pk=id).first()
         rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
-    # elif holcimDocketId:
-    #     holcimDocket = HolcimDocket.objects.filter(pk = holcimDocketId)
+        
     params = {
         'rcti': rcti,
         'clientNames':clientName,
-        # 'docketData':holcimDocket,
-        'Driver':drivers,
+        'rctiReports':rctiReport,
+        'basePlants':basePlant
+    }
+    # return HttpResponse(params['basePlants'])
+    return render(request, 'Account/Tables/rctiForm.html', params)
+def rctiErrorSolveView(request,solveId):
+    rcti = None
+    rctiErrorObj = RctiErrors.objects.filter(pk=solveId).first()
+    clientName = Client.objects.all()
+    rctiReport = RctiReport.objects.all()
+    rcti = RCTI.objects.filter(docketNumber=rctiErrorObj.docketNumber , docketDate = rctiErrorObj.docketDate).first()
+    rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
+        
+    params = {
+        'rcti': rcti,
+        'clientNames':clientName,
+        'rctiReports':rctiReport,
+    }
+    return render(request, 'Account/Tables/rctiForm.html', params)
+
+def rctiErrorForm(request ,errorId ):
+    errorObj = RctiErrors.objects.filter(pk=errorId).first()
+    clientName = Client.objects.all()
+    basePlant = BasePlant.objects.all()
+    rctiReport = RctiReport.objects.all()
+
+    reportId = int(errorObj.data.split('@_!')[1])
+
+    params = {
+        'errorObj': errorObj,
+        'clientNames':clientName,
+        'rctiReports':rctiReport,
+        'reportId':reportId,
+        'basePlants':basePlant,
+        
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
 
@@ -697,64 +729,94 @@ def convertIntoFloat(str):
     return float(cleaned_string)
 
 @csrf_protect
-def rctiFormSave(request):
-    RCTIobj = RCTI()
-    clientObj = Client.objects.filter(pk = request.POST.get('clientName')).first()
+def rctiFormSave(request , errorId = None):
+    # return HttpResponse(request.POST.get('clientName'))
+    RCTIobj = RCTI.objects.filter(docketNumber = request.POST.get('docketNumber'), docketDate = request.POST.get('docketDate')).first()
+    if RCTIobj != None:
+        RCTIobj = RCTI()
+    rctiErrorObj = RctiErrors.objects.filter(pk=errorId).first()
+    
+    if rctiErrorObj:
+        reportId = int(rctiErrorObj.data.split('@_!')[1])
+        RCTIobj.clientName = Client.objects.filter(name = rctiErrorObj.clientName).first()
+        RCTIobj.rctiReport = RctiReport.objects.filter(pk=reportId).first()
+        
+    else:
+        RCTIobj.clientName = Client.objects.filter(pk = request.POST.get('clientName')).first()
+        RCTIobj.rctiReport = RctiReport.objects.filter(pk=request.POST.get('rctiReport')).first()
+        
+    
     RCTIobj.truckNo = request.POST.get('truckNo')
-    RCTIobj.clientName = clientObj
     RCTIobj.docketNumber = request.POST.get('docketNumber')
     RCTIobj.docketDate = request.POST.get('docketDate')
     RCTIobj.docketYard = request.POST.get('docketYard')
     RCTIobj.noOfKm = request.POST.get('noOfKm')
     RCTIobj.unit = request.POST.get('unit')
     RCTIobj.paidQty = request.POST.get('paidQty')
+    # return HttpResponse(request.POST.get('docketYard'))
     RCTIobj.cubicMl = request.POST.get('cubicMl')
     RCTIobj.cubicMiAndKmsCost = request.POST.get('cubicMiAndKmsCost')
     RCTIobj.destination = request.POST.get('destination')
     RCTIobj.cartageGSTPayable = request.POST.get('cartageGSTPayable')
     RCTIobj.cartageTotalExGST = request.POST.get('cartageTotalExGST')
     RCTIobj.cartageTotal = request.POST.get('cartageTotal')
+    
     RCTIobj.transferKM = request.POST.get('transferKM')
     RCTIobj.transferKMCost = request.POST.get('transferKMCost')
     RCTIobj.transferKMGSTPayable = request.POST.get('transferKMGSTPayable')
     RCTIobj.transferKMTotalExGST = request.POST.get('transferKMTotalExGST')
     RCTIobj.transferKMTotal = request.POST.get('transferKMTotal')
+    
     RCTIobj.returnKm = request.POST.get('returnKm')
     RCTIobj.returnPerKmPerCubicMeterCost = request.POST.get('returnPerKmPerCubicMeterCost')
     RCTIobj.returnKmGSTPayable = request.POST.get('returnKmGSTPayable')
     RCTIobj.returnKmTotalExGST = request.POST.get('returnKmTotalExGST')
     RCTIobj.returnKmTotal = request.POST.get('returnKmTotal')
+    
     RCTIobj.waitingTimeSCHED = request.POST.get('waitingTimeSCHED')
     RCTIobj.waitingTimeSCHEDCost = request.POST.get('waitingTimeSCHEDCost')
     RCTIobj.waitingTimeSCHEDGSTPayable = request.POST.get('waitingTimeSCHEDGSTPayable')
     RCTIobj.waitingTimeSCHEDTotalExGST = request.POST.get('waitingTimeSCHEDTotalExGST')
     RCTIobj.waitingTimeSCHEDTotal = request.POST.get('waitingTimeSCHEDTotal')
+    
     RCTIobj.waitingTimeInMinutes = request.POST.get('waitingTimeInMinutes')
     RCTIobj.waitingTimeCost = request.POST.get('waitingTimeCost')
     RCTIobj.waitingTimeGSTPayable = request.POST.get('waitingTimeGSTPayable')
     RCTIobj.waitingTimeTotalExGST = request.POST.get('waitingTimeTotalExGST')
     RCTIobj.waitingTimeTotal = request.POST.get('waitingTimeTotal')
+    
     RCTIobj.standByNoSlot = request.POST.get('standByNoSlot')
     RCTIobj.standByPerHalfHourDuration = request.POST.get('standByPerHalfHourDuration')
     RCTIobj.standByUnit = request.POST.get('standByUnit')
     RCTIobj.standByGSTPayable = request.POST.get('standByGSTPayable')
     RCTIobj.standByTotalExGST = request.POST.get('standByTotalExGST')
     RCTIobj.standByTotal = request.POST.get('standByTotal')
+    
     RCTIobj.minimumLoad = request.POST.get('minimumLoad')
     RCTIobj.loadCost = request.POST.get('loadCost')
     RCTIobj.minimumLoadGSTPayable = request.POST.get('minimumLoadGSTPayable')
     RCTIobj.minimumLoadTotalExGST = request.POST.get('minimumLoadTotalExGST')
     RCTIobj.minimumLoadTotal = request.POST.get('minimumLoadTotal')
+    
     RCTIobj.blowBack = request.POST.get('blowBack')
     RCTIobj.blowBackCost = request.POST.get('blowBackCost')
     RCTIobj.blowBackGSTPayable = request.POST.get('blowBackGSTPayable')
     RCTIobj.blowBackTotalExGST = request.POST.get('blowBackTotalExGST')
     RCTIobj.blowBackTotal = request.POST.get('blowBackTotal')
+    
     RCTIobj.callOut = request.POST.get('callOut')
     RCTIobj.callOutCost = request.POST.get('callOutCost')
     RCTIobj.callOutGSTPayable = request.POST.get('callOutGSTPayable')
     RCTIobj.callOutTotalExGST = request.POST.get('callOutTotalExGST')
     RCTIobj.callOutTotal = request.POST.get('callOutTotal')
+    
+    RCTIobj.surcharge = request.POST.get('surcharge')
+    RCTIobj.surchargeCost = request.POST.get('surchargeCost')
+    RCTIobj.surchargeGSTPayable = request.POST.get('surchargeGSTPayable')
+    RCTIobj.surchargeTotalExGST = request.POST.get('surchargeTotalExGST')
+    RCTIobj.surchargeTotal = request.POST.get('surchargeTotal')
+    
+    RCTIobj.otherDescription = request.POST.get('otherDescription')
     RCTIobj.others = request.POST.get('others')
     RCTIobj.othersCost = request.POST.get('othersCost')
     RCTIobj.othersGSTPayable = request.POST.get('othersGSTPayable')
@@ -765,7 +827,7 @@ def rctiFormSave(request):
     
     reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
 
-    rctiTotalCost =   convertIntoFloat(RCTIobj.cartageTotal) + convertIntoFloat(RCTIobj.waitingTimeTotal) + convertIntoFloat(RCTIobj.transferKMTotal)  +  convertIntoFloat(RCTIobj.returnKmTotal) + convertIntoFloat(RCTIobj.standByTotal) + convertIntoFloat(RCTIobj.minimumLoadTotal)
+    rctiTotalCost =   convertIntoFloat(RCTIobj.cartageTotal) + convertIntoFloat(RCTIobj.waitingTimeTotal) + convertIntoFloat(RCTIobj.transferKMTotal)  +  convertIntoFloat(RCTIobj.returnKmTotal) + convertIntoFloat(RCTIobj.standByTotal) + convertIntoFloat(RCTIobj.minimumLoadTotal) + convertIntoFloat(RCTIobj.surchargeTotalExGST)+convertIntoFloat(RCTIobj.othersTotalExGST) + convertIntoFloat(RCTIobj.blowBackTotal) +convertIntoFloat(RCTIobj.callOutTotal) 
     
     if not reconciliationDocketObj :
         reconciliationDocketObj = ReconciliationReport()
@@ -773,19 +835,26 @@ def rctiFormSave(request):
     reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
     reconciliationDocketObj.docketDate =  RCTIobj.docketDate
     reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-    # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+    reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.surchargeTotalExGST
     reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotal  
     reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotal 
     reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotal
-    # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+    reconciliationDocketObj.rctiOtherCost =  RCTIobj.othersTotalExGST 
     reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotal
     reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotal
+    reconciliationDocketObj.rctiBlowBack =  RCTIobj.blowBackTotal
+    reconciliationDocketObj.rctiCallOut =  RCTIobj.callOutTotal
     reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
     reconciliationDocketObj.fromRcti = True 
     
     reconciliationDocketObj.save()
     checkMissingComponents(reconciliationDocketObj)
-    
+    if errorId:
+        rctiErrorObj.docketNumber = request.POST.get('docketNumber')
+        rctiErrorObj.docketDate = request.POST.get('docketDate')
+        rctiErrorObj.status = True
+        rctiErrorObj.save()
+        
     messages.success( request, "RCTI entry successfully done.")
     return redirect('Account:rcti')
 
@@ -959,6 +1028,8 @@ def rctiSave(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
+        messages.error( request, "Please enter valid file")
+        return redirect(request.META.get('HTTP_REFERER'))
         return HttpResponse(f"Error: {str(e)}")
 
 def uplodedRCTI(request):
@@ -1112,7 +1183,9 @@ def countDocketStandByTime(request):
     
 @csrf_protect
 def getSinglePastTripError(request):
+    print('here')
     pastTripErrorData = PastTripError.objects.filter(pk=request.POST.get('id')).values().first()
+    print(pastTripErrorData)
     return JsonResponse({'status': True,'data':pastTripErrorData})
 
 def driverDocketEntrySave(request, ids, errorId=None):
@@ -1248,21 +1321,6 @@ def rctiTable(request):
             rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), clientName = clientNameObj)
     else:
             rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_))
-        
-    # if basePlant_:
-    #     if dataType== 'rctiDocket':
-    #         rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_) , docketYard = docketYard)
-    #         # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_))
-    #         # rctiData = list(chain(rctiData, holcimData))
-    #     elif dataType == 'rctiExpense':
-    #         rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), docketYard = docketYard)
-    # else:
-    #     if dataType== 'rctiDocket':
-    #         rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_))
-    #         # holcimData = HolcimDocket.objects.filter(ticketedDate__range=(startDate_,endDate_))
-    #         # rctiData = list(chain(rctiData, holcimData))
-    #     elif dataType == 'rctiExpense':
-    #         rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_))
     
     params = {
         'RCTIs': rctiData,
@@ -1271,9 +1329,7 @@ def rctiTable(request):
     }
     # return HttpResponse(params['holcimData'])
     return render(request, 'Account/Tables/rctiTable.html', params)
-        # except:
-            # messages.warning(request, "Invalid Request ")
-            # return redirect(request.META.get('HTTP_REFERER'))
+
 
 
 def HolcimDocketView(request,id):
@@ -2369,8 +2425,8 @@ def DriverShiftForm(request,id):
         
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()
-    pastTripErrors = PastTripError.objects.filter(status = False).values()
-    pastTripSolved = PastTripError.objects.filter(status = True).values()
+    pastTripErrors = PastTripError.objects.filter(status = False , errorType = 0).values()
+    pastTripSolved = PastTripError.objects.filter(status = True , errorType = 0).values()
     # docketObj = DriverDocket.objects.filter(docketnumber = pastTripSolved.docketNumber).values9
     params ={
             'clients': client,
@@ -2523,6 +2579,7 @@ def topUpForm(request,id , topUpDocket = None):
         escalationData = Escalation.objects.filter(clientName = clientNameObj , escalationDate__range = (startDate , endDate ), escalationType = 'External', escalationStep = 3).values()
     formName = None 
     formName = 'Top Up' if rctiError.data else None
+    formName = 'Accommodation' if rctiError.data else None
     params = {
         'errorId':rctiError,
         'formName':formName,
@@ -2549,7 +2606,16 @@ def topUpSolve(request):
     return JsonResponse({'status': True})
     
 def report(request):
-    return render(request,'Account/report.html')
+    reportError = PastTripError.objects.filter(status = False , errorType = 1).values()
+    reportErrorSolved = PastTripError.objects.filter(status = True , errorType = 1).values()
+    str_ = '45'
+    params ={
+            'str_':str_,
+            'reportError' : reportError,
+            'reportErrorSolved' :reportErrorSolved,
+        }  
+    # return HttpResponse(params['str_'])
+    return render(request,'Account/report.html',params)
 
 @csrf_protect
 def reportSave(request):

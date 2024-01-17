@@ -32,6 +32,14 @@ def checkStr(data:str):
     
 manuallyManaged = ["creekpayment","accommodation","topup","ampol","inspectionfailure","diwalisweets","missingdocketpayment"]
 
+# When start subprocess before  clear skip and error file 
+
+with open('holcimUtils.txt', 'w') as file:
+    pass 
+with open('holcim.txt', 'w') as file:
+    pass 
+
+
 with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     csv_reader = csv.reader(f)
     rctiErrorObj = RctiErrors()
@@ -51,6 +59,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     rctiRepoort = None
     flag = False
     strValue = ''
+    rowErrorDescription = ''
     
     try:
         for row in csv_reader:
@@ -67,7 +76,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 truckNo = row[0].split(',')[-3]
                 
                 # for docket pattern = 'G-111111'
-            elif  re.fullmatch(datePattern, splitRow[0].strip()) and  re.fullmatch(docketPattern2, str(splitRow[1].strip())):
+            elif  re.fullmatch(datePattern, splitRow[0].strip()) and  re.fullmatch(docketPattern2, str(splitRow[1].strip())) :
                 rctiErrorObj = RctiErrors()
                 rctiErrorObj.clientName = 'holcim'
                 rctiErrorObj.docketNumber = None
@@ -75,38 +84,43 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 rctiErrorObj.errorDescription = "Manually Manage."
                 rctiErrorObj.fileName = fileName.split('@_!')[-1]
                 rctiErrorObj.data = str(errorSolve)
-                rctiErrorObj.errorType = 1
+                # rctiErrorObj.errorType = 1
                 rctiErrorObj.save()
+                
                 # for top up in docketnumber  
             elif  re.fullmatch(datePattern, splitRow[0].strip()) and  'topup' in row[0].lower() :
                 rctiErrorObj = RctiErrors()
                 rctiErrorObj.clientName = 'holcim'
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
-                rctiErrorObj.errorDescription = "Manually Manage."
+                rctiErrorObj.errorDescription = "topup"
                 rctiErrorObj.fileName = fileName.split('@_!')[-1]
                 rctiErrorObj.data = str(errorSolve)
-                rctiErrorObj.errorType = 1
+                # rctiErrorObj.errorType = 1
                 rctiErrorObj.save()
                 
-            elif  any( value in checkStr(row[0])  for value in manuallyManaged):
-                flag = True
-                strValue = row[0]
+            elif  any(value in checkStr(row[0]) for value in manuallyManaged):
+                for value in manuallyManaged:
+                    if value in checkStr(row[0]):
+                        rowErrorDescription = value
+                        flag = True
+                        strValue = row[0]
+
             elif flag and 'gst' in checkStr(row[0]):
                 rctiErrorObj = RctiErrors()
                 rctiErrorObj.clientName = 'holcim'
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
-                rctiErrorObj.errorDescription = "Manually Manage."
+                rctiErrorObj.errorDescription = rowErrorDescription
                 rctiErrorObj.fileName = fileName.split('@_!')[-1]
                 rctiErrorObj.data = str(strValue) + str(errorSolve)
-                rctiErrorObj.errorType = 1
+                # rctiErrorObj.errorType = 1
                 rctiErrorObj.save()
                 strValue = ''
                 flag = False
             
-            # docket number pattern 
-            elif  re.fullmatch(datePattern, splitRow[0].strip()) and len(splitRow[1].strip()) > 8:
+            # docket number pattern like 'WI200941/1'  or 'T2' 
+            elif re.fullmatch(datePattern, splitRow[0].strip()) and (len(splitRow[1].strip()) > 8 or len(str(splitRow[1].strip())) < 3):
                 rctiErrorObj = RctiErrors()
                 rctiErrorObj.clientName = 'holcim'
                 rctiErrorObj.docketNumber = None
@@ -114,8 +128,9 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 rctiErrorObj.errorDescription = "Manually Manage."
                 rctiErrorObj.fileName = fileName.split('@_!')[-1]
                 rctiErrorObj.data = str(errorSolve)
-                rctiErrorObj.errorType = 1
+                # rctiErrorObj.errorType = 1
                 rctiErrorObj.save()
+
             elif len(splitRow) > 0:
                 if re.fullmatch(datePattern, splitRow[0].strip()) and re.fullmatch(docketPattern, splitRow[1].strip()):
                     tempData.insert(0,splitRow[0])
@@ -129,7 +144,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             rctiErrorObj.errorDescription = "Manually Manage."
                             rctiErrorObj.fileName = fileName.split('@_!')[-1]
                             rctiErrorObj.data = str(errorSolve)
-                            rctiErrorObj.errorType = 1
+                            # rctiErrorObj.errorType = 1
                             
                             rctiErrorObj.save()
                             continue
@@ -152,7 +167,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                             rctiErrorObj.errorDescription = "Manually Manage."
                             rctiErrorObj.fileName = fileName.split('@_!')[-1]
                             rctiErrorObj.data = str(errorSolve)
-                            rctiErrorObj.errorType = 1
+                            # rctiErrorObj.errorType = 1
                             
                             rctiErrorObj.save()
                             continue
@@ -173,6 +188,8 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                         prepared = tempData
                     tempData = []
                 else:
+                    with open('holcimUtils.txt', 'a') as f:
+                        f.write('pattern not match' + str(row) + fileName.split('@_!')[-1] + '\n')
                     with open('holcimUtils.txt','a')as f:
                         f.write('pattern not match'+ str(row) + fileName.split('@_!')[-1] +'\n')
             else:
@@ -221,15 +238,14 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     elif 'blowback' in dataList[0].lower():
                         rctiObj.blowBackCost = dataList[1]
                         rctiObj.blowBackTotal = dataList[1]
-                    elif 'topup' in dataList[0].lower().replace(' ',''):
-                        rctiErrorObj.clientName = 'boral'
-                        rctiErrorObj.docketNumber = rctiObj.docketNumber
-                        rctiErrorObj.docketDate = rctiObj.docketDate
-                        rctiErrorObj.errorDescription = "Manage Top-up."
-                        rctiErrorObj.fileName = fileName
-                        rctiErrorObj.data = str(data)
-                        rctiErrorObj.save()
-                        
+                    # elif 'topup' in dataList[0].lower().replace(' ',''):
+                    #     rctiErrorObj.clientName = 'boral'
+                    #     rctiErrorObj.docketNumber = rctiObj.docketNumber
+                    #     rctiErrorObj.docketDate = rctiObj.docketDate
+                    #     rctiErrorObj.errorDescription = "Manage Top-up."
+                    #     rctiErrorObj.fileName = fileName
+                    #     rctiErrorObj.data = str(data)
+                    #     rctiErrorObj.save()
                     elif 'trucktrf' in dataList[0].lower():
                         rctiObj.transferKMCost = dataList[1]
                         rctiObj.transferKMTotal = dataList[1]
@@ -283,7 +299,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             rctiErrorObj.errorDescription = "Manually Manage."
             rctiErrorObj.fileName = fileName.split('@_!')[-1]
             rctiErrorObj.data = ''.join(data)
-            rctiErrorObj.errorType = 1
+            # rctiErrorObj.errorType = 1
             rctiErrorObj.save()
 
     

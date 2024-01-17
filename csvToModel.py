@@ -37,6 +37,16 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         rctiErrorObj = RctiErrors()
         
         # minimum Payment for top up 
+        if len(dataList) == 1 and 'topup' in data_str:
+            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.docketNumber = None
+            rctiErrorObj.docketDate = None
+            rctiErrorObj.errorDescription = "Manually Manage."
+            rctiErrorObj.fileName = file_name.split('@_!')[-1]
+            rctiErrorObj.data = str(errorSolve)
+            rctiErrorObj.errorType = 1
+            rctiErrorObj.save()
+            return
         if len(dataList) == 1:
             rctiErrorObj.clientName = 'boral'
             rctiErrorObj.docketNumber = None
@@ -47,7 +57,6 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             rctiErrorObj.errorType = 1
             rctiErrorObj.save()
             return
-
         RCTIobj =  RCTI.objects.filter(truckNo = float(dataList[0]) ,docketNumber=int(dataList[1]),docketDate = dateConvert(dataList[2])).first()
 
         if not RCTIobj:
@@ -239,7 +248,7 @@ def insertIntoExpenseModel(dataList , file_name):
             rctiErrorObj.clientName = 'boral'
             rctiErrorObj.docketNumber = dataList[1]
             rctiErrorObj.docketDate =  dataList[2]
-            rctiErrorObj.errorDescription = e
+            rctiErrorObj.errorDescription = 'expense' + e
             rctiErrorObj.fileName = file_name
             rctiErrorObj.data = str(errorSolve)
             rctiErrorObj.save() 

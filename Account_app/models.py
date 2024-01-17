@@ -253,6 +253,7 @@ class RCTI(models.Model):
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE)
     rctiReport = models.ForeignKey(RctiReport,on_delete=models.CASCADE , default =None)
     noOfKm = models.FloatField(default=0)
+    
     cubicMl = models.FloatField(default=0)
     cubicMiAndKmsCost= models.FloatField(default=0)
     destination = models.CharField(max_length=255, default='Not given')
@@ -291,7 +292,7 @@ class RCTI(models.Model):
     
     standByNoSlot = models.FloatField(default=0)
     standByPerHalfHourDuration = models.FloatField(default=0)
-    standByUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=6)
+    standByUnit = models.CharField(choices=UNIT_CHOICES,default="minute",max_length=20)
     standByGSTPayable = models.FloatField(default=0)
     standByTotalExGST = models.FloatField(default=0)
     standByTotal = models.FloatField(default=0)
@@ -322,7 +323,7 @@ class RCTI(models.Model):
     surchargeTotal = models.FloatField(default=0)
    
     otherDescription = models.CharField(max_length=500,default= '', null= True , blank=True)
-    others = models.CharField(max_length=255,default= 0, null= True , blank=True)
+    others = models.FloatField(default=0)
     othersCost = models.FloatField(default=0)
     othersGSTPayable = models.FloatField(default=0)
     othersTotalExGST = models.FloatField(default=0)
@@ -491,7 +492,7 @@ class RctiErrors(models.Model):
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)
     data = models.CharField(max_length=1024,default='')
-    # 0:Earning, 1 : earning top up manually managed error
+    # 0:Earning,
     errorType = models.PositiveIntegerField(default=0)
     
     def __str__(self) -> str:
@@ -534,7 +535,7 @@ class HolcimDocket(models.Model):
     tripId = models.ForeignKey(HolcimTrip, on_delete=models.CASCADE)
     jobNo = models.FloatField(default=0)
     orderNo = models.FloatField(default=0)
-    status = models.CharField(max_length=200)
+    # status = models.CharField(max_length=200)
     ticketed = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     load = models.CharField(max_length= 100 , default=None, null= True, blank=True)
     loadComplete = models.CharField(max_length=200)

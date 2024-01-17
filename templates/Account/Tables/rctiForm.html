@@ -36,7 +36,12 @@
                                 <div class="clearfix"></div>
                             </div>
                             </div>
-                            <form action="{% url 'Account:rctiFormSave' %}" method="post" id="boralRctiForm">
+                            <form action=" 
+                            {% if errorObj %}
+                            {% url 'Account:rctiErrorFormSave' errorId=errorObj.id %}
+                            {% else %}
+                            {% url 'Account:rctiFormSave' %}
+                            {% endif %}" method="post" id="boralRctiForm">
                             {% csrf_token %}
                                 <div class="x_content"   id="boral" >
                                     <div class="col-md-2">
@@ -45,34 +50,56 @@
                                         <div class="nav nav-tabs flex-column  bar_tabs" id="v-pills-tab" role="tablist"
                                         aria-orientation="vertical">
                                         
-                                            {% comment %} {% if rcti %} {% endcomment %}
                                             <a class="nav-link active" id="v-pills-truckNo-tab" data-toggle="pill" href="#v-pills-truckNo" role="tab"
                                                 aria-controls="v-pills-truckNo" aria-selected="true">Truck No</a>
-                                            <a class="nav-link" id="v-pills-noOfKm-tab" data-toggle="pill" href="#v-pills-noOfKm"
+                                             {% if  rcti.cartageTotal != 0 %}
+                                            <a class="nav-link " id="v-pills-noOfKm-tab"  data-toggle="pill" href="#v-pills-noOfKm"
                                                 role="tab" aria-controls="v-pills-noOfKm" aria-selected="false">Cubic</a>
-                                            <a class="nav-link" id="v-pills-transferKM-tab" data-toggle="pill" href="#v-pills-transferKM"
+                                            {% endif %}
+                                            {% if  rcti.transferKMTotal != 0 %}
+                                            <a class="nav-link  " id="v-pills-transferKM-tab" data-toggle="pill" href="#v-pills-transferKM"
                                                 role="tab" aria-controls="v-pills-transferKM" aria-selected="false">Transfer KM</a>
-                                            <a class="nav-link" id="v-pills-returnKm-tab" data-toggle="pill" href="#v-pills-returnKm"
+                                            {% endif %}
+                                            {% if  rcti.returnKmTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-returnKm-tab" data-toggle="pill" href="#v-pills-returnKm"
                                                 role="tab" aria-controls="v-pills-returnKm" aria-selected="false">Return KM</a>
-                                            <a class="nav-link" id="v-pills-waitingTimeSCHED-tab" data-toggle="pill" href="#v-pills-waitingTimeSCHED"
+                                            {% endif %}
+                                            {% if  rcti.waitingTimeSCHEDTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-waitingTimeSCHED-tab" data-toggle="pill" href="#v-pills-waitingTimeSCHED"
                                                 role="tab" aria-controls="v-pills-waitingTimeSCHED" aria-selected="false">Waiting time SCHED</a>
-                                            <a class="nav-link" id="v-pills-waitingTimeInMinutes-tab" data-toggle="pill" href="#v-pills-waitingTimeInMinutes"
+                                            {% endif %}
+                                            {% if  rcti.waitingTimeTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-waitingTimeInMinutes-tab" data-toggle="pill" href="#v-pills-waitingTimeInMinutes"
                                                 role="tab" aria-controls="v-pills-waitingTimeInMinutes" aria-selected="false">Waiting time in minutes</a>
-                                            <a class="nav-link" id="v-pills-standByNoSlot-tab" data-toggle="pill" href="#v-pills-standByNoSlot"
+                                            {% endif %}
+                                            {% if  rcti.standByTotal != 0 %}
+                                                <a class="nav-link   " id="v-pills-standByNoSlot-tab" data-toggle="pill" href="#v-pills-standByNoSlot"
                                                 role="tab" aria-controls="v-pills-standByNoSlot" aria-selected="false">Stand by per half hour cost</a>
-                                            <a class="nav-link" id="v-pills-minimumLoad-tab" data-toggle="pill" href="#v-pills-minimumLoad"
+                                            {% endif %}
+                                            {% if  rcti.minimumLoadTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-minimumLoad-tab" data-toggle="pill" href="#v-pills-minimumLoad"
                                                 role="tab" aria-controls="v-pills-minimumLoad" aria-selected="false">Minimum load</a>
-                                            <a class="nav-link" id="v-pills-blow_back-tab" data-toggle="pill" href="#v-pills-blow_back"
+                                            {% endif %}
+                                            {% if  rcti.blowBackTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-blow_back-tab" data-toggle="pill" href="#v-pills-blow_back"
                                                 role="tab" aria-controls="v-pills-blow_back" aria-selected="false">Blow Back</a>
-                                            <a class="nav-link" id="v-pills-call_out-tab" data-toggle="pill" href="#v-pills-call_out"
+                                            {% endif %}
+                                            {% if  rcti.callOutTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-call_out-tab" data-toggle="pill" href="#v-pills-call_out"
                                                 role="tab" aria-controls="v-pills-call_out" aria-selected="false">Call Out</a>
-                                            <a class="nav-link" id="v-pills-others-tab" data-toggle="pill" href="#v-pills-others"
+                                            {% endif %}
+                                            {% if  rcti.surchargeTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-surcharge-tab" data-toggle="pill" href="#v-pills-surcharge"
+                                                role="tab" aria-controls="v-pills-surcharge" aria-selected="false">surcharge</a>
+                                            {% endif %}
+                                            {% if  rcti.othersTotal != 0 %}
+                                                <a class="nav-link  " id="v-pills-others-tab" data-toggle="pill" href="#v-pills-others"
                                                 role="tab" aria-controls="v-pills-others" aria-selected="false">Others</a>
+                                            {% endif %}
                                             {% if rcti %}
                                             <a class="nav-link" id="v-pills-docketView-tab" data-toggle="pill" href="#v-pills-docketView"
                                             role="tab" aria-controls="v-pills-docketView" aria-selected="false">Full Docket view</a>
-                                            {% endif %}
-                                            {% comment %} {% endif %} {% endcomment %}
+                                            {% endif %} 
                                         </div>
                                     </div>
                                     <div class="col-sm-10">
@@ -524,9 +551,9 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group ">
                                                                 <label for="otherDescription">otherDescription :<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" required
+                                                                <input class="form-control" type="text" required
                                                                     style="padding: 0.25rem 0.2rem;"
-                                                                    value="{{  rcti.otherDescription  }}" {% if rcti %} readonly {% endif  %}>
+                                                                    value="{{ rcti.otherDescription }}" {% if rcti %} readonly {% endif  %}>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
@@ -588,16 +615,42 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="truckNo">Truck No:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="truckNo"  value="{{ rcti.truckNo }}" id="truckNo" {% if rcti %} readonly {% endif %}>
+                                                                <input class="form-control" type="number" name="truckNo"  {% if rcti %} value="{{ rcti.truckNo }}" {% else %} value="0"  {% endif %}
+                                                                
+                                                                id="truckNo" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
-                                                         <div class="col-sm-4">
+                                                        <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="truckNo"><span class="required">clientName*</span></label>
-                                                                <select class="form-control" {% if rcti %} readonly {% endif %} id="clientName" name="clientName">
+                                                                <label for="clientName"><span class="required">clientName*</span></label>
+                                                                <select class="form-control" {% if rcti or errorObj%} disabled {% endif %} required id="clientName" name="clientName">
                                                                     <option value="" disabled selected>Select Client Name</option>
                                                                     {% for clientName in clientNames %}
-                                                                    <option value="{{ clientName.id }}" {% if clientName.name == rcti.clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
+                                                                    {% if rcti %}
+                                                                    <option value="{{ clientName.clientId }}" {% if clientName.name == rcti.clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
+                                                                    {% elif errorObj %}
+                                                                    <option value="{{ clientName.clientId }}" {% if clientName.name == errorObj.clientName %} selected {% endif %}>{{ clientName.name }}</option>
+                                                                    {% else %}
+                                                                    <option value="{{ clientName.clientId }}">{{ clientName.name }}</option>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+
+                                                                </select>
+                                                            </div>
+                                                        </div> 
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="rctiReport"><span class="required">Rcti Report*</span></label>
+                                                                <select class="form-control" {% if rcti or errorObj %} disabled {% endif %} required id="rctiReport" name="rctiReport">
+                                                                    <option value="" disabled selected>Select File Name</option>
+                                                                    {% for report in rctiReports %}
+                                                                    {% if rcti %}
+                                                                    <option value="{{ report.id }}" {% if report.fileName == rcti.rctiReport.fileName %} selected {% endif %}>{{ report.fileName }}</option>
+                                                                    {% elif errorObj %}
+                                                                    <option value="{{ report.id }}" {% if report.id == reportId %} selected {% endif %}>{{ report.fileName }}</option>
+                                                                    {% else %}
+                                                                    <option value="{{ report.id }}">{{ report.fileName }}</option>
+                                                                    {% endif %}
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
@@ -614,16 +667,28 @@
                                                                 <input class="form-control"  {% if rcti %} type="text"  {% else  %}  type="date" {% endif %} name="docketDate"  value="{{rcti.docketDate}}" id="docketDate" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-4">
+                                                        
+                                                        <div class="col-sm-4 " >
                                                             <div class="form-group">
                                                                 <label for="docketYard">Docket yard:<span class="required">*</span></label>
-                                                                <input class="form-control" type="text" name="docketYard"  value="{{ rcti.docketYard }}" id="docketYard" {% if rcti %} readonly {% endif %}>
+                                                                
+                                                                <select class="form-control" {% if rcti or errorObj.docketNumber != None %} disabled {% endif %} required id="docketYard" name="docketYard">
+                                                                <option value="" disabled selected>Select Docket Yard</option>
+                                                                {% for name in basePlants %}
+                                                                {% if rcti %}
+                                                                <option value="{{ name.basePlant }}" {% if name.basePlant == rcti.docketYard %} selected {% endif %}>{{ name.basePlant }}</option>
+                                                                {% else %}
+                                                                <option value="{{ name.basePlant }}">{{ name.basePlant }}</option>
+                                                                {% endif %}
+                                                                {% endfor %}
+                                                                </select>
+                                                                
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="tab-pane fade" id="v-pills-noOfKm" role="tabpanel"
+                                             <div class="tab-pane fade" id="v-pills-noOfKm" role="tabpanel"
                                                 aria-labelledby="v-pills-noOfKm-tab">
                                                 <div class="x_content">
                                                     <div class="custom-container">
@@ -988,6 +1053,43 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="tab-pane fade" id="v-pills-surcharge" role="tabpanel"
+                                                aria-labelledby="v-pills-blow_back-tab">
+                                                <div class="x_content">
+                                                    <div class="custom-container">
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="surcharge">Surcharge:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="surcharge"  value="{{ rcti.surcharge }}" id="surcharge" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="surchargeCost">Surcharge Cost:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="surchargeCost"  value="{{ rcti.surchargeCost }}" id="surchargeCost" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="surchargeGSTPayable">Surcharge GST payable:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="surchargeGSTPayable"  value="{{ rcti.surchargeGSTPayable }}" id="surchargeGSTPayable" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="surchargeTotalExGST">Surcharge total ex GST:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="surchargeTotalExGST"  value="{{ rcti.surchargeTotalExGST }}" id="surchargeTotalExGST" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label for="surchargeTotal">Surcharge Total:<span class="required">*</span></label>
+                                                                <input class="form-control" type="number" name="surchargeTotal"  value="{{ rcti.surchargeTotal }}" id="surchargeTotal" {% if rcti %} readonly {% endif %}>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="tab-pane fade" id="v-pills-others" role="tabpanel" aria-labelledby="v-pills-others-tab">
                                                 <div class="x_content">
                                                     <div class="custom-container">
@@ -1027,13 +1129,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> 
                                         </div>
                                     </div>
                                     
                                 </div>
                                 {% if not rcti %} 
-                                <input class="btn btn-default float-right above " id="boralSub" type="submit" value="submit" >
+                                <button class="btn btn-default float-right above " id="boralSub" type="submit" >Submit</button>
                                 {% endif %}
                             </form>
 
@@ -1048,27 +1150,44 @@
 
 <script>
     $(document).ready(function(){
-        // Select the dropdown by its ID
-       
-      
+        var truckNo = $('#truckNo').val()
+        console.log(truckNo)
+        // Check if rcti.truckNo is greater than 0
+        if (truckNo <= 0 ) {
+            // Reset the values of input fields to 0
+            var inputsToReset = $('.form-group input[type="number"]');
+            inputsToReset.val(0);
+        }
 
+
+        //var inputsToReset = $('.form-group input[type="number"]');
+        
+        // inputsToReset.val(0);
         $("#boralRctiForm").submit(function(e){
-            e.preventDefault(); 
+            //e.preventDefault(); 
             let isValid = true;
-            let valOfField = null
-            $('#boralRctiForm input, #myForm select').each(function() {
-                if ($.trim($(this).val()) === '') {
+            let valOfField = null;
+    
+            $('#boralRctiForm input').each(function() {
+                if ($(this).val().trim() === '') {
                     isValid = false;
                     valOfField = $(this).attr('name');
+                    console.log(this);
                     return false; // Exit the loop if a blank field is found
                 }
             });
+    
             if (!isValid) {
                 e.preventDefault(); // Prevent form submission if fields are blank
-                alert(`Please fill up ${valOfField}.`)
+                alert(`Please fill up ${valOfField}.`);
+            } else {
+                // Form is valid, submit it
+                $(this).submit();
+                return true
             }
         });
     });
+    
 </script>
 {% endblock %}
 
