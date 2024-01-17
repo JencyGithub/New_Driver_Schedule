@@ -476,8 +476,9 @@ admin.site.register(HolcimTrip,HolcimTrip_)
 admin.site.register(AppointmentTruck)
 admin.site.register(AppointmentDriver)
 
-admin.site.register(PreStart)
-admin.site.register(PreStartQuestion)
+
+
+
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
 
@@ -489,11 +490,20 @@ admin.site.register(DriverShift)
 admin.site.register(DriverShiftTrip)
 admin.site.register(DriverShiftDocket)
 
-
-# admin.site.register(DriverPreStart)
-# admin.site.register(DriverPreStartQuestion)
+admin.site.register(DriverBreak)
 
 
+
+
+class PreStartQuestionInline(admin.StackedInline):
+    model = PreStartQuestion
+    extra = 0
+    
+class PreStartAdmin(admin.ModelAdmin):
+    list_display = ["preStartName", "createdDate"]
+    # search_fields = ["preStartName"]
+    inlines = [PreStartQuestionInline]
+admin.site.register(PreStart, PreStartAdmin)
 
 class DriverPreStartQuestionInline(admin.StackedInline):
     model = DriverPreStartQuestion

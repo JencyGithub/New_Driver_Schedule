@@ -59,8 +59,8 @@ class DriverShift(models.Model):
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)
     shiftDate = models.DateField(null=True, blank=True)
-    startTime = models.TimeField(null=True, blank=True)
-    endTime = models.TimeField(null=True, blank=True)
+    startDateTime = models.DateTimeField(null=True, blank=True)
+    endDateTime = models.DateTimeField(null=True, blank=True)
     driverId = models.IntegerField(null=True, blank=True)
     
     def __str__(self) -> str:
@@ -69,8 +69,8 @@ class DriverShift(models.Model):
 
 class DriverShiftTrip(models.Model):
     shiftId = models.IntegerField(null=True, blank=True)
-    startTime = models.TimeField(null=True, blank=True)
-    endTime = models.TimeField(null=True, blank=True)
+    startDateTime = models.DateTimeField(null=True, blank=True)
+    endDateTime = models.DateTimeField(null=True, blank=True)
     clientId = models.IntegerField(null=True, blank=True)
     truckConnectionId = models.IntegerField(null=True, blank=True)
     dispute = models.BooleanField(default = False)
@@ -79,7 +79,7 @@ class DriverShiftTrip(models.Model):
     comment = models.CharField(max_length=200, default='None')
     
     def __str__(self) -> str:
-        return str(self.clientId) + str(self.startTime) + str(self.endTime) 
+        return str(self.clientId) + str(self.startDateTime) + str(self.endDateTime) 
     
     
 class DriverShiftDocket(models.Model):
@@ -93,25 +93,48 @@ class DriverShiftDocket(models.Model):
     tippingToYard = models.BooleanField(default=False)
     returnQty = models.FloatField(default=0)
     returnKm = models.FloatField(default=0)
-    waitingTimeStart = models.TimeField(default='', null=True, blank=True)
-    waitingTimeEnd = models.TimeField(default='', null=True, blank=True)
+    waitingTimeStart = models.TimeField(default=None, null=True, blank=True)
+    waitingTimeEnd = models.TimeField(default=None, null=True, blank=True)
     totalWaitingInMinute = models.FloatField(default=0)
     surchargeType = models.IntegerField(null=True, blank=True)
     surcharge_duration = models.FloatField(default=0)
     cubicMl = models.FloatField(default=0)
-    standByStartTime = models.TimeField(default='', null=True, blank=True)
-    standByEndTime = models.TimeField(default='', null=True, blank=True)
+    standByStartTime = models.TimeField(default=None, null=True, blank=True)
+    standByEndTime = models.TimeField(default=None, null=True, blank=True)
     standBySlot = models.PositiveIntegerField(default=0, null=True)
     minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
     comment = models.CharField(max_length=255, null=True, default='')
 
     def __str__(self) -> str:
-        return str(self.docketNumber)
+        return str(self.docketNumber) + str(self.tripId)
    
 
 # -----------------------------------
 # New Trips Section end
+# -----------------------------------
+
+
+
+# -----------------------------------
+# Breaks end
+# -----------------------------------
+
+class DriverBreak(models.Model):
+    shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None)
+    tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None)
+    driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None)  
+    startDateTime = models.DateTimeField(default='', null=True)
+    endDateTime = models.DateTimeField(default='', null=True)
+    breakFile = models.FileField(default='', null=True)
+    location = models.CharField(max_length=2048, default='', null=True)
+    description = models.CharField(max_length=2048, default='', null=True)
+    
+    def __str__(self) -> str:
+        return str(self.driverId.name)
+
+# -----------------------------------
+# Breaks end
 # -----------------------------------
  
     
@@ -360,7 +383,7 @@ class PastTripError(models.Model):
     status = models.BooleanField(default=False)
     # 0 : pastTrip error  1: Report Error 
     errorType = models.FloatField(default=0) 
-    data = models.CharField(max_length=1024, default=' ')
+    data = models.CharField(max_length=2048, default=' ')
 
     def __str__(self):
         return str(self.docketNumber)
@@ -490,7 +513,7 @@ class RctiErrors(models.Model):
     errorDescription = models.CharField(default=None ,blank=True,null=True ,max_length=255)
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)
-    data = models.CharField(max_length=1024,default='')
+    data = models.CharField(max_length=2048,default='')
     # 0:Earning, 1 : earning top up manually managed error
     errorType = models.PositiveIntegerField(default=0)
     

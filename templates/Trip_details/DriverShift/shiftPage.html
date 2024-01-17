@@ -1,86 +1,122 @@
 {% extends "Trip_details/main/main.html" %}
 {% load static %}
-{% block title %}Shift Page{% endblock title %}
+{% block title %}Shift Page{% endblock %}
 
 {% block headStyle %}
-
-{% endblock headStyle %}
+<style>
+    .nav-link{
+        color: #7c8792;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-2" id="container">
     <div class="card border-0">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <h5 class="card-title text-uppercase text-default">Current Status</h5>
-                </div>
-                <div class="col-md-4">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="currentStatusTab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab" aria-controls="status" aria-selected="true">Status</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="breaksTab" data-bs-toggle="tab" data-bs-target="#breaks" type="button" role="tab" aria-controls="breaks" aria-selected="false">Breaks</button>
+                </li>
+              </ul>
+              
+              <!-- Tab panes -->
+              <div class="tab-content py-4">
+                <div class="tab-pane active" id="status" role="tabpanel" aria-labelledby="currentStatusTab" tabindex="0">
                     <div class="row">
-                        <div class="col-md-3 p-1">
-                            <a href="#" class="btn btn-sm btn-default w-100">Add Break</a>
+                        <div class="col-md-8">
+                            <h5 class="card-title text-uppercase text-default">Current Status</h5>
                         </div>
-                        <div class="col-md-3 p-1">
-                            <a href="#" class="btn btn-sm btn-default w-100">End Trip</a>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-3 p-1">
+                                    <a href="{% url  'Account:addDriverBreak' shiftId=shiftObj.id tripId=tripObj.id %}" class="btn btn-sm btn-default w-100">Add Break</a>
+                                </div>
+                                <div class="col-md-3 p-1">
+                                    <a href="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" class="btn btn-sm btn-default w-100">End Shift</a>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <a href="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=0 %}" class="btn btn-sm btn-default w-100">Change Client/Truck</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 p-1">
-                            <a href="#" class="btn btn-sm btn-default w-100">Change Client/Truck</a>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-5 my-3">
+                            <h6 class="card-title text-uppercase text-default">Shift Details :</h6>
+                            <table class="table mt-3 mb-2">
+                                <tr>
+                                    <th class="py-2">Shift start Date: </th>
+                                    <td class="py-2">{{shiftObj.shiftDate}}</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-2">Shift start Time: </th>
+                                    <td class="py-2"><span>{{shiftObj.startDateTime}}</span></td>
+                                </tr>
+                                <tr>
+                                    <th class="py-2">Shift end Time </th>
+                                    <td class="py-2"><span>{% if shiftObj.endDateTime %}{{shiftObj.endDateTime}}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
+                                </tr>
+                                
+                            </table>
+                        </div>
+                        <div class="col-md-7 my-3">
+                            <h6 class="card-title text-uppercase text-default">Trip Details :</h6>
+                            {% for trip in currentTrips %}
+                                <table class="table mt-3 mb-2 bg-light">
+                                    <tr>
+                                        <th class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}">Client Name: </th>
+                                        <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %} text-capitalize">{{trip.clientName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}">Shift start Time: </th>
+                                        <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}"><span>{{ trip.startDateTime }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}">Shift end Time </th>
+                                        <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}"><span>{% if trip.endDateTime %}{{ trip.endDateTime }}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}">Truck number: </th>
+                                        <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}"><span>{{trip.truckNum}}</span></td>
+                                    </tr>
+                                </table>
+                            {% endfor %}    
                         </div>
                     </div>
                 </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-md-7">
-                    <h6 class="card-title text-uppercase text-default">Trip Details :</h6>
-                    <table class="table mt-3 mb-2">
-                        <tr>
-                            <th class="py-2">Client Name: </th>
-                            <td class="py-2 text-capitalize">{{ clientObj.name }}</td>
-                        </tr>
-                        <tr>
-                            <th class="py-2">Shift start Time: </th>
-                            <td class="py-2"><span>{{ tripObj.startTime }}</span></td>
-                        </tr>
-                        <tr>
-                            <th class="py-2">Shift end Time </th>
-                            <td class="py-2"><span>{% if tripObj.endTime %}{{ tripObj.endTime }}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
-                        </tr>
-                        <tr>
-                            <th class="py-2">Truck number: </th>
-                            <td class="py-2"><span>{{ truckObj.clientTruckId }}</span></td>
-                        </tr>
-                    </table>
+                <div class="tab-pane" id="breaks" role="tabpanel" aria-labelledby="breaksTab" tabindex="0">
+                    <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">SR.</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for break in breaks %}
+                                <tr>
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ break.startDateTime }}</td>
+                                    <td>{{ break.endDateTime }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                    </div> 
                 </div>
-                <div class="col-md-5">
-                    <h6 class="card-title text-uppercase text-default">Shift Details :</h6>
-                    <table class="table mt-3 mb-2">
-                        <tr>
-                            <th class="py-2">Shift start Date: </th>
-                            <td class="py-2">{{shiftObj.shiftDate}}</td>
-                        </tr>
-                        <tr>
-                            <th class="py-2">Shift start Time: </th>
-                            <td class="py-2"><span>{{shiftObj.startTime}}</span></td>
-                        </tr>
-                        <tr>
-                            <th class="py-2">Shift end Time </th>
-                            <td class="py-2"><span>{% if shiftObj.endTime %}{{shiftObj.endTime}}{% else %}<span class="badge bg-default">Running</span>{% endif %}</span></td>
-                        </tr>
-                        
-                    </table>
-                </div>
-            </div>
+              </div>
         </div>
     </div>
 </div>
-
-
-{% endblock content %}
+{% endblock %}
 
 {% block footerStyleEnd %}
-<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-<script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCGJUlSnh56niZZH-YrdDW2q71A4FygrxU&callback=initMap&v=weekly"
-    defer></script>
 
-{% endblock footerStyleEnd %}
+{% endblock %}

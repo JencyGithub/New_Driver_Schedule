@@ -482,31 +482,47 @@ def timeOfStartSave(request):
 
     
 def mapFormView(request):
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDate = datetime.now(tz=currentTimezone)
-    params = {
-        'date':dateConverterFromTableToPageFormate(currentDate),
-        'time':str(currentDate.time()).split('.')[0],
-    }
-    return render(request, 'Trip_details/DriverShift/mapForm.html', params)
+    driverObj = Driver.objects.filter(name=request.user.username).first()
+    shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
+    if shiftObj:
+        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+        if existingTrip:
+            return redirect('Account:DriverPreStartSave', existingTrip.id)
+    else:
+        currentDate = getCurrentDateTimeObj()
+        params = {
+            'date':dateConverterFromTableToPageFormate(currentDate),
+            'time':str(currentDate.time()).split('.')[0],
+        }
+        return render(request, 'Trip_details/DriverShift/mapForm.html', params)
 
 @csrf_protect
-def mapDataSave(request):
+def mapDataSave(request, recurring=None):
     params = {}
-    lat = request.POST.get('latitude')
-    lng = request.POST.get('longitude')
-    date = request.POST.get('date')
-    time = request.POST.get('time')
-    shiftObj = DriverShift.objects.filter(shiftDate=date, startTime=time).first()
-    if not shiftObj:
+    existingTrip = None
+    driverObj = Driver.objects.filter(name=request.user.username).first()
+    shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
+    if shiftObj:
+        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+
+    if shiftObj and existingTrip:
+        return redirect('Account:DriverPreStartSave', existingTrip.id)
+
+    if not recurring:
+        currentDateTime = getCurrentDateTimeObj()
+        lat = request.POST.get('latitude')
+        lng = request.POST.get('longitude')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        
         shiftObj = DriverShift()
-    shiftObj.latitude = lat
-    shiftObj.longitude = lng
-    shiftObj.shiftDate = date
-    shiftObj.startTime = time
-    shiftObj.driverId = Driver.objects.filter(name=request.user.username).first().driverId
-    shiftObj.save()
-    existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endTime=None).first()
+        shiftObj.latitude = lat
+        shiftObj.longitude = lng
+        shiftObj.shiftDate = date
+        shiftObj.startDateTime = currentDateTime
+        shiftObj.driverId = driverObj.driverId
+        shiftObj.save()
+    
     if existingTrip:
         truckConnectionObj = ClientTruckConnection.objects.filter(pk=existingTrip.truckConnectionId).first()
         params['clientName'] = Client.objects.filter(pk=existingTrip.clientId).first()
@@ -514,6 +530,7 @@ def mapDataSave(request):
     else:
         client_ids = Client.objects.all()
         params['client_ids'] = client_ids
+        
     params['shiftObj'] = shiftObj
     return render(request, 'Trip_details/DriverShift/clientForm.html', params)
 
@@ -525,14 +542,13 @@ def clientAndTruckDataSave(request, id):
     clientTruckNum = truckNum[1]
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentTime = datetime.now(tz=currentTimezone).time()
+    currentDateTime = getCurrentDateTimeObj()
     
     tripObj = DriverShiftTrip.objects.filter(shiftId=id, clientId=clientObj.clientId, truckConnectionId=truckConnectionObj.id).first()
     if not tripObj:
         tripObj = DriverShiftTrip()
     tripObj.shiftId = id
-    tripObj.startTime = currentTime
+    tripObj.startDateTime = currentDateTime
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
@@ -576,16 +592,23 @@ def DriverPreStartSave(request, tripId):
     preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
     preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStartObj.id)
     driverObj = Driver.objects.filter(name=request.user.username).first()
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDateTime = datetime.now(tz=currentTimezone)
+    currentDateTime = getCurrentDateTimeObj()
+    currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
+    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    for trip in currentTrips:
+        trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
+        trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
 
     driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
     params = {
         'tripObj' : tripObj,
+        'currentTrips' : currentTrips,
         'shiftObj' : shiftObj,
         'clientObj' : truckConnectionObj.clientId,
-        'truckObj' : truckConnectionObj
+        'truckObj' : truckConnectionObj,
+        'breaks' : breaks
     }
+    msg = None
     if not driverPreStartObj:
         driverPreStartObj = DriverPreStart()
         driverPreStartObj.shiftId = shiftObj
@@ -629,11 +652,138 @@ def DriverPreStartSave(request, tripId):
                 answerObj.answerFile = f'{path}/{newFileName}'
                 answerObj.comment = queComment        
             answerObj.save()
-            messages.success(request, "Pre-start successfully filled, you can start your shift.")
+            if not msg: 
+                msg = "Pre-start successfully filled, you can start your shift."
 
+    if msg:
+        messages.success(request, msg)
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
 
+def addDriverBreak(request, shiftId, tripId):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    truckNo = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first().clientTruckId
+    clientName = Client.objects.filter(pk=tripObj.clientId).first().name
+    params = {
+        'shiftObj' : shiftObj,
+        'tripObj' : tripObj,
+        'truckNo' : truckNo,
+        'clientName' : clientName
+    }
+    return render(request, 'Trip_details/DriverShift/addBreak.html', params)
+
+@csrf_protect
+def saveDriverBreak(request, shiftId, tripId):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    driverId = Driver.objects.filter(name=request.user.username).first()
+    breakObj = DriverBreak()
+    breakObj.shiftId = shiftObj
+    breakObj.tripId = tripObj
+    breakObj.driverId = driverId
+    breakObj.startDateTime = request.POST.get('startDateTime') 
+    breakObj.endDateTime = request.POST.get('endDateTime')
+    breakObj.location = request.POST.get('curLocation')
+    breakObj.description = request.POST.get('description')
+
+    breakFile = request.FILES.get('breakFile')
+    if breakFile:
+        curTimeStr = getCurrentTimeInString()
+        path = 'static/img/breakFiles'
+        fileName = breakFile.name
+        newFileName = 'break-file' + curTimeStr + '!_@' + fileName
+        pfs = FileSystemStorage(location=path)
+        pfs.save(newFileName, breakFile)
+        breakObj.breakFile = f'{path}/{newFileName}'
+    
+    breakObj.save()
+    return redirect('Account:DriverPreStartSave', tripId)
+    
+    
+def collectDockets(request, shiftId, tripId, endShift=None):
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+
+    params = {
+        'docket' : 1 if clientObj.docketGiven else 0,
+        'shiftId' : shiftId,
+        'tripId' : tripId,
+        'endShift': endShift
+    }
+    return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
+
+@csrf_protect
+def collectedDocketSave(request,  shiftId, tripId, endShift):
+    curTimeStr = getCurrentTimeInString()
+    currentDateTime = getCurrentDateTimeObj()
+    docketPath = 'static/img/docketFiles'
+    loadPath = 'static/img/finalloadSheet'
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+
+    loadSheetFile = request.FILES.get('loadSheet')
+    noOfLoads = int(request.POST.get('noOfLoads'))
+    tripObj.numberOfLoads = noOfLoads
+    tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
+    tripObj.endDateTime = currentDateTime
+    
+    if loadSheetFile:
+        fileName = loadSheetFile.name
+        newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
+        pfs = FileSystemStorage(location=loadPath)
+        pfs.save(newFileName, loadSheetFile)
+        tripObj.loadSheet = f'{loadPath}/{newFileName}'
+    
+    if not clientObj.docketGiven:
+        for load in range(1,noOfLoads+1):
+            docketObj = DriverShiftDocket()
+            docketObj.tripId = tripObj.id
+            docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+            docketObj.comment = request.POST.get(f'comment{load}')
+            docketFile = request.FILES.get(f'docketFile{load}')
+            
+            print(tripObj.id,request.POST.get(f'docketNumber{load}'),request.POST.get(f'comment{load}'))
+            if docketFile:
+                fileName = loadSheetFile.name
+                newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
+                pfs = FileSystemStorage(location=docketPath)
+                pfs.save(newFileName, loadSheetFile)
+                docketObj.docketFile = f'{docketPath}/{newFileName}'
+            docketObj.save()
+    else:
+        for load in range(1,noOfLoads+1):
+            noOfKm = request.POST.get(f'noOfKm{load}')
+            transferKm = request.POST.get(f'transferKm{load}')  
+            waitingTimeStart = formatDateTimeForDBSave(request.POST.get(f'waitingTimeStart{load}'))
+            waitingTimeEnd = formatDateTimeForDBSave(request.POST.get(f'waitingTimeEnd{load}'))
+            standByTimeStart = formatDateTimeForDBSave(request.POST.get(f'standByTimeStart{load}'))
+            standByTimeEnd = formatDateTimeForDBSave(request.POST.get(f'standByTimeEnd{load}'))
+            
+            docketObj = DriverShiftDocket()
+            docketObj.tripId = tripObj.id
+            docketObj.noOfKm = noOfKm if noOfKm else 0
+            docketObj.transferKM = transferKm if transferKm else 0
+            
+            docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
+            docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
+            docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+            docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
+            docketObj.save()
+    
+    tripObj.save()  
+    if endShift == 1:
+        shiftObj.endDateTime = currentDateTime
+        shiftObj.save()  
+        messages.success(request, "Shift completed successfully.")
+        return redirect('index')
+    else:
+        
+        return redirect('Account:recurringTrip', 1)
+    
+    
 @csrf_protect
 @api_view(['POST'])
 def getTrucks(request):
@@ -1675,10 +1825,8 @@ def reconciliationEscalationForm(request,id):
     docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
     if docketObj:
         docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
-
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDate = datetime.now(tz=currentTimezone).date()
-    
+        
+    currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
     escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
 
@@ -1691,13 +1839,11 @@ def reconciliationEscalationForm(request,id):
         escalationObj.docketDate = reconciliationObj.docketDate
         escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
         escalationObj.save()
-        
-    
+
     params = {
         'escalationObj' : escalationObj,
         'docketObj' : docketObj
     }
-    
     return render(request, 'Reconciliation/escalation-form.html',params)
 
 @csrf_protect
@@ -1761,10 +1907,9 @@ def reconciliationEscalationMailAdd(request, id):
     mailSubject = request.POST.get('mailSubject')
     mailDescription = request.POST.get('mailDescription')
     mailType = request.POST.get('mailType')
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDate = datetime.now(tz=currentTimezone).date()
-    oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
     
+    currentDate = getCurrentDateTimeObj().date()
+    oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
     
     escalationMailObj = EscalationMail()
     escalationMailObj.escalationId = escalationObj
