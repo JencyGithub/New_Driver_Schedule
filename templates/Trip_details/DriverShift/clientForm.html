@@ -25,7 +25,7 @@
 <div class="container mt-2" id="container">
     <div class="card border-0">
         <div class="card-body">
-            <h5 class="card-title text-uppercase text-default">Start Shift</h5>
+            <h5 class="card-title text-uppercase text-default">Select client and truck number</h5>
             <hr>  
             <form action="{% url 'Account:clientAndTruckDataSave' id=shiftObj.id %}" method="POST" id="clientForm">
                 {% csrf_token %}

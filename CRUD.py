@@ -4,6 +4,7 @@ from Appointment_app.models import *
 from datetime import datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User , Group
+import pytz
 
 
 def dateConverterFromTableToPageFormate(date):
@@ -152,6 +153,14 @@ def holcimDateConvertStr(str_):
     return val_
 
 
+def getCurrentDateTimeObj():
+    currentTimezone = pytz.timezone('Asia/Kolkata')
+    currentDateTime = datetime.now(tz=currentTimezone)
+    return currentDateTime
 
-    
-    
+def formatDateTimeForDBSave(dateTimeStr):
+    if dateTimeStr:
+        dateTimeStr = datetime.strptime(dateTimeStr, "%Y-%m-%dT%H:%M")  
+    else:
+        dateTimeStr = None
+    return dateTimeStr

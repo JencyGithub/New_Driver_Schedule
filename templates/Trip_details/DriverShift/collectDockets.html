@@ -1,0 +1,226 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Collect dockets{% endblock %}
+
+{% block headStyle %}
+    <style>
+        label{
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-2" id="container">
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12 col-12">
+                    <form action="{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripId endShift=endShift %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="card-title text-uppercase text-default">Add Trip Details</h5>
+                                <hr>
+                            </div>
+                            <div class="col-md-4 col-12 my-1">
+                                <label for="loadSheet">Load sheet:</label>
+                                <input type="file" name="loadSheet" id="loadSheet" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 col-12 my-1">
+                                <label for="noOfLoads">Number of loads:</label>
+                                <input type="number" name="noOfLoads" id="noOfLoads" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 col-12 my-1 d-flex align-items-center">
+                                <div class="form-check">
+                                    <input type="checkbox" name="dispute" id="dispute" value="dispute" class="form-check-input">
+                                    <label for="dispute" class="form-check-label">Dispute</label>
+                                </div>  
+                            </div>
+                            <div class="col-12 my-1">
+                                <label for="comment">Comment:</label>
+                                <textarea name="comment" id="comment" rows="2" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <span class="btn btn-sm btn-default float-end mt-2" id="uploadLoads" onclick="addDocketFiles(this, {{docket}})">Upload Loads</span>
+                        <hr class="d-none">
+                        <div id="loadsContainer">
+                            <!-- Loads appending here -->
+                            <!-- <div class="row border rounded-2 py-2 bg-light my-2">
+                                <div class="col-md-3 col-12 my-1">
+                                    <div class="d-flex justify-content-between">
+                                        <label for="waitingTimeStart1">Waiting time start:</label>
+                                        <input type="checkbox" name="waitingTimeActive" id="waitingTimeActive" onclick="changeStatus('waitingTimeStart1','waitingTimeEnd1')">
+                                    </div>
+                                    <input type="datetime-local" name="waitingTimeStart1" id="waitingTimeStart1" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-3 col-12 my-1">
+                                    <label for="waitingTimeEnd1">Waiting time end:</label>
+                                    <input type="datetime-local" name="waitingTimeEnd1" id="waitingTimeEnd1" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-3 col-12 my-1">
+                                    <div class="d-flex justify-content-between">
+                                        <label for="standByTimeStart1">Stand by start:</label>
+                                        <input type="checkbox" name="waitingTimeActive" id="waitingTimeActive" onclick="changeStatus('standByTimeStart1','standByTimeEnd1')">
+                                    </div>
+                                    <input type="datetime-local" name="standByTimeStart1" id="standByTimeStart1" class="form-control" readonly>
+                                </div>
+                                    <div class="col-md-3 col-12 my-1">
+                                    <label for="standByTimeEnd1">Stand by end:</label>
+                                <input type="datetime-local" name="standByTimeEnd1" id="standByTimeEnd1" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-4 col-12 my-1">
+                                    <div class="d-flex justify-content-between">
+                                        <label for="transferKm1">Transfer km:</label>
+                                        <input type="checkbox" name="waitingTimeActive" id="waitingTimeActive" onclick="changeStatus('transferKm1',null)">
+                                    </div>
+                                    <input type="number" name="transferKm1" id="transferKm1" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-8 col-12 my-1">
+                                    <label for="comment1">Comment 1:</label>
+                                    <textarea type="text" name="comment1" id="comment1" class="form-control" rows="1"></textarea>
+                                </div>
+                            </div> -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script>
+    function changeStatus(startId, endId = null) {
+        const startInput = $(`#${startId}`);
+        const endInput = $(`#${endId}`);
+        if (startInput.prop("readonly")) {
+            startInput.removeAttr("readonly");
+            if (endId) {
+                endInput.removeAttr("readonly");
+            }
+        } else {
+            startInput.prop("readonly", true);
+            startInput.val('');
+            if (endId) {
+                endInput.prop("readonly", true);
+                endInput.val('');
+            }
+        }
+    }
+    
+    function checkFields(){
+        let loadSheet = $('input[name="loadSheet"]').val()
+        let noOfLoads = $('input[name="noOfLoads"]').val()
+
+        if(loadSheet.trim() !== "" && noOfLoads.trim() !== ""){
+            return true
+        }else{
+            alert('Please fill in all the required fields before proceeding')
+            return false
+        }
+    }
+
+    function docketAdd(count){
+        let docketContent = ''
+        for (let i = 1; i <= count.val(); i++) {
+            docketContent += `<div class="row border rounded-2 py-2 bg-light my-2">`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="docketNumber${i}">Docket number:</label>`
+            docketContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`
+            docketContent += `</div>`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="docketFile${i}">Docket File:</label>`
+            docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required>`
+            docketContent += `</div>`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
+            docketContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`
+            docketContent += `</div>`
+            docketContent += `</div>`
+        }
+        return docketContent
+    }
+
+    function detailsAdd(count){
+        let detailsContent = '';
+        for (let i = 1; i <= count.val(); i++) {
+            detailsContent += `<div class="row border rounded-2 py-2 bg-light my-2">`;
+            
+            // Waiting Time Start
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<div class="d-flex justify-content-between">`;
+            detailsContent += `<label for="waitingTimeStart${i}">Waiting time start:</label>`;
+            detailsContent += `<input type="checkbox" name="waitingTimeActive${i}" id="waitingTimeActive${i}" onclick="changeStatus('waitingTimeStart${i}','waitingTimeEnd${i}')">`;
+            detailsContent += `</div>`;
+            detailsContent += `<input type="datetime-local" name="waitingTimeStart${i}" id="waitingTimeStart${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+
+            // Waiting Time End
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<label for="waitingTimeEnd${i}">Waiting time end:</label>`;
+            detailsContent += `<input type="datetime-local" name="waitingTimeEnd${i}" id="waitingTimeEnd${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+
+            // Stand By Time Start
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<div class="d-flex justify-content-between">`;
+            detailsContent += `<label for="standByTimeStart${i}">Stand by start:</label>`;
+            detailsContent += `<input type="checkbox" name="standByTimeActive${i}" id="standByTimeActive${i}" onclick="changeStatus('standByTimeStart${i}','standByTimeEnd${i}')">`;
+            detailsContent += `</div>`;
+            detailsContent += `<input type="datetime-local" name="standByTimeStart${i}" id="standByTimeStart${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+
+            // Stand By Time End
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<label for="standByTimeEnd${i}">Stand by end:</label>`;
+            detailsContent += `<input type="datetime-local" name="standByTimeEnd${i}" id="standByTimeEnd${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+
+            // Transfer Km
+            detailsContent += `<div class="col-md-4 col-12 my-1">`;
+            detailsContent += `<div class="d-flex justify-content-between">`;
+            detailsContent += `<label for="transferKm${i}">Transfer km:</label>`;
+            detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
+            detailsContent += `</div>`;
+            detailsContent += `<input type="number" name="transferKm${i}" id="transferKm${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+
+            // Comment
+            detailsContent += `<div class="col-md-8 col-12 my-1">`;
+            detailsContent += `<label for="comment${i}">Comment ${i}:</label>`;
+            detailsContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`;
+            detailsContent += `</div>`;
+
+            detailsContent += `</div>`;
+        }
+        return detailsContent;
+
+    }
+
+    function addDocketFiles(data, gotDocket){
+        if(checkFields()){
+
+            let noOfLoads = $('input[name="noOfLoads"]')
+            if(gotDocket == 0){
+                $('#loadsContainer').append(docketAdd(noOfLoads));
+            }else{
+                $('#loadsContainer').append(detailsAdd(noOfLoads));
+            }
+
+            let submitBtnText = ''
+            submitBtnText += `<div class="row mt-2">`
+            submitBtnText += `<div class="col-md-12 p-0">`
+            submitBtnText += `<button type="submit" class="btn btn-sm btn-default mx-auto mt-3 float-end">Submit</button>`
+            submitBtnText += `</div>`
+            submitBtnText += `</div>`
+            $('#loadsContainer').append(submitBtnText);
+            $('hr.d-none').removeClass('d-none');
+            $(`#${data.id}`).addClass('d-none')
+            $(noOfLoads).attr('readonly', true)
+        }
+    }
+</script>
+{% endblock %}

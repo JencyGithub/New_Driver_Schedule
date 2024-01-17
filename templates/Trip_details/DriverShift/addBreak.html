@@ -1,0 +1,74 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Add break{% endblock %}
+
+{% block headStyle %}
+    <style>
+        label{
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-2" id="container">
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-1 col-12"></div>
+                <div class="col-md-10 col-12">
+                    <form action="{% url 'Account:saveDriverBreak' shiftId=shiftObj.id tripId=tripObj.id  %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-between flex-wrap">
+                                <h5 class="card-title text-uppercase text-default ">Add Break</h5>
+                                <span class="text-secondary">Your are adding break for <b class="text-uppercase">{{ clientName}} / {{truckNo}} </b></span>
+                            </div>
+                            <hr>
+                            <div class="col-md-6 col-12 my-1">
+                                <label for="startDateTime">Start break time:</label>
+                                <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 col-12 my-1">
+                                <label for="endDateTime">End break time:</label>
+                                <input type="datetime-local" name="endDateTime" id="endDateTime" class="form-control" readonly required>
+                            </div>
+                            <div class="col-md-8 col-12 my-1">
+                                <label for="curLocation">Your current location:</label>
+                                <input type="text" name="curLocation" id="curLocation" class="form-control">
+                            </div>
+                            <div class="col-md-4 col-12 my-1">
+                                <label for="breakFile">Upload break file:</label>
+                                <input type="file" name="breakFile" id="breakFile" class="form-control">
+                            </div>
+                            <div class="col-12 my-1">
+                                <label for="description">Description:</label>
+                                <textarea name="description" id="description" rows="2" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-default float-end mt-2">Submit</button>
+                    </form>
+                </div>
+                <div class="col-md-1 col-12"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script>
+    $(document).ready(function() {
+        var currentDateTime = new Date().toISOString().slice(0, 16);
+
+        // Set the value of the datetime-local input
+        $('#startDateTime').prop("max", currentDateTime);
+        $('#startDateTime').on('change', function() {
+            var startDateTimeValue = $(this).val();
+    
+            // Set the max attribute for the endDateTime input
+            $('#endDateTime').attr('min', startDateTimeValue).removeAttr('readonly');
+        });
+    });
+</script>
+{% endblock %}
