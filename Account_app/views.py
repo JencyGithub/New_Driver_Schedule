@@ -2803,15 +2803,19 @@ def EscalationTable(request):
     }
     return render(request,'Account/Tables/escalationTable.html' , params)
 def EscalationForm(request ,id = None):
+    escalationDocketObj = None
     escalationObj  = None
     clientNames = Client.objects.all()
     if id:
-        escalationObj  = Escalation.objects.filter(pk = id).first()
-        escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
+        escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
+        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+        escalationDocketObj.docketDate = dateConverterFromTableToPageFormate(escalationDocketObj.docketDate)
+
 
     params ={
         'escalationObj':escalationObj,
         'clientNames':clientNames,
+        'escalationDocketObj':escalationDocketObj
     }
     return render(request , 'Account/manuallyEscalationForm1.html' , params)
 
@@ -2820,26 +2824,31 @@ def manuallyEscalationForm1Save(request):
     docketNumber = request.POST.get('docketNumber')
     docketDate = request.POST.get('docketDate')
     invoiceFile = request.FILES.get('invoiceFile')
-    # return HttpResponse(invoiceFile)
     clientNameId = request.POST.get('clientName')
+    escalationAmount = request.POST.get('escalationAmount')
+    escalationType = request.POST.get('escalation')
     escalationDocketObj = EscalationDocket.objects.filter(docketNumber = docketNumber , docketDate= docketDate).first()
     if escalationDocketObj:
-        messages.error(request, "Escalation Already Exists.")
-        return redirect(request.META.get('HTTP_REFERER'))
+        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+        return redirect('Account:manuallyEscalationForm2View',escalationDocketObj.id)
     
     currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(clientId=clientNameId).first()
     
     escalationObj = Escalation()
+    
     escalationObj.userId = request.user
     escalationObj.escalationDate = currentDate
     escalationObj.clientName = clientObj
     escalationObj.escalationStep = 1
+    escalationObj.escalationAmount = escalationAmount
+    escalationObj.escalationType = escalationType
     escalationObj.save()
-    
     escalationDocketObj = EscalationDocket()
+
     escalationDocketObj.docketNumber = docketNumber
     escalationDocketObj.docketDate = docketDate
+    escalationDocketObj.amount = escalationAmount
     escalationDocketObj.escalationId = escalationObj
     if invoiceFile:
         time = getCurrentTimeInString()
@@ -2855,44 +2864,71 @@ def manuallyEscalationForm1Save(request):
             
         escalationDocketObj.invoiceFile = f'static/Account/manuallyEscalation/{convertedFileName}'
         escalationDocketObj.save()
-    params = {
-        'escalationDocketObj':escalationDocketObj
-    }
+
     messages.success(request, "Escalation Entry Successfully.")
     return redirect('Account:manuallyEscalationForm2View',escalationDocketObj.id)
     
 
 def manuallyEscalationForm2View(request ,id):
-    params = {
-        'escalationDocketObjId':id
+    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
+    # return HttpResponse(escalationDocketObj)
+    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+    params ={
+        'escalationDocketObj':escalationDocketObj,
+        'escalationObj':escalationObj
     }
     return render(request , 'Account/manuallyEscalationForm2.html' , params)
     
 @csrf_protect
 def manuallyEscalationForm2Save(request,id):
-    escalationAmount = request.POST.get('escalationAmount')
-    escalationType = request.POST.get('escalation')
-    escalationDocketRemark = request.POST.get('remark')
-        
-    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-    escalationDocketObj.amount = escalationAmount
-    escalationDocketObj.remark = escalationDocketRemark
-    escalationDocketObj.save()
     
+    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
     escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-    if escalationType == 'internal':
-        escalationObj.escalationType = 'Internal'
-    elif escalationType == 'external':
-        escalationObj.escalationType = 'External'
-    escalationObj.escalationAmount = escalationAmount
+    if escalationDocketObj:
+        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+        if escalationObj.escalationStep > 2:
+            return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id) 
+    escalationRemark = request.POST.get('remark')
+    escalationObj.remark = escalationRemark
+    escalationObj.escalationStep = 2
+    
     escalationObj.save()
+    # return HttpResponse(escalationRemark)
     messages.success(request, " Saved successfully.")
     return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id)
 
 
 def manuallyEscalationForm3View(request,id):
-    return HttpResponse(id)
+    # return HttpResponse('here')
+    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
+    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+    if escalationObj.escalationStep <= 2: 
+        escalationObj.escalationStep = 3
+        escalationObj.save()
     
+    params ={
+        'escalationDocketObj':escalationDocketObj,
+        'escalationObj':escalationObj
+    }
+    return render(request,'Account/manuallyEscalationForm3.html' , params)
+
+@csrf_protect
+def manuallyEscalationForm3Save(request,id):
+    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
+    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+    if escalationDocketObj:
+        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
+        # return HttpResponse(escalationObj.escalationStep)
+        if escalationObj.escalationStep > 3:
+            return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id) 
+    escalationObj.escalationStep = 4
+    escalationObj.save()
+    # return HttpResponse(escalationObj.escalationStep)
+    messages.success(request, " Saved successfully.")
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+@csrf_protect
 def manuallyEscalationMailAdd(request,id):
     escalationObj = Escalation.objects.filter(pk=id).first()
     mailTo = request.POST.get('mailTo')

@@ -27,16 +27,8 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0)" class="disabled" isdone="1" rel="2">
+                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="2">
                                     <span class="step_no">2</span>
-                                    <span class="step_descr">
-                                        <br>
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="3">
-                                    <span class="step_no">3</span>
                                     <span class="step_descr">
                                         <br>
                                     </span>
@@ -59,7 +51,7 @@
                                     for="docketNumber">Docket number <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <input class="form-control"    type="number"
+                                    <input class="form-control" {% if escalationDocketObj %} readonly {% endif %}   type="number" value="{{escalationDocketObj.docketNumber}}"
                                             name="docketNumber" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="docketNumber">
                                 </div>
@@ -69,7 +61,7 @@
                                     for="docketDate">Docket date <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <input class="form-control"   type="date"  
+                                    <input class="form-control" {% if escalationDocketObj %} readonly {% endif %}  value="{{escalationDocketObj.docketDate}}"   type="date"  
                                             name="docketDate" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="docketDate">
                                 </div>
@@ -80,7 +72,7 @@
                                 <label for="clientName"
                                     class="col-form-label col-md-3 col-sm-3  label-align">Client name</label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <select class="form-control"   required id="clientName"  name="clientName">
+                                    <select class="form-control" {% if escalationDocketObj %} readonly {% endif %}    required id="clientName"  name="clientName">
                                         <option value="" disabled selected>Select Client Name</option>
                                         {% for clientName in clientNames %}
                                         {% if escalationObj %}
@@ -99,14 +91,42 @@
                                     for="invoiceFile">Invoice File <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
+                                    {% if escalationDocketObj.invoiceFile %}
+                                    <a href="/{{escalationDocketObj.invoiceFile}}" class="d-inline-block mt-2 text-primary" target="_blanck">Docket image here</a>
+
+                                    {% else %}
+                                    
                                     <input class="form-control"   type="file"   
                                             name="invoiceFile" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="invoiceFile">
+                                    {% endif %}
+                                    
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-3 col-sm-3 label-align"
+                                    for="escalationAmount">Escalation Amount <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <input class="form-control" {% if escalationObj.escalationAmount != None %} disabled {% endif %} value="{{escalationObj.escalationAmount}}"   type="number"   
+                                            name="escalationAmount" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="escalationAmount">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="clientName"
+                                    class="col-form-label col-md-3 col-sm-3  label-align">Escalation Type</label>
+                                <div class="col-md-6 col-sm-6 ">
+                                    <select class="form-control"  {% if escalationObj.escalationType == 'External' or  escalationObj.escalationType == 'Internal'  %}  disabled {% endif %} required id="escalation"  name="escalation">
+                                        <option value="" disabled selected>Select Escalation Type</option>
+                                        <option value="External" {% if escalationObj.escalationType == 'External' %} selected {% endif %}  >External</option>
+                                        <option value="Internal" {% if escalationObj.escalationType == 'Internal' %} selected {% endif %} >Internal</option>
+                                        
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="float-right">
-                                <button type="reset" class="buttonPrevious btn btn-primary">Reset</button>
                                 <button type="submit" class="buttonNext btn btn-success">Next</button>
                             </div>
 

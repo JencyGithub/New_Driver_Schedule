@@ -467,11 +467,10 @@ class ReconciliationReport(models.Model):
 # Escalation Mail section
 # -----------------------------------
 class Escalation(models.Model):
-    escalationType = [('External', 'External'),('Internal', 'Internal'),]
     
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
-    escalationType = models.CharField(max_length=20,choices=escalationType, default='External')
+    escalationType = models.CharField(max_length=20 , default='')
     remark = models.CharField(max_length=1024, default='')
     clientName = models.ForeignKey(Client, on_delete=models.CASCADE, default=None)
     
