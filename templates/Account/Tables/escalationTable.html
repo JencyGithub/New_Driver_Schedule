@@ -66,9 +66,9 @@
                         <td>{{ data.escalationDate }}</td>
                         <td>{{ data.escalationAmount }}</td>
                         <td>
-                          <a href="{% url 'Account:EscalationFormView' id=data.id %}" title="update">
+                          {% comment %} <a href="{% url 'Account:EscalationFormView' id=data.id %}" title="update">
                             <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                          </a>
+                          </a> {% endcomment %}
                       </td>
                       </tr>
                       {% endfor %}

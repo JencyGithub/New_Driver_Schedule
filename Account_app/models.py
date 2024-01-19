@@ -468,9 +468,6 @@ class ReconciliationReport(models.Model):
 # -----------------------------------
 class Escalation(models.Model):
     escalationType = [('External', 'External'),('Internal', 'Internal'),]
-    
-    docketNumber = models.CharField(max_length=10, default=None)
-    docketDate = models.DateField(default=None, null=True)
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
     escalationType = models.CharField(max_length=20,choices=escalationType, default='External')
@@ -484,6 +481,19 @@ class Escalation(models.Model):
     
     def __str__(self) -> str:
         return str(self.docketNumber) + ' ' + str(self.escalationType)
+    
+class EscalationDocket(models.Model):
+    
+    docketNumber = models.CharField(max_length=10, default=None)
+    docketDate = models.DateField(default=None, null=True)
+    escalationId = models.ForeignKey(Escalation, on_delete=models.CASCADE, default=None)
+    amount = models.IntegerField(default=0)
+    remark = models.CharField(max_length=1024, default='')
+    
+    def __str__(self) -> str:
+        return str(self.docketNumber) + ' ' + str(self.escalationType)
+    
+
     
     
 class EscalationMail(models.Model):

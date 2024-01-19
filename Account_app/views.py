@@ -881,18 +881,21 @@ def convertIntoFloat(str):
 @csrf_protect
 def rctiFormSave(request , errorId = None):
     # return HttpResponse(request.POST.get('clientName'))
+    RCTIobj = None
     RCTIobj = RCTI.objects.filter(docketNumber = request.POST.get('docketNumber'), docketDate = request.POST.get('docketDate')).first()
-    if RCTIobj != None:
+    if RCTIobj is None:
         RCTIobj = RCTI()
     rctiErrorObj = RctiErrors.objects.filter(pk=errorId).first()
     
     if rctiErrorObj:
         reportId = int(rctiErrorObj.data.split('@_!')[1])
-        RCTIobj.clientName = Client.objects.filter(name = rctiErrorObj.clientName).first()
+        clientObj= Client.objects.filter(name = rctiErrorObj.clientName).first()
+        RCTIobj.clientName =clientObj
         RCTIobj.rctiReport = RctiReport.objects.filter(pk=reportId).first()
         
     else:
-        RCTIobj.clientName = Client.objects.filter(pk = request.POST.get('clientName')).first()
+        clientObj = Client.objects.filter(pk = request.POST.get('clientName')).first()
+        RCTIobj.clientName =clientObj
         RCTIobj.rctiReport = RctiReport.objects.filter(pk=request.POST.get('rctiReport')).first()
         
     
@@ -1878,14 +1881,15 @@ def reconciliationSetMark(request):
 def reconciliationEscalationForm(request,id):
     
     reconciliationObj = ReconciliationReport.objects.filter(pk=id).first()
+    # for get docket  file purpose 
     docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
     if docketObj:
         docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
         
     currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
-    escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
-
+    escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber , docketDate = reconciliationObj.docketDate).first()
+    clientNames = Client.objects.all()
     if not escalationObj:
         escalationObj = Escalation()
         escalationObj.docketNumber = reconciliationObj.docketNumber
@@ -1895,10 +1899,11 @@ def reconciliationEscalationForm(request,id):
         escalationObj.docketDate = reconciliationObj.docketDate
         escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
         escalationObj.save()
-
+    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
     params = {
         'escalationObj' : escalationObj,
-        'docketObj' : docketObj
+        'docketObj' : docketObj,
+        'clientNames':clientNames
     }
     return render(request, 'Reconciliation/escalation-form.html',params)
 
@@ -1957,13 +1962,14 @@ def reconciliationEscalationForm3(request ,id):
 
 @csrf_protect
 def reconciliationEscalationMailAdd(request, id):
+    # return HttpResponse('here')
     escalationObj = Escalation.objects.filter(pk=id).first()
     mailTo = request.POST.get('mailTo')
     mailFrom = request.POST.get('mailFrom')
     mailSubject = request.POST.get('mailSubject')
     mailDescription = request.POST.get('mailDescription')
     mailType = request.POST.get('mailType')
-    
+    # return HttpResponse(mailType)
     currentDate = getCurrentDateTimeObj().date()
     oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
     
@@ -2013,7 +2019,7 @@ def reconciliationEscalationForm4(request ,id):
 @csrf_protect
 def reconciliationEscalationComplete(request, id):
     escalationObj = Escalation.objects.filter(pk=id).first()
-    # return HttpResponse(escalationObj.remark)
+    escalationObj.remark = request.POST.get('remark')
     escalationObj.escalationStep = 5
     escalationObj.save()
     
@@ -2798,15 +2804,110 @@ def EscalationTable(request):
     return render(request,'Account/Tables/escalationTable.html' , params)
 def EscalationForm(request ,id = None):
     escalationObj  = None
-    clientObj = Client.objects.all()
+    clientNames = Client.objects.all()
     if id:
         escalationObj  = Escalation.objects.filter(pk = id).first()
-        # escalationObj.docketDate = escalationObj.docketDate.strftime('%d-%m-%Y')
-        print(type(escalationObj.docketDate), escalationObj.docketDate)
-        # return HttpResponse(escalationObj.docketDate)
-        
+        escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
+
     params ={
         'escalationObj':escalationObj,
-        'clientObj':clientObj
+        'clientNames':clientNames,
     }
-    return render(request , 'Account/escalationForm.html' , params)
+    return render(request , 'Account/manuallyEscalationForm1.html' , params)
+
+@csrf_protect
+
+def manuallyEscalationForm1(request ,id = None):
+    params = {}
+    if id:
+        if escalationObj.escalationType == 'External':
+            escalationObj = Escalation.objects.filter(docketNumber  = docketNumber  ,docketDate = docketDate).first()
+            
+            oldMail = EscalationMail.objects.filter(escalationId=id).order_by('mailCount')
+            params['oldMail'] = oldMail
+            params['escalationObj'] = escalationObj
+            
+            return render(request , 'Account/manuallyEscalationForm2.html' , params)
+            
+    escalationObj = None
+    docketNumber = request.POST.get('docketNumber')
+    docketDate = request.POST.get('docketDate')
+    # return HttpResponse(docketDate)
+    clientNameId = request.POST.get('clientName')
+    escalationAmount = request.POST.get('escalationAmount')
+    escalationType = request.POST.get('escalation')
+    
+    currentDate = getCurrentDateTimeObj().date()
+    clientObj = Client.objects.filter(clientId=clientNameId).first()
+    escalationObj = Escalation.objects.filter(docketNumber  = docketNumber  ,docketDate = docketDate).first()
+    clientNames = Client.objects.all()
+    if not escalationObj:
+        escalationObj = Escalation()
+    escalationObj.docketNumber = docketNumber
+    escalationObj.docketDate = docketDate
+    escalationObj.userId = request.user
+    escalationObj.escalationDate = currentDate
+    escalationObj.clientName = clientObj
+    escalationObj.escalationAmount = escalationAmount
+    if escalationType == 'internal':
+        escalationObj.escalationType = 'Internal'
+    elif escalationType == 'external':
+        escalationObj.escalationType = 'External'
+    escalationObj.save()
+    
+    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
+    
+        
+    
+    params['escalationObj'] = escalationObj
+    params['clientNames'] = clientNames
+
+    # return HttpResponse(params)
+    return render(request , 'Account/manuallyEscalationForm2.html' , params)
+
+def manuallyEscalationForm1View(request,id):
+    params = {}
+    escalationObj = Escalation.objects.filter(pk  = id ).first()
+    clientNames = Client.objects.all()
+    
+    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
+    
+    params['escalationObj'] = escalationObj
+    params['clientNames'] = clientNames
+    return render(request , 'Account/manuallyEscalationForm1.html' , params)
+    
+def manuallyEscalationMailAdd(request,id):
+    escalationObj = Escalation.objects.filter(pk=id).first()
+    mailTo = request.POST.get('mailTo')
+    mailFrom = request.POST.get('mailFrom')
+    mailSubject = request.POST.get('mailSubject')
+    mailDescription = request.POST.get('mailDescription')
+    mailType = request.POST.get('mailType')
+    # return HttpResponse(mailType)
+    currentDate = getCurrentDateTimeObj().date()
+    oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
+    
+    escalationMailObj = EscalationMail()
+    escalationMailObj.escalationId = escalationObj
+    escalationMailObj.userId = request.user
+    escalationMailObj.mailTo = mailTo
+    escalationMailObj.mailFrom = mailFrom 
+    escalationMailObj.mailSubject = mailSubject
+    escalationMailObj.mailDescription = mailDescription
+    escalationMailObj.mailType = mailType
+    escalationMailObj.mailDate = currentDate
+    escalationMailObj.mailCount = oldMailCount + 1    
+
+    mailFile = request.FILES.get('mailAttechment')
+    if mailFile:
+        time = getCurrentTimeInString()
+        attachmentPath = 'static/img/mailAttachment'
+        fileName = mailFile.name
+        convertedFileName = time + '!_@' + fileName
+        pfs = FileSystemStorage(location=attachmentPath)
+        pfs.save(convertedFileName, mailFile)
+        escalationMailObj.mailAttachment = f'static/img/mailAttachment/{convertedFileName}'
+    
+    escalationMailObj.save()
+    messages.success(request, "Mail added successfully.")
+    return redirect(request.META.get('HTTP_REFERER'))

@@ -220,6 +220,10 @@ urlpatterns = [
     path('Escalation/Form', views.EscalationForm, name='EscalationForm'),
     path('Escalation/Table', views.EscalationTable, name='EscalationTable'),
     path('Escalation/Form/View/<int:id>', views.EscalationForm, name='EscalationFormView'),
+    path('Manually/Escalation/Form/Save/', views.manuallyEscalationForm1, name='manuallyEscalationForm1'),
+    path('Manually/Escalation/Form/Save/<int:id>', views.manuallyEscalationForm1, name='manuallyEscalationForm'),
+    path('Manually/Escalation/Form/View/<int:id>', views.manuallyEscalationForm1View, name='manuallyEscalationForm1View'),
+    path('Manually/Escalation/Mail/Add/<int:id>', views.manuallyEscalationMailAdd, name='manuallyEscalationMailAdd'),
     
 
 ]
