@@ -1,0 +1,165 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Escalation form {% endblock %}
+
+{% block content %}
+<div class="right_col">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 ">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Escalation form</h2>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <!-- Smart Wizard -->
+                    <div id="wizard" class="form_wizard wizard_horizontal">
+                        <ul class="wizard_steps anchor p-0">
+                            <li>
+                                <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
+                                    <span class="step_no">1</span>
+                                    <span class="step_descr">
+                                        <br>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="2">
+                                    <span class="step_no">2</span>
+                                    <span class="step_descr">
+                                        <br>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="3">
+                                    <span class="step_no">3</span>
+                                    <span class="step_descr">
+                                        <br>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <form action="{% url 'Account:createReconciliationEscalation' reconciliationIdStr=reconciliationIdStr clientName=currentClient %}" method="POST" class="form-horizontal form-label-left">
+                            {% csrf_token%}
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="float-right d-flex flex-wrap justify-content-end">
+                                        <div class="mx-1">
+                                            <input type="radio" id="internal" name="escalation" value="Internal" {% if escalationObj.escalationType == 'Internal' %}checked{% endif %} required>
+                                            <label for="internal">Internal Escalation</label>
+                                        </div>
+                                        <div class="mx-1">
+                                            <input type="radio" {% if escalationObj.escalationType == 'External' or escalationObj.escalationType == ''  %}checked{% endif %} name="escalation" value="External" id="external" required>
+                                            <label for="external" >External Escalation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="m-1">
+                            {% for docket in reconciliationDockets %}
+                            <div class="row">
+                                <div class="col-md-3 col-12">
+                                    <label class="col-form-label" for="docketNumber{{docket.id}}">Docket number
+                                        <span class="required">*</span></label>
+                                    <input type="number" id="docketNumber{{docket.id}}"
+                                        name="docketNumber{{docket.id}}" required="required" class="form-control"
+                                        value="{{docket.docketNumber}}" readonly>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <label class="col-form-label" for="docketDate{{docket.id}}">Docket date <span
+                                            class="required">*</span></label>
+                                    <input type="date" id="docketDate{{docket.id}}" name="docketDate{{docket.id}}"
+                                        required="required" class="form-control" readonly
+                                        value="{{docket.docketDate}}">
+                                </div>
+                                <div class="col-md-3 col-12">
+                                    <label for="clientName{{docket.id}}" class="col-form-label">Client name</label>
+                                    <select class="form-control" required id="clientName{{docket.id}}" disabled name="clientName{{docket.id}}">
+                                        <option value="" disabled selected>Select Client Name</option>
+                                        {% for clientName in clientNames %}
+                                        <option value="{{ clientName.clientId }}" {% if docket.clientName == clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2 col-12 d-flex">
+                                    <span style="cursor:pointer" class="align-self-center" onclick="getDifference({{docket.id}})">View Difference <i class="fa-solid fa-angle-right"></i></span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="float-right">
+                                <button type="submit" class="buttonNext btn btn-default">Next</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="costModal" tabindex="-1" role="dialog" aria-labelledby="costModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Difference: </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col">Cost</th>
+                                <th scope="col">Driver</th>
+                                <th scope="col">RCTI</th>
+                                <th scope="col">Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Content will come here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block footerStyleEnd %}
+<script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+    function getDifference(id) {
+        $.ajax({
+            type: "POST",
+            url: "/account/reconciliation/get/difference/",
+            data: {
+                reconciliationId: id,
+            },
+            dataType: "json",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                if (data.status) {
+                    let tableContent = ''
+                    $.each(data.params, function (key, value) {
+                        tableContent += `<tr>`
+                        tableContent += `<th scope="row" class="text-capitalize">${key}</th>`
+                        tableContent += `<td>${value[0]}</td>`
+                        tableContent += `<td>${value[1]}</td>`
+                        tableContent += `<td>${value[2]}</td>`
+                        tableContent += `</tr>`
+                    });
+                    $(".modal-body table tbody").empty().append(tableContent)
+                    $('#costModal').modal('show')
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

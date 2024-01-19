@@ -1878,98 +1878,162 @@ def reconciliationSetMark(request):
     
     return JsonResponse({'status': True})
 
-def reconciliationEscalationForm(request,id):
-    
-    reconciliationObj = ReconciliationReport.objects.filter(pk=id).first()
-    # for get docket  file purpose 
-    docketObj = DriverDocket.objects.filter(docketNumber=reconciliationObj.docketNumber).first()
-    if docketObj:
-        docketObj.docketDate = dateConverterFromTableToPageFormate(docketObj.docketDate)
-        
-    currentDate = getCurrentDateTimeObj().date()
-    clientObj = Client.objects.filter(name=reconciliationObj.clientName).first()
-    escalationObj = Escalation.objects.filter(docketNumber=reconciliationObj.docketNumber , docketDate = reconciliationObj.docketDate).first()
-    clientNames = Client.objects.all()
-    if not escalationObj:
-        escalationObj = Escalation()
-        escalationObj.docketNumber = reconciliationObj.docketNumber
-        escalationObj.userId = request.user
-        escalationObj.escalationDate = currentDate
-        escalationObj.clientName = clientObj
-        escalationObj.docketDate = reconciliationObj.docketDate
-        escalationObj.escalationAmount = reconciliationObj.driverTotalCost - reconciliationObj.rctiTotalCost
-        escalationObj.save()
-    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
-    params = {
-        'escalationObj' : escalationObj,
-        'docketObj' : docketObj,
-        'clientNames':clientNames
-    }
-    return render(request, 'Reconciliation/escalation-form.html',params)
-
 @csrf_protect
-def reconciliationEscalationForm2(request, id):
-    escalationObj = Escalation.objects.filter(pk=id).first()
-    reconciliationData = ReconciliationReport.objects.filter(docketNumber=escalationObj.docketNumber, docketDate=escalationObj.docketDate).first()
+@api_view(['POST'])
+def escalationClientCheck(request):
+    dockets = request.POST.getlist('dockets[]')
+    clientNames = set()
+    reconciliationId = []
+    available = True
+    msg = None
+    for docket in dockets:
+        getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
+        clientNames.add(getDocket.clientName)
+        existDocket = EscalationDocket.objects.filter(docketNumber=ReconciliationReport.docketNumber, docketDate=getDocket.docketDate).first()
+        reconciliationId.append(getDocket.id)
+        if getDocket.fromDriver == False:
+            msg = "Driver data missing from any docket."
+            available = False
+            break
+        elif getDocket.fromRcti == False:
+            msg = "RCTI data missing from any docket."
+            available = False
+            break
+        elif existDocket:
+            msg = "Docket is already escalate."
+            available = False
+            break
+        
+    return JsonResponse({'status':True, 'msg':msg,'clientName' : list(clientNames)[0] ,'reconciliationId': reconciliationId }) if len(clientNames) == 1 and available else JsonResponse({'status':False, 'msg':msg})
+
+def showReconciliationEscalation1(request, reconciliationId, clientName):
+    reconciliationList = reconciliationId.split(',')
+    reconciliationDockets = []
+    for i in reconciliationList:
+        obj = ReconciliationReport.objects.filter(pk=i).first()
+        obj.docketDate = dateConverterFromTableToPageFormate(obj.docketDate)
+        reconciliationDockets.append(obj)
+        
+    params = {
+        'currentClient' : clientName,
+        'reconciliationDockets' : reconciliationDockets,
+        'clientNames' : Client.objects.all(),
+        'reconciliationIdStr' : reconciliationId
+    }
+    return render(request, 'Reconciliation/escalation-form1.html', params)
+    
+@csrf_protect
+@api_view(['POST'])
+def getCostDifference(request):
+    reconciliationId = request.POST.get('reconciliationId')
+    print(reconciliationId)
+    params = {}
+    reconciliationData = ReconciliationReport.objects.filter(pk=reconciliationId).first()
 
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
+    if loadKmCostDifference != 0:
+        params['loadKmCostDifference'] = [reconciliationData.driverLoadAndKmCost, reconciliationData.rctiLoadAndKmCost, round(loadKmCostDifference,2)]
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
+    if surchargeCostDifference != 0:
+        params['surchargeCostDifference'] = [reconciliationData.driverSurchargeCost, reconciliationData.rctiSurchargeCost, round(surchargeCostDifference,2)]
     waitingTimeCostDifference= reconciliationData.driverWaitingTimeCost - reconciliationData.rctiWaitingTimeCost
+    if waitingTimeCostDifference != 0:
+        params['waitingTimeCostDifference'] = [reconciliationData.driverWaitingTimeCost, reconciliationData.rctiWaitingTimeCost, round(waitingTimeCostDifference,2)]
     transferKmCostDifference= reconciliationData.driverTransferKmCost - reconciliationData.rctiTransferKmCost
+    if transferKmCostDifference != 0:
+        params['transferKmCostDifference'] = [reconciliationData.driverTransferKmCost, reconciliationData.rctiTransferKmCost, round(transferKmCostDifference,2)]
     returnKmCostDifference= reconciliationData.driverReturnKmCost - reconciliationData.rctiReturnKmCost
+    if returnKmCostDifference != 0:
+        params['returnKmCostDifference'] = [reconciliationData.driverReturnKmCost, reconciliationData.rctiReturnKmCost, round(returnKmCostDifference,2)]
     otherCostDifference= reconciliationData.driverOtherCost - reconciliationData.rctiOtherCost
+    if otherCostDifference != 0:
+        params['otherCostDifference'] = [reconciliationData.driverOtherCost, reconciliationData.rctiOtherCost, round(otherCostDifference,2)]
     standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
+    if standByCostDifference != 0:
+        params['standByCostDifference'] = [reconciliationData.driverStandByCost, reconciliationData.rctiStandByCost, round(standByCostDifference,2)]
     loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
+    if loadDeficitDifference != 0:
+        params['loadDeficitDifference'] = [reconciliationData.driverLoadDeficit, reconciliationData.rctiLoadDeficit, loadDeficitDifference]
     totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
+    if totalCostDifference != 0:
+        params['totalCostDifference'] = [reconciliationData.driverTotalCost, reconciliationData.rctiTotalCost, round(totalCostDifference,2)]
+    
+    return JsonResponse({ 'status':True, 'params':params })
+    
+    
+@csrf_protect
+def createReconciliationEscalation(request, reconciliationIdStr, clientName):
+    escalationType = request.POST.get('escalation')
+    reconciliationList = reconciliationIdStr.split(',')
+    totalAmt = 0
+    escalationObj = Escalation()
+    escalationObj.userId = request.user
+    escalationObj.escalationDate = getCurrentDateTimeObj().date()
+    escalationObj.escalationType = escalationType
+    escalationObj.clientName = Client.objects.filter(name=clientName).first()
+    escalationObj.save()
 
-    if escalationObj.escalationStep < 2:
-        escalationObj.escalationStep = 2
-        escalationObj.save()
+    for rId in reconciliationList:
+        recObj = ReconciliationReport.objects.filter(pk=rId).first()
 
+        # Move to short paid or write-of 
+        
+        recObj.reconciliationType = 3 if escalationType == 'Internal' else 2
+        recObj.save()
+
+        driverDocketObj = DriverDocket.objects.filter(docketNumber=recObj.docketNumber, shiftDate=recObj.docketDate).first()
+        escalationDocketObj = EscalationDocket()
+        escalationDocketObj.docketNumber = recObj.docketNumber
+        escalationDocketObj.docketDate = recObj.docketDate
+        escalationDocketObj.escalationId = escalationObj
+        escalationDocketObj.amount = round(recObj.driverTotalCost - recObj.rctiTotalCost, 2)
+        escalationDocketObj.invoiceFile = driverDocketObj.docketFile
+        escalationDocketObj.save()
+        totalAmt += escalationDocketObj.amount
+
+    escalationObj.escalationAmount = totalAmt
+    escalationObj.save()
+    return redirect('Account:showReconciliationEscalation2', escalationObj.id)
+
+
+def showReconciliationEscalation2(request, escalationId):
+    escalationObj = Escalation.objects.filter(pk=escalationId).first()
+    oldMail = EscalationMail.objects.filter(escalationId=escalationObj)
+    
     params = {
-        'escalationObj':escalationObj,
-        'data': reconciliationData,
-        'loadKmCostDifference':round(loadKmCostDifference,2),
-        'surchargeCostDifference':round(surchargeCostDifference,2),
-        'waitingTimeCostDifference':round(waitingTimeCostDifference,2),
-        'transferKmCostDifference':round(transferKmCostDifference,2),
-        'returnKmCostDifference':round(returnKmCostDifference,2),
-        'otherCostDifference':round(otherCostDifference,2),
-        'standByCostDifference':round(standByCostDifference,2),
-        'loadDeficitDifference':round(loadDeficitDifference,2),
-        'totalCostDifference':round(totalCostDifference,2),
+        'oldMail' : oldMail,
+        'escalationObj' : escalationObj
     }
-    return render(request, 'Reconciliation/escalation-form2.html',params)
+    return render(request, 'Reconciliation/escalation-form2.html', params)
+
 
 @csrf_protect
 def reconciliationEscalationForm3(request ,id):
-    params = {}
     escalationObj = Escalation.objects.filter(pk=id).first()
-    escalationObj.escalationStep = 3
-    if request.POST.get('escalation') == 'internal':
-        escalationObj.escalationType = 'Internal'
-    elif request.POST.get('escalation') == 'external':
-        escalationObj.escalationType = 'External'
-    escalationObj.save()
-    
-    if escalationObj.escalationType == 'External':
-        oldMail = EscalationMail.objects.filter(escalationId=escalationObj).order_by('mailCount')
-        params['oldMail'] = oldMail
+
+    remark = request.POST.get('remark')
+    if remark:
+        escalationObj.remark = remark
         
-    params['escalationObj']=escalationObj
-    
+    if escalationObj.escalationStep <= 2:
+        escalationObj.escalationStep = 2
+        
+    escalationObj.save()
+    params = {
+        'escalationObj':escalationObj
+    }
     return render(request, 'Reconciliation/escalation-form3.html',params)
+    
 
 @csrf_protect
 def reconciliationEscalationMailAdd(request, id):
-    # return HttpResponse('here')
     escalationObj = Escalation.objects.filter(pk=id).first()
     mailTo = request.POST.get('mailTo')
     mailFrom = request.POST.get('mailFrom')
     mailSubject = request.POST.get('mailSubject')
     mailDescription = request.POST.get('mailDescription')
     mailType = request.POST.get('mailType')
-    # return HttpResponse(mailType)
+   
     currentDate = getCurrentDateTimeObj().date()
     oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
     
@@ -1995,42 +2059,26 @@ def reconciliationEscalationMailAdd(request, id):
         escalationMailObj.mailAttachment = f'static/img/mailAttachment/{convertedFileName}'
     
     escalationMailObj.save()
+    
     messages.success(request, "Mail added successfully.")
     return redirect(request.META.get('HTTP_REFERER'))
 
-@csrf_protect
-def reconciliationEscalationForm4(request ,id):
-    escalationObj = Escalation.objects.filter(pk=id).first()
 
-    remark = request.POST.get('remark')
-    if remark:
-        escalationObj.remark = remark
-        
-    if escalationObj.escalationStep <= 4:
-        escalationObj.escalationStep = 4
-        
-    escalationObj.save()
-    params = {
-        'escalationObj':escalationObj
-    }
-    return render(request, 'Reconciliation/escalation-form4.html',params)
-    
-    
 @csrf_protect
 def reconciliationEscalationComplete(request, id):
     escalationObj = Escalation.objects.filter(pk=id).first()
-    escalationObj.remark = request.POST.get('remark')
-    escalationObj.escalationStep = 5
+    if request.POST.get('remark'):
+        escalationObj.remark = request.POST.get('remark')
+        
+    escalationObj.escalationStep = 4
     escalationObj.save()
-    
-    # set short paid 
-    reconciliationData = ReconciliationReport.objects.filter(docketNumber=escalationObj.docketNumber, docketDate=escalationObj.docketDate).first()
-    reconciliationData.reconciliationType = 1
-    reconciliationData.save()
-    
+        
     messages.success(request, "Escalation completed successfully.")
-    return redirect(request.META.get('HTTP_REFERER'))
+    # return redirect(request.META.get('HTTP_REFERER'))
+    return redirect('Account:index')
     
+    
+
 # ```````````````````````````````````
 # Public holiday
 # ```````````````````````````````````
@@ -2052,6 +2100,7 @@ def publicHolidayForm(request, id=None):
         'data': data
     }
     return render(request, 'Account/PublicHolidayForm.html', params)
+
 
 
 @csrf_protect

@@ -482,16 +482,11 @@ admin.site.register(AppointmentDriver)
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
 
-admin.site.register(Escalation)
-admin.site.register(EscalationMail)
-
-
 admin.site.register(DriverShift)
 admin.site.register(DriverShiftTrip)
 admin.site.register(DriverShiftDocket)
 
 admin.site.register(DriverBreak)
-admin.site.register(EscalationDocket)
 
 
 
@@ -515,3 +510,19 @@ class DriverPreStartAdmin(admin.ModelAdmin):
     # search_fields = ["adminTruckNumber"]
     inlines = [DriverPreStartQuestionInline]
 admin.site.register(DriverPreStart, DriverPreStartAdmin)
+
+
+
+class EscalationMailInline(admin.StackedInline):
+    model = EscalationMail
+    extra = 0
+
+class EscalationDocketInline(admin.StackedInline):
+    model = EscalationDocket
+    extra = 0
+    
+class EscalationAdmin(admin.ModelAdmin):
+    list_display = ["userId","escalationDate","escalationType","clientName","escalationStep","escalationAmount"]
+    search_fields = ["escalationDate","escalationType","clientName","escalationStep"]
+    inlines = [EscalationDocketInline, EscalationMailInline]
+admin.site.register(Escalation, EscalationAdmin)

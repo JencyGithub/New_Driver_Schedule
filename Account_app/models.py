@@ -402,7 +402,7 @@ class ReconciliationReport(models.Model):
     clientId = models.PositiveIntegerField(default=0)
     truckId = models.PositiveIntegerField(default=0)
     
-    # 0:reconciliation, 1:Short Paid 2: Top up solved
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
@@ -483,18 +483,15 @@ class Escalation(models.Model):
         return str(self.id) + ' ' + str(self.escalationType)
     
 class EscalationDocket(models.Model):
-    
     docketNumber = models.CharField(max_length=10, default=None)
     docketDate = models.DateField(default=None, null=True)
     escalationId = models.ForeignKey(Escalation, on_delete=models.CASCADE, default=None)
-    amount = models.IntegerField(default=0)
+    amount = models.FloatField(default=0)
     remark = models.CharField(max_length=1024, default='')
     invoiceFile = models.FileField(default=None, null=True, blank=True)
     def __str__(self) -> str:
         return str(self.docketNumber) + ' ' + str(self.docketDate)
-    
 
-    
     
 class EscalationMail(models.Model):
     mailType = [('Send', 'Send'),('Receive', 'Receive'),]

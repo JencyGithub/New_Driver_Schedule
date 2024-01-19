@@ -32,9 +32,9 @@
                     <div class="x_title">
                         <h2>{{dataType}} result</h2>
                         {% if dataType == 'Reconciliation' %}
-                        <div class="float-right">
-                            <button class="btn btn-sm btn-default submit" value="Mark as complete">Mark as
-                                complete</button>
+                            <div class="float-right">
+                                <button class="btn btn-sm btn-default escalate" value="Escalate">Escalate</button>
+                                <button class="btn btn-sm btn-default markAsComplete" value="Mark as complete">Mark ascomplete</button>
                             </div>
                         {% endif %}
                         <div class="clearfix"></div>
@@ -47,13 +47,13 @@
                                         <thead>
                                             <th></th>
                                             <th>Docket number</th>
+                                            <th>Client</th>
                                             <th>Load & Km cost</th>
                                             <th>Surcharge </th>
                                             <th>Waiting cost</th> 
                                             <th>Stand by cost</th>
                                             <th>Total cost</th>
                                             <th style="width:17%">Missing components</th>
-                                            <th>Action</th>
                                         </thead>
                                         <tbody>
                                             <!-- Driver / RCTI -->
@@ -65,6 +65,8 @@
                                                             class="{% if item.fromDriver and item.fromRcti %} text-success {% else %} text-danger {% endif %}">{{ item.docketNumber }}
                                                         </a>
                                                     </td>
+                                                    <td class="text-capitalize">{{ item.clientName }}</td>
+
                                                     <td class="{% if item.driverLoadAndKmCost == item.rctiLoadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverLoadAndKmCost}} / {{ item.rctiLoadAndKmCost }} </td>
                                                     <td class="{% if item.driverSurchargeCost == item.rctiSurchargeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverSurchargeCost}} / {{ item.rctiSurchargeCost }} </td>
                                                     <td class="{% if item.driverWaitingTimeCost == item.rctiWaitingTimeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverWaitingTimeCost}} / {{ item.rctiWaitingTimeCost }} </td>
@@ -73,7 +75,7 @@
                                                     <td class="text-danger">{{ item.missingComponent }} </td>
                                                     
                                                     {% comment %} <td><a href="{% if item.escalationStep == 2 %} {% url 'Account:reconciliationEscalationForm2' id=item.id %} {% elif item.escalationStep == 3 %} {% url 'Account:reconciliationEscalationForm3' id=item.id %} {% elif item.escalationStep == 4 %} {% url 'Account:reconciliationEscalationForm4' id=item.id %} {% else %} {% url 'Account:reconciliationEscalationForm' id=item.id %} {% endif %}" class="btn btn-sm btn-default">Escalation</a></td> {% endcomment %}
-                                                    <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default" target="_blank">Escalation</a></td>
+                                                    {% comment %} <td><a href="{% url 'Account:reconciliationEscalationForm' id=item.id %}" class="btn btn-sm btn-default" target="_blank">Escalation</a></td> {% endcomment %}
 
                                                 </tr>
                                             {% endfor %}
@@ -105,16 +107,24 @@
                 }
             }]
         });
-        $('.submit').on('click', function () {
+
+        function getSelectedDockets(){
             var selectedRows = table.column(0).checkboxes.selected();
-        
             var rowDockets = [];
             $.each(selectedRows, function(key,docket){
                 rowDockets.push(docket)
             })
-            console.log(rowDockets)
-        
-            if(rowDockets.length > 0){ // Check if any rows are selected
+            if(rowDockets.length > 0){
+                return rowDockets
+            }else{
+                alert("Please select at least one docket");
+                return false
+            }
+        }
+
+        $('.markAsComplete').on('click', function () {
+            let rowDockets = getSelectedDockets()
+            if(rowDockets){ 
                 $.ajax({
                     type: "POST",
                     url: "/account/reconciliation/setMark/",
@@ -128,10 +138,41 @@
                         window.location.reload();
                         alert('Selected Dockets Marked As Completed Successfully.');
                     }
-
                 });
             }
         });
+
+        $('.escalate').on('click', function () {
+            let rowDockets = getSelectedDockets()
+            if(rowDockets){ 
+                $.ajax({
+                    type: "POST",
+                    url: "/account/reconciliation/escalate/checkClient/",
+                    data: {
+                        dockets: rowDockets,
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        if(data.status){
+                            let reconciliationId = data.reconciliationId.join(',')
+                            try {
+                                var url = `/account/reconciliation/escalation/form1/${reconciliationId}/${data.clientName}`;
+                                window.location.href = url;
+                            }
+                            catch(err) {
+                                console.log(err)
+                            }
+                        }else{
+                            alert(data.msg)
+                        }
+                    }
+                });
+            }
+        });
+
+
     });
 </script>
 
