@@ -468,6 +468,7 @@ class ReconciliationReport(models.Model):
 # -----------------------------------
 class Escalation(models.Model):
     escalationType = [('External', 'External'),('Internal', 'Internal'),]
+    
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
     escalationType = models.CharField(max_length=20,choices=escalationType, default='External')
@@ -480,7 +481,7 @@ class Escalation(models.Model):
     errorId = models.PositiveIntegerField(default=None, null=True)
     
     def __str__(self) -> str:
-        return str(self.docketNumber) + ' ' + str(self.escalationType)
+        return str(self.id) + ' ' + str(self.escalationType)
     
 class EscalationDocket(models.Model):
     
@@ -489,9 +490,9 @@ class EscalationDocket(models.Model):
     escalationId = models.ForeignKey(Escalation, on_delete=models.CASCADE, default=None)
     amount = models.IntegerField(default=0)
     remark = models.CharField(max_length=1024, default='')
-    
+    invoiceFile = models.FileField(default=None, null=True, blank=True)
     def __str__(self) -> str:
-        return str(self.docketNumber) + ' ' + str(self.escalationType)
+        return str(self.docketNumber) + ' ' + str(self.docketDate)
     
 
     

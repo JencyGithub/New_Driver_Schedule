@@ -8,18 +8,10 @@
     <div class="row">
         <div class="col-md-12 col-sm-12 ">
             <div class="x_panel">
-                <form  action = "{% url 'Account:manuallyEscalationForm1' %}" method="POST" class="form-horizontal form-label-left">
+                <form  action = "{% url 'Account:manuallyEscalationForm1Save' %}" method="POST" class="form-horizontal form-label-left" enctype="multipart/form-data">
 
                 <div class="x_title">
                     <h2>Escalation form</h2>
-                    <div class="float-right">
-                        <div class="float-right">
-                            <input type="radio" id="internal" name="escalation" value="internal" {% if escalationObj.escalationType == 'Internal' %} checked   {% endif %}>
-                            <label for="internal">Internal Escalation</label> &nbsp;
-                            <input type="radio" name="escalation" value="external" id="external" {% if escalationObj.escalationType == 'External'%}  checked   {% endif %} >
-                            <label for="external" >External Escalation</label>
-                        </div>
-                    </div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
@@ -35,8 +27,16 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="2">
+                                <a href="javascript:void(0)" class="disabled" isdone="1" rel="2">
                                     <span class="step_no">2</span>
+                                    <span class="step_descr">
+                                        <br>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" class="disabled" isdone="0" rel="3">
+                                    <span class="step_no">3</span>
                                     <span class="step_descr">
                                         <br>
                                     </span>
@@ -73,7 +73,9 @@
                                             name="docketDate" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="docketDate">
                                 </div>
+                                
                             </div>
+
                             <div class="form-group row">
                                 <label for="clientName"
                                     class="col-form-label col-md-3 col-sm-3  label-align">Client name</label>
@@ -94,12 +96,12 @@
                             </div>
                             <div class="form-group row">
                                 <label class="col-form-label col-md-3 col-sm-3 label-align"
-                                    for="escalationAmount">Escalation Amount <span class="required">*</span>
+                                    for="invoiceFile">Invoice File <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <input class="form-control"   type="number"   
-                                            name="escalationAmount" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="escalationAmount">
+                                    <input class="form-control"   type="file"   
+                                            name="invoiceFile" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="invoiceFile">
                                 </div>
                             </div>
 

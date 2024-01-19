@@ -2816,65 +2816,82 @@ def EscalationForm(request ,id = None):
     return render(request , 'Account/manuallyEscalationForm1.html' , params)
 
 @csrf_protect
-
-def manuallyEscalationForm1(request ,id = None):
-    params = {}
-    if id:
-        if escalationObj.escalationType == 'External':
-            escalationObj = Escalation.objects.filter(docketNumber  = docketNumber  ,docketDate = docketDate).first()
-            
-            oldMail = EscalationMail.objects.filter(escalationId=id).order_by('mailCount')
-            params['oldMail'] = oldMail
-            params['escalationObj'] = escalationObj
-            
-            return render(request , 'Account/manuallyEscalationForm2.html' , params)
-            
-    escalationObj = None
+def manuallyEscalationForm1Save(request):
     docketNumber = request.POST.get('docketNumber')
     docketDate = request.POST.get('docketDate')
-    # return HttpResponse(docketDate)
+    invoiceFile = request.FILES.get('invoiceFile')
+    # return HttpResponse(invoiceFile)
     clientNameId = request.POST.get('clientName')
-    escalationAmount = request.POST.get('escalationAmount')
-    escalationType = request.POST.get('escalation')
+    escalationDocketObj = EscalationDocket.objects.filter(docketNumber = docketNumber , docketDate= docketDate).first()
+    if escalationDocketObj:
+        messages.error(request, "Escalation Already Exists.")
+        return redirect(request.META.get('HTTP_REFERER'))
     
     currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(clientId=clientNameId).first()
-    escalationObj = Escalation.objects.filter(docketNumber  = docketNumber  ,docketDate = docketDate).first()
-    clientNames = Client.objects.all()
-    if not escalationObj:
-        escalationObj = Escalation()
-    escalationObj.docketNumber = docketNumber
-    escalationObj.docketDate = docketDate
+    
+    escalationObj = Escalation()
     escalationObj.userId = request.user
     escalationObj.escalationDate = currentDate
     escalationObj.clientName = clientObj
-    escalationObj.escalationAmount = escalationAmount
+    escalationObj.escalationStep = 1
+    escalationObj.save()
+    
+    escalationDocketObj = EscalationDocket()
+    escalationDocketObj.docketNumber = docketNumber
+    escalationDocketObj.docketDate = docketDate
+    escalationDocketObj.escalationId = escalationObj
+    if invoiceFile:
+        time = getCurrentTimeInString()
+        attachmentPath = 'static/Account/manuallyEscalation/'
+        fileName = invoiceFile.name
+        convertedFileName = time + '!_@' + fileName
+        pfs = FileSystemStorage(location=attachmentPath)
+        try:
+            pfs.save(convertedFileName, invoiceFile)
+        except Exception as e:
+            messages.error(request, "FileName Not Valid.")
+            return redirect(request.META.get('HTTP_REFERER'))
+            
+        escalationDocketObj.invoiceFile = f'static/Account/manuallyEscalation/{convertedFileName}'
+        escalationDocketObj.save()
+    params = {
+        'escalationDocketObj':escalationDocketObj
+    }
+    messages.success(request, "Escalation Entry Successfully.")
+    return redirect('Account:manuallyEscalationForm2View',escalationDocketObj.id)
+    
+
+def manuallyEscalationForm2View(request ,id):
+    params = {
+        'escalationDocketObjId':id
+    }
+    return render(request , 'Account/manuallyEscalationForm2.html' , params)
+    
+@csrf_protect
+def manuallyEscalationForm2Save(request,id):
+    escalationAmount = request.POST.get('escalationAmount')
+    escalationType = request.POST.get('escalation')
+    escalationDocketRemark = request.POST.get('remark')
+        
+    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
+    escalationDocketObj.amount = escalationAmount
+    escalationDocketObj.remark = escalationDocketRemark
+    escalationDocketObj.save()
+    
+    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
     if escalationType == 'internal':
         escalationObj.escalationType = 'Internal'
     elif escalationType == 'external':
         escalationObj.escalationType = 'External'
+    escalationObj.escalationAmount = escalationAmount
     escalationObj.save()
-    
-    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
-    
-        
-    
-    params['escalationObj'] = escalationObj
-    params['clientNames'] = clientNames
+    messages.success(request, " Saved successfully.")
+    return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id)
 
-    # return HttpResponse(params)
-    return render(request , 'Account/manuallyEscalationForm2.html' , params)
 
-def manuallyEscalationForm1View(request,id):
-    params = {}
-    escalationObj = Escalation.objects.filter(pk  = id ).first()
-    clientNames = Client.objects.all()
-    
-    escalationObj.docketDate = dateConverterFromTableToPageFormate(escalationObj.docketDate)
-    
-    params['escalationObj'] = escalationObj
-    params['clientNames'] = clientNames
-    return render(request , 'Account/manuallyEscalationForm1.html' , params)
+def manuallyEscalationForm3View(request,id):
+    return HttpResponse(id)
     
 def manuallyEscalationMailAdd(request,id):
     escalationObj = Escalation.objects.filter(pk=id).first()
