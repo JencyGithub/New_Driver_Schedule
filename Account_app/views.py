@@ -1633,37 +1633,63 @@ def dateRangeFilter(request):
 
 @csrf_protect
 def DriverTripEditForm(request, id):
-    driver_trip = DriverTrip.objects.get(id=id)
+    superUser = False
+    if request.user.is_superuser:
+        superUser = True
+    else:
+        superUser = False
+    shiftObj = DriverShift.objects.filter(pk=id).first()
+    shiftObj.shiftDate = dateConverterFromTableToPageFormate(shiftObj.shiftDate)
+    tripObj = DriverShiftTrip.objects.filter(shiftId=id)
+    # return HttpResponse(tripObj.startDateTime)
+    docketObj = DriverShiftDocket.objects.filter(shiftId=id)
+    tripCount_ = 1
+    docketCount_ = 1
+    
+    for trip in tripObj:
+        trip.count_ = tripCount_
+        # trip.startDateTime = trip.startDateTime.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+        # trip.endDateTime = trip.endDateTime.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+        
+        tripCount_+=1
+        
+    for docket in docketObj:
+        docket.count_ = docketCount_
+        docketCount_+=1
+        
     driver = Driver.objects.all()
     clientName = Client.objects.all()
-    AdminTrucks = AdminTruck.objects.all()
-    driver_trip.shiftDate = str(driver_trip.shiftDate)
-    driver_trip.startTime =str(datetime.strptime(driver_trip.startTime, '%H:%M:%S').time())
+    clientTruck = ClientTruckConnection.objects.all()
+    # driver_trip.shiftDate = str(driver_trip.shiftDate)
+    # driver_trip.startTime =str(datetime.strptime(driver_trip.startTime, '%H:%M:%S').time())
     
 
-    driver_docket = DriverDocket.objects.filter(tripId=id)
+    # driver_docket = DriverDocket.objects.filter(tripId=id)
     surcharges = Surcharge.objects.all()
-    count_ = 1
-    for i in driver_docket:
-        i.shiftDate = dateConverterFromTableToPageFormate(i.shiftDate)
-        i.count_ = count_
-        count_ += 1
+    # count_ = 1
+    # for i in driver_docket:
+    #     i.count_ = count_
+    #     count_ += 1
 
-        i.totalWaitingInMinute =DriverTripCheckWaitingTime(i.docketNumber,i.shiftDate)
-        i.standBySlot = DriverTripCheckStandByTotal(i.docketNumber,i.shiftDate)
-        print(i.standBySlot)
+    #     i.totalWaitingInMinute =DriverTripCheckWaitingTime(i.docketNumber,i.shiftDate)
+    #     i.standBySlot = DriverTripCheckStandByTotal(i.docketNumber,i.shiftDate)
+    #     print(i.standBySlot)
         
     base_plant = BasePlant.objects.all()
 
     params = {
-        'driverTrip': driver_trip,
-        'driverDocket': driver_docket,
+        'driverTrip': tripObj,
+        'driverDocket': docketObj,
+        'shiftObj':shiftObj,
+        'clientTruck':clientTruck,
         'basePlants': base_plant,
         'Driver': driver,
         'Client': clientName,
-        'trucks': AdminTrucks,
-        'surcharges' : surcharges
+        # 'adminTrucks': AdminTrucks,
+        'surcharges' : surcharges,
+        'superUser':superUser
     }
+    # return HttpResponse(params['driverTrip'])
     return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
 
 
@@ -1788,7 +1814,27 @@ def driverEntryUpdate(request, ids):
     messages.success(request, "Docket Updated successfully")
     return redirect(url)
 
+@csrf_protect
+def tripEntry(request,shiftId):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    superUser = False
+    driver = Driver.objects.all()
+    clientName = Client.objects.all()
+    clientTruck = ClientTruckConnection.objects.all()
+    if request.user.is_superuser:
+        superUser = True
+    else:
+        messages.warning('Only SuperUser Add Trip.. ')
+        return redirect(request.META.get('HTTP_REFERER'))
+    params = {
 
+        'clientTruck':clientTruck,
+        'Driver': driver,
+        'Client': clientName,
+        'shiftObj':shiftObj,
+        'superUser':superUser
+    }
+    return render(request,'Account/shiftTripEntry.html',params)
 # ````````````````````````````````````
 # Reconciliation
 
@@ -2015,8 +2061,8 @@ def reconciliationEscalationForm3(request ,id):
     if remark:
         escalationObj.remark = remark
         
-    if escalationObj.escalationStep <= 2:
-        escalationObj.escalationStep = 2
+    if escalationObj.escalationStep <= 3:
+        escalationObj.escalationStep = 3
         
     escalationObj.save()
     params = {
@@ -2642,44 +2688,26 @@ def DriverShiftForm(request,id):
 def ShiftDetails(request,id):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    clientNameObj = Client.objects.filter(name=request.POST.get('clients')).first()
     id_ = id
-    trips =None
-    if id == 0:
-        if clientNameObj:
-            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False , clientName = clientNameObj)
-        else:
-            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    elif id == 1:
-        if clientNameObj:
-            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True , clientName = clientNameObj)
-        else:
-            trips = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-    #     if clientName == 'boral':
-    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    #     elif clientName == 'holcim':
-    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
+    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= False )
+    for shift in shifts:
+        shift.driverName = Driver.objects.filter(pk = shift.driverId).first().name
+    # if id == 0:
+    #     if clientId != 0:
+    #         pass
     #     else:
-    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    #         holcimTrip = DriverTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = False)
-    # elif id ==1:
-    #     if clientName == 'boral':
-    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-    #     elif clientName == 'holcim':
-    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate) ,verified = True)
+    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
+    # elif id == 1:
+    #     if clientId != 0:
+    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True , clientName = clientNameObj)
     #     else:
-    #         boralTrip = DriverTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-    #         holcimTrip = HolcimTrip.objects.filter(shiftDate__range=(startDate,endDate),verified = True)
-        # return HttpResponse(holcimTrip.driverName)
-           
+    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
 
-            
-        
-    else:
-        messages.warning( request, "Invalid Request")
-        return redirect(request.META.get('HTTP_REFERER'))
+    # else:
+    #     messages.warning( request, "Invalid Request")
+    #     return redirect(request.META.get('HTTP_REFERER'))
     params = {
-        'trips': trips,
+        'shifts': shifts,
         'startDate': startDate,
         'endDate': endDate,
         'id_': id_,
@@ -2881,7 +2909,7 @@ def manuallyEscalationForm1Save(request):
     escalationDocketObj = EscalationDocket.objects.filter(docketNumber = docketNumber , docketDate= docketDate).first()
     if escalationDocketObj:
         escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-        return redirect('Account:manuallyEscalationForm2View',escalationDocketObj.id)
+        return redirect('Account:showReconciliationEscalation2',escalationObj.id)
     
     currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(clientId=clientNameId).first()
@@ -2927,18 +2955,26 @@ def ViewBulkEscalationData(request,escalationId):
     escalationDocketObj = list(EscalationDocket.objects.filter(escalationId=escalationId).values())
     oldMail = EscalationMail.objects.filter(escalationId=escalationObj)
 
-    
+    manuallyEscalationDocketObj = None
     reconciliationDockets = []
     for i in escalationDocketObj:
-        obj = ReconciliationReport.objects.filter(docketNumber = i['docketNumber'] , docketDate= i['docketDate']).first()
-        obj.docketDate = dateConverterFromTableToPageFormate(obj.docketDate)
-        reconciliationDockets.append(obj)
         
+        obj = ReconciliationReport.objects.filter(docketNumber = i['docketNumber'], docketDate= i['docketDate']).first()
+        if obj != None:
+            obj.docketDate = dateConverterFromTableToPageFormate(obj.docketDate)
+            reconciliationDockets.append(obj)
+        else:
+            manuallyEscalationDocketObj = EscalationDocket.objects.filter(escalationId=escalationId).first()
+            manuallyEscalationDocketObj.docketDate = dateConverterFromTableToPageFormate(manuallyEscalationDocketObj.docketDate)
+            
+            
+    # return HttpResponse(manuallyEscalationDocketObj)
     params = {
         'reconciliationDockets' : reconciliationDockets,
         'escalationObj':escalationObj,
         'oldMail' : oldMail,
         'clientNames' : Client.objects.all(),
+        'manuallyEscalationDocketObj':manuallyEscalationDocketObj
         
 
     }

@@ -1,0 +1,168 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Driver Trip Form {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<style>
+    .cuatom-continer {
+        margin: 0 5rem;
+    }
+
+    .errorMsg {
+        font-size: 0.7rem;
+        color: rgb(255, 0, 0);
+        margin-top: 0.3rem;
+        list-style-type: none;
+    }
+
+    .isInvalid {
+        border: 1px solid rgb(255, 0, 0) !important;
+        border-radius: 7px !important;
+    }
+
+    @media (max-width: 576px) {
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' ids=shiftObj.id%}" novalidate
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                        <div class="x_panel">
+                        <div class="x_title ">
+                            <h2 class="text-primary"> Driver Trip Form </h2>
+                            <div class="clearfix"></div>
+                        </div> 
+                        <div class="x_content ">
+                            <div class="custom-continer">
+                                <!-- driver-id client-name shift-type  -->
+                                 <div class="col-md-4 col-sm-4">
+                                    <label for="driverId">Driver Id:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select {% if not superUser %}disabled{% endif %} name="driverId" class="form-control">
+                                            {% for D_id in Driver %}
+                                            <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientName">Client Name :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select {% if not superUser %}disabled{% endif %} name="clientName" class="form-control">
+                                            {% for C_id in Client %}
+                                            <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4 ">
+                                    <label for="shiftType">ShiftType :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select {% if not superUser %}disabled{% endif %} name="shiftType" class="form-control">
+                                            <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
+                                            <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
+
+                                        </select>
+                                    </div>
+                                </div> 
+                                <!-- numberOfLoads truckNo  shiftDate  -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.numberOfLoads}}" type="number"
+                                            name="numberOfLoads" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="numberOfLoads">
+                                    </div>
+                                </div>
+                                 <div class="col-md-4 col-sm-4">
+                                    <label for="truckNo">Truck No:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select {% if not superUser %}disabled{% endif %} class="form-control" required id="truckNo" name="truckNo">
+                                            <option value="" disabled selected>Select Truck No</option>
+                                            {% for truck in clientTruck %}
+                                            <option value="{{ truck.id }}" {% if trip.truckConnectionId == truck.id %}selected="selected"{% endif %}>{{ truck.clientTruckId }} - {{truck.truckNumber.adminTruckNumber}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div> 
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="shiftDate">Shift Date:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{shiftObj.shiftDate}}" type="date"
+                                            name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="shiftDate">
+                                    </div>
+                                </div>
+                                <!-- startTime    endTime    loadSheet -->
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="startDateTime">Start Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                            name="startDateTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="startDateTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endDateTime">End Time :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                        {% if not superUser %}disabled{% endif %}  name="endDateTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                            id="endDateTime">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="loadSheet">loadSheet :<span class="required">*</span></label>
+                                    <div  class="field item form-group">
+                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet"
+                                            style="padding: 0.25rem 0.2rem;" id="loadSheet">
+                                    </div>
+                                </div>
+                                <!-- comment  -->
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="comment">Comment :<span class="required">*</span></label>
+                                    <div  class="field item form-group">
+                                        <textarea placeholder="comment" name="comment" id="comment"
+                                        {% if not superUser %}disabled{% endif %}  class="form-control">{{trip.comment}}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+{% endblock %}
+
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+{% endblock %}

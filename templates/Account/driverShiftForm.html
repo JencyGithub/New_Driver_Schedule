@@ -95,17 +95,17 @@
                                             readonly required>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
+                                {% comment %} <div class="col-md-4 col-sm-4">
                                     <label for="clientId">Client Name</label>
                                     <div class="field item form-group">
                                         <select class="form-control" id="clients" name="clients">
                                             <option value="" >All</option>
                                             {% for client in clients %}
-                                            <option value="{{ client.name }}">{{ client.name }}</option>
+                                            <option value="{{ client.clientId }}">{{ client.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
-                                </div>
+                                </div> {% endcomment %}
                                 <div class="col-md-12 text-right">
                                     <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
                                 </div>

@@ -55,7 +55,7 @@ class BasePlant(models.Model):
 
 class DriverShift(models.Model):
     verified = models.BooleanField(default=False)
-    shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')))
+    shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')),default = 'Day')
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)
     shiftDate = models.DateField(null=True, blank=True)
@@ -68,6 +68,7 @@ class DriverShift(models.Model):
     
 
 class DriverShiftTrip(models.Model):
+    verified = models.BooleanField(default=False)
     shiftId = models.IntegerField(null=True, blank=True)
     startDateTime = models.DateTimeField(null=True, blank=True)
     endDateTime = models.DateTimeField(null=True, blank=True)
@@ -84,6 +85,7 @@ class DriverShiftTrip(models.Model):
     
 class DriverShiftDocket(models.Model):
     tripId = models.PositiveIntegerField(null=True, blank=True)
+    shiftId = models.IntegerField(null=True, blank=True)
     docketNumber = models.CharField(max_length=20, default='', null=True, blank=True)
     docketFile = models.FileField(upload_to='static/img/docketFiles', null=True, blank=True)
     basePlant = models.PositiveIntegerField(null=True, blank=True)

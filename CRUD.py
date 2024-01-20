@@ -164,3 +164,13 @@ def formatDateTimeForDBSave(dateTimeStr):
     else:
         dateTimeStr = None
     return dateTimeStr
+
+
+
+# driverShift form admin side 
+
+def dateTimeConvertIntoDate(data):
+    formatted_string = data.strftime("%Y-%m-%d %H:%M:%S.%f%z")
+    datetime_object = datetime.fromisoformat(formatted_string)
+    date_only = datetime_object.date()
+    return date_only

@@ -58,6 +58,37 @@
                              class="form-control" data-validate-length-range="20" placeholder="Minimum 20 characters" rows="3">{{ escalationObj.remark }}</textarea></div>
                     </div>
                     <hr class="m-3">
+                    {% if manuallyEscalationDocketObj %}
+                    <div class="row">
+                        <div class="col-md-3 col-12">
+                            <label class="col-form-label" for="docketNumber">Docket number
+                                <span class="required">*</span></label>
+                            <input type="text" id="docketNumber"
+                                name="docketNumber" required="required" class="form-control"
+                                value="{{manuallyEscalationDocketObj.docketNumber}}" readonly>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label class="col-form-label" for="docketDate">Docket date <span
+                                    class="required">*</span></label>
+                            <input type="date" id="docketDate" name="docketDate"
+                                required="required" class="form-control" readonly
+                                value="{{manuallyEscalationDocketObj.docketDate}}">
+                        </div>
+                        <div class="col-md-3 col-12">
+                            <label for="clientName" class="col-form-label">Client name</label>
+                            <input type="text" id="clientName"
+                                name="clientName" required="required" class="form-control"
+                                value="{{escalationObj.clientName}}" readonly>
+                        </div>
+                        <div class="col-md-2 col-12">
+                            <label for="clientName" class="col-form-label">Client name</label>
+                            <br>
+                            <a href="/{{manuallyEscalationDocketObj.invoiceFile}}" class="d-inline-block mt-2 text-primary" target="_blanck">Docket image here</a>
+
+                        </div>
+                        
+                    </div>
+                    {% else %}
                     {% for docket in reconciliationDockets %}
                     <div class="row">
                         <div class="col-md-3 col-12">
@@ -88,6 +119,7 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% endif %}
                     {% if oldMail %}
                     <h4 class="mt-3">Conversations:</h4>
                         <div style="max-height: 58vh; overflow-y: auto;" class="border rounded px-3 py-1">

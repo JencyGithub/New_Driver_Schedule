@@ -55,21 +55,22 @@
 
             <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
               <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Running</a>
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Open</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Close</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" id="Archive-tab" data-toggle="tab" href="#Archive" role="tab" aria-controls="Archive" aria-selected="false">Archive</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Solved</a>
-              </li>
+              
             </ul>
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <!-- Running Table  -->
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Running</h2>
+                    <h2>Open</h2>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
@@ -79,7 +80,7 @@
                           <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                               <tr>
-                                <th>User</th>
+                                <th>Added By</th>
                                 <th>EscalationDate</th>
                                 <th>EscalationAmount</th>
                                 <th>action</th>
@@ -93,10 +94,11 @@
                                 <td>{{ data.escalationDate }}</td>
                                 <td>{{ data.escalationAmount }}</td>
                                 <td>
-                                   <a href="{% if data.escalationType == 2 %}{% url 'Account:showReconciliationEscalation2' esclationId=data.id %} {% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update">
-                                    <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                                   <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update"
+                                    class="btn btn-default btn-sm ">Update</a>
                                   </a> 
-                                  <a href="{% if data.escalationType == 2 %}{% url 'Account:showReconciliationEscalation2' esclationId=data.id %} {% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update">
+                                  
+                                  <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update">
                                     <a href="{% url 'Account:ViewBulkEscalationData' escalationId=data.id %}" class="btn btn-default btn-sm float-right">View</a>
                                   </a> 
                               </td>
@@ -113,49 +115,7 @@
                 <!-- End Error Table  -->
               </div>
 
-              <div class="tab-pane fade" id="Archive" role="tabpanel" aria-labelledby="Archive-tab">
-                <!--Archive Table  -->
-          
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Archive</h2>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
-                    <div class="row">
-                      <div class="col-sm-12">
-                        <div class="card-box table-responsive">
-                          <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
-                              <tr>
-                                <th>View</th>
-                                <th>DocketNumber</th>
-                                <th>DocketDate</th>
-                                <th>Solved Description</th>
-                                <th>FileName</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {% for solve in archiveError %}
-                              <tr>
-                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                <td>{{ solve.docketNumber }}</td>
-                                <td>{{solve.docketDate}}</td>
-                                <td>{{solve.errorDescription}}</td>
-                                <td>{{solve.fileName}}</td>
-                              </tr>
-                              {% endfor %}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- End ArchiveTable  -->
-
-                
-              </div>
+              
               <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <!-- Solve Table  -->
           
@@ -203,7 +163,49 @@
 
                 
               </div>
+              <div class="tab-pane fade" id="Archive" role="tabpanel" aria-labelledby="Archive-tab">
+                <!--Archive Table  -->
+          
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Archive</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="card-box table-responsive">
+                          <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                              <tr>
+                                <th>View</th>
+                                <th>DocketNumber</th>
+                                <th>DocketDate</th>
+                                <th>Solved Description</th>
+                                <th>FileName</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for solve in archiveError %}
+                              <tr>
+                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                <td>{{ solve.docketNumber }}</td>
+                                <td>{{solve.docketDate}}</td>
+                                <td>{{solve.errorDescription}}</td>
+                                <td>{{solve.fileName}}</td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End ArchiveTable  -->
 
+                
+              </div>
             </div>
           </div>
         </div>

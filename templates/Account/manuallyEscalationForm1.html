@@ -51,7 +51,7 @@
                                     for="docketNumber">Docket number <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    <input class="form-control" {% if escalationDocketObj %} readonly {% endif %}   type="number" value="{{escalationDocketObj.docketNumber}}"
+                                    <input class="form-control" minlength="3" maxlength="10" {% if escalationDocketObj %} readonly {% endif %}   type="text" value="{{escalationDocketObj.docketNumber}}"
                                             name="docketNumber" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="docketNumber">
                                 </div>
@@ -91,15 +91,15 @@
                                     for="invoiceFile">Invoice File <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 ">
-                                    {% if escalationDocketObj.invoiceFile %}
+                                    {% comment %} {% if escalationDocketObj.invoiceFile %}
                                     <a href="/{{escalationDocketObj.invoiceFile}}" class="d-inline-block mt-2 text-primary" target="_blanck">Docket image here</a>
 
-                                    {% else %}
+                                    {% else %} {% endcomment %}
                                     
                                     <input class="form-control"   type="file"   
                                             name="invoiceFile" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="invoiceFile">
-                                    {% endif %}
+                                    {% comment %} {% endif %} {% endcomment %}
                                     
                                 </div>
                             </div>
@@ -127,7 +127,7 @@
                             </div>
 
                             <div class="float-right">
-                                <button type="submit" class="buttonNext btn btn-success">Next</button>
+                                <button type="submit" class="buttonNext btn btn-default">Next</button>
                             </div>
 
                         <!-- End SmartWizard Content -->

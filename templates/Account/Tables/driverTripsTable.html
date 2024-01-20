@@ -50,55 +50,6 @@
       <div class="col-md-12 col-sm-12 ">
         <div class="x_panel" >
           <div class="x_title">
-            <!-- Filters -->
-            <!-- Verified -->
-            {% comment %} <div class="btn-group">
-              <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Verified
-              </button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" onclick="verifiedFilter(this)"><i class="fa fa-check text-success"> </i>
-                  Verified </a>
-                <a class="dropdown-item" onclick="verifiedFilter(this,0)"><i class="fa fa-close text-danger"> </i> Not
-                  verified </a>
-              </div>
-            </div> {% endcomment %}
-            <!-- Client name -->
-            {% comment %} <div class="btn-group">
-              <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Client name
-              </button>
-              <div class="dropdown-menu">
-                {% for client in clientName %}
-                <a class="dropdown-item" onclick="clientFilter({{client.clientId}})">{{client.name}} </a>
-                {% endfor %}
-              </div>
-            </div> {% endcomment %}
-            <!-- Date range -->
-            {% comment %} <div id="reportrange_right" class="pull-right"
-              style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
-              <i class="fa fa-calendar"></i>
-              <span>December 30, 2014 - January 28, 2015</span> <b class="caret"></b>
-            </div> {% endcomment %}
-            
-
-            <!-- CSV Download -->
-            {% comment %} <a class="btn btn-app float-right mr-1" onclick="csvDownloadFilter()"> {% endcomment %}
-            {% comment %} <form action="{% url 'Account:driverTripCsv' %}" class="d-inline" method="POST" id="filterForm">
-              {% csrf_token %}
-
-              <input type="text" hidden id="verifiedInput" name="verifiedInput" value="">
-              <input type="text" hidden id="clientInput" name="clientInput" value="">
-              <input type="text" hidden id="startDate" name="startDate" value="">
-              <input type="text" hidden id="endDate" name="endDate" value="">
-              
-              <button type="submit" class="btn btn-app float-right mr-1 d-inline">
-                <i class="fa fa-download" style="font-size:1rem"></i>
-              </button>
-
-            </form> {% endcomment %}
             <form action="{% url 'Account:driverShiftCsv' %}" class="d-inline" method="POST" id="filterForm">
               {% csrf_token %}
 
@@ -120,27 +71,21 @@
                   <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
                     <thead>
                       <tr>
-                        {% comment %} <th>verified</th> {% endcomment %}
-                        <th>truckNo</th>
-                        <th>clientName</th>
-                        {% comment %} <th>driverName</th> {% endcomment %}
+                        <th>ShiftType</th>
+                        <th>driverName</th>
                         <th>shiftDate</th>
-                        <th>numberOfLoads</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% if trips %}
-                      {% for trip in trips %}
+                      {% if shifts %}
+                      {% for shift in shifts %}
                       <tr>
-                        {% comment %} <td><i class="fa {% if driverTtips.verified %} fa-check text-success {% else %}  fa-close text-danger {% endif %}"></td> {% endcomment %}
-                        <td>{{ trip.truckNo }}</td>
-                        <td>{{ trip.clientName.name }}</td>
-                        {% comment %} <td>{{ trip.driverId.name }}</td> {% endcomment %}
-                        <td>{{ trip.shiftDate }}</td>
-                        <td>{{ trip.numberOfLoads }}</td>
+                        <td>{{ shift.shiftType }}</td>
+                        <td>{{ shift.driverName }}</td>
+                        <td>{{ shift.shiftDate }}</td>
                         <td>
-                            <a href="{% url 'Account:DriverTripEdit' id=trip.id%}" title="update">
+                            <a href="{% url 'Account:DriverTripEdit' id=shift.id%}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
                             </a>
                         </td>
