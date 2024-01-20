@@ -2846,9 +2846,11 @@ def reportSave(request):
     return redirect(request.META.get('HTTP_REFERER'))
 
 def EscalationTable(request):
-    escalationObj  = Escalation.objects.all()
+    escalationObj  = Escalation.objects.filter(Q(escalationStep = 1) | Q( escalationStep = 2) |Q(escalationStep = 3))
+    completeEscalationObj  = Escalation.objects.filter(escalationStep = 4)
     params ={
-        'escalationObj':escalationObj
+        'escalationObj':escalationObj,
+        'completeEscalationObj':completeEscalationObj,
     }
     return render(request,'Account/Tables/escalationTable.html' , params)
 def EscalationForm(request ,id = None):
@@ -2856,8 +2858,8 @@ def EscalationForm(request ,id = None):
     escalationObj  = None
     clientNames = Client.objects.all()
     if id:
+        escalationObj = Escalation.objects.filter(pk = id).first()
         escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
         escalationDocketObj.docketDate = dateConverterFromTableToPageFormate(escalationDocketObj.docketDate)
 
 
@@ -2915,101 +2917,29 @@ def manuallyEscalationForm1Save(request):
         escalationDocketObj.save()
 
     messages.success(request, "Escalation Entry Successfully.")
-    return redirect('Account:manuallyEscalationForm2View',escalationDocketObj.id)
+    return redirect('Account:showReconciliationEscalation2', escalationObj.id)
     
 
-def manuallyEscalationForm2View(request ,id):
-    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-    # return HttpResponse(escalationDocketObj)
-    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-    params ={
-        'escalationDocketObj':escalationDocketObj,
-        'escalationObj':escalationObj
+def ViewBulkEscalationData(request,escalationId):
+    escalationObj = Escalation.objects.filter(pk=escalationId).first()
+    escalationObj.escalationDate = dateConverterFromTableToPageFormate(escalationObj.escalationDate)
+    
+    escalationDocketObj = list(EscalationDocket.objects.filter(escalationId=escalationId).values())
+    oldMail = EscalationMail.objects.filter(escalationId=escalationObj)
+
+    
+    reconciliationDockets = []
+    for i in escalationDocketObj:
+        obj = ReconciliationReport.objects.filter(docketNumber = i['docketNumber'] , docketDate= i['docketDate']).first()
+        obj.docketDate = dateConverterFromTableToPageFormate(obj.docketDate)
+        reconciliationDockets.append(obj)
+        
+    params = {
+        'reconciliationDockets' : reconciliationDockets,
+        'escalationObj':escalationObj,
+        'oldMail' : oldMail,
+        'clientNames' : Client.objects.all(),
+        
+
     }
-    return render(request , 'Account/manuallyEscalationForm2.html' , params)
-    
-@csrf_protect
-def manuallyEscalationForm2Save(request,id):
-    
-    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-    if escalationDocketObj:
-        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-        if escalationObj.escalationStep > 2:
-            return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id) 
-    escalationRemark = request.POST.get('remark')
-    escalationObj.remark = escalationRemark
-    escalationObj.escalationStep = 2
-    
-    escalationObj.save()
-    # return HttpResponse(escalationRemark)
-    messages.success(request, " Saved successfully.")
-    return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id)
-
-
-def manuallyEscalationForm3View(request,id):
-    # return HttpResponse('here')
-    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-    if escalationObj.escalationStep <= 2: 
-        escalationObj.escalationStep = 3
-        escalationObj.save()
-    
-    params ={
-        'escalationDocketObj':escalationDocketObj,
-        'escalationObj':escalationObj
-    }
-    return render(request,'Account/manuallyEscalationForm3.html' , params)
-
-@csrf_protect
-def manuallyEscalationForm3Save(request,id):
-    escalationDocketObj = EscalationDocket.objects.filter(pk=id).first()
-    escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-    if escalationDocketObj:
-        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-        # return HttpResponse(escalationObj.escalationStep)
-        if escalationObj.escalationStep > 3:
-            return redirect('Account:manuallyEscalationForm3View',escalationDocketObj.id) 
-    escalationObj.escalationStep = 4
-    escalationObj.save()
-    # return HttpResponse(escalationObj.escalationStep)
-    messages.success(request, " Saved successfully.")
-    return redirect(request.META.get('HTTP_REFERER'))
-
-
-@csrf_protect
-def manuallyEscalationMailAdd(request,id):
-    escalationObj = Escalation.objects.filter(pk=id).first()
-    mailTo = request.POST.get('mailTo')
-    mailFrom = request.POST.get('mailFrom')
-    mailSubject = request.POST.get('mailSubject')
-    mailDescription = request.POST.get('mailDescription')
-    mailType = request.POST.get('mailType')
-    # return HttpResponse(mailType)
-    currentDate = getCurrentDateTimeObj().date()
-    oldMailCount = EscalationMail.objects.filter(escalationId=escalationObj).count()
-    
-    escalationMailObj = EscalationMail()
-    escalationMailObj.escalationId = escalationObj
-    escalationMailObj.userId = request.user
-    escalationMailObj.mailTo = mailTo
-    escalationMailObj.mailFrom = mailFrom 
-    escalationMailObj.mailSubject = mailSubject
-    escalationMailObj.mailDescription = mailDescription
-    escalationMailObj.mailType = mailType
-    escalationMailObj.mailDate = currentDate
-    escalationMailObj.mailCount = oldMailCount + 1    
-
-    mailFile = request.FILES.get('mailAttechment')
-    if mailFile:
-        time = getCurrentTimeInString()
-        attachmentPath = 'static/img/mailAttachment'
-        fileName = mailFile.name
-        convertedFileName = time + '!_@' + fileName
-        pfs = FileSystemStorage(location=attachmentPath)
-        pfs.save(convertedFileName, mailFile)
-        escalationMailObj.mailAttachment = f'static/img/mailAttachment/{convertedFileName}'
-    
-    escalationMailObj.save()
-    messages.success(request, "Mail added successfully.")
-    return redirect(request.META.get('HTTP_REFERER'))
+    return render(request,'Account/EscalationView.html',params)

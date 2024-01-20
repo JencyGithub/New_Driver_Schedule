@@ -226,11 +226,6 @@ urlpatterns = [
     path('Escalation/Table', views.EscalationTable, name='EscalationTable'),
     path('Escalation/Form/View/<int:id>', views.EscalationForm, name='EscalationFormView'),
     path('Manually/Escalation/Forma/Save/', views.manuallyEscalationForm1Save, name='manuallyEscalationForm1Save'),
-    path('Manually/Escalation/Forma2/View/<int:id>', views.manuallyEscalationForm2View, name='manuallyEscalationForm2View'),
-    path('Manually/Escalation/Form2/Save/<int:id>', views.manuallyEscalationForm2Save, name='manuallyEscalationForm2Save'),
-    path('Manually/Escalation/Forma3/View/<int:id>', views.manuallyEscalationForm3View, name='manuallyEscalationForm3View'),
-    path('Manually/Escalation/Forma3/Save/<int:id>', views.manuallyEscalationForm3Save, name='manuallyEscalationForm3Save'),
-    path('Manually/Escalation/Mail/Add/<int:id>', views.manuallyEscalationMailAdd, name='manuallyEscalationMailAdd'),
-    
+    path('Escalation/View/<int:escalationId>', views.ViewBulkEscalationData, name='ViewBulkEscalationData'),
 
 ]
