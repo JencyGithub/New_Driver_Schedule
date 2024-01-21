@@ -15,8 +15,8 @@ def run():
     monthFileName = open(r"pastTrip_entry_month.txt",'r')
     monthAndYear = monthFileName.read()
 
-    fileName = f'static/Account/PastTripsEntry/{file_name}'
-    # fileName = f'static/Account/PastTripsEntry/20231202141345@_!20231202112629@_!April1-152023.csv'
+    # fileName = f'static/Account/PastTripsEntry/{file_name}'
+    fileName = f'static/Account/PastTripsEntry/01 Jan Data 1-15 2023.xlsx - Past trip.csv'
 
     txtFile = open(r'static/subprocessFiles/errorFromPastTrip.txt','w')
     txtFile.write(f'File:{file_name}\n\n')
@@ -170,26 +170,63 @@ def run():
                         #     print('Else startTime  Set' , tripObj.startDateTime)
                         #     print('Else EndTime Set' , tripObj.endDateTime)
                         shiftDate = datetime.strptime(res_, '%Y-%m-%d')
-                        startTime = datetime.strptime(str(data[6]).strip(), '%H:%M:%S').time()
-                        startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
-                        endTime = datetime.strptime(str(data[7]).strip(), '%H:%M:%S').time()
-                        endTimeDateTime = datetime.combine(shiftDate.date(),endTime)  
-                        if tripObj.startDateTime and tripObj.endTime :
-                            print('Start Date time Inside if')
-                            if tripObj.startDateTime > startTimeDateTime:
-                                tripObj.startDateTime = startTimeDateTime
-                            if tripObj.endDateTime < endTimeDateTime:
+                        
+                        # startTime = datetime.strptime(str(data[6]).strip(), '%H:%M:%S').time()
+                        # startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
+                        
+                        # endTime = datetime.strptime(str(data[7]).strip(), '%H:%M:%S').time()
+                        # endTimeDateTime = datetime.combine(shiftDate.date(),endTime)  
+                        try:
+                            shiftDateStr = datetime.strftime(shiftDate.date(), '%Y-%m-%d')
+                            
+                            startTimeDateTime = shiftDateStr + ' ' + data[6].strip()                            
+                            endTimeDateTime = shiftDateStr + ' ' + data[7].strip()
+                            
+                            startTimeDateTime = datetime.strptime(startTimeDateTime, '%Y-%m-%d %H:%M:%S')
+                            endTimeDateTime = datetime.strptime(endTimeDateTime, '%Y-%m-%d %H:%M:%S')
+                            
+                            print(startTimeDateTime, endTimeDateTime)
+                        except Exception as e:
+                            pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
+                                    tripDate = res_,
+                                    docketNumber = data[5],
+                                    truckNo = data[1],
+                                    lineNumber = count,
+                                    errorFromPastTrip = "Incorrect date format",
+                                    fileName = fileName.split('@_!')[-1],
+                                    data = data
+                                ) 
+                            pastTripErrorObj.save()
+                            continue
+                        
+                        try:
+                            # print(startTimeDateTime.tzinfo, startTimeDateTime)
+                            # print(endTimeDateTime.tzinfo, endTimeDateTime)
+                            if tripObj.startDateTime and tripObj.endDateTime :
+                                # print('Start Date time Inside if')
+                                if tripObj.startDateTime > startTimeDateTime:
+                                    tripObj.startDateTime = startTimeDateTime
+                                if tripObj.endDateTime < endTimeDateTime:
+                                    tripObj.endDateTime = endTimeDateTime
+                            else:
+                                # print('Start Date time Inside Else')
+                                tripObj.startDateTime =startTimeDateTime
                                 tripObj.endDateTime = endTimeDateTime
-                            print('startDateTime  Set' , tripObj.startDateTime)
-                            print('EndDateTime Set' , tripObj.endDateTime)
-                        else:
-                            print('Start Date time Inside Else')
-                            
-                            
-                            tripObj.startDateTime =startTimeDateTime
-                            tripObj.endDateTime = endTimeDateTime
-                            print('Else startTime  Set' , tripObj.startDateTime)
-                            print('Else EndTime Set' , tripObj.endDateTime)
+                        except Exception as e:
+                            pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
+                                    tripDate = res_,
+                                    docketNumber = data[5],
+                                    truckNo = data[1],
+                                    lineNumber = count,
+                                    errorFromPastTrip = "Incorrect date format",
+                                    fileName = fileName.split('@_!')[-1],
+                                    data = data
+                                ) 
+                            pastTripErrorObj.save()
+                            continue
+                        
                         shiftObj.startDateTime = tripObj.startDateTime
                         if count == 5:
                             exit() 
@@ -198,9 +235,11 @@ def run():
                         shiftObj.endDateTime = tripObj.endDateTime
                         shiftObj.save()
                         tripObj.save()
+                        # print('startDateTime Set' , tripObj.startDateTime)
+                        # print('EndDateTime Set' , tripObj.endDateTime)
 
                         surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
-                        docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5] , tripId=tripObj.id).first()
+                        docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id).first()
                         if docketObj :
                             pastTripErrorObj = PastTripError(
                                     clientName = 'boral',
@@ -215,14 +254,15 @@ def run():
                             pastTripErrorObj.save()
                             continue
                         docketObj = DriverShiftDocket()                
+                        print('Docket Obj Created.')
 
-
-                        clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1] , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
+                        clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1].strip() , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
 
                         if clientTruckConnectionObj:
-                            # print("finding ratecard")
-                            rateCard = clientTruckConnectionObj.rate_card_name                        
-                            graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = tripObj.shiftDate,end_date__gte = tripObj.shiftDate).first()
+                            print("finding ratecard")
+                            rateCard = clientTruckConnectionObj.rate_card_name 
+                            graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = shiftObj.shiftDate,end_date__gte = shiftObj.shiftDate).first()
+
                             if not graceObj:
                                 pastTripErrorObj = PastTripError(
                                     clientName = 'boral',
@@ -234,7 +274,7 @@ def run():
                                     fileName = fileName.split('@_!')[-1],
                                     data = data
                                 ) 
-                                # print('grace card not found')                   
+                                print('grace card not found')                   
                                 pastTripErrorObj.save()
                                 continue
 
@@ -252,82 +292,89 @@ def run():
                                     data = data
                                 )                    
                                 pastTripErrorObj.save()
-                                # print('COST PARAMETER not found')
+                                print('COST PARAMETER not found')
                                 continue
                                 
 
+                            try:
+                                docketObj.shiftDate = shiftDate
+                                docketObj.tripId = tripObj.id
+                                docketObj.docketNumber = data[5]
+                                docketObj.noOfKm = 0 if str(data[10]).lower() == '' else data[10]
+                                docketObj.transferKM = 0 if str(data[18]).lower() == '' else data[18]
+                                docketObj.returnToYard = True if data[16].lower() == 'yes' else False
+                                docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
+                                docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
+                                docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11], '%H:%M:%S').time()) 
+                                docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12], '%H:%M:%S').time())
+                                # docketObj.totalWaitingInMinute = totalWaitingTime
+                                docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
+                                docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20], '%H:%M:%S').time())
+                                docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21], '%H:%M:%S').time())
+                                # docketObj.standBySlot = standBySlot
+                                docketObj.comment = data[17]
+                                # modification for adding blow back and replacement.
+                                if data[19].strip().replace(' ','') != None:
+                                    docketObj.comment = docketObj.comment + 'Blow back comment : ' + data[19].strip() 
+                                    
+                                if data[23].strip().replace(' ','') != None:
+                                    docketObj.comment = docketObj.comment + 'Replacement comment : ' + data[23].strip() 
+                                    
                                 
-                            docketObj.shiftDate = shiftDate
-                            docketObj.tripId = tripObj.id
-                            docketObj.docketNumber = data[5]
-                            docketObj.noOfKm = 0 if str(data[10]).lower() == '' else data[10]
-                            docketObj.transferKM = 0 if str(data[18]).lower() == '' else data[18]
-                            docketObj.returnToYard = True if data[16].lower() == 'yes' else False
-                            docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
-                            docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
-                            docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11], '%H:%M:%S').time()) 
-                            docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12], '%H:%M:%S').time())
-                            # docketObj.totalWaitingInMinute = totalWaitingTime
-                            docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
-                            docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20], '%H:%M:%S').time())
-                            docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21], '%H:%M:%S').time())
-                            # docketObj.standBySlot = standBySlot
-                            docketObj.comment = data[17]
-                            # modification for adding blow back and replacement.
-                            if data[19].strip().replace(' ','') != None:
-                                docketObj.comment = docketObj.comment + 'Blow back comment : ' + data[19].strip() 
-                                
-                            if data[23].strip().replace(' ','') != None:
-                                docketObj.comment = docketObj.comment + 'Replacement comment : ' + data[23].strip() 
-                                
-                            
-                            docketObj.basePlant = basePlant.id
-                            docketObj.surcharge_type = surCharge.id
-                            # surcharge_duration = 
-                            # others = 
-                            docketObj.save()
-                            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
-                        
-                            if not  reconciliationDocketObj :
-                                reconciliationDocketObj = ReconciliationReport()
-                                
-                                
-                            reconciliationDocketObj.driverId = driverObj.driverId  
-                            reconciliationDocketObj.clientId = clientObj.clientId
-                            reconciliationDocketObj.truckId = tripObj.truckConnectionId
-                            
-                            # for ReconciliationReport 
-                            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId,startDate__lte = docketObj.shiftDate,endDate__gte = docketObj.shiftDate, clientId = clientObj).first()
-                            rateCard = clientTruckConnectionObj.rate_card_name
-                            costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
-                            graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
-                            
-                            driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            
-                            driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                docketObj.basePlant = basePlant.id
+                                docketObj.surcharge_type = surCharge.id
+                                # surcharge_duration = 
+                                # others = 
+                                docketObj.save()
+                            except Exception as e:
+                                print('Docket save Error:', e)
 
-                            driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
-                            driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            # minLoad 
-                            driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            # TotalCost 
-                            driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
-                            reconciliationDocketObj.docketNumber = docketObj.docketNumber  
-                            reconciliationDocketObj.docketDate = shiftObj.shiftDate 
-                            reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
-                            reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
-                            reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
-                            reconciliationDocketObj.driverStandByCost = driverStandByCost 
-                            reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
-                            reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
-                            reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
-                            reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
-                            reconciliationDocketObj.fromDriver = True 
-                            reconciliationDocketObj.save()
-                            # print("reconciliation done!!!!")
+                            print('Docket obj saved')
+                            try:
+                                reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
+                                
+                                if not  reconciliationDocketObj :
+                                    reconciliationDocketObj = ReconciliationReport()
+                                    
+                                    
+                                reconciliationDocketObj.driverId = driverObj.driverId  
+                                reconciliationDocketObj.clientId = clientObj.clientId
+                                reconciliationDocketObj.truckId = tripObj.truckConnectionId
+                                
+                                # for ReconciliationReport 
+                                clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId,startDate__lte = docketObj.shiftDate,endDate__gte = docketObj.shiftDate, clientId = clientObj).first()
+                                rateCard = clientTruckConnectionObj.rate_card_name
+                                costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
+                                graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
+                                
+                                driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                
+                                driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+
+                                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
+                                driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                # minLoad 
+                                driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                # TotalCost 
+                                driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+                                reconciliationDocketObj.docketNumber = docketObj.docketNumber  
+                                reconciliationDocketObj.docketDate = shiftObj.shiftDate 
+                                reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
+                                reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
+                                reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
+                                reconciliationDocketObj.driverStandByCost = driverStandByCost 
+                                reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
+                                reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
+                                reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
+                                reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
+                                reconciliationDocketObj.fromDriver = True 
+                                reconciliationDocketObj.save()
+                                print("reconciliation done!!!!")
+                            except Exception as e:
+                                print('Reconciliation Error: ', e)
                         
                         else:
                             pastTripErrorObj = PastTripError(

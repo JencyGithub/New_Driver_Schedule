@@ -210,8 +210,6 @@ def getOriginDetails(request):
     if not origin:
         status = False
     return JsonResponse({'status': status ,'origin' : origin})
-        
-
 
 def preStartTableView(request):
     preStarts = PreStart.objects.all()

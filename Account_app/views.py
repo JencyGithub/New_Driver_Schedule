@@ -1939,10 +1939,14 @@ def reconciliationAnalysis(request,dataType):
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
+        for data in dataList:        
+            data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
         params['dataType'] = 'Reconciliation'
         params['dataTypeInt'] = 0
     elif dataType == 1:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 1).values()
+        for data in dataList:                
+            data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
         params['dataType'] = 'Short paid'
         params['dataTypeInt'] = 1
         
@@ -1990,7 +1994,6 @@ def reconciliationSetMark(request):
         getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
         getDocket.reconciliationType = 1
         getDocket.save()
-    
     return JsonResponse({'status': True})
 
 @csrf_protect
@@ -2003,7 +2006,8 @@ def escalationClientCheck(request):
     msg = None
     for docket in dockets:
         getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
-        clientNames.add(getDocket.clientName)
+        clientNames.add(getDocket.clientId)
+        
         existDocket = EscalationDocket.objects.filter(docketNumber=ReconciliationReport.docketNumber, docketDate=getDocket.docketDate).first()
         reconciliationId.append(getDocket.id)
         if getDocket.fromDriver == False:

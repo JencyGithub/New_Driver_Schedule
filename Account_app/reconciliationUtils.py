@@ -192,7 +192,7 @@ def checkTransferCost(docketObj , shiftObj , rateCard , costParameterObj , grace
 
 def checkReturnCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
-        driverReturnCostTotal = (docketObj.returnKm -  graceObj.return_km_grace) * docketObj.returnQty 
+        driverReturnCostTotal = (float(docketObj.returnKm) -  float(graceObj.return_km_grace)) * float(docketObj.returnQty) 
         return round(driverReturnCostTotal,2)
     except Exception as e : 
         return -404.0
