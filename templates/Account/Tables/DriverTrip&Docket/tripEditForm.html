@@ -84,7 +84,9 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="clientName{{trip.id}}">Client Name :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select {% if not superUser %}disabled{% endif %} name="clientName{{trip.id}}" class="form-control">
+                                        <select readonly required name="clientName{{trip.id}}" class="form-control">
+                                            <option value=""disabled selected>Select Client Name</option>
+
                                             {% for C_id in Client %}
                                             <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
                                             {% endfor %}
@@ -94,7 +96,7 @@
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="shiftType{{trip.id}}">ShiftType :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select disabled name="shiftType{{trip.id}}" class="form-control">
+                                        <select {% if not superUser %}disabled{% endif %} name="shiftType{{trip.id}}" class="form-control">
                                             <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
                                             <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
 
@@ -105,7 +107,7 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="numberOfLoads{{trip.id}}">No. Of Loads:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.numberOfLoads}}" type="number"
+                                        <input readonly class="form-control" value="{{trip.numberOfLoads}}" type="number"
                                             name="numberOfLoads{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="numberOfLoads{{trip.id}}">
                                     </div>
@@ -161,7 +163,7 @@
                                     <label for="comment{{trip.id}}">Comment :<span class="required">*</span></label>
                                     <div  class="field item form-group">
                                         <textarea placeholder="comment" name="comment{{trip.id}}" id="comment{{trip.id}}"
-                                        {% if not superUser %}disabled{% endif %}  class="form-control">{{trip.comment}}</textarea>
+                                        {% if not superUser %}readonly{% endif %}  class="form-control">{{trip.comment}}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -194,10 +196,39 @@
                                     <!--  docketNumber docketFile  -->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="docketNumber{{docket.id}}">Docket Number :<span class="required">*</span></label>
+                                        <a href="" class="text-primary" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.docketNumber}}" type="text"
+                                            <input class="form-control" readonly value="{{docket.docketNumber}}" type="text"
                                                 name="docketNumber{{docket.id}}" required='required'
                                                 style="padding: 0.25rem 0.2rem;" id="docketNumber{{docket.id}}">
+                                        </div>
+                                    </div>
+                                    <!-- docket Edit Model  -->
+
+                                    <div class="modal fade" id="editDocketModel" tabindex="-1" role="dialog" aria-labelledby="editDocketModelLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="editDocketModelLabel">Docket Edit</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                        <div class="modal-body">
+                                                            <label for="docketNumber_{{docket.id}}">Docket Number :<span class="required">*</span></label>
+                                                            <div class="field item form-group">
+                                                            <input class="form-control" type="text" name="docketNumber_{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;"
+                                                                id="docketNumber_{{docket.id}}">
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" onclick="docketUpdate({{docket.id}})" class="btn btn-primary">Save </button>
+                                                </div>
+
+                                        </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -227,65 +258,48 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="noOfKm{{docket.id}}">Number Of Km:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.noOfKm}}" type="number"
-                                                name="noOfKm{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="noOfKm{{docket.id}}">
+                                            <input class="form-control" value="{{docket.noOfKm}}" type="number"name="noOfKm{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="noOfKm{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="transferKM{{docket.id}}">Transfer Km :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.transferKM}}" type="number"
-                                                name="transferKM{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="transferKM{{docket.id}}">
+                                            <input class="form-control" value="{{docket.transferKM}}" type="number" name="transferKM{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="transferKM{{docket.id}}">
                                         </div>
                                     </div>
                                     <!--    returnQty  returnKm  waitingTimeStart      -->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnQty{{docket.id}}">Return Qty:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnQty}}" type="number"
-                                                name="returnQty{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnQty}}" type="number"name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnKm{{docket.id}}">Return Km:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnKm}}" type="number"
-                                                name="returnKm{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnKm}}" type="number" name="returnKm{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" readonly>
                                         </div>
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span
-                                                class="required">*</span></label>
+                                        <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeStart}}" type="time"
-                                                name="waitingTimeStart{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">
+                                            <input class="form-control"  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">
                                         </div>
                                     </div>
 
                                     {% comment %} totalWaitingInMinute waitingTimeEnd surcharge_type {% endcomment %}
                                     {% comment %} {{docket.waitingTimeEnd}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span
-                                                class="required">*</span></label>
+                                        <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time"
-                                                name="waitingTimeEnd{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="totalWaitingInMinute{{docket.id}}">Total Waiting In Minute :<span
-                                                class="required">*</span></label>
+                                        <label for="totalWaitingInMinute{{docket.id}}">Total Waiting In Minute :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" readonly value="{{docket.totalWaitingInMinute}}" type="number"
-                                                name="totalWaitingInMinute{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute{{docket.id}}">
+                                            <input class="form-control" readonly value="{{docket.totalWaitingInMinute}}" type="number" name="totalWaitingInMinute{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -300,63 +314,48 @@
                                     </div>
                                     <!--     surcharge_duration    cubicMl standByStartTime -->
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="surcharge_duration{{docket.id}}">Surcharge Duration :<span
-                                                class="required">*</span></label>
+                                        <label for="surcharge_duration{{docket.id}}">Surcharge Duration :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.surcharge_duration}}" type="number"
-                                                name="surcharge_duration{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="surcharge_duration{{docket.id}}">
+                                            <input class="form-control" value="{{docket.surcharge_duration}}" type="number"name="surcharge_duration{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="surcharge_duration{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="cubicMl{{docket.id}}">Cubic Meter :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.cubicMl}}" type="number"
-                                                name="cubicMl{{docket.id}}" required="required"
-                                                style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
+                                            <input class="form-control" value="{{docket.cubicMl}}" type="number" name="cubicMl{{docket.id}}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standByStartTime{{docket.id}}">StandBy start Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByStartTime}}" type="time"
-                                                name="standByStartTime{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,{{docket.id}})">
+                                            <input class="form-control" value="{{docket.standByStartTime}}" type="time" name="standByStartTime{{docket.id}}" required='required'  style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,{{docket.id}})">
                                         </div>
                                     </div>
                                     <!--     standByEndTime   others  comment-->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standByEndTime{{docket.id}}">StandBy End Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" readonly
-                                                name="standByEndTime{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" readonly name="standByEndTime{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="standBySlot{{docket.id}}">Stand By Slot :<span
-                                                class="required">*</span></label>
+                                        <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" readonly  type="number"
-                                                name="standBySlot{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if driverDocket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                            <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if driverDocket %}{{docket.standBySlot}}{% else %}0{% endif %}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.others}}" type="number"
-                                                name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;"
-                                                required="required" id="others{{docket.id}}">
+                                            <input class="form-control" value="{{docket.others}}" type="number" name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-12 col-sm-12">
                                         <label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <textarea placeholder="comment" name="comment{{docket.id}}"
-                                                class="form-control">{{docket.comment}}</textarea>
+                                            <textarea placeholder="comment" name="comment{{docket.id}}" class="form-control">{{docket.comment}}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -464,7 +463,34 @@
             $(`#standByEndTime${count_}`).removeAttr('readonly');
         }
     }
-
+    function docketUpdate( docketId){
+        let docketId_ = docketId
+        let docketNumber_ =$(`#docketNumber_${docketId_}`).val()
+        console.log(docketNumber_)
+        if(docketId){
+            $.ajax({
+                type: "POST",
+                url: "/account/driverTrip/docket/update/",
+                data: {
+                    docketId : docketId_,
+                    docketNumber:docketNumber_
+                    
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    if(data.status){
+                        alertify.success('Update Successfully..');
+                        location.reload();
+                    }
+                    else{
+                        alert('DocketNumber must be unique')
+                    }
+                },
+            });
+        }
+    }
     function countTotalWaitingTime(lineData, count_,tripId){
         let waitingTimeStart = $(`#waitingTimeStart${count_}`).val()
         let waitingTimeEnd = lineData.value 

@@ -45,108 +45,117 @@
                     enctype="multipart/form-data">
                     {% csrf_token %}
                         <div class="x_panel">
-                        <div class="x_title ">
-                            <h2 class="text-primary"> Driver Trip Form </h2>
-                            <div class="clearfix"></div>
-                        </div> 
-                        <div class="x_content ">
-                            <div class="custom-continer">
-                                <!-- driver-id client-name shift-type  -->
-                                 <div class="col-md-4 col-sm-4">
-                                    <label for="driverId">Driver Id:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <select disabled name="driverId" class="form-control">
-                                            {% for D_id in Driver %}
-                                            <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
-                                            {% endfor %}
-                                        </select>
+                            <div class="x_title ">
+                                <h2 class="text-primary"> Driver Trip Form </h2>
+                                <div class="clearfix"></div>
+                            <div class="x_content mt-3 ">
+                                <div class="custom-continer">
+                                    <!-- driver-id client-name shift-type  -->
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="driverId">Driver Id:<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select disabled name="driverId" class="form-control">
+                                                {% for D_id in Driver %}
+                                                <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="clientName">Client Name :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <select {% if not superUser %}disabled{% endif %} name="clientName" class="form-control">
-                                            {% for C_id in Client %}
-                                            <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
-                                            {% endfor %}
-                                        </select>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="clientName">Client Name :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select {% if not superUser %}disabled{% endif %} required name="clientName" class="form-control">
+                                                <option value=""disabled selected>Select Client Name</option>
+                                                {% for C_id in Client %}
+                                                <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4 ">
-                                    <label for="shiftType">ShiftType :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <select disabled name="shiftType" class="form-control">
-                                            <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
-                                            <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
+                                    <div class="col-md-4 col-sm-4 ">
+                                        <label for="shiftType">ShiftType :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select disabled name="shiftType" class="form-control">
+                                                <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
+                                                <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
 
-                                        </select>
+                                            </select>
+                                        </div>
+                                    </div> 
+                                    <!-- numberOfLoads truckNo  shiftDate  -->
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.numberOfLoads}}" type="number"
+                                                name="numberOfLoads" min="1" max="5" onchange="addDocketForms(this)" required='required' style="padding: 0.25rem 0.2rem;"
+                                                id="numberOfLoads">
+                                        </div>
                                     </div>
-                                </div> 
-                                <!-- numberOfLoads truckNo  shiftDate  -->
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.numberOfLoads}}" type="number"
-                                            name="numberOfLoads" onclick="addDocketForms(this)" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="numberOfLoads">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="truckNo">Truck No:<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select {% if not superUser %}disabled{% endif %} class="form-control" required id="truckNo" name="truckNo">
+                                                <option value="" disabled selected>Select Truck No</option>
+                                                {% for truck in clientTruck %}
+                                                <option value="{{ truck.id }}" {% if trip.truckConnectionId == truck.id %}selected="selected"{% endif %}>{{ truck.clientTruckId }} - {{truck.truckNumber.adminTruckNumber}}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div> 
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="shiftDate">Shift Date:<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input disabled class="form-control" value="{{shiftObj.shiftDate}}" type="date"
+                                                name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
+                                                id="shiftDate">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="truckNo">Truck No:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <select {% if not superUser %}disabled{% endif %} class="form-control" required id="truckNo" name="truckNo">
-                                            <option value="" disabled selected>Select Truck No</option>
-                                            {% for truck in clientTruck %}
-                                            <option value="{{ truck.id }}" {% if trip.truckConnectionId == truck.id %}selected="selected"{% endif %}>{{ truck.clientTruckId }} - {{truck.truckNumber.adminTruckNumber}}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
+                                    <!-- startTime    endTime    loadSheet -->
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="startDateTime">Start Time :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                                name="startDateTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                                id="startDateTime">
+                                        </div>
                                     </div>
-                                </div> 
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="shiftDate">Shift Date:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input disabled class="form-control" value="{{shiftObj.shiftDate}}" type="date"
-                                            name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="shiftDate">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="endDateTime">End Time :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                            {% if not superUser %}disabled{% endif %}  name="endDateTime" required='required' style="padding: 0.25rem 0.2rem;"
+                                                id="endDateTime">
+                                        </div>
                                     </div>
-                                </div>
-                                <!-- startTime    endTime    loadSheet -->
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="startDateTime">Start Time :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                            name="startDateTime" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="startDateTime">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="loadSheet">loadSheet :<span class="required">*</span></label>
+                                        <div  class="field item form-group">
+                                            <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet"
+                                                style="padding: 0.25rem 0.2rem;" id="loadSheet">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="endDateTime">End Time :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                        {% if not superUser %}disabled{% endif %}  name="endDateTime" required='required' style="padding: 0.25rem 0.2rem;"
-                                            id="endDateTime">
+                                    <!-- comment  -->
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="comment">Comment :<span class="required">*</span></label>
+                                        <div  class="field item form-group">
+                                            <textarea placeholder="comment" name="comment" id="comment"
+                                            {% if not superUser %}disabled{% endif %}  class="form-control">{{trip.comment}}</textarea>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <label for="loadSheet">loadSheet :<span class="required">*</span></label>
-                                    <div  class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet"
-                                            style="padding: 0.25rem 0.2rem;" id="loadSheet">
-                                    </div>
-                                </div>
-                                <!-- comment  -->
-                                <div class="col-md-12 col-sm-12">
-                                    <label for="comment">Comment :<span class="required">*</span></label>
-                                    <div  class="field item form-group">
-                                        <textarea placeholder="comment" name="comment" id="comment"
-                                        {% if not superUser %}disabled{% endif %}  class="form-control">{{trip.comment}}</textarea>
-                                    </div>
-                                </div>
-                            </div>                            
+                                </div>    
+                            </div>
+                                                
+                            </div>
+                        </div> 
+                        <div class="x_panel">
+                            <div id="loadsContainer">
+                            </div>
                         </div>
-                    <div id="loadsContainer">
-                    </div>
+                        <div class="col-md-12 text-right p-0">
+                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
+                        </div> 
+                        
                 </form>
             </div>
         </div>
@@ -160,39 +169,283 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-
+<script src="{% static 'js/shiftEntry.js' %}"></script>
 <script>
-    
-    function docketAdd(count){
-        let docketContent = ''
-        for (let i = 1; i <= count.val(); i++) {
-            docketContent += `<div class="row border rounded-2 py-2 bg-light my-2">`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
-            docketContent += `<label for="docketNumber${i}">Docket number:</label>`
-            docketContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`
-            docketContent += `</div>`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
-            docketContent += `<label for="docketFile${i}">Docket File:</label>`
-            docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required>`
-            docketContent += `</div>`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
-            docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
-            docketContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`
-            docketContent += `</div>`
-            docketContent += `</div>`
-        }
-        return docketContent
-    }
-    function addDocketForms(data){
-        if(checkFields()){
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-            let numberOfLoads = $('input[name="numberOfLoads"]')
-            if(gotDocket == 0){
-                $('#loadsContainer').append(docketAdd(numberOfLoads));
-            }else{
-                $('#loadsContainer').append(detailsAdd(numberOfLoads));
-            }
-        }
+    // A "<form>" element is optionally passed as an argument, but is not a must
+var validator = new FormValidator({
+    "events": ['blur', 'input', 'change']
+}, document.forms[0]);
+// on form "submit" event
+document.forms[0].onsubmit = function (e) {
+    var submit = true,
+        validatorResult = validator.checkAll(this);
+    console.log(validatorResult);
+    return !!validatorResult.valid;
+};
+// on form "reset" event
+document.forms[0].onreset = function (e) {
+    validator.reset();
+};
+// stuff related ONLY for this demo page:
+$('.toggleValidationTooltips').change(function () {
+    validator.settings.alerts = !this.checked;
+    if (this.checked)
+        $('form .alert').remove();
+}).prop('checked', false);
+function returnToYard(id,tag){
+    let selected = $(`#${tag.id}`).is(':checked')
+
+    if(selected){
+        $(`#returnQty${id}`).removeAttr('readonly')
+        $(`#returnKm${id}`).removeAttr('readonly')
+    }else{
+        $(`#returnQty${id}`).attr('readonly',true)
+        $(`#returnKm${id}`).attr('readonly',true)
     }
+}
+
+function resetRadio(id){
+    $(`#tippingToYard${id}`).removeAttr('checked')
+    $(`#returnToYard${id}`).removeAttr('checked')
+    $(`#returnQty${id}`).attr('readonly',true)
+    $(`#returnKm${id}`).attr('readonly',true)
+}
+
+function openWaitingTimeEnd(lineData,count_){
+    let waitingTimeStart = lineData.value 
+    if(waitingTimeStart){
+        $(`#waitingTimeEnd${count_}`).removeAttr('readonly');
+    }
+}
+function openStandByEnd(lineData,count_){
+    let standByEndTime = lineData.value 
+    if(standByEndTime){
+        $(`#standByEndTime${count_}`).removeAttr('readonly');
+    }
+}
+
+function countTotalWaitingTime(lineData, count_,tripId){
+    let waitingTimeStart = $(`#waitingTimeStart${count_}`).val()
+    let waitingTimeEnd = lineData.value 
+    if(waitingTimeStart && waitingTimeEnd){
+        $.ajax({
+            type: "POST",
+            url: "/account/driverDocket/waitingTime/count/",
+            data: {
+                tripId : tripId,
+                waitingTimeEnd : waitingTimeEnd,
+                waitingTimeStart : waitingTimeStart,
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                console.log(data.totalWaitingTime)
+                $(`#totalWaitingInMinute${count_}`).val(data.totalWaitingTime)
+            },
+        });
+    }
+}
+
+function countStandBySlot(lineData,count_,tripId){
+    let standByStartTime = $(`#standByStartTime${count_}`).val()
+    let standByEndTime = $(`#standByEndTime${count_}`).val()
+
+    if(standByStartTime && standByEndTime){
+        $.ajax({
+            type: "POST",
+            url: "/account/driverDocket/standByTime/count/",
+            data: {
+                tripId : tripId,
+                standByStartTime : standByStartTime,
+                standByEndTime : standByEndTime,
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                console.log(data.totalWaitingTime)
+                $(`#standBySlot${count_}`).val(data.standBySlot)
+            },
+        });
+    }
+}
+
+function docketAdd(count){
+    let docketContent = ''
+    for (let i = 1; i <= count.val(); i++) {
+        docketContent += `<div class="x_title">`
+        docketContent += `<h2 class ="text-primary"> Load #${i}</h2>`
+        docketContent += `<div class="float-right">`
+        docketContent += `<input type="radio" id="tippingToYard${i}" name="returnToYard${i}" style="margin-top: .8rem;"  onclick="returnToYard(${i},this)" {% if item.tippingToYard %} checked {% endif %}>`
+        docketContent += `<label for="tippingToYard${i}" class="ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>`
+        docketContent += `<input type="radio" id="returnToYard${i}" name="returnToYard${i}" style="margin-top: .8rem;"  onclick="returnToYard(${i},this)" {% if item.returnToYard %} checked {% endif %}>`
+        docketContent += `<label for="returnToYard${i}" class="ml-2"style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>`
+        docketContent += `<i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio${i}" onclick="resetRadio(${i})"></i>`
+        docketContent += `</div>`
+        docketContent += `<div class="clearfix"></div>`
+        docketContent += `</div>`
+        docketContent += `<div class="x_content">`
+        docketContent += `<div class="custom-continer">`
+            
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="docketNumber${i}">Docket Number :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="text"name="docketNumber${i}" required='required'style="padding: 0.25rem 0.2rem;" id="docketNumber${i}" >`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="docketFile${i}">DocketFile :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="file"name="docketFile${i}" style="padding: 0.25rem 0.2rem;" required="required"id="docketFile${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4 ">`
+        docketContent += `<label for="basePlant${i}">BasePlant :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<select name="basePlant${i}" class="form-control">`
+        docketContent += `{% for basePlant_ in basePlants %}`
+        docketContent += `<option value="{{ basePlant_.id }}" {% if docket.basePlant == basePlant_.id %}selected="selected" {% endif %}>{{ basePlant_.basePlant }}</option>`
+        docketContent += `{% endfor %}`
+        docketContent += `</select>`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="noOfKm${i}">Number Of Km:<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number"name="noOfKm${i}" required='required'style="padding: 0.25rem 0.2rem;" id="noOfKm${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="transferKM{i}">Transfer Km :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control" type="number" name="transferKM{i}" required='required'style="padding: 0.25rem 0.2rem;" id="transferKM{i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="returnQty${i}">Return Qty:<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number"name="returnQty${i}" required='required'style="padding: 0.25rem 0.2rem;" id="returnQty${i}" readonly>`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="returnKm${i}">Return Km:<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number" name="returnKm${i}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm${i}" readonly>`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="waitingTimeStart${i}">Waiting Time Start :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"   type="time" name="waitingTimeStart${i}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeStart${i}" onchange="openWaitingTimeEnd(this,${i})">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="waitingTimeEnd${i}">Waiting Time End :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"   type="time" name="waitingTimeEnd${i}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd${i}" readonly onchange="countTotalWaitingTime(this,${i},{{docket.tripId}})">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="totalWaitingInMinute${i}">Total Waiting In Minute :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control" readonly  type="number" name="totalWaitingInMinute${i}" required='required' style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+            
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="surcharge_type${i}">Surcharge Type:<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<select name="surcharge_type${i}" class="form-control" >`
+        docketContent += `{% for surcharge in surcharges %}`
+        docketContent += `<option value="{{surcharge.id}}" {% if docket.surchargeType == surcharge.id %} selected {% endif %} >{{surcharge.surcharge_Name}}</option>`
+        docketContent += `{% endfor %}`
+        docketContent += `</select>`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="surcharge_duration${i}">Surcharge Duration :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number"name="surcharge_duration${i}" required='required' style="padding: 0.25rem 0.2rem;" id="surcharge_duration${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="cubicMl${i}">Cubic Meter :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number"name="cubicMl${i}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="standByStartTime${i}">StandBy Start Time :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="time" name="standByStartTime${i}" required='required'  style="padding: 0.25rem 0.2rem;" id="standByStartTime${i}" onchange="openStandByEnd(this,${i})">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+       
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="standByEndTime${i}">StandBy End Time :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="time" readonly name="standByEndTime${i}" required='required' style="padding: 0.25rem 0.2rem;" id="standByEndTime${i}" onchange="countStandBySlot(this,${i},{{docket.tripId}})">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="standBySlot${i}">Stand By Slot :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control" readonly  type="number" name="standBySlot${i}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-4 col-sm-4">`
+        docketContent += `<label for="others${i}">Others :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<input class="form-control"  type="number" name="others${i}" style="padding: 0.25rem 0.2rem;" required="required" id="others${i}">`
+        docketContent += `</div>`
+        docketContent += `</div>`
+
+        docketContent += `<div class="col-md-12 col-sm-12">`
+        docketContent += `<label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>`
+        docketContent += `<div class="field item form-group">`
+        docketContent += `<textarea placeholder="comment" name="comment${i}" class="form-control">{{docket.comment}}</textarea>`
+        docketContent += `</div>`
+        docketContent += `</div>`
+    }
+    return docketContent
+}
+function addDocketForms(data){
+
+    let numberOfLoads = $('input[name="numberOfLoads"]')
+    if(numberOfLoads != 0){
+        $('#loadsContainer').empty();
+        $('#loadsContainer').append(docketAdd(numberOfLoads));
+    }
+    else{
+        console.log('here')
+        alert('Minimum 1 docket required')
+    }
+}
 </script>
+
 {% endblock %}

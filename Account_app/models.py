@@ -113,7 +113,8 @@ class DriverShiftDocket(models.Model):
     def __str__(self) -> str:
         return str(self.docketNumber) + str(self.tripId)
    
-
+    class Meta:
+        unique_together = (('docketNumber', 'shiftDate','clientId'),)
 # -----------------------------------
 # New Trips Section end
 # -----------------------------------

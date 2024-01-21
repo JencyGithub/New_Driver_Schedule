@@ -140,6 +140,7 @@ urlpatterns = [
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
     path('driverTrip/update/<int:shiftId>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
+    path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
     
     # Filters
