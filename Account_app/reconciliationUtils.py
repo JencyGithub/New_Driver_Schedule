@@ -76,7 +76,7 @@ def checkLoadAndKmCost(driverDocketNumber,docketDate):
  
     except Exception as e :
         with open("scripts/checkLoadAndKmCost.txt", 'a') as f:
-            f.write(driverDocketNumber + str(e)+','+'\n')
+            f.write(str(driverDocketNumber) + str(e)+','+'\n')
         return -404.0
 
 def checkMinLoadCost(driverDocketNumber,docketDate):

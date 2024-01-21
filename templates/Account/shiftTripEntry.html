@@ -39,13 +39,11 @@
 <div class="right_col" role="main">
     <div class="">
         <div class="clearfix"></div>
-
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' ids=shiftObj.id%}" novalidate
+                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" novalidate
                     enctype="multipart/form-data">
                     {% csrf_token %}
-
                         <div class="x_panel">
                         <div class="x_title ">
                             <h2 class="text-primary"> Driver Trip Form </h2>
@@ -57,7 +55,7 @@
                                  <div class="col-md-4 col-sm-4">
                                     <label for="driverId">Driver Id:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select {% if not superUser %}disabled{% endif %} name="driverId" class="form-control">
+                                        <select disabled name="driverId" class="form-control">
                                             {% for D_id in Driver %}
                                             <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
                                             {% endfor %}
@@ -77,7 +75,7 @@
                                 <div class="col-md-4 col-sm-4 ">
                                     <label for="shiftType">ShiftType :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select {% if not superUser %}disabled{% endif %} name="shiftType" class="form-control">
+                                        <select disabled name="shiftType" class="form-control">
                                             <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
                                             <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
 
@@ -89,11 +87,11 @@
                                     <label for="numberOfLoads">No. Of Loads:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.numberOfLoads}}" type="number"
-                                            name="numberOfLoads" required='required' style="padding: 0.25rem 0.2rem;"
+                                            name="numberOfLoads" onclick="addDocketForms(this)" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="numberOfLoads">
                                     </div>
                                 </div>
-                                 <div class="col-md-4 col-sm-4">
+                                <div class="col-md-4 col-sm-4">
                                     <label for="truckNo">Truck No:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select {% if not superUser %}disabled{% endif %} class="form-control" required id="truckNo" name="truckNo">
@@ -108,7 +106,7 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="shiftDate">Shift Date:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{shiftObj.shiftDate}}" type="date"
+                                        <input disabled class="form-control" value="{{shiftObj.shiftDate}}" type="date"
                                             name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="shiftDate">
                                     </div>
@@ -145,12 +143,10 @@
                                         {% if not superUser %}disabled{% endif %}  class="form-control">{{trip.comment}}</textarea>
                                     </div>
                                 </div>
-                            </div>
-                            
+                            </div>                            
                         </div>
-                        </div>
-
-
+                    <div id="loadsContainer">
+                    </div>
                 </form>
             </div>
         </div>
@@ -165,4 +161,38 @@
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 
+<script>
+    
+    function docketAdd(count){
+        let docketContent = ''
+        for (let i = 1; i <= count.val(); i++) {
+            docketContent += `<div class="row border rounded-2 py-2 bg-light my-2">`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="docketNumber${i}">Docket number:</label>`
+            docketContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`
+            docketContent += `</div>`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="docketFile${i}">Docket File:</label>`
+            docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required>`
+            docketContent += `</div>`
+            docketContent += `<div class="col-md-4 col-12 my-1">`
+            docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
+            docketContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`
+            docketContent += `</div>`
+            docketContent += `</div>`
+        }
+        return docketContent
+    }
+    function addDocketForms(data){
+        if(checkFields()){
+
+            let numberOfLoads = $('input[name="numberOfLoads"]')
+            if(gotDocket == 0){
+                $('#loadsContainer').append(docketAdd(numberOfLoads));
+            }else{
+                $('#loadsContainer').append(detailsAdd(numberOfLoads));
+            }
+        }
+    }
+</script>
 {% endblock %}

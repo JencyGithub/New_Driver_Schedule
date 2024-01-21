@@ -86,6 +86,8 @@ class DriverShiftTrip(models.Model):
 class DriverShiftDocket(models.Model):
     tripId = models.PositiveIntegerField(null=True, blank=True)
     shiftId = models.IntegerField(null=True, blank=True)
+    shiftDate = models.DateField(null=True, blank=True)
+    clientId = models.IntegerField(null=True, blank=True)
     docketNumber = models.CharField(max_length=20, default='', null=True, blank=True)
     docketFile = models.FileField(upload_to='static/img/docketFiles', null=True, blank=True)
     basePlant = models.PositiveIntegerField(null=True, blank=True)
@@ -401,7 +403,7 @@ class ReconciliationReport(models.Model):
     docketDate = models.DateField(default=None, null= True, blank=True)
     clientName =  models.CharField(max_length=20,default='')
     driverId = models.PositiveIntegerField(default=0)
-    clientId = models.PositiveIntegerField(default=0)
+    # clientId = models.PositiveIntegerField(default=0)
     truckId = models.PositiveIntegerField(default=0)
     
     # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of

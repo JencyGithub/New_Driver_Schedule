@@ -1291,9 +1291,11 @@ def countDocketWaitingTime(request):
     tripId = request.POST.get('tripId')
     waitingTimeStart = request.POST.get('waitingTimeStart')
     waitingTimeEnd = request.POST.get('waitingTimeEnd')
-    tripObj = DriverTrip.objects.filter(pk=tripId).first()
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    totalWaitingTime =0
     if tripObj:
-        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+        adminTruckObj = clientTruckConnectionObj.truckNumber
         clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
         rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
@@ -1311,21 +1313,22 @@ def countDocketWaitingTime(request):
 
 @csrf_protect
 def countDocketStandByTime(request):
+    standBySlot= 0
     tripId = request.POST.get('tripId')
     standByStartTime = request.POST.get('standByStartTime')
     standByEndTime = request.POST.get('standByEndTime')
 
-    tripObj = DriverTrip.objects.filter(pk=tripId).first()
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     
     if tripObj:
-        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+        adminTruckObj = clientTruckConnectionObj.truckNumber
         clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
         rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
         costParameterObj = CostParameters.objects.filter(rate_card_name = rateCardObj).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
 
         totalStandByTime = getTimeDifference(standByStartTime,standByEndTime)
-        standBySlot = 0
         if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
             totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
             standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
@@ -1641,51 +1644,32 @@ def DriverTripEditForm(request, id):
     shiftObj = DriverShift.objects.filter(pk=id).first()
     shiftObj.shiftDate = dateConverterFromTableToPageFormate(shiftObj.shiftDate)
     tripObj = DriverShiftTrip.objects.filter(shiftId=id)
-    # return HttpResponse(tripObj.startDateTime)
-    docketObj = DriverShiftDocket.objects.filter(shiftId=id)
-    tripCount_ = 1
-    docketCount_ = 1
-    
-    for trip in tripObj:
-        trip.count_ = tripCount_
-        # trip.startDateTime = trip.startDateTime.strftime("%Y-%m-%d %H:%M:%S.%f%z")
-        # trip.endDateTime = trip.endDateTime.strftime("%Y-%m-%d %H:%M:%S.%f%z")
-        
-        tripCount_+=1
-        
-    for docket in docketObj:
-        docket.count_ = docketCount_
-        docketCount_+=1
+    for i in tripObj:
+        i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
+        for docket in i.tripDockets:
+            if docket.waitingTimeStart:
+                docket.waitingTimeStart = docket.waitingTimeStart.strftime("%H:%M:%S")
+            if docket.waitingTimeEnd:
+                docket.waitingTimeEnd = docket.waitingTimeEnd.strftime("%H:%M:%S")
+            if docket.standByStartTime:
+                docket.standByStartTime = docket.standByStartTime.strftime("%H:%M:%S")
+            if docket.standByEndTime:
+                docket.standByEndTime = docket.standByEndTime.strftime("%H:%M:%S")
         
     driver = Driver.objects.all()
     clientName = Client.objects.all()
     clientTruck = ClientTruckConnection.objects.all()
-    # driver_trip.shiftDate = str(driver_trip.shiftDate)
-    # driver_trip.startTime =str(datetime.strptime(driver_trip.startTime, '%H:%M:%S').time())
-    
-
-    # driver_docket = DriverDocket.objects.filter(tripId=id)
     surcharges = Surcharge.objects.all()
-    # count_ = 1
-    # for i in driver_docket:
-    #     i.count_ = count_
-    #     count_ += 1
-
-    #     i.totalWaitingInMinute =DriverTripCheckWaitingTime(i.docketNumber,i.shiftDate)
-    #     i.standBySlot = DriverTripCheckStandByTotal(i.docketNumber,i.shiftDate)
-    #     print(i.standBySlot)
         
     base_plant = BasePlant.objects.all()
 
     params = {
         'driverTrip': tripObj,
-        'driverDocket': docketObj,
         'shiftObj':shiftObj,
         'clientTruck':clientTruck,
         'basePlants': base_plant,
         'Driver': driver,
         'Client': clientName,
-        # 'adminTrucks': AdminTrucks,
         'surcharges' : surcharges,
         'superUser':superUser
     }
@@ -1694,105 +1678,100 @@ def DriverTripEditForm(request, id):
 
 
 @csrf_protect
-def driverEntryUpdate(request, ids):
+def driverEntryUpdate(request, shiftId):
     # Update Trip Save
-    driver_trip = DriverTrip.objects.get(id=ids)
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+    for trip in tripObj:
+        trip.clientId = request.POST.get(f'clientName{trip.id}')
+        trip.numberOfLoads = request.POST.get(f'numberOfLoads{trip.id}')
+        trip.truckConnectionId = request.POST.get(f'truckNo{trip.id}')
+        trip.startDateTime = request.POST.get(f'startDateTime{trip.id}')
+        trip.endDateTime = request.POST.get(f'endDateTime{trip.id}')
+        if request.FILES.get(f'loadSheet{trip.id}'):
+            loadSheet = request.FILES.get(f'loadSheet{trip.id}')
+            trip.loadSheet = loadFileSave(loadSheet)
 
-    driver_trip.verified = True if request.POST.get('verified') == 'on' else False
-    driver_trip.driverId = Driver.objects.get(pk=request.POST.get('driverId'))
-    driver_trip.clientName = Client.objects.get(pk=request.POST.get('clientName'))
-    driver_trip.shiftType = request.POST.get('shiftType')
-    driver_trip.numberOfLoads = request.POST.get('numberOfLoads')
-    driver_trip.truckNo = request.POST.get('truckNo')
-    driver_trip.shiftDate = request.POST.get('shiftDate')
-    driver_trip.startTime = request.POST.get('startTime')
-    driver_trip.endTime = request.POST.get('endTime')
-    if request.FILES.get('loadSheet'):
-        loadSheet = request.FILES.get('loadSheet')
-        driver_trip.loadSheet = loadFileSave(loadSheet)
-
-    driver_trip.comment = request.POST.get('comment')
-    driver_trip.save()
-
-    driver_docket = DriverDocket.objects.filter(tripId=ids).values()
-    count_ = 1
-    for i in driver_docket:
-        try:
-            docketNumberVal = DriverDocket.objects.get(docketNumber=int(float(request.POST.get(f'docketNumber{count_}'))), shiftDate=request.POST.get(f'shiftDate{count_}'))
-            if docketNumberVal.docketId != i['docketId']:
+        trip.comment = request.POST.get(f'comment{trip.id}')
+        trip.save()
+        
+        
+    docketObj = DriverShiftDocket.objects.filter(shiftId=shiftObj.id)
+    driverDocketNumber = None
+    for docket in docketObj:
+        driverDocketNumber =int(float(request.POST.get(f'docketNumber{docket.id}')))
+        tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+        for trip in tripObj:
+            docketNumberVal = DriverShiftDocket.objects.filter(tripId = trip.id ,clientId =  trip.clientId , shiftId = shiftObj.id ,docketNumber=driverDocketNumber).first()
+            docket.clientId = trip.clientId
+            if docketNumberVal:
                 messages.error(request, "Docket must be unique.")
                 return redirect(request.META.get('HTTP_REFERER'))
-        except:
-            pass
-        docketObj = DriverDocket.objects.get(pk=i['docketId'])
-        docketObj.shiftDate = request.POST.get(f'shiftDate{count_}')
-        docketObj.docketNumber = int(float(request.POST.get(f'docketNumber{count_}')))
-        if request.FILES.get(f'docketFile{count_}'):
-            docketFiles = request.FILES.get(f'docketFile{count_}')
-            docketObj.docketFile = docketFileSave(
-                docketFiles, docketObj.docketNumber)
-        docketObj.basePlant = BasePlant.objects.get(
-            pk=request.POST.get(f'basePlant{count_}'))
-        docketObj.noOfKm = request.POST.get(f'noOfKm{count_}')
-        docketObj.transferKM = request.POST.get(f'transferKM{count_}')
-        surchargeObj = Surcharge.objects.get(pk = request.POST.get(f'surcharge_type{count_}'))
-        docketObj.surcharge_type = surchargeObj
-        if request.POST.get(f'returnToYard{count_}') == f'returnToYard{count_}':
-            docketObj.returnQty = request.POST.get(f'returnQty{count_}')
-            docketObj.returnKm = request.POST.get(f'returnKm{count_}')
-            docketObj.returnToYard = True
-        elif request.POST.get(f'returnToYard{count_}') == f'tippingToYard{count_}':
-            docketObj.returnQty = request.POST.get(f'returnQty{count_}')
-            docketObj.returnKm = request.POST.get(f'returnKm{count_}')
-            docketObj.tippingToYard = True
+        docket.docketNumber = driverDocketNumber
+        docket.shiftId = shiftObj.id
+        if request.FILES.get(f'docketFile{docket.id}'):
+            docketFiles = request.FILES.get(f'docketFile{docket.id}')
+            docket.docketFile = docketFileSave(docketFiles, docket.driverDocketNumber)
+        docket.basePlant = request.POST.get(f'basePlant{docket.id}')
+        docket.noOfKm = request.POST.get(f'noOfKm{docket.id}')
+        docket.transferKM = request.POST.get(f'transferKM{docket.id}')
+        docket.surcharge_type = request.POST.get(f'surcharge_type{docket.id}')
+        if request.POST.get(f'returnToYard{docket.id}') == f'returnToYard{docket.id}':
+            docket.returnQty = request.POST.get(f'returnQty{docket.id}')
+            docket.returnKm = request.POST.get(f'returnKm{docket.id}')
+            docket.returnToYard = True
+        elif request.POST.get(f'returnToYard{docket.id}') == f'tippingToYard{docket.id}':
+            docket.returnQty = request.POST.get(f'returnQty{docket.id}')
+            docket.returnKm = request.POST.get(f'returnKm{docket.id}')
+            docket.tippingToYard = True
         
-        docketObj.waitingTimeStart = request.POST.get(
-            f'waitingTimeStart{count_}')
-        docketObj.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{count_}')
-        # docketObj.totalWaitingInMinute = request.POST.get(f'totalWaitingInMinute{count_}')
+        docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
+        docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
+        docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
+        docket.cubicMl = request.POST.get(f'cubicMl{docket.id}')
+        docket.standByStartTime = request.POST.get(f'standByStartTime{docket.id}')
+        docket.standByEndTime = request.POST.get(f'standByEndTime{docket.id}')
+        docket.others = request.POST.get(f'others{docket.id}')
+        docket.comment = request.POST.get(f'comment{docket.id}')
         
-        docketObj.surcharge_duration = request.POST.get(
-            f'surcharge_duration{count_}')
-        docketObj.cubicMl = request.POST.get(f'cubicMl{count_}')
+        docket.save()
+
+        verified = request.POST.get('verified')
         
-        docketObj.standByStartTime = request.POST.get(
-            f'standByStartTime{count_}')
-        docketObj.standByEndTime = request.POST.get(f'standByEndTime{count_}')
-        # docketObj.standBySlot = request.POST.get(f'standBySlot{count_}')
-        # print(request.POST.get(f'standBySlot{count_}'))
-        docketObj.others = request.POST.get(f'others{count_}')
-        docketObj.comment = request.POST.get(f'comment{count_}')
-        count_ += 1
-        
-        docketObj.save()
-    # return HttpResponse('here')
-        if driver_trip.verified:
-            docketObj.shiftDate= datetime.strptime(docketObj.shiftDate, "%Y-%m-%d").date()
-            driverDocketNumber = docketObj.docketNumber
-            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = docketObj.shiftDate ).first()
+        if verified == 'True' :
+            
+            tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+            clientName = None
+            clientTruckConnectionObj = None
+            for trip in tripObj:
+                trip.verified = True
+                clientName = Client.objects.filter(clientId = trip.clientId).values('name').first()['name']
+                clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk = trip.truckConnectionId).first()
+                trip.save()
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate=shiftObj.shiftDate).first()
                     
             if not  reconciliationDocketObj :
                 reconciliationDocketObj = ReconciliationReport()
                 
-             
-            reconciliationDocketObj.driverId = request.POST.get('driverId')  
-            reconciliationDocketObj.clientId = request.POST.get('clientName') 
-            reconciliationDocketObj.truckId = request.POST.get('truckNo') 
                 
-            driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,docketObj.shiftDate)
-            driverSurchargeCost = checkSurcharge(driverDocketNumber,docketObj.shiftDate)
-            # return HttpResponse(driverSurchargeCost)
-            driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,docketObj.shiftDate)
-            slotSize = DriverTripCheckStandByTotal(driverDocketNumber,docketObj.shiftDate)
-            driverStandByCost = checkStandByTotal(driverDocketNumber,docketObj.shiftDate,slotSize)
-            driverTransferKmCost = checkTransferCost(driverDocketNumber,docketObj.shiftDate)
-            driverReturnKmCost = checkReturnCost(driverDocketNumber,docketObj.shiftDate)
+            reconciliationDocketObj.driverId = request.POST.get('driverId')  
+            reconciliationDocketObj.clientId = clientName 
+            reconciliationDocketObj.truckId = clientTruckConnectionObj.truckNumber.adminTruckNumber 
+                
+            driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,shiftObj.shiftDate)
+            return HttpResponse(driverLoadAndKmCost)
+            driverSurchargeCost = checkSurcharge(driverDocketNumber,shiftObj.shiftDate)
+            driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,shiftObj.shiftDate)
+            slotSize = DriverTripCheckStandByTotal(driverDocketNumber,shiftObj.shiftDate)
+            driverStandByCost = checkStandByTotal(driverDocketNumber,shiftObj.shiftDate,slotSize)
+            driverTransferKmCost = checkTransferCost(driverDocketNumber,shiftObj.shiftDate)
+            driverReturnKmCost = checkReturnCost(driverDocketNumber,shiftObj.shiftDate)
             # minLoad 
-            driverLoadDeficit = checkMinLoadCost(driverDocketNumber,docketObj.shiftDate)
+            driverLoadDeficit = checkMinLoadCost(driverDocketNumber,shiftObj.shiftDate)
             # TotalCost 
             driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
             reconciliationDocketObj.docketNumber = driverDocketNumber  
-            reconciliationDocketObj.docketDate = docketObj.shiftDate  
+            reconciliationDocketObj.docketDate = shiftObj.shiftDate 
             reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
             reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
             reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
@@ -1805,18 +1784,15 @@ def driverEntryUpdate(request, ids):
             reconciliationDocketObj.save()
             # missingComponents 
             checkMissingComponents(reconciliationDocketObj)
-    
-    
-    # return HttpResponse('Work')
-
-
-    url = reverse('Account:DriverTripEdit', kwargs={'id': ids})
     messages.success(request, "Docket Updated successfully")
+    url = reverse('Account:DriverTripEdit', kwargs={'ids': shiftId})
     return redirect(url)
-
+    return redirect(request.META.get('HTTP_REFERER'))
 @csrf_protect
 def tripEntry(request,shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    shiftObj.shiftDate = dateConverterFromTableToPageFormate(shiftObj.shiftDate)
+    
     superUser = False
     driver = Driver.objects.all()
     clientName = Client.objects.all()
@@ -2685,7 +2661,7 @@ def DriverShiftForm(request,id):
 
 
 @csrf_protect
-def ShiftDetails(request,id):
+def  ShiftDetails(request,id):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
     id_ = id

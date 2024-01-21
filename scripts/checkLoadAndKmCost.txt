@@ -1929,3 +1929,6 @@
 27893614'NoneType' object has no attribute 'rate_card_name',
 27893623'NoneType' object has no attribute 'rate_card_name',
 27893632'NoneType' object has no attribute 'rate_card_name',
+699'NoneType' object has no attribute 'cubicMl',
+275'NoneType' object has no attribute 'cubicMl',
+590'NoneType' object has no attribute 'cubicMl',
