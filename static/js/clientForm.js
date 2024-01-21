@@ -8,9 +8,10 @@ $(document).ready(function() {
       );
     $('#clientId').select2();
     $('#truckNum').select2();
-
+    
     $("#clientId").on("change", function () {
       let clientId = $(this).val();
+     
     
       if (clientId) {
         $("#truckNum").prop("disabled", false);
@@ -20,6 +21,7 @@ $(document).ready(function() {
           url: "/account/getTrucks/",
           data: {
             clientName: $(this).val(),
+            shiftId: shiftId
           },
           beforeSend: function (xhr) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
