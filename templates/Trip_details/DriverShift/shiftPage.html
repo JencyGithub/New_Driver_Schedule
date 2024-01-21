@@ -94,7 +94,9 @@
                     <table class="table">
                         <thead>
                           <tr>
-                            <th scope="col">SR.</th>
+                            {% comment %} <th scope="col">SR.</th> {% endcomment %}
+                            <th scope="col">Client </th>
+                            <th scope="col">Truck</th>
                             <th scope="col">Start Time</th>
                             <th scope="col">End Time</th>
                           </tr>
@@ -102,7 +104,9 @@
                         <tbody>
                             {% for break in breaks %}
                                 <tr>
-                                    <th scope="row">{{ forloop.counter }}</th>
+                                    {% comment %} <th scope="row">{{ forloop.counter }}</th> {% endcomment %}
+                                    <td class="text-capitalize">{{ break.clientName }}</td>
+                                    <td>{{ break.truckNum }}</td>
                                     <td>{{ break.startDateTime }}</td>
                                     <td>{{ break.endDateTime }}</td>
                                 </tr>

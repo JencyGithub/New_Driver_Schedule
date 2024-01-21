@@ -484,10 +484,17 @@ def timeOfStartSave(request):
 def mapFormView(request):
     driverObj = Driver.objects.filter(name=request.user.username).first()
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
+    
     if shiftObj:
         existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
         if existingTrip:
-            return redirect('Account:DriverPreStartSave', existingTrip.id)
+            preStart = DriverPreStart.objects.filter(tripId=existingTrip.id)
+            if len(preStart) > 0:
+                return redirect('Account:driverShiftView', shiftObj.id)
+            else:
+                return redirect('Account:showPreStartForm', shiftId=shiftObj.id, tripId=existingTrip.id)
+        else:
+            return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
         currentDate = getCurrentDateTimeObj()
         params = {
@@ -498,16 +505,9 @@ def mapFormView(request):
 
 @csrf_protect
 def mapDataSave(request, recurring=None):
-    params = {}
-    existingTrip = None
     driverObj = Driver.objects.filter(name=request.user.username).first()
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
-    if shiftObj:
-        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
-
-    if shiftObj and existingTrip:
-        return redirect('Account:DriverPreStartSave', existingTrip.id)
-
+    
     if not recurring:
         currentDateTime = getCurrentDateTimeObj()
         lat = request.POST.get('latitude')
@@ -522,45 +522,64 @@ def mapDataSave(request, recurring=None):
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
         shiftObj.save()
-    
-    if existingTrip:
-        truckConnectionObj = ClientTruckConnection.objects.filter(pk=existingTrip.truckConnectionId).first()
-        params['clientName'] = Client.objects.filter(pk=existingTrip.clientId).first()
-        params['truckNum'] = str(truckConnectionObj.truckNumber) + '-' + str(truckConnectionObj.clientTruckId)
-    else:
-        client_ids = Client.objects.all()
-        params['client_ids'] = client_ids
         
-    params['shiftObj'] = shiftObj
+    return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
+
+
+def showClientAndTruckNumGet(request, shiftId):
+    client_ids = Client.objects.all()
+    params = {
+        'client_ids' : client_ids
+    }
+    
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    if shiftObj:
+        params['shiftObj'] = shiftObj
+        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+        if existingTrip:
+            return redirect('Account:showPreStartForm',shiftId=shiftObj.id, tripId=existingTrip.id)
+
+        
     return render(request, 'Trip_details/DriverShift/clientForm.html', params)
 
+def showPreStartForm(request, shiftId, tripId):
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id)
+    
+    params = {
+        'preStartQuestions':preStartQuestions,
+        'shiftId' : shiftId,
+        'tripObj' : tripObj
+    }
+     
+    return render(request, 'Trip_details/pre-startForm.html',params)
+    
 @csrf_protect
 def clientAndTruckDataSave(request, id):
+    tripObj = DriverShiftTrip.objects.filter(shiftId=id, endDateTime=None).first()
+    if tripObj:
+        messages.error(request, "Please complete your current trip first.")
+        return redirect('Account:mapFormView')
+        
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
+    
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
     clientTruckNum = truckNum[1]
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
     currentDateTime = getCurrentDateTimeObj()
     
-    tripObj = DriverShiftTrip.objects.filter(shiftId=id, clientId=clientObj.clientId, truckConnectionId=truckConnectionObj.id).first()
-    if not tripObj:
-        tripObj = DriverShiftTrip()
+    tripObj = DriverShiftTrip()
     tripObj.shiftId = id
     tripObj.startDateTime = currentDateTime
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
-    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id)
-    params = {
-        'preStartQuestions':preStartQuestions,
-        'shiftId' : id,
-        'tripObj' : tripObj
-    }
     
-    return render(request, 'Trip_details/pre-startForm.html',params)
+    return redirect('Account:showPreStartForm', shiftId=tripObj.shiftId, tripId=tripObj.id)
 
 def checkQuestionRequired(request):
     status = False
@@ -568,24 +587,20 @@ def checkQuestionRequired(request):
     optionNumber = request.GET.get('optionNumber')
     questionObj = PreStartQuestion.objects.filter(pk=questionId).first()
     
-    if int(optionNumber) == 1:
-        if questionObj.wantFile1 == True:
-            status = True
-    elif int(optionNumber) == 2:
-        print(int(optionNumber))
-        if questionObj.wantFile2 == True:
-            status = True
-    elif int(optionNumber) == 3:
-        if questionObj.wantFile3 == True:
-            status = True
-    elif int(optionNumber) == 4:
-        if questionObj.wantFile4 == True:
-            status = True
+    if int(optionNumber) == 1 and questionObj.wantFile1 == True:
+        status = True
+    elif int(optionNumber) == 2 and questionObj.wantFile2 == True:
+        status = True
+    elif int(optionNumber) == 3 and questionObj.wantFile3 == True:
+        status = True
+    elif int(optionNumber) == 4 and questionObj.wantFile4 == True:
+        status = True
         
     return JsonResponse({'status': status})
     
 @csrf_protect
 def DriverPreStartSave(request, tripId):
+    
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
@@ -594,20 +609,13 @@ def DriverPreStartSave(request, tripId):
     driverObj = Driver.objects.filter(name=request.user.username).first()
     currentDateTime = getCurrentDateTimeObj()
     currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
-    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    
     for trip in currentTrips:
         trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
         trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
 
     driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
-    params = {
-        'tripObj' : tripObj,
-        'currentTrips' : currentTrips,
-        'shiftObj' : shiftObj,
-        'clientObj' : truckConnectionObj.clientId,
-        'truckObj' : truckConnectionObj,
-        'breaks' : breaks
-    }
+   
     msg = None
     if not driverPreStartObj:
         driverPreStartObj = DriverPreStart()
@@ -652,18 +660,48 @@ def DriverPreStartSave(request, tripId):
                 answerObj.answerFile = f'{path}/{newFileName}'
                 answerObj.comment = queComment        
             answerObj.save()
-            if not msg: 
-                msg = "Pre-start successfully filled, you can start your shift."
+           
+    return redirect('Account:driverShiftView', shiftObj.id)
+    
+    
+def driverShiftView(request, shiftId):
+    tripObj = None
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
 
-    if msg:
-        messages.success(request, msg)
+    for trip in currentTrips:
+        trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
+        trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
+        
+        if trip.endDateTime == None:
+            tripObj = trip
+            
+    truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
+    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    
+    for breakObj in breaks:
+        breakObj.clientName = Client.objects.filter(pk=breakObj.tripId.clientId).first().name
+        breakObj.truckNum = ClientTruckConnection.objects.filter(pk=breakObj.tripId.truckConnectionId).first().clientTruckId
+
+         
+    params = {
+        'tripObj' : tripObj,
+        'currentTrips' : currentTrips,
+        'shiftObj' : shiftObj,
+        'clientObj' : truckConnectionObj.clientId,
+        'truckObj' : truckConnectionObj,
+        'breaks' : breaks
+    }
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
 
 def addDriverBreak(request, shiftId, tripId):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    tripObj.startDateTime = str(tripObj.startDateTime).split('.')[0]
+    tripObj.currentTime = str(getCurrentDateTimeObj()).split('.')[0]
+    # print(str(tripObj.startDateTime).split('.')[0])
     truckNo = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first().clientTruckId
     clientName = Client.objects.filter(pk=tripObj.clientId).first().name
     params = {
@@ -673,6 +711,7 @@ def addDriverBreak(request, shiftId, tripId):
         'clientName' : clientName
     }
     return render(request, 'Trip_details/DriverShift/addBreak.html', params)
+
 
 @csrf_protect
 def saveDriverBreak(request, shiftId, tripId):
@@ -741,6 +780,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         for load in range(1,noOfLoads+1):
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
+            docketObj.shiftId = shiftId
+            docketObj.shiftDate = shiftObj.shiftDate
+            docketObj.clientId = clientObj.clientId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
             docketObj.comment = request.POST.get(f'comment{load}')
             docketFile = request.FILES.get(f'docketFile{load}')
@@ -756,19 +798,19 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     else:
         for load in range(1,noOfLoads+1):
             noOfKm = request.POST.get(f'noOfKm{load}')
-            transferKm = request.POST.get(f'transferKm{load}')  
-            waitingTimeStart = formatDateTimeForDBSave(request.POST.get(f'waitingTimeStart{load}'))
-            waitingTimeEnd = formatDateTimeForDBSave(request.POST.get(f'waitingTimeEnd{load}'))
+            transferKm = request.POST.get(f'transferKm{load}')
             standByTimeStart = formatDateTimeForDBSave(request.POST.get(f'standByTimeStart{load}'))
             standByTimeEnd = formatDateTimeForDBSave(request.POST.get(f'standByTimeEnd{load}'))
             
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
+            docketObj.shiftId = shiftId
+            docketObj.shiftDate = shiftObj.shiftDate
+            docketObj.clientId = clientObj.clientId
+            docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+
             docketObj.noOfKm = noOfKm if noOfKm else 0
             docketObj.transferKM = transferKm if transferKm else 0
-            
-            docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
-            docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
             docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
             docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
             docketObj.save()
@@ -787,14 +829,29 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
 @csrf_protect
 @api_view(['POST'])
 def getTrucks(request):
+    connections = []
     clientName = request.POST.get('clientName')
     client = Client.objects.get(name=clientName)
+    shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
+    
+    currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+    for trip in currentTripObjs:
+        connections.append(trip.truckConnectionId)
+    
+    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime=None)
+    for trip in allCurrentTrips:
+        connections.append(trip.truckConnectionId)
+    
     truckList = []
     truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId)
     docket = client.docketGiven
 
     for truck_connection in truck_connections:
-        truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
+        if truck_connection.id in connections:
+            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId) + ' Occupied')
+        else:
+            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
+            
     return JsonResponse({'status': True, 'trucks': truckList, 'docket': docket})
 
 

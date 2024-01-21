@@ -16,7 +16,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12 col-12">
-                    <form action="{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripId endShift=endShift %}" method="post" enctype="multipart/form-data">
+                    <form action="{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripId endShift=endShift %}" method="post" enctype="multipart/form-data" id="docketsForm">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-12">
@@ -93,6 +93,7 @@
 
 {% block footerStyleEnd %}
 <script>
+
     function changeStatus(startId, endId = null) {
         const startInput = $(`#${startId}`);
         const endInput = $(`#${endId}`);
@@ -114,8 +115,17 @@
     function checkFields(){
         let loadSheet = $('input[name="loadSheet"]').val()
         let noOfLoads = $('input[name="noOfLoads"]').val()
+        let comment = $('textarea[name="comment"]').val()
 
-        if(loadSheet.trim() !== "" && noOfLoads.trim() !== ""){
+        if($(`#dispute`).prop('checked')){
+            if (loadSheet.trim() !== "" && noOfLoads.trim() !== "" && comment.trim() !== ""){
+                return true;
+            }else{
+                alert('Please fill in all the required fields before proceeding')
+                return false
+            }
+        }
+        else if(loadSheet.trim() !== "" && noOfLoads.trim() !== ""){
             return true
         }else{
             alert('Please fill in all the required fields before proceeding')
@@ -148,7 +158,8 @@
         let detailsContent = '';
         for (let i = 1; i <= count.val(); i++) {
             detailsContent += `<div class="row border rounded-2 py-2 bg-light my-2">`;
-            
+
+            /*
             // Waiting Time Start
             detailsContent += `<div class="col-md-3 col-12 my-1">`;
             detailsContent += `<div class="d-flex justify-content-between">`;
@@ -162,6 +173,13 @@
             detailsContent += `<div class="col-md-3 col-12 my-1">`;
             detailsContent += `<label for="waitingTimeEnd${i}">Waiting time end:</label>`;
             detailsContent += `<input type="datetime-local" name="waitingTimeEnd${i}" id="waitingTimeEnd${i}" class="form-control" readonly>`;
+            detailsContent += `</div>`;
+            */
+
+            // Transfer Km
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<label for="docketNumber${i}">Docket Number:</label>`;
+            detailsContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`;
             detailsContent += `</div>`;
 
             // Stand By Time Start
@@ -180,7 +198,7 @@
             detailsContent += `</div>`;
 
             // Transfer Km
-            detailsContent += `<div class="col-md-4 col-12 my-1">`;
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
             detailsContent += `<div class="d-flex justify-content-between">`;
             detailsContent += `<label for="transferKm${i}">Transfer km:</label>`;
             detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
@@ -189,7 +207,7 @@
             detailsContent += `</div>`;
 
             // Comment
-            detailsContent += `<div class="col-md-8 col-12 my-1">`;
+            detailsContent += `<div class="col-12 my-1">`;
             detailsContent += `<label for="comment${i}">Comment ${i}:</label>`;
             detailsContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`;
             detailsContent += `</div>`;
@@ -222,5 +240,40 @@
             $(noOfLoads).attr('readonly', true)
         }
     }
+
+    $('#docketsForm').submit(function(event) {
+        event.preventDefault();
+        var values = [];
+        var docketNumberInputs = $('input[name^="docketNumber"]');
+        var docketFileInputs = $('input[name^="docketFile"]');
+        var isUnique = true;
+
+        docketNumberInputs.each(function() {
+            var inputValue = $(this).val();
+            if (values.includes(inputValue)) {
+                isUnique = false;
+                msg = "Please make sure that all docket numbers are unique."
+                return false;
+            }
+            values.push(inputValue);
+        });
+
+        docketFileInputs.each(function() {
+            var inputValue = $(this).val();
+            if (values.includes(inputValue)) {
+                isUnique = false;
+                msg = "Please ensure you haven't uploaded the same file multiple times."
+                return false;
+            }
+            values.push(inputValue);
+        });
+
+        if (!isUnique) {
+            alert(msg);
+        } else {
+            this.submit();
+        }
+    });
+
 </script>
 {% endblock %}

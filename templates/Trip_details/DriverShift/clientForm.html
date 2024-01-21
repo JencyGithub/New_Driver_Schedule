@@ -70,11 +70,56 @@
 
 {% endblock %}
 {% block footerStyleEnd %}
-
-    <!-- select2 for searching dropdown -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
-        integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="{% static "js/clientForm.js" %}"></script>
-    
+<!-- select2 for searching dropdown -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+    integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $(document).ready(function() {
+        $(".js-example-basic-single").append(
+            `<option value="AL">Alabama</option>
+            <option value="WY">Wyoming</option>`
+        );
+        $('#clientId').select2();
+        $('#truckNum').select2();
+        
+        $("#clientId").on("change", function () {
+        let clientId = $(this).val();
+        let shiftId = {{ shiftObj.id }}
+        
+        if (clientId) {
+            $("#truckNum").prop("disabled", false);
+            $("#truckNum").html('<option value="">Loading...</option>');
+            $.ajax({
+            type: "POST",
+            url: "/account/getTrucks/",
+            data: {
+                clientName: $(this).val(),
+                shiftId: shiftId
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                $("#truckNum").html('<option value="">Select an Item</option>');
+                data.trucks.forEach(function (item) {
+                    $("#truckNum").append(
+                        // `<option value="${item}"  >${item}</option>`
+                        `<option value="${item}" ${item.includes('Occupied') ? 'disabled' : ''}>${item}</option>`
+                    );
+                });
+                $("#truckNum").trigger("change.select2");
+        
+                if (data.docket) {
+                $("#nextBtn").val("Submit");
+                } else {
+                $("#nextBtn").val("Next");
+                }
+            },
+            });
+        }
+        });
+    });
+</script>
 {% endblock  %}

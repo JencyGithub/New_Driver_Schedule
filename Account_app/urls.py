@@ -64,6 +64,10 @@ urlpatterns = [
     path('collect/dockets/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectDockets, name='collectDockets'),
     path('collect/dockets/save/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectedDocketSave, name='collectedDocketSave'),
     
+    path('driver/pre-start/view/<int:shiftId>/<int:tripId>/', views.showPreStartForm, name='showPreStartForm'),
+    path('driver/shift/view/<int:shiftId>/', views.driverShiftView, name='driverShiftView'),
+    path('driver/select/client-docket/view/<int:shiftId>/', views.showClientAndTruckNumGet, name='showClientAndTruckNumGet'),
+    
     
     # Driver trip path end
     
