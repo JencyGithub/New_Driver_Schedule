@@ -46,10 +46,9 @@
                     {% csrf_token %}
                     
                     <div class="x_title">
-                        <h2> Driver Trip Details</h2>
+                        <h2>  Shift Details</h2>
                         {% if shiftObj.verified is  False  %}
-                        <a href="{% url 'Account:tripEntry' shiftId=shiftObj.id%}"
-                            class="float-right btn btn-dark">Add Trip</a>
+                        
                             
                         
                         <label for="verified" class="float-right ml-2"
@@ -64,7 +63,9 @@
                         {% for trip in driverTrip %}
                         <div class="x_panel">
                         <div class="x_title ">
-                            <h2 class="text-primary"> Driver Trip Details {{forloop.counter}}</h2>
+                            <h2 class="text-primary">  Trip  {{forloop.counter}}</h2>
+                            <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}"
+                            class="float-right btn btn-dark btn-sm">Add Docket</a>
                             <div class="clearfix"></div>
                         </div>
  
@@ -136,7 +137,7 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="startDateTime{{trip.id}}">Start Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                        <input readonly class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
                                             name="startDateTime{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="startDateTime{{trip.id}}">
                                     </div>
@@ -145,7 +146,7 @@
                                     <label for="endDateTime{{trip.id}}">End Time :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                        {% if not superUser %}disabled{% endif %}  name="endDateTime{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
+                                        readonly  name="endDateTime{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
                                             id="endDateTime{{trip.id}}">
                                     </div>
                                 </div>
@@ -196,7 +197,10 @@
                                     <!--  docketNumber docketFile  -->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="docketNumber{{docket.id}}">Docket Number :<span class="required">*</span></label>
+                                        {% if shiftObj.verified != True%}
+                                        
                                         <a href="" class="text-primary" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
+                                        {% endif %}
                                         <div class="field item form-group">
                                             <input class="form-control" readonly value="{{docket.docketNumber}}" type="text"
                                                 name="docketNumber{{docket.id}}" required='required'
@@ -339,10 +343,11 @@
                                             <input class="form-control" value="{{docket.standByEndTime}}" type="time" readonly name="standByEndTime{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
+                                    
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if driverDocket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                            <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -366,7 +371,7 @@
                         {% endfor %}
 
                     {% if shiftObj.verified is  False  %}
-                    <div class="col-md-12 text-right p-0">
+                    <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
                         <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
                     </div>
                     {% endif%}
@@ -491,7 +496,7 @@
             });
         }
     }
-    function countTotalWaitingTime(lineData, count_,tripId){
+        function countTotalWaitingTime(lineData, count_,tripId){
         let waitingTimeStart = $(`#waitingTimeStart${count_}`).val()
         let waitingTimeEnd = lineData.value 
         if(waitingTimeStart && waitingTimeEnd){

@@ -402,10 +402,10 @@ class PastTripError(models.Model):
 class ReconciliationReport(models.Model):
     docketNumber = models.CharField(max_length=10, default='')
     docketDate = models.DateField(default=None, null= True, blank=True)
-    clientName =  models.CharField(max_length=20,default='')
+    # clientName =  models.CharField(max_length=20,default='')
     driverId = models.PositiveIntegerField(default=0)
-    # clientId = models.PositiveIntegerField(default=0)
-    truckId = models.PositiveIntegerField(default=0)
+    clientId = models.PositiveIntegerField(default=0)
+    truckConnectionId = models.PositiveIntegerField(default=0)
     
     # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of
     reconciliationType = models.PositiveIntegerField(default=0)

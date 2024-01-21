@@ -98,13 +98,13 @@ urlpatterns = [
     
     path('DriverEntry/', views.driverEntry, name='driverentry'), 
     path('DriverEntrySave/', views.driverEntrySave, name='driverEntrySave'),           
-    path('DriverDocketEntry/<int:ids>/', views.driverDocketEntry, name='driverDocketEntry'),
+    path('DriverDocketEntry/<int:tripId>/', views.driverDocketEntry, name='driverDocketEntry'),
     
     path('driverDocket/waitingTime/count/', views.countDocketWaitingTime, name='countDocketWaitingTime'),
     path('driverDocket/standByTime/count/', views.countDocketStandByTime, name='countDocketStandByTime'),
 
     
-    path('DriverDocketEntrySave/<int:ids>/', views.driverDocketEntrySave, name='driverDocketEntrySave'), 
+    path('DriverDocketEntrySave/<int:tripId>/', views.driverDocketEntrySave, name='driverDocketEntrySave'), 
     # for error solve      
     path('DriverDocketEntrySave/<int:ids>/<int:errorId>', views.driverDocketEntrySave, name='driverDocketErrorEntrySave'),      
     
@@ -185,7 +185,7 @@ urlpatterns = [
     path('pastTrip/form/',views.PastTripForm, name='pastTripForm'),
     path('pastTrip/form/save/',views.pastTripSave, name='pastTripSave'),
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
-    path('pastTrip/error/resolve/<int:ids>/<int:errorId>/', views.driverDocketEntry, name='pastTripErrorResolve'),
+    path('pastTrip/error/resolve/<int:tripId>/<int:errorId>/', views.driverDocketEntry, name='pastTripErrorResolve'),
     path('pastTrip/error/get/', views.getSinglePastTripError, name='getSinglePastTripError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
