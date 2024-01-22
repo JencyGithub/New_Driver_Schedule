@@ -678,49 +678,42 @@ def driverShiftView(request, shiftId):
             
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
     breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    reimbursements = DriverReimbursement.objects.filter(shiftId=shiftObj)
     
-    for breakObj in breaks:
-        breakObj.clientName = Client.objects.filter(pk=breakObj.tripId.clientId).first().name
-        breakObj.truckNum = ClientTruckConnection.objects.filter(pk=breakObj.tripId.truckConnectionId).first().clientTruckId
-
-         
     params = {
         'tripObj' : tripObj,
         'currentTrips' : currentTrips,
         'shiftObj' : shiftObj,
         'clientObj' : truckConnectionObj.clientId,
         'truckObj' : truckConnectionObj,
-        'breaks' : breaks
+        'breaks' : breaks,
+        'reimbursements' : reimbursements
     }
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
 
-def addDriverBreak(request, shiftId, tripId):
-    
+def addDriverBreak(request, shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    tripObj.startDateTime = str(tripObj.startDateTime).split('.')[0]
-    tripObj.currentTime = str(getCurrentDateTimeObj()).split('.')[0]
-    # print(str(tripObj.startDateTime).split('.')[0])
-    truckNo = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first().clientTruckId
+    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
+    shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
+    currentTime = str(getCurrentDateTimeObj()).split('.')[0]
     clientName = Client.objects.filter(pk=tripObj.clientId).first().name
+    
     params = {
         'shiftObj' : shiftObj,
         'tripObj' : tripObj,
-        'truckNo' : truckNo,
-        'clientName' : clientName
+        'clientName' : clientName,
+        'currentTime' : currentTime
     }
     return render(request, 'Trip_details/DriverShift/addBreak.html', params)
 
 
 @csrf_protect
-def saveDriverBreak(request, shiftId, tripId):
+def saveDriverBreak(request, shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     driverId = Driver.objects.filter(name=request.user.username).first()
     breakObj = DriverBreak()
     breakObj.shiftId = shiftObj
-    breakObj.tripId = tripObj
     breakObj.driverId = driverId
     breakObj.startDateTime = request.POST.get('startDateTime') 
     breakObj.endDateTime = request.POST.get('endDateTime')
@@ -738,9 +731,52 @@ def saveDriverBreak(request, shiftId, tripId):
         breakObj.breakFile = f'{path}/{newFileName}'
     
     breakObj.save()
-    return redirect('Account:DriverPreStartSave', tripId)
+    return redirect('Account:driverShiftView', shiftId)
     
+
+def addReimbursementView(request, shiftId):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
+    shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
+    currentTime = str(getCurrentDateTimeObj()).split('.')[0]
+    clientName = Client.objects.filter(pk=tripObj.clientId).first().name
     
+    params = {
+        'shiftObj' : shiftObj,
+        'tripObj' : tripObj,
+        'clientName' : clientName,
+        'currentTime' : currentTime
+    }
+    return render(request, 'Trip_details/DriverShift/reimbursement.html', params)
+    
+
+@csrf_protect
+def addReimbursementSave(request, shiftId):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    driverId = Driver.objects.filter(name=request.user.username).first()
+    tripObj = DriverShiftTrip.objects.filter(endDateTime=None, shiftId=shiftId).first()
+    curDateTime = getCurrentDateTimeObj()
+
+    reimbursementObj = DriverReimbursement()
+    reimbursementObj.shiftId = shiftObj
+    reimbursementObj.driverId = driverId
+    reimbursementObj.raiseDate = curDateTime
+    reimbursementObj.notes = request.POST.get('notes')
+    reimbursementObj.amount = request.POST.get('amount')
+
+    reimbursementFile = request.FILES.get('reimbursementFile')
+    if reimbursementFile:
+        curTimeStr = getCurrentTimeInString()
+        path = 'static/img/reimbursementFiles'
+        fileName = reimbursementFile.name
+        newFileName = 'break-file' + curTimeStr + '!_@' + fileName
+        pfs = FileSystemStorage(location=path)
+        pfs.save(newFileName, reimbursementFile)
+        reimbursementObj.reimbursementFile = f'{path}/{newFileName}'
+    
+    reimbursementObj.save()
+    return redirect('Account:DriverPreStartSave', tripObj.id)
+
 def collectDockets(request, shiftId, tripId, endShift=None):
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
@@ -748,8 +784,8 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
-        'tripId' : tripId,
-        'endShift': endShift
+        'endShift': endShift,
+        'tripObj' : tripObj
     }
     return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
 

@@ -131,7 +131,7 @@ class DriverShiftDocket(models.Model):
 
 class DriverBreak(models.Model):
     shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None)
-    tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None)
+    # tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None)  
     startDateTime = models.DateTimeField(default='', null=True)
     endDateTime = models.DateTimeField(default='', null=True)
@@ -141,6 +141,18 @@ class DriverBreak(models.Model):
     
     def __str__(self) -> str:
         return str(self.driverId.name)
+
+class DriverReimbursement(models.Model):
+    shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None, null=True)
+    driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
+    raiseDate = models.DateTimeField(default=None, null=True, blank=True)
+    notes = models.CharField(max_length=2048, default='', null=True, blank=True)
+    amount = models.FloatField(default=0)
+    reimbursementFile = models.FileField(default=None, null=True, blank=True)
+
+    def __str__(self) -> str:
+        return str(self.shiftId.id) + '-' + str(self.driverId.driverId)
+    
 
 # -----------------------------------
 # Breaks end

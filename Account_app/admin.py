@@ -500,6 +500,7 @@ admin.site.register(DriverShiftDocket,DriverShiftDocket_)
 admin.site.register(DriverShiftTrip)
 
 admin.site.register(DriverBreak)
+admin.site.register(DriverReimbursement)
 
 
 
