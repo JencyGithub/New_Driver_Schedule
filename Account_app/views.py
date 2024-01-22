@@ -2744,7 +2744,6 @@ def surchargeForm(request, id=None):
 
 
 @csrf_protect
-@api_view(['POST'])
 def surchargeSave(request, id=None):
     dataList = {
         'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
@@ -2754,8 +2753,16 @@ def surchargeSave(request, id=None):
         messages.success(request, 'Surcharge updated successfully')
     else:
         # return HttpResponse(dataList['surcharge_Name'])
-        insertIntoTable(tableName='Surcharge', dataSet=dataList)
+        # insertIntoTable(tableName='Surcharge', dataSet=dataList)
+        with open("scripts/addSurchargeToRateCard.txt",'w',encoding='utf-8') as f:
+            f.write(dataList['surcharge_Name'])
+            
+        colorama.AnsiToWin32.stream = None
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'addSurchargeToRateCard','--continue-on-error']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(request, 'Surcharge added successfully')
+        return redirect(request.META.get('HTTP_REFERER'))
 
     return redirect('Account:surchargeTable')
 
