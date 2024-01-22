@@ -58,8 +58,11 @@ urlpatterns = [
     path('checkQuestion/requirement/', views.checkQuestionRequired, name='checkQuestionRequired'),
     path('DriverPreStart/save/<int:tripId>/', views.DriverPreStartSave, name='DriverPreStartSave'),
 
-    path('Driver/break/add/view/<int:shiftId>/<int:tripId>/', views.addDriverBreak, name='addDriverBreak'),
-    path('Driver/break/add/save/<int:shiftId>/<int:tripId>/', views.saveDriverBreak, name='saveDriverBreak'),
+    path('Driver/break/add/view/<int:shiftId>/', views.addDriverBreak, name='addDriverBreak'),
+    path('Driver/break/add/save/<int:shiftId>/', views.saveDriverBreak, name='saveDriverBreak'),
+
+    path('Driver/reimbursement/view/<int:shiftId>/', views.addReimbursementView, name='addReimbursementView'),
+    path('Driver/reimbursement/save/<int:shiftId>/', views.addReimbursementSave, name='addReimbursementSave'),
 
     path('collect/dockets/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectDockets, name='collectDockets'),
     path('collect/dockets/save/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectedDocketSave, name='collectedDocketSave'),

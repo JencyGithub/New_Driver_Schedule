@@ -487,6 +487,7 @@ admin.site.register(DriverShiftTrip)
 admin.site.register(DriverShiftDocket)
 
 admin.site.register(DriverBreak)
+admin.site.register(DriverReimbursement)
 
 
 
