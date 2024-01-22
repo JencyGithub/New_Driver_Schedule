@@ -783,6 +783,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.shiftId = shiftId
             docketObj.shiftDate = shiftObj.shiftDate
             docketObj.clientId = clientObj.clientId
+            docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
             docketObj.comment = request.POST.get(f'comment{load}')
             docketFile = request.FILES.get(f'docketFile{load}')
@@ -807,6 +808,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.shiftId = shiftId
             docketObj.shiftDate = shiftObj.shiftDate
             docketObj.clientId = clientObj.clientId
+            docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
 
             docketObj.noOfKm = noOfKm if noOfKm else 0
@@ -1347,28 +1349,7 @@ def driverDocketEntry(request, tripId , errorId = None):
     else:
         messages.warning(request, "Invalid Request ")
         return redirect('Account:driverTripsTable')
-    # shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    # shiftObj.shiftDate = dateConverterFromTableToPageFormate(shiftObj.shiftDate)
-    
-    # superUser = False
-    # driver = Driver.objects.all()
-    # clientName = Client.objects.all()
-    # clientTruck = ClientTruckConnection.objects.all()
-    # base_plant = BasePlant.objects.all()
-    # if request.user.is_superuser:
-    #     superUser = True
-    # else:
-    #     messages.warning('Only SuperUser Add Trip.. ')
-    #     return redirect(request.META.get('HTTP_REFERER'))
-    # params = {
 
-    #     'clientTruck':clientTruck,
-    #     'Driver': driver,
-    #     'Client': clientName,
-    #     'shiftObj':shiftObj,
-    #     'superUser':superUser,
-    #     'basePlants': base_plant,
-    # }
 
 @csrf_protect
 def countDocketWaitingTime(request):
@@ -1455,7 +1436,8 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             surchargeType=surchargeId,
             surcharge_duration=request.POST.get('surcharge_duration'),
             cubicMl=request.POST.get('cubicMl'),
-            others=request.POST.get('others')
+            others=request.POST.get('others'),
+            truckConnectionId = tripObj.truckConnectionId
         )
         # return HttpResponse(DriverDocketObj.shiftDate)
         if request.POST.get('returnToYard') == 'returnToYard':
@@ -1728,16 +1710,24 @@ def DriverTripEditForm(request, id):
     shiftObj.shiftDate = dateConverterFromTableToPageFormate(shiftObj.shiftDate)
     tripObj = DriverShiftTrip.objects.filter(shiftId=id)
     for i in tripObj:
+        clientObj = Client.objects.filter(pk=i.clientId).first()
         i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
         for docket in i.tripDockets:
+            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
+            rateCard = clientTruckConnectionObj.rate_card_name
+            costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
+            graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
+      
             if docket.waitingTimeStart:
                 docket.waitingTimeStart = docket.waitingTimeStart.strftime("%H:%M:%S")
             if docket.waitingTimeEnd:
                 docket.waitingTimeEnd = docket.waitingTimeEnd.strftime("%H:%M:%S")
+                docket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
             if docket.standByStartTime:
                 docket.standByStartTime = docket.standByStartTime.strftime("%H:%M:%S")
             if docket.standByEndTime:
                 docket.standByEndTime = docket.standByEndTime.strftime("%H:%M:%S")
+                docket.standBySlot = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
         
     driver = Driver.objects.all()
     clientName = Client.objects.all()
@@ -1939,14 +1929,10 @@ def reconciliationAnalysis(request,dataType):
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
-        for data in dataList:        
-            data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
         params['dataType'] = 'Reconciliation'
         params['dataTypeInt'] = 0
     elif dataType == 1:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 1).values()
-        for data in dataList:                
-            data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
         params['dataType'] = 'Short paid'
         params['dataTypeInt'] = 1
         
@@ -1994,6 +1980,7 @@ def reconciliationSetMark(request):
         getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
         getDocket.reconciliationType = 1
         getDocket.save()
+    
     return JsonResponse({'status': True})
 
 @csrf_protect
@@ -2006,8 +1993,7 @@ def escalationClientCheck(request):
     msg = None
     for docket in dockets:
         getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
-        clientNames.add(getDocket.clientId)
-        
+        clientNames.add(getDocket.clientName)
         existDocket = EscalationDocket.objects.filter(docketNumber=ReconciliationReport.docketNumber, docketDate=getDocket.docketDate).first()
         reconciliationId.append(getDocket.id)
         if getDocket.fromDriver == False:
@@ -2362,6 +2348,7 @@ def rateCardSave(request, id=None, edit=0):
             existingThresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingGrace = Grace.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
+            return HttpResponse(rateCardSurchargeObj)
             for surcharge in rateCardSurchargeObj:
                 surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
                 surcharge.start_date = startDate
@@ -2759,26 +2746,13 @@ def DriverShiftForm(request,id):
 
 @csrf_protect
 def  ShiftDetails(request,id):
+    # return HttpResponse(id)
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
     id_ = id
-    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= False )
+    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False )
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first().name
-    # if id == 0:
-    #     if clientId != 0:
-    #         pass
-    #     else:
-    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = False)
-    # elif id == 1:
-    #     if clientId != 0:
-    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True , clientName = clientNameObj)
-    #     else:
-    #         trips = DriverShiftTrip.objects.filter(shiftDate__range=(startDate, endDate) ,verified = True)
-
-    # else:
-    #     messages.warning( request, "Invalid Request")
-    #     return redirect(request.META.get('HTTP_REFERER'))
     params = {
         'shifts': shifts,
         'startDate': startDate,

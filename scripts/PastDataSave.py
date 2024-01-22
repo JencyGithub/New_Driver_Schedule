@@ -15,8 +15,8 @@ def run():
     monthFileName = open(r"pastTrip_entry_month.txt",'r')
     monthAndYear = monthFileName.read()
 
-    # fileName = f'static/Account/PastTripsEntry/{file_name}'
-    fileName = f'static/Account/PastTripsEntry/01 Jan Data 1-15 2023.xlsx - Past trip.csv'
+    fileName = f'static/Account/PastTripsEntry/{file_name}'
+    # fileName = f'static/Account/PastTripsEntry/20240121134630@_!01JanData1-152023.xlsx-Pasttrip.csv'
 
     txtFile = open(r'static/subprocessFiles/errorFromPastTrip.txt','w')
     txtFile.write(f'File:{file_name}\n\n')
@@ -33,6 +33,8 @@ def run():
                 count += 1
                 if count == 1:
                     continue
+                # if count == 10:
+                #     exit() 
                 data = line.split(',')
 
                 if len(data) != 25:
@@ -44,6 +46,7 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "File Data in wrong format.",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = "File Data in wrong format.",
                                     data = data
                                 )                    
                     pastTripErrorObj.save()
@@ -63,6 +66,9 @@ def run():
                 #     f.write(str(data[0]) + '\n')
                 # print(count)
                 shiftDate = datetime.strptime(res_, '%Y-%m-%d')
+                # print('-----------------------------------------')
+                # print('shiftDate',shiftDate , type(shiftDate))
+                # print('-----------------------------------------')
                 startTime = datetime.strptime(str(data[6]), '%H:%M:%S').time()
                 startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
                 startTimeStr = startTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
@@ -82,6 +88,8 @@ def run():
                                 lineNumber = count,
                                 errorFromPastTrip = "Incorrect month/year values present in file.",
                                 fileName = fileName.split('@_!')[-1],
+                                exceptionText = "Incorrect month/year values present in file.",
+                                
                                 data = data
                             ) 
                             # print('grace card not found')                   
@@ -93,6 +101,7 @@ def run():
                 clientObj = Client.objects.filter(name = 'boral').first()
                 
                 driverObj = Driver.objects.filter(name = driverName).first()
+                
                 if driverObj:
                     
                     # Trip save
@@ -107,8 +116,25 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "BasePlant does not exist.",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = "BasePlant does not exist.",
                                     data = data
                                 ) 
+                            pastTripErrorObj.save()
+                            continue
+                        clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1] , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
+                        if clientTruckConnectionObj is None:
+                            pastTripErrorObj = PastTripError(
+                                clientName = 'boral',
+                                tripDate = res_,
+                                docketNumber = data[5],
+                                truckNo = data[1],
+                                lineNumber = count,
+                                errorFromPastTrip = "Client truck connection object does not exist.",
+                                fileName = fileName.split('@_!')[-1],
+                                exceptionText = "Client truck connection object does not exist.",
+                                
+                                data = data
+                            )
                             pastTripErrorObj.save()
                             continue
                         shiftObj = DriverShift.objects.filter(shiftDate = shiftDate , driverId = driverObj.driverId).first()
@@ -122,24 +148,11 @@ def run():
                             
                         shiftId = shiftObj.id
                         
-                        clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1] , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
-                        if clientTruckConnectionObj is None:
-                            pastTripErrorObj = PastTripError(
-                                clientName = 'boral',
-                                tripDate = res_,
-                                docketNumber = data[5],
-                                truckNo = data[1],
-                                lineNumber = count,
-                                errorFromPastTrip = "Client truck connection object does not exist.",
-                                fileName = fileName.split('@_!')[-1],
-                                data = data
-                            )
-                            pastTripErrorObj.save()
-                            continue
+                        
                         
                         tripObj = DriverShiftTrip.objects.filter(shiftId = shiftId , truckConnectionId = clientTruckConnectionObj.id).first()
                         if tripObj is None:
-                            print('Creating New Trip')
+                            # print('Creating New Trip')
                             
                             tripObj = DriverShiftTrip()
                             tripObj.verified = True
@@ -150,32 +163,15 @@ def run():
                             # print('truckConnection ',clientTruckConnectionObj,tripObj)
                             
                             tripObj.save()
-                            print('Trip Obj Created')
-                        print('tripId',tripObj.id)
+                        #     print('Trip Obj Created')
+                        # print('tripId',tripObj.id)
 
                         # Docket save
                         # existingDockets = DriverShiftDocket.objects.filter(tripId = tripObj.id,shiftId = shiftObj.id).count()
                         # tripObj.numberOfLoads = existingDockets + 1
                         
-                        
-                        # if tripObj.startDateTime and tripObj.endDateTime :
-                        #     tripObj.startDateTime = getMaxTimeFromTwoTime(str(tripObj.startDateTime),str(data[6]),'min').strip()
-                        #     tripObj.endDateTime = getMaxTimeFromTwoTime(str(tripObj.endDateTime),str(data[7])).strip()
-                        #     print('startTime  Set' , tripObj.startDateTime)
-                        #     print('EndTime Set' , tripObj.endDateTime)
-                            
-                        # else:
-                        #     tripObj.startDateTime =getMaxTimeFromTwoTime(str(data[6]),str(data[6]),'min').strip()
-                        #     tripObj.endDateTime = getMaxTimeFromTwoTime(str(data[7]),str(data[7])).strip()
-                        #     print('Else startTime  Set' , tripObj.startDateTime)
-                        #     print('Else EndTime Set' , tripObj.endDateTime)
                         shiftDate = datetime.strptime(res_, '%Y-%m-%d')
-                        
-                        # startTime = datetime.strptime(str(data[6]).strip(), '%H:%M:%S').time()
-                        # startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
-                        
-                        # endTime = datetime.strptime(str(data[7]).strip(), '%H:%M:%S').time()
-                        # endTimeDateTime = datetime.combine(shiftDate.date(),endTime)  
+
                         try:
                             shiftDateStr = datetime.strftime(shiftDate.date(), '%Y-%m-%d')
                             
@@ -185,7 +181,7 @@ def run():
                             startTimeDateTime = datetime.strptime(startTimeDateTime, '%Y-%m-%d %H:%M:%S')
                             endTimeDateTime = datetime.strptime(endTimeDateTime, '%Y-%m-%d %H:%M:%S')
                             
-                            print(startTimeDateTime, endTimeDateTime)
+                            # print(startTimeDateTime, endTimeDateTime)
                         except Exception as e:
                             pastTripErrorObj = PastTripError(
                                     clientName = 'boral',
@@ -195,6 +191,7 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "Incorrect date format",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = e,
                                     data = data
                                 ) 
                             pastTripErrorObj.save()
@@ -205,14 +202,19 @@ def run():
                             # print(endTimeDateTime.tzinfo, endTimeDateTime)
                             if tripObj.startDateTime and tripObj.endDateTime :
                                 # print('Start Date time Inside if')
-                                if tripObj.startDateTime > startTimeDateTime:
+                                # print(data[5], tripObj.startDateTime.date(),startTimeDateTime.date() , tripObj.startDateTime.time() , startTimeDateTime.time())
+                                if tripObj.startDateTime.date() == startTimeDateTime.date() and tripObj.startDateTime.time() > startTimeDateTime.time():
                                     tripObj.startDateTime = startTimeDateTime
-                                if tripObj.endDateTime < endTimeDateTime:
+                                    # print('Updating Start Time trip match')
+                                if tripObj.endDateTime.date() == endTimeDateTime.date() and tripObj.endDateTime.time() < endTimeDateTime.time():
                                     tripObj.endDateTime = endTimeDateTime
+                                    # print('Updating End Time trip match')
+                                    
                             else:
                                 # print('Start Date time Inside Else')
                                 tripObj.startDateTime =startTimeDateTime
                                 tripObj.endDateTime = endTimeDateTime
+                                # print('Saved Start Time : ', startTimeDateTime ,  'Saved End Time' ,endTimeDateTime )
                         except Exception as e:
                             pastTripErrorObj = PastTripError(
                                     clientName = 'boral',
@@ -222,14 +224,14 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "Incorrect date format",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = e,
                                     data = data
                                 ) 
                             pastTripErrorObj.save()
                             continue
                         
                         shiftObj.startDateTime = tripObj.startDateTime
-                        if count == 5:
-                            exit() 
+                        
                         # print('shift' , shiftObj.startDateTime)
                                          
                         shiftObj.endDateTime = tripObj.endDateTime
@@ -239,7 +241,7 @@ def run():
                         # print('EndDateTime Set' , tripObj.endDateTime)
 
                         surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
-                        docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id).first()
+                        docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                         if docketObj :
                             pastTripErrorObj = PastTripError(
                                     clientName = 'boral',
@@ -249,17 +251,18 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "DocketNumber already Exist for this trip.",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = "DocketNumber already Exist for this trip.",
                                     data = data
                                 ) 
                             pastTripErrorObj.save()
                             continue
                         docketObj = DriverShiftDocket()                
-                        print('Docket Obj Created.')
+                        # print('Docket Obj Created.')
 
                         clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1].strip() , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
 
                         if clientTruckConnectionObj:
-                            print("finding ratecard")
+                            # print("finding ratecard")
                             rateCard = clientTruckConnectionObj.rate_card_name 
                             graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = shiftObj.shiftDate,end_date__gte = shiftObj.shiftDate).first()
 
@@ -272,9 +275,11 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "No matching grace card for the date.",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = "No matching grace card for the date.",
+                                    
                                     data = data
                                 ) 
-                                print('grace card not found')                   
+                                # print('grace card not found')                   
                                 pastTripErrorObj.save()
                                 continue
 
@@ -289,28 +294,33 @@ def run():
                                     lineNumber = count,
                                     errorFromPastTrip = "No matching cost parameter card for the date.",
                                     fileName = fileName.split('@_!')[-1],
+                                    exceptionText = "No matching cost parameter card for the date.",
+                                    
                                     data = data
                                 )                    
                                 pastTripErrorObj.save()
-                                print('COST PARAMETER not found')
+                                # print('COST PARAMETER not found')
                                 continue
                                 
 
                             try:
                                 docketObj.shiftDate = shiftDate
+                                docketObj.shiftId = shiftObj.id
                                 docketObj.tripId = tripObj.id
+                                docketObj.clientId = tripObj.clientId
+                                docketObj.truckConnectionId = tripObj.truckConnectionId
                                 docketObj.docketNumber = data[5]
                                 docketObj.noOfKm = 0 if str(data[10]).lower() == '' else data[10]
                                 docketObj.transferKM = 0 if str(data[18]).lower() == '' else data[18]
                                 docketObj.returnToYard = True if data[16].lower() == 'yes' else False
                                 docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
                                 docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
-                                docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11], '%H:%M:%S').time()) 
-                                docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12], '%H:%M:%S').time())
+                                docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11].strip(), '%H:%M:%S').time()) 
+                                docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
                                 # docketObj.totalWaitingInMinute = totalWaitingTime
                                 docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
-                                docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20], '%H:%M:%S').time())
-                                docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21], '%H:%M:%S').time())
+                                docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
+                                docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
                                 # docketObj.standBySlot = standBySlot
                                 docketObj.comment = data[17]
                                 # modification for adding blow back and replacement.
@@ -327,9 +337,21 @@ def run():
                                 # others = 
                                 docketObj.save()
                             except Exception as e:
-                                print('Docket save Error:', e)
-
-                            print('Docket obj saved')
+                                pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
+                                    tripDate = res_,
+                                    docketNumber = data[5],
+                                    truckNo = data[1],
+                                    lineNumber = count,
+                                    errorFromPastTrip = "Docket Save internal server error.",
+                                    fileName = fileName.split('@_!')[-1],
+                                    exceptionText = e,
+                                    data = data
+                                    )
+                                pastTripErrorObj.save()
+                                # print('Docket save Error:', e)
+                                continue
+                            # print('Docket obj saved')
                             try:
                                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
                                 
@@ -351,9 +373,14 @@ def run():
                                 
                                 driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
 
-                                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                                slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                                driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
+                                driverWaitingTimeCost =0
+                                driverStandByCost = 0
+                                
+                                if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
+                                    driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                if docketObj.standByStartTime and docketObj.standByEndTime:
+                                    slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                    driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                                 driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 # minLoad 
@@ -372,9 +399,21 @@ def run():
                                 reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
                                 reconciliationDocketObj.fromDriver = True 
                                 reconciliationDocketObj.save()
-                                print("reconciliation done!!!!")
+                                # print("reconciliation done!!!!")
                             except Exception as e:
-                                print('Reconciliation Error: ', e)
+                                pastTripErrorObj = PastTripError(
+                                    clientName = 'boral',
+                                    tripDate = res_,
+                                    docketNumber = data[5],
+                                    truckNo = data[1],
+                                    lineNumber = count,
+                                    errorFromPastTrip = "Reconciliation Entry internal server error.",
+                                    fileName = fileName.split('@_!')[-1],
+                                    exceptionText =e,
+                                    data = data
+                                    )
+                                pastTripErrorObj.save()
+                                continue
                         
                         else:
                             pastTripErrorObj = PastTripError(
@@ -385,6 +424,8 @@ def run():
                                 lineNumber = count,
                                 errorFromPastTrip = "Client truck connection object does not exist.",
                                 fileName = fileName.split('@_!')[-1],
+                                exceptionText ="Client truck connection object does not exist.",
+                                
                                 data = data
                             )
                             pastTripErrorObj.save()
@@ -397,6 +438,7 @@ def run():
                             lineNumber = count,
                             errorFromPastTrip = e,
                             fileName = fileName.split('@_!')[-1],
+                            exceptionText = e,
                             data = data
                         )
                         pastTripErrorObj.save()
@@ -409,6 +451,7 @@ def run():
                             lineNumber = count,
                             errorFromPastTrip = 'Driver matching query does not exist.',
                             fileName = fileName.split('@_!')[-1],
+                            exceptionText = 'Driver matching query does not exist.',
                             data = data
                         )
                     pastTripErrorObj.save()
@@ -423,6 +466,7 @@ def run():
                         lineNumber = count,
                         errorFromPastTrip = e,
                         fileName = fileName.split('@_!')[-1],
+                        exceptionText = e,
                         data = data
                     )
                 pastTripErrorObj.save()

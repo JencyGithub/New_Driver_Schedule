@@ -64,8 +64,11 @@
                         <div class="x_panel">
                         <div class="x_title ">
                             <h2 class="text-primary">  Trip  {{forloop.counter}}</h2>
+                            {% if shiftObj.verified is False %}
+                            
                             <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}"
                             class="float-right btn btn-dark btn-sm">Add Docket</a>
+                            {% endif %}
                             <div class="clearfix"></div>
                         </div>
  
@@ -152,8 +155,11 @@
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="loadSheet{{trip.id}}">loadSheet :<span class="required">*</span></label>
+                                    {% if trip.loadSheet is None %}
+                                    
                                     <a href="/{{trip.loadSheet}}" class="text-primary"
                                         target="_blank">loadSheet_file</a>
+                                    {% endif %}
                                     <div  class="field item form-group">
                                         <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet{{trip.id}}"
                                             style="padding: 0.25rem 0.2rem;" id="loadSheet{{trip.id}}">

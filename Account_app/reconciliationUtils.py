@@ -20,25 +20,28 @@ costDict = {
         'standByTotalCost':0
     }
 }
-def DriverTripCheckWaitingTime(driverDocketNumber,docketDate):
-    date_= docketDate
-    driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=date_).first()
-    tripObj = DriverTrip.objects.filter(pk=driverDocketObj.tripId.id).first()
-    if tripObj:
-        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
-        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
-        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
-        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
+def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+    date_= docketObj.shiftDate
        
-        totalWaitingTime = timeDifference(driverDocketObj.waitingTimeStart,driverDocketObj.waitingTimeEnd)
-        
-        if float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
-            totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
-            if totalWaitingTime < 0:
-                totalWaitingTime = 0    
-        else:
-            totalWaitingTime = 0
-        return totalWaitingTime
+    totalWaitingTime = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
+    
+    if float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
+        totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
+        if totalWaitingTime < 0:
+            totalWaitingTime = 0    
+    else:
+        totalWaitingTime = 0
+    return totalWaitingTime
+    
+def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+
+
+    totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
+    standBySlot = 0
+    if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
+        totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
+        standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+    return standBySlot
     
 def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
@@ -143,25 +146,7 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
     except Exception as e :
         return -404.0
     
-def DriverTripCheckStandByTotal(driverDocketNumber,docketDate):
 
-    driverDocketObj = DriverDocket.objects.filter(docketNumber=driverDocketNumber,shiftDate=docketDate).first()
-    tripObj = DriverTrip.objects.filter(pk=driverDocketObj.tripId.id).first()
-    
-    if tripObj:
-        adminTruckObj = AdminTruck.objects.filter(adminTruckNumber = tripObj.truckNo).first()
-        clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
-        rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
-        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCardObj).first()
-        graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
-        
-        totalStandByTime = getTimeDifference(driverDocketObj.standByStartTime,driverDocketObj.standByEndTime)
-        standBySlot = 0
-        if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
-            totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
-            standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
-        return standBySlot
-    
 def checkStandByTotal( docketObj , shiftObj , rateCard , costParameterObj , graceObj, slotSize):
     try:
         if slotSize > 0:
@@ -329,10 +314,13 @@ def checkMissingComponents(reconciliationReportObj):
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
 
     tripObj = DriverShiftTrip.objects.filter(pk=docketObj.tripId).first()
-    if tripObj:
-        totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
-        standBySlot = 0
-        if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
-            totalStandByTime = totalStandByTime - graceObj.standby_time_grace_in_minutes
-            standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
-        return standBySlot
+    try:
+        if tripObj:
+            totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
+            standBySlot = 0
+            if float(totalStandByTime) > float(graceObj.chargeable_standby_time_starts_after):
+                totalStandByTime = float(totalStandByTime) - float(graceObj.standby_time_grace_in_minutes)
+                standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+            return standBySlot
+    except:
+        return -404

@@ -481,10 +481,23 @@ admin.site.register(AppointmentDriver)
 
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
+class DriverShift_(admin.ModelAdmin):
 
-admin.site.register(DriverShift)
+    list_display = ['verified','shiftDate','driverId']
+    search_fields = ["driverId"]
+
+
+admin.site.register(DriverShift,DriverShift_)
+
+class DriverShiftDocket_(admin.ModelAdmin):
+
+    list_display = ['tripId','shiftId','clientId','docketNumber']
+    search_fields = ["docketNumber" , "shiftId"]
+
+
+admin.site.register(DriverShiftDocket,DriverShiftDocket_)
+
 admin.site.register(DriverShiftTrip)
-admin.site.register(DriverShiftDocket)
 
 admin.site.register(DriverBreak)
 

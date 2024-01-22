@@ -64,7 +64,7 @@ class DriverShift(models.Model):
     driverId = models.IntegerField(null=True, blank=True)
     
     def __str__(self) -> str:
-        return str(self.shiftDate)
+        return str(self.shiftDate) 
     
 
 class DriverShiftTrip(models.Model):
@@ -88,6 +88,7 @@ class DriverShiftDocket(models.Model):
     shiftId = models.IntegerField(null=True, blank=True)
     shiftDate = models.DateField(null=True, blank=True)
     clientId = models.IntegerField(null=True, blank=True)
+    truckConnectionId = models.IntegerField(null=True, blank=True)
     docketNumber = models.CharField(max_length=20, default='', null=True, blank=True)
     docketFile = models.FileField(upload_to='static/img/docketFiles', null=True, blank=True)
     basePlant = models.PositiveIntegerField(null=True, blank=True)
@@ -106,15 +107,18 @@ class DriverShiftDocket(models.Model):
     standByStartTime = models.TimeField(default=None, null=True, blank=True)
     standByEndTime = models.TimeField(default=None, null=True, blank=True)
     standBySlot = models.PositiveIntegerField(default=0, null=True)
+    blowBack = models.CharField(max_length=2048, default='', null=True)
+    callOut = models.CharField(max_length=2048, default='', null=True)
     minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
+    
     comment = models.CharField(max_length=255, null=True, default='')
 
     def __str__(self) -> str:
         return str(self.docketNumber) + str(self.tripId)
    
     class Meta:
-        unique_together = (('docketNumber', 'shiftDate','clientId'),)
+        unique_together = (('docketNumber', 'shiftDate','clientId','truckConnectionId'))
 # -----------------------------------
 # New Trips Section end
 # -----------------------------------
@@ -385,6 +389,7 @@ class PastTripError(models.Model):
     docketNumber = models.CharField(max_length=255, default=None, null=True, blank=True)
     lineNumber =  models.CharField(max_length=255, default=None, null=True, blank=True)   
     errorFromPastTrip = models.CharField(max_length=255, default=None, null=True, blank=True)
+    exceptionText = models.CharField(max_length=255, default=None, null=True, blank=True)
     fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
     status = models.BooleanField(default=False)
     # 0 : pastTrip error  1: Report Error 
