@@ -286,6 +286,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 
                 reconciliationDocketObj.save()
                 checkMissingComponents(reconciliationDocketObj)
+                reconciliationTotalCheck(reconciliationDocketObj)
             else:
                 with open('holcim.txt','a')as f:
                     f.write('skip'+ ''.join(data) + fileName.split('@_!')[-1]  +'\n')

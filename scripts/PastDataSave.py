@@ -315,12 +315,12 @@ def run():
                                 docketObj.returnToYard = True if data[16].lower() == 'yes' else False
                                 docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
                                 docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
-                                docketObj.waitingTimeStart = '00:00:00' if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11].strip(), '%H:%M:%S').time()) 
-                                docketObj.waitingTimeEnd = '00:00:00' if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
+                                docketObj.waitingTimeStart = None if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11].strip(), '%H:%M:%S').time()) 
+                                docketObj.waitingTimeEnd = None if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
                                 # docketObj.totalWaitingInMinute = totalWaitingTime
                                 docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
-                                docketObj.standByStartTime ='00:00:00' if str(data[20]).lower() == '' else str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
-                                docketObj.standByEndTime ='00:00:00' if str(data[21]).lower() == '' else str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
+                                docketObj.standByStartTime =None if str(data[20]).lower() == '' else str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
+                                docketObj.standByEndTime =None if str(data[21]).lower() == '' else str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
                                 # docketObj.standBySlot = standBySlot
                                 docketObj.comment = data[17]
                                 # modification for adding blow back and replacement.

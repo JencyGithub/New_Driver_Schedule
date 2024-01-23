@@ -22,7 +22,8 @@ costDict = {
 }
 def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     date_= docketObj.shiftDate
-       
+    docketObj.waitingTimeStart = docketObj.waitingTimeStart.strftime("%H:%M:%S")
+    docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
     totalWaitingTime = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
     
     if float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
@@ -31,7 +32,7 @@ def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterOb
             totalWaitingTime = 0    
     else:
         totalWaitingTime = 0
-    return totalWaitingTime
+    return round(totalWaitingTime,2)
     
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
 
@@ -130,16 +131,20 @@ def checkSurcharge(docketObj , shiftObj , rateCard , costParameterObj , graceObj
 def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
         date_= docketObj.shiftDate
-        docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
         
-        totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
-        if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
-            totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
-            if totalWaitingTime > 0: 
-                totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
+        if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
+            docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
+        
+            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
+            if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
+                totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
+                if totalWaitingTime > 0: 
+                    totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
+                else:
+                    totalWaitingCost = 0
+                return round(totalWaitingCost,2) 
             else:
-                totalWaitingCost = 0
-            return round(totalWaitingCost,2) 
+                return 0
         else:
             return 0
         
@@ -287,26 +292,27 @@ def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
 def checkMissingComponents(reconciliationReportObj):
 
     components = ''
-    if reconciliationReportObj.driverLoadAndKmCost > 0 and reconciliationReportObj.rctiLoadAndKmCost == 0:
+    if float(reconciliationReportObj.driverLoadAndKmCost) > 0 and float(reconciliationReportObj.rctiLoadAndKmCost) == 0:
         components += 'Load Km Cost' + ', '
-    if reconciliationReportObj.driverSurchargeCost > 0 and reconciliationReportObj.rctiSurchargeCost == 0:
+    if float(reconciliationReportObj.driverSurchargeCost) > 0 and float(reconciliationReportObj.rctiSurchargeCost) == 0:
         components += 'Surcharge Cost' + ', '
-    if reconciliationReportObj.driverWaitingTimeCost > 0 and reconciliationReportObj.rctiWaitingTimeCost == 0:
+    if float(reconciliationReportObj.driverWaitingTimeCost) > 0 and float(reconciliationReportObj.rctiWaitingTimeCost) == 0:
         components += 'Waiting Time Cost' + ', '
-    if reconciliationReportObj.driverTransferKmCost > 0 and reconciliationReportObj.rctiTransferKmCost == 0:
+    if float(reconciliationReportObj.driverTransferKmCost) > 0 and float(reconciliationReportObj.rctiTransferKmCost) == 0:
         components += 'Transfer Km Cost' + ', '
-    if reconciliationReportObj.driverReturnKmCost > 0 and reconciliationReportObj.rctiReturnKmCost == 0:
+    if float(reconciliationReportObj.driverReturnKmCost) > 0 and float(reconciliationReportObj.rctiReturnKmCost) == 0:
         components += 'Return Km Cost' + ', '
-    if reconciliationReportObj.driverStandByCost > 0 and reconciliationReportObj.rctiStandByCost == 0:
+    if float(reconciliationReportObj.driverStandByCost) > 0 and float(reconciliationReportObj.rctiStandByCost) == 0:
         components += 'Stand By Cost' + ', '
-    if reconciliationReportObj.driverLoadDeficit > 0 and reconciliationReportObj.rctiLoadDeficit == 0:
+    if float(reconciliationReportObj.driverLoadDeficit) > 0 and float(reconciliationReportObj.rctiLoadDeficit) == 0:
         components += 'Load Deficit Cost' + ', '
-    if reconciliationReportObj.driverBlowBack > 0 and reconciliationReportObj.rctiBlowBack == 0:
+    if float(reconciliationReportObj.driverBlowBack) > 0 and float(reconciliationReportObj.rctiBlowBack) == 0:
         components += 'Blow Back Cost' + ', '
-    if reconciliationReportObj.driverCallOut > 0 and reconciliationReportObj.rctiCallOut == 0:
+    if float(reconciliationReportObj.driverCallOut) > 0 and float(reconciliationReportObj.rctiCallOut) == 0:
         components += 'Call Out Cost' + ', '
     reconciliationReportObj.missingComponent = components
     reconciliationReportObj.save()
+
 
     
     
@@ -315,12 +321,30 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
 
     tripObj = DriverShiftTrip.objects.filter(pk=docketObj.tripId).first()
     try:
-        if tripObj:
-            totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
-            standBySlot = 0
-            if float(totalStandByTime) > float(graceObj.chargeable_standby_time_starts_after):
-                totalStandByTime = float(totalStandByTime) - float(graceObj.standby_time_grace_in_minutes)
-                standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
-            return standBySlot
+        if docketObj.standByStartTime and docketObj.standByStartTime:
+            if tripObj:
+                docketObj.standByStartTime = docketObj.standByStartTime.strftime("%H:%M:%S")
+                docketObj.standByEndTime = docketObj.standByEndTime.strftime("%H:%M:%S")
+                totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
+                standBySlot = 0
+                if float(totalStandByTime) > float(graceObj.chargeable_standby_time_starts_after):
+                    totalStandByTime = float(totalStandByTime) - float(graceObj.standby_time_grace_in_minutes)
+                    standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
+                return standBySlot
+        else:
+            return 0
     except:
         return -404
+    
+    
+def reconciliationTotalCheck(reconciliationReportObj):
+        
+    attributes = ['LoadAndKmCost', 'SurchargeCost', 'WaitingTimeCost', 'TransferKmCost', 'ReturnKmCost', 'OtherCost', 'StandByCost', 'LoadDeficit', 'BlowBack', 'CallOut', 'TotalCost']
+
+    all_equal = all(float(getattr(reconciliationReportObj, f"driver{attr}")) == float(getattr(reconciliationReportObj, f"rcti{attr}")) for attr in attributes)
+    if all_equal is True:
+        reconciliationReportObj.reconciliationType = 7
+        reconciliationReportObj.save()
+
+
+        

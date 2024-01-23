@@ -1097,6 +1097,8 @@ def rctiFormSave(request , errorId = None):
     
     reconciliationDocketObj.save()
     checkMissingComponents(reconciliationDocketObj)
+    reconciliationTotalCheck(reconciliationDocketObj)
+    
     if errorId:
         rctiErrorObj.docketNumber = request.POST.get('docketNumber')
         rctiErrorObj.docketDate = request.POST.get('docketDate')
@@ -1218,6 +1220,13 @@ def rctiSave(request):
                             fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
                             date_ = 0
                 date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+                shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
+                print('shiftObj',shiftObj)
+                pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
+                print('pastTripErrorObj',pastTripErrorObj)
+                if len(shiftObj) == 0 or len(pastTripErrorObj) ==0:
+                    messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                    return redirect(request.META.get('HTTP_REFERER'))
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file already exists!")
@@ -1276,6 +1285,7 @@ def rctiSave(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
+        print(e)
         messages.error( request, "Please enter valid file")
         return redirect(request.META.get('HTTP_REFERER'))
         return HttpResponse(f"Error: {str(e)}")
@@ -1379,7 +1389,8 @@ def driverDocketEntry(request, tripId , errorId = None):
             'errorId':errorId,
             'clientTruck':clientTruck,
             'Driver': driver,
-            'shiftObj':shiftObj
+            'shiftObj':shiftObj,
+            'errorId':errorId
         }
         return render(request, 'Account/driverDocketEntry.html', params)
     else:
@@ -1446,11 +1457,30 @@ def getSinglePastTripError(request):
 
 @csrf_protect
 def getSinglePastTripSolveError(request):
-    pastTripErrorSolve = PastTripError.objects.filter(pk=request.POST.get('id')).first()
-    clientObj = Client.objects.filter(name = 'boral').first().id
-    docketObj = DriverShiftDocket.objects(clientId = clientObj.id)
-    return JsonResponse({'status': True,'data':pastTripErrorSolve})
+    pastTripErrorSolveObj = PastTripError.objects.filter(pk=request.POST.get('id')).first()
+    clientObj = Client.objects.filter(name = pastTripErrorSolveObj.clientName).first()
+    clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = pastTripErrorSolveObj.truckNo, startDate__lte = pastTripErrorSolveObj.tripDate,endDate__gte = pastTripErrorSolveObj.tripDate, clientId = clientObj.clientId).first()
+    docketObj = DriverShiftDocket.objects.filter(docketNumber=pastTripErrorSolveObj.docketNumber,clientId=clientObj.clientId,shiftDate=pastTripErrorSolveObj.tripDate,truckConnectionId=clientTruckConnectionObj.id).values().first()
+    # for get total waiting minue and slot 
+    docket =  DriverShiftDocket.objects.filter(docketNumber=pastTripErrorSolveObj.docketNumber,clientId=clientObj.clientId,shiftDate=pastTripErrorSolveObj.tripDate,truckConnectionId=clientTruckConnectionObj.id).first()
     
+    
+    shiftObj = DriverShift.objects.filter(pk=docketObj['shiftId']).first()
+    rateCard = clientTruckConnectionObj.rate_card_name
+    costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj['shiftDate'],end_date__gte = docketObj['shiftDate']).first()
+    graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj['shiftDate'],end_date__gte = docketObj['shiftDate']).first()
+    
+    basePlantObj = BasePlant.objects.filter(pk=docketObj['basePlant']).first()
+    docketObj['basePlantName'] = basePlantObj.basePlant
+    docketObj['totalWaitingInMinute'] = 0
+    if docketObj['waitingTimeStart'] and docketObj['waitingTimeEnd']:
+        docketObj['totalWaitingInMinute'] = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+    docketObj['standBySlot'] = 0
+    if docketObj['standByStartTime'] and docketObj['standByEndTime']:
+        docketObj['standBySlot'] = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+    return JsonResponse({'status': True,'data':docketObj})
+
+        
 def driverDocketEntrySave(request, tripId, errorId=None):
     
     # return HttpResponse(errorId)
@@ -1459,7 +1489,7 @@ def driverDocketEntrySave(request, tripId, errorId=None):
 
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     surchargeId = Surcharge.objects.filter(pk=request.POST.get('surcharge_type')).first().id
-    
+    clientObj = Client.objects.filter(pk=tripObj.clientId).first()
     docketNumbers = DriverShiftDocket.objects.filter(docketNumber=docketNumber_, shiftDate=shiftObj.shiftDate, tripId = tripId).first()
     if docketNumbers:
         messages.error(request, "This docket number  already exists!")
@@ -1469,6 +1499,7 @@ def driverDocketEntrySave(request, tripId, errorId=None):
         docketObj = DriverShiftDocket(
             shiftDate=shiftObj.shiftDate,
             tripId=tripId,
+            clientId = tripObj.clientId,
             docketNumber=docketNumber_,
             docketFile=docketFileSave(docketFile, docketNumber_),
             basePlant=BasePlant.objects.filter(pk=request.POST.get('basePlant')).first().id,
@@ -1490,13 +1521,23 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             docketObj.returnKm = request.POST.get('returnKm')
             docketObj.tippingToYard = True
 
-        docketObj.waitingTimeStart = request.POST.get('waitingTimeStart')
-        docketObj.waitingTimeEnd = request.POST.get('waitingTimeEnd')
-        # docketObj.totalWaitingInMinute = getTimeDifference(docketObj.waitingTimeStart, docketObj.waitingTimeEnd)
-        docketObj.totalWaitingInMinute = request.POST.get('totalWaitingInMinute')
-        docketObj.standByStartTime = request.POST.get('standByStartTime')
-        docketObj.standByEndTime = request.POST.get('standByEndTime')
-        docketObj.standBySlot = request.POST.get('standBySlot')
+        if request.POST.get('waitingCheck'):
+            docketObj.waitingTimeStart = request.POST.get('waitingTimeStart')
+            docketObj.waitingTimeEnd = request.POST.get('waitingTimeEnd')
+        else:
+            docketObj.waitingTimeStart = None
+            docketObj.waitingTimeEnd = None
+            
+
+            
+        if request.POST.get('standByCheck'):
+            docketObj.standByStartTime = request.POST.get('standByStartTime')
+            docketObj.standByEndTime = request.POST.get('standByEndTime')
+        else:
+            docketObj.standByStartTime = None
+            docketObj.standByEndTime = None
+            # docketObj.standBySlot = request.POST.get('standBySlot')
+            
         docketObj.comment = request.POST.get('comment')
         docketObj.save()
         driver_dockets = DriverShiftDocket.objects.filter(tripId=tripId)
@@ -1505,47 +1546,57 @@ def driverDocketEntrySave(request, tripId, errorId=None):
         tripObj.numberOfLoads = driver_dockets.count()
 
         tripObj.save()
-        # if errorId:
-        #     DriverDocketObj.shiftDate = datetime.strptime(DriverDocketObj.shiftDate, "%Y-%m-%d").date()
-        #     driverDocketNumber = DriverDocketObj.docketNumber
-        #     reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = driverDocketNumber , docketDate = DriverDocketObj.shiftDate ).first()
-                    
-        #     if not  reconciliationDocketObj :
-        #         reconciliationDocketObj = ReconciliationReport()
-        #     reconciliationDocketObj.driverId = driver_trip_id.id  
-        #     reconciliationDocketObj.clientId = driver_trip_id.id 
-        #     reconciliationDocketObj.truckId = driver_trip_id.truckNo 
+        if errorId:
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
+                                
+            if not  reconciliationDocketObj :
+                reconciliationDocketObj = ReconciliationReport()
                 
-        #     driverLoadAndKmCost = checkLoadAndKmCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverSurchargeCost = checkSurcharge(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # return HttpResponse(driverSurchargeCost)
-        #     driverWaitingTimeCost = checkWaitingTime(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     slotSize = DriverTripCheckStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverStandByCost = checkStandByTotal(driverDocketNumber,DriverDocketObj.shiftDate,slotSize)
-        #     driverTransferKmCost = checkTransferCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     driverReturnKmCost = checkReturnCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # minLoad 
-        #     driverLoadDeficit = checkMinLoadCost(driverDocketNumber,DriverDocketObj.shiftDate)
-        #     # TotalCost 
-        #     driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
-        #     reconciliationDocketObj.docketNumber = driverDocketNumber  
-        #     reconciliationDocketObj.docketDate = DriverDocketObj.shiftDate  
-        #     reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
-        #     reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
-        #     reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
-        #     reconciliationDocketObj.driverStandByCost = driverStandByCost 
-        #     reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
-        #     reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
-        #     reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
-        #     reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
-        #     reconciliationDocketObj.fromDriver = True 
-        #     reconciliationDocketObj.save()
-        #     # missingComponents 
-        #     checkMissingComponents(reconciliationDocketObj)
+                
+            reconciliationDocketObj.driverId = shiftObj.driverId  
+            reconciliationDocketObj.clientId = tripObj.clientId
+            reconciliationDocketObj.truckConnectionId = tripObj.truckConnectionId
 
-        #     errorObj = PastTripError.objects.filter(pk =errorId).first()
-        #     errorObj.status = True
-        #     errorObj.save()
+            # for ReconciliationReport 
+            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId,startDate__lte = docketObj.shiftDate,endDate__gte = docketObj.shiftDate, clientId = clientObj).first()
+            rateCard = clientTruckConnectionObj.rate_card_name
+            costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
+            graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
+
+            driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+
+            driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+
+            driverWaitingTimeCost =0
+            driverStandByCost = 0
+
+            if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
+                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+            if docketObj.standByStartTime and docketObj.standByEndTime:
+                slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
+            driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+            driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+            # minLoad 
+            driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+            # TotalCost 
+            driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+            reconciliationDocketObj.docketNumber = docketObj.docketNumber  
+            reconciliationDocketObj.docketDate = shiftObj.shiftDate 
+            reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
+            reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
+            reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
+            reconciliationDocketObj.driverStandByCost = driverStandByCost 
+            reconciliationDocketObj.driverLoadDeficit = driverLoadDeficit 
+            reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
+            reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
+            reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
+            reconciliationDocketObj.fromDriver = True 
+            reconciliationDocketObj.save()
+            errorObj = PastTripError.objects.filter(pk =errorId).first()
+            errorObj.status = True
+            errorObj.save()
+
 
         url = reverse('Account:DriverTripEdit', kwargs={'id': shiftObj.id})
         messages.success(request, "Docket Added successfully")
@@ -1758,18 +1809,12 @@ def DriverTripEditForm(request, id):
             rateCard = clientTruckConnectionObj.rate_card_name
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
-      
-            if docket.waitingTimeStart:
-                docket.waitingTimeStart = docket.waitingTimeStart.strftime("%H:%M:%S")
-            if docket.waitingTimeEnd:
-                docket.waitingTimeEnd = docket.waitingTimeEnd.strftime("%H:%M:%S")
+
+            if docket.waitingTimeStart and docket.waitingTimeEnd:
                 docket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-            if docket.standByStartTime:
-                docket.standByStartTime = docket.standByStartTime.strftime("%H:%M:%S")
-            if docket.standByEndTime:
-                docket.standByEndTime = docket.standByEndTime.strftime("%H:%M:%S")
+            if docket.standByStartTime and docket.standByEndTime:
                 docket.standBySlot = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-        
+
     driver = Driver.objects.all()
     clientName = Client.objects.all()
     clientTruck = ClientTruckConnection.objects.all()
@@ -1839,16 +1884,26 @@ def driverEntryUpdate(request, shiftId):
                 docket.returnQty = request.POST.get(f'returnQty{docket.id}')
                 docket.returnKm = request.POST.get(f'returnKm{docket.id}')
                 docket.tippingToYard = True
-            
-            docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
-            docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
-            docket.totalWaitingInMinute = request.POST.get(f'totalWaitingInMinute{docket.id}')
+                
+                
+            if request.POST.get(f'waitingCheck{docket.id}'):
+                docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
+                docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
+            else:
+                docket.waitingTimeStart = None
+                docket.waitingTimeEnd = None
+                
+            if request.POST.get(f'standByCheck{docket.id}'):
+                docket.standByStartTime = request.POST.get(f'standByStartTime{docket.id}')
+                docket.standByEndTime = request.POST.get(f'standByEndTime{docket.id}')
+            else:
+                docket.standByStartTime  = None
+                docket.standByEndTime = None
+                
             docket.surchargeType = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first().id
             docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
             docket.cubicMl = request.POST.get(f'cubicMl{docket.id}')
-            docket.standByStartTime = request.POST.get(f'standByStartTime{docket.id}')
-            docket.standByEndTime = request.POST.get(f'standByEndTime{docket.id}')
-            docket.standBySlot = request.POST.get(f'standBySlot{docket.id}')
+            
             docket.others = request.POST.get(f'others{docket.id}')
             docket.comment = request.POST.get(f'comment{docket.id}')
             
@@ -1904,6 +1959,7 @@ def driverEntryUpdate(request, shiftId):
                 reconciliationDocketObj.save()
                 # missingComponents 
                 checkMissingComponents(reconciliationDocketObj)
+                reconciliationTotalCheck(reconciliationDocketObj)
                 shiftObj.verified = True
                 shiftObj.save()
     
@@ -2005,21 +2061,22 @@ def reconciliationDocketView(request, reconciliationId):
     # rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
     # for driverDocket view 
     driverDocket = DriverShiftDocket.objects.filter(clientId = reconciliationData.clientId , shiftDate = reconciliationData.docketDate , truckConnectionId = reconciliationData.truckConnectionId,docketNumber=reconciliationData.docketNumber).first()
+    
     driverDocket.basePlantName = BasePlant.objects.filter(pk=driverDocket.basePlant).first().basePlant
-    driverDocket.waitingTimeStart = driverDocket.waitingTimeStart.strftime("%H:%M:%S")
-    driverDocket.waitingTimeEnd = driverDocket.waitingTimeEnd.strftime("%H:%M:%S")
-    driverDocket.standByStartTime = driverDocket.standByStartTime.strftime("%H:%M:%S")
-    driverDocket.standByEndTime = driverDocket.standByEndTime.strftime("%H:%M:%S")
+    
     surcharges = Surcharge.objects.all()
     base_plant = BasePlant.objects.all()
-    # trip_ = DriverTrip.objects.filter(id = driverDocket.tripId).first()
-    # return HttpResponse(trip_)
-    # AdminTruckNo = AdminTruck.objects.filter(adminTruckNumber = trip_.truckNo).first()
-    # clientTruck = ClientTruckConnection.objects.filter(truckNumber = AdminTruckNo.adminTruckNumber).first()
-    # return HttpResponse(clientTruck)
-    # rateCard = RateCard.objects.filter(rate_card_name = clientTruck.rate_card_name ).first()
-    # return HttpResponse(rateCard)
-    
+    shiftObj = DriverShift.objects.filter(pk =driverDocket.shiftId).first()
+    clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=driverDocket.truckConnectionId,startDate__lte = driverDocket.shiftDate,endDate__gte = driverDocket.shiftDate, clientId = clientObj).first()
+    rateCard = clientTruckConnectionObj.rate_card_name
+    costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
+    graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
+
+    if driverDocket.waitingTimeStart and driverDocket.waitingTimeEnd:
+        driverDocket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+    if driverDocket.standByStartTime and driverDocket.standByEndTime:
+        driverDocket.standBySlot = DriverTripCheckStandByTotal(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+
     if rctiDocket:
         rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
     if driverDocket:
@@ -2673,12 +2730,18 @@ def PastTripForm(request):
 def pastTripErrorSolve(request, id):
     # print(f'message{id}')
     errorObj = PastTripError.objects.filter(pk=id).first()
-
+    errorObj.tripDate =  datetime.strptime(errorObj.tripDate, '%Y-%m-%d')
     # Check if errorObj is not None before proceeding
     if errorObj:
-        tripObj = DriverTrip.objects.filter(shiftDate=errorObj.tripDate, truckNo=errorObj.truckNo).first()
+        clientObj = Client.objects.filter(name= 'boral').first()
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = errorObj.truckNo , startDate__lte = errorObj.tripDate,endDate__gte = errorObj.tripDate, clientId = clientObj).first()
+        tripObj = DriverShiftTrip.objects.filter(startDateTime__date = errorObj.tripDate, truckConnectionId=clientTruckConnectionObj.id, clientId = clientObj.clientId).first()
+        shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
+        if shiftObj.verified:
+            messages.error(request,'This shift already close you can not add data please contact to admin')
+            return redirect(request.META.get('HTTP_REFERER'))
         if tripObj:
-            url_name = reverse('Account:pastTripErrorResolve', kwargs={'ids': tripObj.id, 'errorId': errorObj.id})
+            url_name = reverse('Account:pastTripErrorResolve', kwargs={'tripId': tripObj.id, 'errorId': errorObj.id})
             return redirect(url_name)
         else:
             return HttpResponse("Error: Trip not found")
@@ -2686,7 +2749,19 @@ def pastTripErrorSolve(request, id):
         return HttpResponse("Error: PastTripError not found")
 
 
-
+def archivePastTrip(request ,errorId):
+    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    pastTripErrorObj.errorType = 2
+    pastTripErrorObj.save()
+    messages.success(request,'Archive successfully..')
+    return redirect(request.META.get('HTTP_REFERER'))  
+  
+def archiveReset(request ,errorId):
+    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    pastTripErrorObj.errorType = 0
+    pastTripErrorObj.save()
+    messages.success(request,'Archive Reset successfully..')
+    return redirect(request.META.get('HTTP_REFERER'))    
     
 
 
@@ -2797,6 +2872,7 @@ def DriverShiftForm(request,id):
     client = Client.objects.all()
     pastTripErrors = PastTripError.objects.filter(status = False , errorType = 0).values()
     pastTripSolved = PastTripError.objects.filter(status = True , errorType = 0).values()
+    pastTripArchive = PastTripError.objects.filter(errorType = 2).values()
     # docketObj = DriverDocket.objects.filter(docketnumber = pastTripSolved.docketNumber).values9
     params ={
             'clients': client,
@@ -2804,6 +2880,7 @@ def DriverShiftForm(request,id):
             'pasrTripFileNameLists' : pasrTripFileNameList,
             'pastTripErrors' : pastTripErrors ,
             'pastTripSolved' :pastTripSolved,
+            'pastTripArchive':pastTripArchive
         }      
     return render(request, 'Account/driverShiftForm.html',params)
 

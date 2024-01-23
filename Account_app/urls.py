@@ -109,7 +109,7 @@ urlpatterns = [
     
     path('DriverDocketEntrySave/<int:tripId>/', views.driverDocketEntrySave, name='driverDocketEntrySave'), 
     # for error solve      
-    path('DriverDocketEntrySave/<int:ids>/<int:errorId>', views.driverDocketEntrySave, name='driverDocketErrorEntrySave'),      
+    path('DriverDocketEntrySave/<int:tripId>/<int:errorId>', views.driverDocketEntrySave, name='driverDocketErrorEntrySave'),      
     
     # Account Tables 
     # Base plant routes
@@ -193,9 +193,10 @@ urlpatterns = [
     path('pastTrip/solve/error/get/', views.getSinglePastTripSolveError, name='getSinglePastTripSolveError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
+    path('archive/pastTrip/<int:errorId>', views.archivePastTrip, name='archivePastTrip'),
+    path('archive/reset/pastTrip/<int:errorId>', views.archiveReset, name='archiveReset'),
     
     
-    # Resolve Error  
      
     
     

@@ -217,6 +217,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             
             reconciliationDocketObj.save()
             checkMissingComponents(reconciliationDocketObj)
+            reconciliationTotalCheck(reconciliationDocketObj)
             return
         except Exception as e: 
             pass

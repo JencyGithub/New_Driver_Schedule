@@ -404,7 +404,7 @@ class PastTripError(models.Model):
     exceptionText = models.CharField(max_length=255, default=None, null=True, blank=True)
     fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
     status = models.BooleanField(default=False)
-    # 0 : pastTrip error  1: Report Error 
+    # 0 : pastTrip error  1: Report Error  2: pastTrip archive
     errorType = models.FloatField(default=0) 
     data = models.CharField(max_length=2048, default=' ')
 

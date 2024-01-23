@@ -111,15 +111,17 @@
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="waitingTimeStart">Waiting Time Start :<span class="required">*</span></label>
+                                <input type="checkbox" class="float-right" id="waitingCheck" name="waitingCheck" value="1"
+                                      onclick="waitingCheckFun(this)">
                                 <div class="field item form-group">
-                                    <input class="form-control" type="time" name="waitingTimeStart" required='required'
-                                        style="padding: 0.25rem 0.2rem;" id="waitingTimeStart" onchange="openWaitingTimeEnd(this)">
+                                    <input class="form-control" type="time" name="waitingTimeStart" 
+                                        style="padding: 0.25rem 0.2rem;" readonly id="waitingTimeStart" onchange="openWaitingTimeEnd(this)">
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="waitingTimeEnd">Waiting Time End :<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <input class="form-control" type="time" name="waitingTimeEnd" required='required'
+                                    <input class="form-control" type="time" name="waitingTimeEnd" 
                                         style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd" readonly
                                         onchange="countTotalWaitingTime(this,{{tripObj.id}})">
                                 </div>
@@ -127,7 +129,7 @@
                             <div class="col-md-4 col-sm-4">
                                 <label for="totalWaitingInMinute">Total Waiting In Minute :<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <input class="form-control" readonly type="number" name="totalWaitingInMinute" required='required'
+                                    <input class="form-control" readonly type="number" name="totalWaitingInMinute" 
                                         style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute">
                                 </div>
                             </div>
@@ -158,23 +160,25 @@
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="standByStartTime">StandBy Start Time :<span class="required">*</span></label>
+                                <input type="checkbox" class="float-right" id="standByCheck" name="standByCheck" value="standByCheck"
+                                        onclick="standByCheckFun(this)" >
                                 <div class="field item form-group">
-                                    <input class="form-control" type="time" name="standByStartTime" required='required'
+                                    <input class="form-control" type="time" name="standByStartTime" readonly
                                         style="padding: 0.25rem 0.2rem;" id="standByStartTime" onchange="openStandByEnd(this)">
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="standByEndTime">StandBy End Time :<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <input class="form-control" type="time" readonly name="standByEndTime" required='required'
+                                    <input class="form-control" type="time" readonly name="standByEndTime"
                                         style="padding: 0.25rem 0.2rem;" id="standByEndTime"
-                                        onchange="countStandBySlot(this,{{tripObj.id}})">
+                                        onchange="countStandBySlot(this, {{ tripObj.id }})">
                                 </div>
                             </div>
                             <div class="col-md-4 col-sm-4">
                                 <label for="standBySlot">Stand By Slot :<span class="required">*</span></label>
                                 <div class="field item form-group">
-                                    <input class="form-control" readonly type="number" name="standBySlot" required='required'
+                                    <input class="form-control" readonly type="number" name="standBySlot"
                                         style="padding: 0.25rem 0.2rem;" id="standBySlot">
                                 </div>
                             </div>
@@ -256,6 +260,33 @@
         $('#returnKm').attr('disabled',true)
     });
 
+    function waitingCheckFun(data){
+        let selected = $(`#waitingCheck`).is(':checked')
+        if(selected == 1){
+            $(`#waitingTimeStart`).removeAttr('readonly').attr('required',true)
+            $(`#waitingTimeEnd`).attr('required',true)
+        }else{
+            $(`#waitingTimeStart`).attr('readonly',true)
+            $(`#waitingTimeStart`).removeAttr('required').val('')
+            $(`#waitingTimeEnd`).removeAttr('required').val('')
+            $(`#totalWaitingInMinute`).removeAttr('required').val('')
+        }
+    }
+
+    
+   
+    function standByCheckFun(tag){
+        let selected = $(`#standByCheck`).is(':checked')
+
+        if(selected){
+            $(`#standByStartTime`).removeAttr('readonly').attr('required',true)
+            $(`#standByEndTime`).attr('required',true)
+        }else{
+            $(`#standByStartTime`).attr('readonly',true).removeAttr('required').val('')
+            $(`#standByEndTime`).attr('readonly',true).removeAttr('required').val('')
+            $(`#standBySlot`).removeAttr('required').val('')
+        }
+    }
     function openWaitingTimeEnd(lineData){
         let waitingTimeStart = lineData.value 
         if(waitingTimeStart){
@@ -296,7 +327,7 @@
     function countStandBySlot(lineData,tripId){
         let standByStartTime = $(`#standByStartTime`).val()
         let standByEndTime = $(`#standByEndTime`).val()
-
+        console.log(tripId)
         if(standByStartTime && standByEndTime){
             $.ajax({
                 type: "POST",

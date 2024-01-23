@@ -210,11 +210,15 @@
                         <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
-                                    role="tab" aria-controls="home" aria-selected="true">Error</a>
+                                role="tab" aria-controls="home" aria-selected="true">Active</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile"
-                                    role="tab" aria-controls="profile" aria-selected="false">Solved</a>
+                                role="tab" aria-controls="profile" aria-selected="false">Closed</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="archive-tab" data-toggle="tab" href="#archive"
+                                    role="tab" aria-controls="profile" aria-selected="false">Archive</a>
                             </li>
                         </ul>
                         <div class="tab-content" id="myTabContent">
@@ -258,6 +262,8 @@
                                                                 <td>{{ error.errorFromPastTrip }}</td>
                                                                 <td>{{ error.fileName }}</td>
                                                                 <td>
+                                                                    <a href="{% url 'Account:archivePastTrip' errorId=error.id %}"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+
                                                                     {% if 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'boral' %}
                                                                     <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
 
@@ -269,7 +275,7 @@
                                                                     <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
 
                                                                     {% elif error.clientName == 'boral' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  Resolve  </a>
+                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
                                                                     {% comment %} HOLCIM  {% endcomment %}
                                                                     
                                                                     {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
@@ -299,7 +305,7 @@
                                 <!-- End Error Table  -->
                             </div>
                             
-
+                            {% comment %} solved Start  {% endcomment %}
                             <div class="tab-pane fade" id="profile" role="tabpanel"
                                 aria-labelledby="profile-tab">
                                 <!-- Solve Table  -->
@@ -337,9 +343,8 @@
                                                                 <td>{{ solve.errorFromPastTrip }}</td>
                                                                 <td>{{ solve.fileName }}</td>
                                                                 <td>
-                                                                    {% comment %} <a href="{% url 'Account:resolveError' id=solve.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View Docket  </a> {% endcomment %}
-
-                                                                    <a href="#" onclick="showResolveModel(this) id="{{solve.id}}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View Docket  </a>
+                                                                    <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+                                                                    <a class="btn btn-success btn-sm text-light" type="button" onclick="showSolveErrorModel(this)" id="solveDocket{{solve.id}}" value="{{solve.id}}"> Docket</a>
                                                                 </td>
                                                             </tr>
                                                             {% endfor %}
@@ -352,64 +357,231 @@
                                 </div>
                                 <!-- End Solve Table  -->
                             </div>
+                            {% comment %} solved End  {% endcomment %}
+
+
+                            {% comment %} Archive Start {% endcomment %}
+                            <div class="tab-pane fade" id="archive" role="tabpanel"
+                                aria-labelledby="archive-tab">
+                                <!-- Solve Table  -->
+
+                                <div class="x_panel">
+                                    <div class="x_title">
+                                        <h2>Archive</h2>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="card-box table-responsive">
+                                                    <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Id</th>
+                                                                <th>Status</th>
+                                                                <th>Docket Date</th>
+                                                                <th>Line number</th>
+                                                                <th>Docket Number</th>
+                                                                <th>Error Description</th>
+                                                                <th>File name</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for archive in pastTripArchive %}
+                                                            <tr>
+                                                                <td><button type="button" onclick="showModel(this)" id="{{archive.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                                <td><i class="fa fa-check text-success "></td>
+                                                                <td>{{ archive.tripDate }}</td>
+                                                                <td>{{ archive.lineNumber }}</td>
+                                                                <td>{{ archive.docketNumber }}</td>
+                                                                <td>{{ archive.errorFromPastTrip }}</td>
+                                                                <td>{{ archive.fileName }}</td>
+                                                                <td>
+                                                                    <a href="{% url 'Account:archiveReset' errorId=archive.id%}"type="button" class="btn btn-default btn-sm" value="{{solve.id}}">Restore</a>
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End Solve Table  -->
+                            </div>
+                            {% comment %} Archive End  {% endcomment %}
                                 {% comment %} View error Model start {% endcomment %}
                                 <div class="modal fade" id="errorModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                        
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Error details</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                        
-                                        <div class="modal-body">
-                                            <div class="container-fluid">
-                                                <div class="row mt-2">
-                                                    <div class="col-md-12">
-                                                        <ul>
-                                                            <li class="mt-1">
-                                                                <b>Trip Date:-</b>
-                                                                <span class="d-inline-block" id="tripDate"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Truck Number:-</b>
-                                                                <span class="d-inline-block" id="truckNo"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Docket Number:-</b>
-                                                                <span class="d-inline-block" id="docketNumber"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>File Name :-</b>    
-                                                                <span class="d-inline-block" id="fileName"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Line Number Of File :-</b>    
-                                                                <span class="d-inline-block" id="lineNumber"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Error :-</b>    
-                                                                <span class="d-inline-block" id="error"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Status :-</b>    
-                                                                <span class="d-inline-block" id="status"></span>
-                                                            </li>
-                                                            <li class="mt-1">
-                                                                <b>Data of entry :-</b>    
-                                                                <span class="d-inline-block" id="data"></span>
-                                                            </li>
-                                                        </ul>
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                            
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Error details</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                            
+                                            <div class="modal-body">
+                                                <div class="container-fluid">
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12">
+                                                            <ul>
+                                                                <li class="mt-1">
+                                                                    <b>Trip Date:-</b>
+                                                                    <span class="d-inline-block" id="tripDate"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Truck Number:-</b>
+                                                                    <span class="d-inline-block" id="truckNo"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Docket Number:-</b>
+                                                                    <span class="d-inline-block" id="docketNumber"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>File Name :-</b>    
+                                                                    <span class="d-inline-block" id="fileName"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Line Number Of File :-</b>    
+                                                                    <span class="d-inline-block" id="lineNumber"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Error :-</b>    
+                                                                    <span class="d-inline-block" id="error"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Status :-</b>    
+                                                                    <span class="d-inline-block" id="status"></span>
+                                                                </li>
+                                                                <li class="mt-1">
+                                                                    <b>Data of entry :-</b>    
+                                                                    <span class="d-inline-block" id="data"></span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                {% comment %} View error Model end {% endcomment %}
+
+                                {% comment %} View Solve error Model Start {% endcomment %}
+
+                                <div class="modal fade bd-example-modal-lg" id="errorSolve" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalScrollableTitle">Docket View</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="col-md-6">
+                                                <ul>
+                                                    <li class="mt-1">
+                                                        <b>Shift Date:-</b>
+                                                        <span class="d-inline-block" id="shiftDate"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Docket Number:-</b>
+                                                        <span class="d-inline-block" id="docketNumber1"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>TippingTo Yard:-</b>
+                                                        <span class="d-inline-block" id="tippingToYard"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Return To Yard :-</b>    
+                                                        <span class="d-inline-block" id="returnToYard"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>BasePlant :-</b>    
+                                                        <span class="d-inline-block" id="basePlant"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Number Of Km :-</b>    
+                                                        <span class="d-inline-block" id="noOfKm"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Transfer Km :-</b>    
+                                                        <span class="d-inline-block" id="transferKM"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Return Qty :-</b>    
+                                                        <span class="d-inline-block" id="returnQty"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Return Km :-</b>    
+                                                        <span class="d-inline-block" id="returnKm"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Waiting Time Start :-</b>    
+                                                        <span class="d-inline-block" id="waitingTimeStart"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <ul>
+                                                    <li class="mt-1">
+                                                        <b>Waiting Time End:-</b>
+                                                        <span class="d-inline-block" id="waitingTimeEnd"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Total Waiting Minute:-</b>
+                                                        <span class="d-inline-block" id="totalWaitingInMinute"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Surcharge Type:-</b>
+                                                        <span class="d-inline-block" id="surcharge_type"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Surcharge Duration :-</b>    
+                                                        <span class="d-inline-block" id="surcharge_duration"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Cubic M :-</b>    
+                                                        <span class="d-inline-block" id="cubicMl"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Stand By Start Time :-</b>    
+                                                        <span class="d-inline-block" id="standByStartTime"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Stand By End Time :-</b>    
+                                                        <span class="d-inline-block" id="standByEndTime"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Stand By Slot :-</b>    
+                                                        <span class="d-inline-block" id="standBySlot"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Others:-</b>    
+                                                        <span class="d-inline-block" id="others"></span>
+                                                    </li>
+                                                    <li class="mt-1">
+                                                        <b>Comment :-</b>    
+                                                        <span class="d-inline-block" id="comment"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                {% comment %} View Solve error Model End {% endcomment %}
+
                             </div>
-                            {% comment %} View error Model end {% endcomment %}
                         </div>
                     </div>
                 </div>
@@ -437,7 +609,6 @@
         }
     });
     function showModel(data) {
-        $("#errorModel").modal("toggle");
         $.ajax({
             type: "POST",
             url: "/account/pastTrip/error/get/",
@@ -448,7 +619,7 @@
               xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: function (data) {
-                console.log(data.data)
+                $("#errorModel").modal("toggle");
               $("#tripDate").text(data.data.tripDate);
               $("#truckNo").text(data.data.truckNo);
               $("#docketNumber").text(data.data.docketNumber);
@@ -465,33 +636,42 @@
             },
           });
     }
-    function showResolveModel(data)
+    function showSolveErrorModel(data)
     {
-        $("#errorModel").modal("toggle");
+        solveId = data.value
         $.ajax({
             type: "POST",
-            url: "/account/pastTrip/error/resolve/get/",
+            url: "/account/pastTrip/solve/error/get/",
             data: {
-              id: data.id,
+              id: solveId,
             },
             beforeSend: function (xhr) {
               xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: function (data) {
-                console.log(data.data)
-              $("#tripDate").text(data.data.tripDate);
-              $("#truckNo").text(data.data.truckNo);
-              $("#docketNumber").text(data.data.docketNumber);
-              $("#fileName").text(data.data.fileName);
-              $("#lineNumber").text(data.data.lineNumber);
-              $("#error").text(data.data.errorFromPastTrip);
-              $("#data").text(data.data.data);
+            $("#errorSolve").modal("show");
 
-              if(data.data.status){
-                $("#status").text("Solved");
-              }else{
-                $("#status").text("Unsolved");
-              }
+            $("#shiftDate").text(data.data.shiftDate);
+            $("#docketNumber1").text(data.data.docketNumber);
+            $("#tippingToYard").text(data.data.tippingToYard);
+            $("#returnToYard").text(data.data.returnToYard);
+            $("#basePlant").text(data.data.basePlantName);
+            $("#noOfKm").text(data.data.noOfKm);
+            $("#transferKM").text(data.data.transferKM);
+            $("#returnQty").text(data.data.returnQty);
+            $("#returnKm").text(data.data.returnKm);
+            $("#waitingTimeStart").text(data.data.waitingTimeStart);
+            $("#waitingTimeEnd").text(data.data.waitingTimeEnd);
+            $("#totalWaitingInMinute").text(data.data.totalWaitingInMinute);
+            $("#surcharge_type").text(data.data.surcharge_type);
+            $("#surcharge_duration").text(data.data.surcharge_duration);
+            $("#cubicMl").text(data.data.cubicMl);
+            $("#standByStartTime").text(data.data.standByStartTime);
+            $("#standByEndTime").text(data.data.standByEndTime);
+            $("#standBySlot").text(data.data.standBySlot);
+            $("#others").text(data.data.others);
+            $("#comment").text(data.data.comment);
+
             },
           });
     }

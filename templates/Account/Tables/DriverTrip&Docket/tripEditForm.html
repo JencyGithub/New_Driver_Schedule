@@ -292,9 +292,12 @@
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
+                                        <input type="checkbox" class="float-right" id="waitingCheck{{docket.id}}" name="waitingCheck{{docket.id}}" value="waitingCheck{{docket.id}}"
+                                      onclick="waitingCheck({{docket.id}},this)" {% if docket.waitingTimeStart %} checked {% endif %}>
+
                                         <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">
+                                            <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">
                                         </div>
                                     </div>
 
@@ -303,7 +306,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -337,16 +340,18 @@
                                     </div>
 
                                     <div class="col-md-4 col-sm-4">
+                                        <input type="checkbox" class="float-right" id="standByCheck{{docket.id}}" name="standByCheck{{docket.id}}" value="standByCheck{{docket.id}}"
+                                        onclick="standByCheck({{docket.id}},this)" {% if docket.standByStartTime %} checked {% endif %}>
                                         <label for="standByStartTime{{docket.id}}">StandBy start Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByStartTime}}" type="time" name="standByStartTime{{docket.id}}" required='required'  style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,{{docket.id}})">
+                                            <input class="form-control" value="{{docket.standByStartTime}}" {% if docket.standByStartTime is None %} readonly {% endif %} type="time" name="standByStartTime{{docket.id}}"   style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,{{docket.id}})">
                                         </div>
                                     </div>
                                     <!--     standByEndTime   others  comment-->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standByEndTime{{docket.id}}">StandBy End Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" readonly name="standByEndTime{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% endif %} name="standByEndTime{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
                                     
@@ -454,14 +459,38 @@
             $(`#returnKm${id}`).attr('readonly',true)
         }
     }
-
+    
     function resetRadio(id){
         $(`#tippingToYard${id}`).removeAttr('checked')
         $(`#returnToYard${id}`).removeAttr('checked')
         $(`#returnQty${id}`).attr('readonly',true)
         $(`#returnKm${id}`).attr('readonly',true)
     }
+    function waitingCheck(id,tag){
+        let selected = $(`#${tag.id}`).is(':checked')
 
+        if(selected){
+            $(`#waitingTimeStart${id}`).removeAttr('readonly').attr('required',true)
+            $(`#waitingTimeEnd${id}`).attr('required',true)
+        }else{
+            $(`#waitingTimeStart${id}`).attr('readonly',true)
+            $(`#waitingTimeStart${id}`).removeAttr('required').val('')
+            $(`#waitingTimeEnd${id}`).removeAttr('required').val('')
+            $(`#totalWaitingInMinute${id}`).removeAttr('required').val('')
+        }
+    }
+    function standByCheck(id,tag){
+        let selected = $(`#${tag.id}`).is(':checked')
+
+        if(selected){
+            $(`#standByStartTime${id}`).removeAttr('readonly').attr('required',true)
+            $(`#standByEndTime${id}`).attr('required',true)
+        }else{
+            $(`#standByStartTime${id}`).attr('readonly',true).removeAttr('required').val('')
+            $(`#standByEndTime${id}`).attr('readonly',true).removeAttr('required').val('')
+            $(`#standBySlot${id}`).removeAttr('required').val('')
+        }
+    }
     function openWaitingTimeEnd(lineData,count_){
         let waitingTimeStart = lineData.value 
         if(waitingTimeStart){
