@@ -64,7 +64,7 @@ class DriverShift(models.Model):
     driverId = models.IntegerField(null=True, blank=True)
     
     def __str__(self) -> str:
-        return str(self.shiftDate) 
+        return str(self.shiftDate) + '-' + str(self.id)
     
 
 class DriverShiftTrip(models.Model):
@@ -424,7 +424,7 @@ class ReconciliationReport(models.Model):
     clientId = models.PositiveIntegerField(default=0)
     truckConnectionId = models.PositiveIntegerField(default=0)
     
-    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: write-of, 4(3):internal,  5(1):External,  7: revenue
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
@@ -488,8 +488,7 @@ class ReconciliationReport(models.Model):
 # -----------------------------------
 # Escalation Mail section
 # -----------------------------------
-class Escalation(models.Model):
-    
+class Escalation(models.Model):   
     userId = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     escalationDate = models.DateField(default=None, null=True)
     escalationType = models.CharField(max_length=20 , default='')
@@ -511,6 +510,7 @@ class EscalationDocket(models.Model):
     amount = models.FloatField(default=0)
     remark = models.CharField(max_length=1024, default='')
     invoiceFile = models.FileField(default=None, null=True, blank=True)
+    
     def __str__(self) -> str:
         return str(self.docketNumber) + ' ' + str(self.docketDate)
 
