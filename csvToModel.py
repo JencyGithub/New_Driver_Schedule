@@ -62,7 +62,8 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         if not RCTIobj:
             RCTIobj = RCTI()
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
-        RCTIobj.clientName = Client.objects.filter(name = 'boral').first()
+        clientObj = Client.objects.filter(name = 'boral').first()
+        RCTIobj.clientName = clientObj
         
         
         dataList = dataList[1:]
@@ -186,31 +187,40 @@ def insertIntoModel(dataList,file_name , rctiReportId):
                 dataList = dataList[11:]
         RCTIobj.rctiReport = rctiReportObj
         RCTIobj.save()
+        # print('Rcti Obj - ', RCTIobj)
+        # print('CLIENT---',Client.objects.filter(name = 'boral').first())
+        # clientObj = Client.objects.filter(name = 'boral').first()
+        # print('Client Obj',clientObj.clientId)
+        try:
+            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
+            rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
+
+            if not reconciliationDocketObj :
+                reconciliationDocketObj = ReconciliationReport()
             
-        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
-        rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
-
-        if not reconciliationDocketObj :
-            reconciliationDocketObj = ReconciliationReport()
-        
-        reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
-        reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-        reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-        reconciliationDocketObj.clientName =  'boral'
-        # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-        reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
-        reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
-        reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
-        # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-        reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
-        reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
-        reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
-        reconciliationDocketObj.fromRcti = True 
-        
-        reconciliationDocketObj.save()
-        checkMissingComponents(reconciliationDocketObj)
-        return
-
+            reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
+            reconciliationDocketObj.docketDate =  RCTIobj.docketDate
+            reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
+            # reconciliationDocketObj.clientName =  'boral'
+            reconciliationDocketObj.clientId =  clientObj.clientId
+            # print('reconciliationDocketObj client Obj',reconciliationDocketObj.clientId)
+            
+            # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+            reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
+            reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
+            reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
+            # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+            reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
+            reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
+            reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+            reconciliationDocketObj.fromRcti = True 
+            
+            reconciliationDocketObj.save()
+            checkMissingComponents(reconciliationDocketObj)
+            return
+        except Exception as e: 
+            pass
+            # print('Exception' , e)
     except Exception as e:
         rctiErrorObj.clientName = 'boral'
         rctiErrorObj.docketNumber = dataList[0]

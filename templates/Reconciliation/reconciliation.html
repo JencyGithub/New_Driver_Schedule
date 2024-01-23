@@ -71,7 +71,7 @@
                                         required="required" >
                                 </div>
                             </div>
-                            <div class="ol-md-4 col-sm-4">
+                            {% comment %} <div class="ol-md-4 col-sm-4">
                                 <label for="driverId">Driver id :<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <select class="form-control"  id="driverId" name="driverId">
@@ -81,8 +81,8 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-4">
+                            </div> {% endcomment %}
+                            {% comment %} <div class="col-md-4 col-sm-4">
                                 <label for="clientId">Client Name :<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <select class="form-control"  id="clientName" name="clientName">
@@ -92,8 +92,8 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-4">
+                            </div> {% endcomment %}
+                            {% comment %} <div class="col-md-4 col-sm-4">
                                 <label for="truckNo">Truck No :<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <select class="form-control"  id="truckNo" name="truckNo">
@@ -104,11 +104,11 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
 
                             <div class="col-md-12 text-right">
-                                <button type='reset' class="btn btn-success px-4">Reset</button>
-                                <button type='submit' class="btn btn-primary px-4">Submit</button>
+                                {% comment %} <button type='reset' class="btn btn-success px-4">Reset</button> {% endcomment %}
+                                <button type='submit' class="btn btn-default px-4">Submit</button>
                             </div>
                         </form>
                     </div>

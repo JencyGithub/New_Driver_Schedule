@@ -79,7 +79,7 @@
                                     <select class="form-control" required id="clientName{{docket.id}}" disabled name="clientName{{docket.id}}">
                                         <option value="" disabled selected>Select Client Name</option>
                                         {% for clientName in clientNames %}
-                                        <option value="{{ clientName.clientId }}" {% if docket.clientName == clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
+                                        <option value="{{ clientName.clientId }}" {% if docket.clientId == clientName.clientId %} selected {% endif %}>{{ clientName.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

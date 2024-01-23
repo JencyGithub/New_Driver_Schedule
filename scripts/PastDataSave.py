@@ -361,7 +361,7 @@ def run():
                                     
                                 reconciliationDocketObj.driverId = driverObj.driverId  
                                 reconciliationDocketObj.clientId = clientObj.clientId
-                                reconciliationDocketObj.truckId = tripObj.truckConnectionId
+                                reconciliationDocketObj.truckConnectionId = tripObj.truckConnectionId
                                 
                                 # for ReconciliationReport 
                                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId,startDate__lte = docketObj.shiftDate,endDate__gte = docketObj.shiftDate, clientId = clientObj).first()

@@ -208,12 +208,15 @@
               </li>
               <li><a>Reports<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="#">Revenue Report</a>
+                  <li class="sub_menu"><a href="{% url 'Account:reconciliationForm' dataType=7 %}">Revenue Report</a>
                   </li>
                   <li><a href="{% url 'Account:reconciliationForm' dataType=0 %}">Reconciliation Report</a>
                   </li>
                   <li><a href="{% url 'Account:reconciliationForm' dataType=1 %}">Short Paid Report</a>
                   </li>
+                  <li><a href="{% url 'Account:reconciliationForm' dataType=3 %}">Write Off Report</a>
+                  </li>
+                  
                   <li><a href="#">Expense Report</a>
                   </li>
                   <li><a href="#">Custom Report</a>

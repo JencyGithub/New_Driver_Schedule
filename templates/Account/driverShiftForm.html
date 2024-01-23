@@ -337,7 +337,9 @@
                                                                 <td>{{ solve.errorFromPastTrip }}</td>
                                                                 <td>{{ solve.fileName }}</td>
                                                                 <td>
-                                                                    <a href="{% url 'Account:resolveError' id=solve.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View  </a>
+                                                                    {% comment %} <a href="{% url 'Account:resolveError' id=solve.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View Docket  </a> {% endcomment %}
+
+                                                                    <a href="#" onclick="showResolveModel(this) id="{{solve.id}}" target="_blank"  title="solved" class="btn btn-sm btn-success">  View Docket  </a>
                                                                 </td>
                                                             </tr>
                                                             {% endfor %}
@@ -463,7 +465,36 @@
             },
           });
     }
+    function showResolveModel(data)
+    {
+        $("#errorModel").modal("toggle");
+        $.ajax({
+            type: "POST",
+            url: "/account/pastTrip/error/resolve/get/",
+            data: {
+              id: data.id,
+            },
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+                console.log(data.data)
+              $("#tripDate").text(data.data.tripDate);
+              $("#truckNo").text(data.data.truckNo);
+              $("#docketNumber").text(data.data.docketNumber);
+              $("#fileName").text(data.data.fileName);
+              $("#lineNumber").text(data.data.lineNumber);
+              $("#error").text(data.data.errorFromPastTrip);
+              $("#data").text(data.data.data);
 
+              if(data.data.status){
+                $("#status").text("Solved");
+              }else{
+                $("#status").text("Unsolved");
+              }
+            },
+          });
+    }
     $("#save_").click(function(){
         alert('Please ensure, All trucks, ratecard and client truck connections are correctly configured for the data you are about to add. Incorect mappings may lead to failure of adding data.')
     })

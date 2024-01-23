@@ -424,7 +424,7 @@ class ReconciliationReport(models.Model):
     clientId = models.PositiveIntegerField(default=0)
     truckConnectionId = models.PositiveIntegerField(default=0)
     
-    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue
     reconciliationType = models.PositiveIntegerField(default=0)
     missingComponent = models.CharField(max_length=255, default=None, null=True, blank=True)
     
@@ -540,6 +540,8 @@ class RctiErrors(models.Model):
     clientName = models.CharField(max_length=25 ,default=None ,blank=True,null=True)
     docketNumber = models.CharField(default=None ,blank=True,null=True ,max_length=255)
     docketDate = models.CharField(default=None, blank=True,null=True, max_length=255)
+    truckNo = models.CharField(default=None, blank=True,null=True, max_length=255)
+    exceptionText = models.CharField(default=None, blank=True,null=True, max_length=255)
     errorDescription = models.CharField(default=None ,blank=True,null=True ,max_length=255)
     fileName =  models.CharField(default=None ,blank=True,null=True ,max_length=255)
     status = models.BooleanField(default=False)

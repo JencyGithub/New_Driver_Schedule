@@ -1441,11 +1441,16 @@ def countDocketStandByTime(request):
     
 @csrf_protect
 def getSinglePastTripError(request):
-    print('here')
     pastTripErrorData = PastTripError.objects.filter(pk=request.POST.get('id')).values().first()
-    print(pastTripErrorData)
     return JsonResponse({'status': True,'data':pastTripErrorData})
 
+@csrf_protect
+def getSinglePastTripSolveError(request):
+    pastTripErrorSolve = PastTripError.objects.filter(pk=request.POST.get('id')).first()
+    clientObj = Client.objects.filter(name = 'boral').first().id
+    docketObj = DriverShiftDocket.objects(clientId = clientObj.id)
+    return JsonResponse({'status': True,'data':pastTripErrorSolve})
+    
 def driverDocketEntrySave(request, tripId, errorId=None):
     
     # return HttpResponse(errorId)
@@ -1946,14 +1951,19 @@ def reconciliationForm(request, dataType):
         'clients': clients,
         'trucks': trucks ,
     }
-
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue
     if dataType == 0:
         params['dataType'] = 'Reconciliation Report'
         params['dataTypeInt'] = 0
     elif dataType ==  1:
         params['dataType'] = 'Short paid Report'
         params['dataTypeInt'] = 1
-        
+    elif dataType ==  3:
+        params['dataType'] = 'Write Off Report'
+        params['dataTypeInt'] = 3
+    elif dataType ==  7:
+        params['dataType'] = 'Revenue Report'
+        params['dataTypeInt'] = 7
         
     return render(request, 'Reconciliation/reconciliation.html', params)
 
@@ -1971,18 +1981,35 @@ def reconciliationAnalysis(request,dataType):
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 1).values()
         params['dataType'] = 'Short paid'
         params['dataTypeInt'] = 1
-        
+    elif dataType == 3:
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 3).values()
+        params['dataType'] = 'Write Off'
+        params['dataTypeInt'] = 3
+    elif dataType == 7:
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
+        params['dataType'] = 'Revenue'
+        params['dataTypeInt'] = 7
+    for data in dataList:        
+        data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
     params['dataList'] = dataList
     
     return render(request, 'Reconciliation/reconciliation-result.html', params)
      
 
 
-def reconciliationDocketView(request, docketNumber):
+def reconciliationDocketView(request, reconciliationId):
     # try:
-    rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
+    reconciliationData = ReconciliationReport.objects.filter(pk=reconciliationId).first()
+    clientObj = Client.objects.filter(pk=reconciliationData.clientId).first()
+    rctiDocket = RCTI.objects.filter(clientName = clientObj ,truckNo =reconciliationData.truckConnectionId, docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
+    # rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
     # for driverDocket view 
-    driverDocket = DriverDocket.objects.filter(docketNumber=docketNumber).first()
+    driverDocket = DriverShiftDocket.objects.filter(clientId = reconciliationData.clientId , shiftDate = reconciliationData.docketDate , truckConnectionId = reconciliationData.truckConnectionId,docketNumber=reconciliationData.docketNumber).first()
+    driverDocket.basePlantName = BasePlant.objects.filter(pk=driverDocket.basePlant).first().basePlant
+    driverDocket.waitingTimeStart = driverDocket.waitingTimeStart.strftime("%H:%M:%S")
+    driverDocket.waitingTimeEnd = driverDocket.waitingTimeEnd.strftime("%H:%M:%S")
+    driverDocket.standByStartTime = driverDocket.standByStartTime.strftime("%H:%M:%S")
+    driverDocket.standByEndTime = driverDocket.standByEndTime.strftime("%H:%M:%S")
     surcharges = Surcharge.objects.all()
     base_plant = BasePlant.objects.all()
     # trip_ = DriverTrip.objects.filter(id = driverDocket.tripId).first()
@@ -2029,7 +2056,7 @@ def escalationClientCheck(request):
     msg = None
     for docket in dockets:
         getDocket = ReconciliationReport.objects.filter(docketNumber = docket).first()
-        clientNames.add(getDocket.clientName)
+        clientNames.add(getDocket.clientId)
         existDocket = EscalationDocket.objects.filter(docketNumber=ReconciliationReport.docketNumber, docketDate=getDocket.docketDate).first()
         reconciliationId.append(getDocket.id)
         if getDocket.fromDriver == False:
@@ -2111,7 +2138,7 @@ def createReconciliationEscalation(request, reconciliationIdStr, clientName):
     escalationObj.userId = request.user
     escalationObj.escalationDate = getCurrentDateTimeObj().date()
     escalationObj.escalationType = escalationType
-    escalationObj.clientName = Client.objects.filter(name=clientName).first()
+    escalationObj.clientName = Client.objects.filter(pk=clientName).first()
     escalationObj.save()
 
     for rId in reconciliationList:
@@ -2384,7 +2411,7 @@ def rateCardSave(request, id=None, edit=0):
             existingThresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingGrace = Grace.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
-            return HttpResponse(rateCardSurchargeObj)
+            # return HttpResponse(rateCardSurchargeObj)
             for surcharge in rateCardSurchargeObj:
                 surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
                 surcharge.start_date = startDate
@@ -2659,13 +2686,7 @@ def pastTripErrorSolve(request, id):
         return HttpResponse("Error: PastTripError not found")
 
 
-def resolveError(request, id):
-    resolveErrorObj = PastTripError.objects.filter(pk=id).first()
-    tripObj = DriverTrip.objects.filter(shiftDate=resolveErrorObj.tripDate, truckNo=resolveErrorObj.truckNo).first()
-    # return HttpResponse(tripObj.id)
-    # url_name = reverse('Account:DriverTripEditForm', kwargs={'id': tripObj.id})
-    return redirect('Account:DriverTripEdit',id=tripObj.id)
-    return redirect(url_name)
+
     
 
 

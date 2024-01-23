@@ -808,7 +808,7 @@ request {% endblock %} {% block headStyle %}
                                         <input class="form-control"  type="number"
                                         name="{{surcharge.id}}"
                                         value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
-                                        {% if surcharge %} readonly {% endif %}
+                                        readonly
                                         required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
                                     </div>
                                 </div>

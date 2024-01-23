@@ -62,7 +62,7 @@
                                                 <tr>
                                                     <td>{{ item.docketNumber }}</td>
                                                     <td>
-                                                        <a href="{% url 'Account:reconciliationDocketView' docketNumber=item.docketNumber %}" target="_blank" 
+                                                        <a href="{% url 'Account:reconciliationDocketView' reconciliationId=item.id %}" target="_blank" 
                                                             class="{% if item.fromDriver and item.fromRcti %} text-success {% else %} text-danger {% endif %}">{{ item.docketNumber }}
                                                         </a>
                                                     </td>

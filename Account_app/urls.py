@@ -159,7 +159,7 @@ urlpatterns = [
     # Reconciliation
     path('reconciliation/form/<int:dataType>/', views.reconciliationForm, name='reconciliationForm'),
     path('reconciliation/analysis/<int:dataType>/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
-    path('reconciliation/docket/view/<int:docketNumber>/', views.reconciliationDocketView, name='reconciliationDocketView'),
+    path('reconciliation/docket/view/<int:reconciliationId>/', views.reconciliationDocketView, name='reconciliationDocketView'),
     path('reconciliation/setMark/', views.reconciliationSetMark, name='reconciliationSetMark'),
     
     path('reconciliation/escalate/checkClient/', views.escalationClientCheck, name='escalationClientCheck'),
@@ -190,12 +190,12 @@ urlpatterns = [
     path('pastTrip/errorSolve/<int:id>/',views.pastTripErrorSolve, name='pastTripErrorSolve'),
     path('pastTrip/error/resolve/<int:tripId>/<int:errorId>/', views.driverDocketEntry, name='pastTripErrorResolve'),
     path('pastTrip/error/get/', views.getSinglePastTripError, name='getSinglePastTripError'),
+    path('pastTrip/solve/error/get/', views.getSinglePastTripSolveError, name='getSinglePastTripSolveError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
     
     
     # Resolve Error  
-    path('resolveError/<int:id>', views.resolveError, name='resolveError'),
      
     
     
