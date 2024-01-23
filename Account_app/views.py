@@ -17,12 +17,78 @@ from Account_app.reconciliationUtils import *
 from django.urls import reverse
 from django.db.models import Q
 from itertools import chain
+from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, 'Account/dashboard.html')
+    curDate = getCurrentDateTimeObj().date()
+    totalShiftsCount = DriverShift.objects.filter(shiftDate=curDate)
+    continueShiftsCount = DriverShift.objects.filter(shiftDate=curDate, endDateTime=None).count()
+    completedShiftsCount = DriverShift.objects.filter(shiftDate=curDate, endDateTime__isnull=False).count()
+    reimbursementCount = DriverReimbursement.objects.filter(raiseDate__date=curDate).count()
+    preStartPendingCount = 0
+    disputeCount = 0
+    oldEscalation = []
+    previous_month_date = (getCurrentDateTimeObj() - relativedelta(months=1)).date()
+    
+    # reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = previous_month_date.month, docketDate__year=previous_month_date.year)
+    reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = 1 , docketDate__year=2023)
+    
+    openedEscalation = Escalation.objects.exclude(escalationStep=4)
+    
+    
+    dateBefore3days = curDate - timedelta(days=3)
+    for escalation in openedEscalation:
+        if escalation.escalationType == "External":
+            lastMail = EscalationMail.objects.filter(escalationId=escalation).order_by('mailDate').first()
+            if lastMail.mailDate <= dateBefore3days:
+                if len(oldEscalation) <= 5:
+                    oldEscalation.append(escalation)
+                else:
+                    continue
+            
+    
+
+    for shift in totalShiftsCount:
+        # pre-start pending 
+        preStart = DriverPreStart.objects.filter(shiftId=shift.id).first()
+        if not preStart:
+            preStartPendingCount +=1
+            
+        # dispute check
+        trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
+        for trip in trips:
+            if trip.dispute:
+                disputeCount += 1
+    
+    writeOfCount = reconciliationCount = shortPaidCount = 0 
+    
+    for report in reconciliationObjs:
+        if report.reconciliationType == 0:
+            reconciliationCount += 1
+        elif report.reconciliationType == 1:
+            shortPaidCount += 1
+        elif report.reconciliationType == 3:
+            writeOfCount += 1
+            
+    
+    params = {
+        'totalShiftsCount' : totalShiftsCount.count(),
+        'continueShiftsCount' : continueShiftsCount,
+        'completedShiftsCount' : completedShiftsCount,
+        'preStartPendingCount' : preStartPendingCount,
+        'disputeCount' : disputeCount,
+        'reimbursementCount' : reimbursementCount,
+        'reportCount' : reconciliationObjs.count(),
+        'reconciliationCount' : reconciliationCount,
+        'shortPaidCount' : shortPaidCount,
+        'writeOfCount' : writeOfCount,
+        'openedEscalationCount' : openedEscalation.count(),
+        'oldEscalation' : oldEscalation
+    }
+    return render(request, 'Account/dashboard.html', params)
 
 def getForm1(request):
     if request.user.is_authenticated:
@@ -507,9 +573,15 @@ def mapFormView(request):
 def mapDataSave(request, recurring=None):
     driverObj = Driver.objects.filter(name=request.user.username).first()
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
-    
+    currentDateTime = getCurrentDateTimeObj()
+    result = None
     if not recurring:
-        currentDateTime = getCurrentDateTimeObj()
+        currentHour = currentDateTime.time().hour
+        if 6 <= currentHour <= 17 :
+            result = "Day"
+        else:
+            result = "Night"
+        
         lat = request.POST.get('latitude')
         lng = request.POST.get('longitude')
         date = request.POST.get('date')
@@ -519,6 +591,7 @@ def mapDataSave(request, recurring=None):
         shiftObj.latitude = lat
         shiftObj.longitude = lng
         shiftObj.shiftDate = date
+        shiftObj.shiftType = result
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
         shiftObj.save()
@@ -570,11 +643,9 @@ def clientAndTruckDataSave(request, id):
     clientTruckNum = truckNum[1]
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
-    currentDateTime = getCurrentDateTimeObj()
     
     tripObj = DriverShiftTrip()
     tripObj.shiftId = id
-    tripObj.startDateTime = currentDateTime
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.save()
@@ -600,14 +671,15 @@ def checkQuestionRequired(request):
     
 @csrf_protect
 def DriverPreStartSave(request, tripId):
-    
+    currentDateTime = getCurrentDateTimeObj()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    tripObj.startDateTime = currentDateTime 
+    tripObj.save()
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
     preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
     preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStartObj.id)
     driverObj = Driver.objects.filter(name=request.user.username).first()
-    currentDateTime = getCurrentDateTimeObj()
     currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
     
     for trip in currentTrips:
@@ -814,10 +886,11 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     
     if not clientObj.docketGiven:
         for load in range(1,noOfLoads+1):
+            
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
             docketObj.shiftId = shiftId
-            docketObj.shiftDate = shiftObj.shiftDate
+            docketObj.shiftDate = tripObj.startDateTime.date()
             docketObj.clientId = clientObj.clientId
             docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
@@ -842,7 +915,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
             docketObj.shiftId = shiftId
-            docketObj.shiftDate = shiftObj.shiftDate
+            docketObj.shiftDate = tripObj.startDateTime.date()
             docketObj.clientId = clientObj.clientId
             docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
@@ -2143,10 +2216,8 @@ def createReconciliationEscalation(request, reconciliationIdStr, clientName):
 
     for rId in reconciliationList:
         recObj = ReconciliationReport.objects.filter(pk=rId).first()
-
-        # Move to short paid or write-of 
-        
-        recObj.reconciliationType = 3 if escalationType == 'Internal' else 2
+        # internal = 4,  External = 5
+        recObj.reconciliationType = 4 if escalationType == 'Internal' else 5
         recObj.save()
 
         driverDocketObj = DriverDocket.objects.filter(docketNumber=recObj.docketNumber, shiftDate=recObj.docketDate).first()
@@ -2178,7 +2249,6 @@ def showReconciliationEscalation2(request, escalationId):
 @csrf_protect
 def reconciliationEscalationForm3(request ,id):
     escalationObj = Escalation.objects.filter(pk=id).first()
-
     remark = request.POST.get('remark')
     if remark:
         escalationObj.remark = remark
@@ -2238,11 +2308,21 @@ def reconciliationEscalationComplete(request, id):
     if request.POST.get('remark'):
         escalationObj.remark = request.POST.get('remark')
         
+    escalationDockets = EscalationDocket.objects.filter(escalationId=escalationObj)
+
+    for docket in escalationDockets:
+        recObj = ReconciliationReport.objects.filter(docketNumber=docket.docketNumber,docketDate=docket.docketDate,clientId=escalationObj.clientName.clientId).first()
+        if recObj.reconciliationType == 4:
+            recObj.reconciliationType = 3
+        if recObj.reconciliationType == 5:
+            recObj.reconciliationType = 1
+            
+        recObj.save()
+
     escalationObj.escalationStep = 4
     escalationObj.save()
         
     messages.success(request, "Escalation completed successfully.")
-    # return redirect(request.META.get('HTTP_REFERER'))
     return redirect('Account:index')
     
     
@@ -2790,8 +2870,10 @@ def surchargeSave(request, id=None):
 def DriverShiftForm(request,id):
     pastTripFile = os.listdir('static/Account/PastTripsEntry')
     pasrTripFileNameList = []
-    for file in pastTripFile:
-        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+    
+    for pastFile in pastTripFile:
+        print(pastFile)
+        pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[1]])
         
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()

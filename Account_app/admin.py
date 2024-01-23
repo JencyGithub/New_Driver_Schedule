@@ -520,7 +520,7 @@ class DriverPreStartQuestionInline(admin.StackedInline):
     extra = 0
     
 class DriverPreStartAdmin(admin.ModelAdmin):
-    list_display = ["driverId", "curDateTime"]
+    list_display = ["driverId", "curDateTime", "shiftId"]
     # search_fields = ["adminTruckNumber"]
     inlines = [DriverPreStartQuestionInline]
 admin.site.register(DriverPreStart, DriverPreStartAdmin)
