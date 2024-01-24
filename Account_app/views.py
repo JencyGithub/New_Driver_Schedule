@@ -549,6 +549,11 @@ def timeOfStartSave(request):
     
 def mapFormView(request):
     driverObj = Driver.objects.filter(name=request.user.username).first()
+    
+    if not driverObj:
+        messages.error(request, "Only driver can access this.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
     
     if shiftObj:

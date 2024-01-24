@@ -27,7 +27,7 @@
 
           <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-desktop"></i> Dashboard</a></li>
           {% endif %}
-          <li class=""><a href="{% url 'Account:getForm1'%}"><i class="fa fa-truck"></i> DriverTrip</a></li>
+          <li class=""><a href="{% url 'Account:mapFormView' %}"><i class="fa fa-truck"></i> DriverTrip</a></li>
         </ul>
         {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
         <ul class="nav side-menu">
