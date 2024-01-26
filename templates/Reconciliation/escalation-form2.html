@@ -30,7 +30,7 @@
 
                         <!-- Smart Wizard -->
                         <div id="wizard" class="form_wizard wizard_horizontal">
-                            <ul class="wizard_steps anchor p-0 m-0">
+                            {% comment %} <ul class="wizard_steps anchor p-0 m-0">
                                 <li>
                                     <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                         <span class="step_no">1</span>
@@ -55,7 +55,7 @@
                                         </span>
                                     </a>
                                 </li>
-                            </ul>
+                            </ul> {% endcomment %}
                             {% if escalationObj.escalationType == 'Internal' %}
                                 <form action="{% url 'Account:reconciliationEscalationForm3' id=escalationObj.id %}" method="POST" novalidate id="reconciliationForm">
                                 {% comment %} <form action="#" method="POST" novalidate id="reconciliationForm"> {% endcomment %}
@@ -152,7 +152,7 @@
                                                     <div class="col-12">
                                                         <div class="mb-2">
                                                             <label for="mailSubject" class="m-0">Subject :</label>
-                                                            <input type="email" name="mailSubject" id="mailSubject" class="form-control" required>
+                                                            <input type="text" name="mailSubject" id="mailSubject" class="form-control" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -160,7 +160,7 @@
                                                     <div class="col-12">
                                                         <div class="mb-2">
                                                             <label for="mailDescription" class="m-0">Description :</label>
-                                                            <textarea type="email" name="mailDescription" id="mailDescription" class="form-control" required rows="4"></textarea>
+                                                            <textarea name="mailDescription" id="mailDescription" class="form-control" required rows="4"></textarea>
                                                         </div>
                                                     </div>
                                                 </div>

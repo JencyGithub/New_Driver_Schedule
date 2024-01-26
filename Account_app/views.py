@@ -2235,31 +2235,31 @@ def getCostDifference(request):
 
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
     if loadKmCostDifference != 0:
-        params['loadKmCostDifference'] = [reconciliationData.driverLoadAndKmCost, reconciliationData.rctiLoadAndKmCost, round(loadKmCostDifference,2)]
+        params['Load Fees'] = [reconciliationData.driverLoadAndKmCost, reconciliationData.rctiLoadAndKmCost, round(loadKmCostDifference,2)]
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
     if surchargeCostDifference != 0:
-        params['surchargeCostDifference'] = [reconciliationData.driverSurchargeCost, reconciliationData.rctiSurchargeCost, round(surchargeCostDifference,2)]
+        params['Surcharge'] = [reconciliationData.driverSurchargeCost, reconciliationData.rctiSurchargeCost, round(surchargeCostDifference,2)]
     waitingTimeCostDifference= reconciliationData.driverWaitingTimeCost - reconciliationData.rctiWaitingTimeCost
     if waitingTimeCostDifference != 0:
-        params['waitingTimeCostDifference'] = [reconciliationData.driverWaitingTimeCost, reconciliationData.rctiWaitingTimeCost, round(waitingTimeCostDifference,2)]
+        params['Waiting Cost'] = [reconciliationData.driverWaitingTimeCost, reconciliationData.rctiWaitingTimeCost, round(waitingTimeCostDifference,2)]
     transferKmCostDifference= reconciliationData.driverTransferKmCost - reconciliationData.rctiTransferKmCost
     if transferKmCostDifference != 0:
-        params['transferKmCostDifference'] = [reconciliationData.driverTransferKmCost, reconciliationData.rctiTransferKmCost, round(transferKmCostDifference,2)]
+        params['Transfer Cost'] = [reconciliationData.driverTransferKmCost, reconciliationData.rctiTransferKmCost, round(transferKmCostDifference,2)]
     returnKmCostDifference= reconciliationData.driverReturnKmCost - reconciliationData.rctiReturnKmCost
     if returnKmCostDifference != 0:
-        params['returnKmCostDifference'] = [reconciliationData.driverReturnKmCost, reconciliationData.rctiReturnKmCost, round(returnKmCostDifference,2)]
+        params['Return Cost'] = [reconciliationData.driverReturnKmCost, reconciliationData.rctiReturnKmCost, round(returnKmCostDifference,2)]
     otherCostDifference= reconciliationData.driverOtherCost - reconciliationData.rctiOtherCost
     if otherCostDifference != 0:
-        params['otherCostDifference'] = [reconciliationData.driverOtherCost, reconciliationData.rctiOtherCost, round(otherCostDifference,2)]
+        params['Other Cost'] = [reconciliationData.driverOtherCost, reconciliationData.rctiOtherCost, round(otherCostDifference,2)]
     standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
     if standByCostDifference != 0:
-        params['standByCostDifference'] = [reconciliationData.driverStandByCost, reconciliationData.rctiStandByCost, round(standByCostDifference,2)]
+        params['Stand By Cost'] = [reconciliationData.driverStandByCost, reconciliationData.rctiStandByCost, round(standByCostDifference,2)]
     loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
     if loadDeficitDifference != 0:
-        params['loadDeficitDifference'] = [reconciliationData.driverLoadDeficit, reconciliationData.rctiLoadDeficit, loadDeficitDifference]
+        params['Load Deficit'] = [reconciliationData.driverLoadDeficit, reconciliationData.rctiLoadDeficit, loadDeficitDifference]
     totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
     if totalCostDifference != 0:
-        params['totalCostDifference'] = [reconciliationData.driverTotalCost, reconciliationData.rctiTotalCost, round(totalCostDifference,2)]
+        params['Total Cost'] = [reconciliationData.driverTotalCost, reconciliationData.rctiTotalCost, round(totalCostDifference,2)]
     
     return JsonResponse({ 'status':True, 'params':params })
     
@@ -2374,12 +2374,13 @@ def reconciliationEscalationComplete(request, id):
 
     for docket in escalationDockets:
         recObj = ReconciliationReport.objects.filter(docketNumber=docket.docketNumber,docketDate=docket.docketDate,clientId=escalationObj.clientName.clientId).first()
-        if recObj.reconciliationType == 4:
-            recObj.reconciliationType = 3
-        if recObj.reconciliationType == 5:
-            recObj.reconciliationType = 1
+        if recObj:
+            if recObj.reconciliationType == 4:
+                recObj.reconciliationType = 3
+            if recObj.reconciliationType == 5:
+                recObj.reconciliationType = 1
             
-        recObj.save()
+            recObj.save()
 
     escalationObj.escalationStep = 4
     escalationObj.save()

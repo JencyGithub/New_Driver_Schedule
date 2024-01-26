@@ -7,10 +7,16 @@
     .nav-link{
         color: #7c8792;
     }
-    {% comment %} media query for min width 720px {% endcomment %}
+
     @media (max-width: 721px) {
        body{
         font-size: 14px !important;
+       }
+       button, .btn.btn-sm{
+        font-size: 0.9em !important;
+       }
+       h5{
+        font-size: 1.2em!important;
        }
     }
                 
@@ -86,61 +92,87 @@
                                     </tr>
                                 </table>
                             {% endfor %}    
+                            <a href="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" class="btn btn-sm btn-default w-auto float-end px-3">End Trip</a>
                         </div>
                     </div>
                 </div>
                 <div class="tab-pane" id="breaks" role="tabpanel" aria-labelledby="breaksTab" tabindex="0">
-                    <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">SR.</th>
-                            {% comment %} <th scope="col">Client </th>
-                            <th scope="col">Truck</th> {% endcomment %}
-                            <th scope="col">Start Time</th>
-                            <th scope="col">End Time</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            {% for break in breaks %}
+                    <div class="row">
+                        <div class="ms-auto d-flex justify-content-between flex-wrap">
+                            <h5 class="card-title text-uppercase text-default">Breaks</h5>
+                            <div class="p-1 ms-auto">
+                                <a href="{% url 'Account:addDriverBreak' shiftId=shiftObj.id %}" class="btn btn-sm btn-default">Add Break</a>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    {% if breaks|length < 1 %}
+                        <h5 class="text-secondary">No breaks found</h5>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                 <tr>
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    {% comment %} <td class="text-capitalize">{{ break.clientName }}</td>
-                                    <td>{{ break.truckNum }}</td> {% endcomment %}
-                                    <td>{{ break.startDateTime }}</td>
-                                    <td>{{ break.endDateTime }}</td>
+                                    <th scope="col">SR.</th>
+                                    {% comment %} <th scope="col">Client </th>
+                                    <th scope="col">Truck</th> {% endcomment %}
+                                    <th scope="col">Start Time</th>
+                                    <th scope="col">End Time</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                      </table>
-                    </div> 
+                                </thead>
+                                <tbody>
+                                    {% for break in breaks %}
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            {% comment %} <td class="text-capitalize">{{ break.clientName }}</td>
+                                            <td>{{ break.truckNum }}</td> {% endcomment %}
+                                            <td>{{ break.startDateTime }}</td>
+                                            <td>{{ break.endDateTime }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div> 
+                    {% endif %}
                 </div>
                 <div class="tab-pane" id="reimbursement" role="tabpanel" aria-labelledby="reimbursementTab" tabindex="0">
                     <div class="row">
-                        <h5 class="card-title text-uppercase text-default">Reimbursement Details :</h5>
-                        <hr>
-                        {% for reimbursement in reimbursements %}
-                            <div class="col-md-4">
-                                <table class="table my-2">
-                                    <tr>
-                                        <th class="py-2">Notes :  </th>
-                                        <td class="py-2">{{ reimbursement.notes }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-2">Raise Date :  </th>
-                                        <td class="py-2"><span>{{ reimbursement.raiseDate }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-2">Amount : </th>
-                                        <td class="py-2"><span>{{ reimbursement.amount }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="py-2">Reimbursement File : </th>
-                                        <td class="py-2"><span><a href="/{{ reimbursement.reimbursementFile }}" target="_blank"><i class="fa-solid fa-file-import text-default" style="font-size: 1.2rem;"></i></a></span></td>
-                                    </tr>
-                                </table>
+                        <div class="ms-auto d-flex justify-content-between flex-wrap">
+                            <h5 class="card-title text-uppercase text-default">Reimbursements</h5>
+                            <div class="p-1 ms-auto">
+                                <a href="{% url 'Account:addReimbursementView' shiftId=shiftObj.id %}" class="btn btn-sm btn-default">Add new</a>
                             </div>
-                        {% endfor %}    
+                        </div>
+                    </div>
+                    <hr class="my-2">
+
+                    <div class="row">
+                        {% if reimbursements|length < 1 %}
+                            <h5 class="text-secondary">No reimbursements found</h5>
+                        {% else %}
+                            {% for reimbursement in reimbursements %}
+                                <div class="col-md-4">
+                                    <table class="table my-2">
+                                        <tr>
+                                            <th class="py-2">Notes :  </th>
+                                            <td class="py-2">{{ reimbursement.notes }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-2">Raise Date :  </th>
+                                            <td class="py-2"><span>{{ reimbursement.raiseDate }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-2">Amount : </th>
+                                            <td class="py-2"><span>{{ reimbursement.amount }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-2">Reimbursement File : </th>
+                                            <td class="py-2"><span><a href="/{{ reimbursement.reimbursementFile }}" target="_blank"><i class="fa-solid fa-file-import text-default" style="font-size: 1.2rem;"></i></a></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            {% endfor %}    
+                        {% endif %}
                     </div>
                 </div>
             </div>

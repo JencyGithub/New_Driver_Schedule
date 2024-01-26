@@ -17,7 +17,7 @@
                 <div class="x_content">
                     <!-- Smart Wizard -->
                     <div id="wizard" class="form_wizard wizard_horizontal">
-                        <ul class="wizard_steps anchor p-0">
+                        {% comment %} <ul class="wizard_steps anchor p-0">
                             <li>
                                 <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                     <span class="step_no">1</span>
@@ -43,7 +43,7 @@
                                 </a>
                             </li>
                         </ul>
-                        
+                         {% endcomment %}
                             {% csrf_token%}
                             
                             <div class="form-group row">
@@ -119,8 +119,8 @@
                                 <div class="col-md-6 col-sm-6 ">
                                     <select class="form-control"  {% if escalationObj.escalationType == 'External' or  escalationObj.escalationType == 'Internal'  %}  disabled {% endif %} required id="escalation"  name="escalation">
                                         <option value="" disabled selected>Select Escalation Type</option>
-                                        <option value="External" {% if escalationObj.escalationType == 'External' %} selected {% endif %}  >External</option>
-                                        <option value="Internal" {% if escalationObj.escalationType == 'Internal' %} selected {% endif %} >Internal</option>
+                                        <option value="Internal" {% if escalationObj.escalationType == 'Internal' %} selected {% endif %} >Internally Closed</option>
+                                        <option value="External" {% if escalationObj.escalationType == 'External' %} selected {% endif %} >Forword to Client</option>
                                         
                                     </select>
                                 </div>

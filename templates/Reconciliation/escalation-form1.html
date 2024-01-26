@@ -15,7 +15,7 @@
                 <div class="x_content">
                     <!-- Smart Wizard -->
                     <div id="wizard" class="form_wizard wizard_horizontal">
-                        <ul class="wizard_steps anchor p-0">
+                        {% comment %} <ul class="wizard_steps anchor p-0">
                             <li>
                                 <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                     <span class="step_no">1</span>
@@ -40,7 +40,7 @@
                                     </span>
                                 </a>
                             </li>
-                        </ul>
+                        </ul> {% endcomment %}
                         <form action="{% url 'Account:createReconciliationEscalation' reconciliationIdStr=reconciliationIdStr clientName=currentClient %}" method="POST" class="form-horizontal form-label-left">
                             {% csrf_token%}
                             <div class="row">
@@ -48,11 +48,11 @@
                                     <div class="float-right d-flex flex-wrap justify-content-end">
                                         <div class="mx-1">
                                             <input type="radio" id="internal" name="escalation" value="Internal" {% if escalationObj.escalationType == 'Internal' %}checked{% endif %} required>
-                                            <label for="internal">Internal Escalation</label>
+                                            <label for="internal">Internally Closed</label>
                                         </div>
                                         <div class="mx-1">
                                             <input type="radio" {% if escalationObj.escalationType == 'External' or escalationObj.escalationType == ''  %}checked{% endif %} name="escalation" value="External" id="external" required>
-                                            <label for="external" >External Escalation</label>
+                                            <label for="external" >Forword to Client</label>
                                         </div>
                                     </div>
                                 </div>
@@ -149,10 +149,10 @@
                     let tableContent = ''
                     $.each(data.params, function (key, value) {
                         tableContent += `<tr>`
-                        tableContent += `<th scope="row" class="text-capitalize">${key}</th>`
-                        tableContent += `<td>${value[0]}</td>`
-                        tableContent += `<td>${value[1]}</td>`
-                        tableContent += `<td>${value[2]}</td>`
+                        tableContent += `<th scope="row" class="text-capitalize  ${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${key}</th>`
+                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[0]}</td>`
+                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[1]}</td>`
+                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[2]}</td>`
                         tableContent += `</tr>`
                     });
                     $(".modal-body table tbody").empty().append(tableContent)

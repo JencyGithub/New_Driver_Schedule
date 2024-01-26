@@ -19,7 +19,7 @@
 
                         <!-- Smart Wizard -->
                         <div id="wizard" class="form_wizard wizard_horizontal">
-                            <ul class="wizard_steps anchor p-0">
+                            {% comment %} <ul class="wizard_steps anchor p-0">
                                 <li>
                                     <a href="javascript:void(0)" class="selected" isdone="1" rel="1">
                                         <span class="step_no">1</span>
@@ -44,7 +44,7 @@
                                         </span>
                                     </a>
                                 </li>
-                            </ul>
+                            </ul> {% endcomment %}
                             {% if escalationObj.escalationStep == 4 %}
                                 <h5 class="text-center my-5"><i class="fa-solid fa-circle-dot mr-2"></i> This Docket is complete.</h5>
                             {% else %}
