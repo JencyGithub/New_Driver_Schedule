@@ -57,18 +57,59 @@
                     <div class="x_content">
                         <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
                             {% csrf_token %}
-                            <div class="col-md-6 col-sm-6">
+                            <div class="col-md-3 col-sm-3 " >
+                                <label for="lastMonth">Last Month:<span class="required">*</span></label>
+                                <input type="radio" class="float-center" id="lastMonth" name="setDateRange" value="lastMonth"
+                                        onchange="setDateRangeFun(this)">
+                                <div class="field item form-group">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3 " >
+                                <label for="lastQuarter">Last Quarter:<span class="required">*</span></label>
+                                <input type="radio" class="float-center" id="lastQuarter" name="setDateRange" value="lastQuarter"
+                                        onchange="setDateRangeFun(this)">
+                                <div class="field item form-group">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3 " >
+                                <label for="lastYear">Last Finanicial Year:<span class="required">*</span></label>
+                                <input type="radio" class="float-center" id="lastYear" name="setDateRange" value="lastYear"
+                                        onchange="setDateRangeFun(this)">
+                                <div class="field item form-group">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3 " >
+                                <label for="startDate">custom:<span class="required">*</span></label>
+                                <input type="radio" class="float-center" id="custom" name="setDateRange" value="custom"
+                                        onchange="setDateRangeFun(this)">
+                                <div class="field item form-group">
+                                </div>
+                            </div>
+                            <div class="col-md-6  col-sm-6  d-none" id="startDateDiv">
                                 <label for="startDate">Start Date:<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <input class="form-control date" type="date" name="startDate" id="startDate"
                                         required="required">
                                 </div>
                             </div>
-                            <div class="col-md-6 col-sm-6">
+                            <div class="col-md-6  col-sm-6  d-none" id="endDateDiv">
                                 <label for="endDate">End Date:<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <input class="form-control date" readonly type="date" name="endDate" id="endDate"
                                         required="required" >
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4 d-none">
+
+                                <label for="dateDropDown">Date Range  :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <select onchange="setDateRange(this)" class="form-control"   id="dateDropDown" name="dateDropDown">
+                                        <option selected value="custom"  >Custom</option>
+                                        <option  value="lastMonth"  >Last Month</option>
+                                        <option value="lastQuarter"  >Last Quarter</option>
+                                        <option value="lastYear"  >Last Finanicial Year</option>
+                                        
+                                    </select>
                                 </div>
                             </div>
                             {% comment %} <div class="ol-md-4 col-sm-4">
@@ -155,6 +196,7 @@
         if (this.checked)
             $('form .alert').remove();
     }).prop('checked', false);
+    
     
 
 </script>

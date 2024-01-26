@@ -2105,7 +2105,7 @@ def reconciliationForm(request, dataType):
 def reconciliationAnalysis(request,dataType):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-    
+
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
@@ -2953,7 +2953,6 @@ def DriverShiftForm(request,id):
     pasrTripFileNameList = []
     
     for pastFile in pastTripFile:
-        print(pastFile)
         pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[1]])
         
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
@@ -2978,6 +2977,7 @@ def  ShiftDetails(request,id):
     # return HttpResponse(id)
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
+
     id_ = id
     shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False )
     for shift in shifts:
