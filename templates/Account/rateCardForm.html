@@ -1,6 +1,7 @@
-{% extends "main/main.html" %} {% load static %} {% block title %} | Rate Card Form
-request {% endblock %} {% block headStyle %}
-
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Rate Card Form request {% endblock %} 
+{% block headStyle %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <style>
     .cuatom-continer {
@@ -36,7 +37,9 @@ request {% endblock %} {% block headStyle %}
         margin-left: 0.3rem;
     }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <!-- page content -->
 <div class="right_col" role="main">
     <div class="">
@@ -649,7 +652,7 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-xl-4 col-md-6">
                                     <label for="chargeable_waiting_time_starts_after">Chargeable waiting time starts after :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.chargeable_waiting_time_starts_after}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_chargeable_waiting_time_starts_after"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="chargeable_waiting_time_starts_after">
@@ -835,8 +838,8 @@ request {% endblock %} {% block headStyle %}
 
                     <div class="col-md-12 text-right" id="submitBtn">
                         {% if not rateCard %}
-                        <button type='submit' class="btn btn-primary px-4">Submit</button>
-                       {% endif %}
+                            <button type='submit' class="btn btn-primary px-4">Submit</button>
+                        {% endif %}
                         
                     </div>
                 </form>
@@ -848,8 +851,8 @@ request {% endblock %} {% block headStyle %}
 {% endblock %}
 
 {% block footerStyleEnd %}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+{% comment %} <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> {% endcomment %}
 <script>
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 

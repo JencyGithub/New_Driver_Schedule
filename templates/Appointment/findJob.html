@@ -13,7 +13,18 @@
 <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
   rel="stylesheet">
 
+  <!-- Date range picker and multi select dropdown css -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.1/daterangepicker.css" />
+
 <style>
+  .dataTables_length{
+    display: inline-block!important;
+  }
+  #datatable-buttons_filter{
+    display: inline-block!important;
+    float: right!important;
+  }
   .dt-buttons.btn-group {
     float: right ! important;
   }
@@ -23,11 +34,42 @@
     display: none !important;
   }
 
-  /* Show CSV button */
-  .dt-buttons.btn-group>a:nth-child(2) {
-    display: block !important;
+  .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #2a3f54!important;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #2a3f54!important;
+    border: 1px solid #2a3f54!important;
+    color: white;
+  }
+  .select2-container--default .select2-selection--multiple {
+    cursor: pointer!important;
+  }
+  input:hover{
+    cursor: pointer!important;
+  }
+
+  .dateRangePicker{
+    background-color: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    min-height: 32px;
+    padding: 0 0.5em;
+    color: gray;
+  }
+  .applyBtn {
+    background-color: #2a3f54!important;
+    border: 1px solid #2a3f54!important;
+    color: white;
+  }
+  .cancelBtn {
+    color: #2a3f54!important;
+    background-color: #ffffff!important;
+    border: 1px solid #2a3f54!important;
   }
 </style>
+
 {% endblock %}
 {% block content %}
 
@@ -36,9 +78,21 @@
     <div class="clearfix"></div>
     <div class="row">
       <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel d-flex justify-content-between">
+          <select id="multiSelect" multiple="multiple" class="w-25">
+            <option value="Unassigned">Unassigned</option>
+            <option value="Assigned">Assigned</option>
+            <option value="Dispatched">Dispatched</option>
+            <option value="InProgress">InProgress</option>
+            <option value="Incomplete">Incomplete</option>
+            <option value="Complete">Complete</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        <input type="text" id="dateRangePicker" class="dateRangePicker w-25 d-inline-block" readonly/>
+        </div>
         <div class="x_panel">
           <div class="x_title">
-            <h2>Find Job</h2>
+              <h2>Find Job</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -85,11 +139,12 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
-<script>
-  $(document).ready(function () {
-    $('#datatable-buttons').DataTable();
-  });
-</script>
+<!-- Date range picker and multi select dropdown JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.1/daterangepicker.js"></script>
+<script src="{% static 'js/findJobFilters.js' %}"></script>
+
+
 <!-- Datatables -->
 <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>

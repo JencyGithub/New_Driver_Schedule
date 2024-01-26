@@ -3255,3 +3255,32 @@ def ViewBulkEscalationData(request,escalationId):
 
     }
     return render(request,'Account/EscalationView.html',params)
+
+
+# Find job filters
+@csrf_protect
+@api_view(['POST'])
+def jobSelectedStatus(request):
+    selectedJobs = request.POST.getlist('selectedStatus[]')
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    data = []
+    
+    if startDate and endDate and len(selectedJobs) > 0:
+        for job in selectedJobs:
+            temp = Appointment.objects.filter(Status=job, Start_Date_Time__date__gte = startDate, End_Date_Time__date__lte =endDate).values()
+            print('temp:',temp)
+            data.extend(temp)
+    elif startDate and endDate:
+        temp = Appointment.objects.filter(Start_Date_Time__date__gte = startDate, End_Date_Time__date__lte =endDate).values()
+        data.extend(temp)
+    elif len(selectedJobs) > 0:
+         for job in selectedJobs:
+            temp = Appointment.objects.filter(Status=job).values()
+            data.extend(temp)
+    
+    for obj in data:
+        obj['Start_Date_Time'] = str(obj['Start_Date_Time']).split('+')[0]
+        obj['End_Date_Time'] = str(obj['End_Date_Time']).split('+')[0]
+    
+    return JsonResponse({'status': True, 'data':data})

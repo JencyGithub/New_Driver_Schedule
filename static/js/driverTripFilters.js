@@ -49,7 +49,6 @@ function verifiedFilter(element, verified = 1) {
         $("#filterForm #verifiedInput").remove();
         inputElement = `<input type="text" hidden id="verifiedInput" name="verifiedInput" value="${verified}">`
         $('#filterForm').append(inputElement);
-
       }
     },
   });

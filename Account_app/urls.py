@@ -238,4 +238,8 @@ urlpatterns = [
     path('Manually/Escalation/Forma/Save/', views.manuallyEscalationForm1Save, name='manuallyEscalationForm1Save'),
     path('Escalation/View/<int:escalationId>', views.ViewBulkEscalationData, name='ViewBulkEscalationData'),
 
+    # Find job filters
+    path('job/selectedStatus/', views.jobSelectedStatus, name='jobSelectedStatus'),
+    
+
 ]
