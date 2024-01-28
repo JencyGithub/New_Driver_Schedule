@@ -456,41 +456,36 @@ class AppointmentAdmin(admin.ModelAdmin):
     send_email_action.short_description = 'Send email to selected applicants'
 
 class HolcimDocket_(admin.ModelAdmin):
-
     list_display = ['truckNo' ,'jobNo','tripId']
     search_fields = ["jobNo"]
 
 
 admin.site.register(HolcimDocket,HolcimDocket_)
 
-admin.site.register(RateCardSurchargeValue)
+# admin.site.register(RateCardSurchargeValue)
+class RateCardSurchargeValue_(admin.ModelAdmin):
+    list_display = ['rate_card_name','surcharge','start_date','end_date']
+    search_fields = ['start_date','end_date']
+admin.site.register(RateCardSurchargeValue,RateCardSurchargeValue_)
+
 
 class HolcimTrip_(admin.ModelAdmin):
-
     list_display = ['truckNo','shiftDate','numberOfLoads']
     search_fields = ["truckNo"]
-
-
 admin.site.register(HolcimTrip,HolcimTrip_)
 
 admin.site.register(AppointmentTruck)
 admin.site.register(AppointmentDriver)
 
 
-
-
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
 class DriverShift_(admin.ModelAdmin):
-
     list_display = ['verified','shiftDate','driverId']
     search_fields = ["driverId"]
-
-
 admin.site.register(DriverShift,DriverShift_)
 
 class DriverShiftDocket_(admin.ModelAdmin):
-
     list_display = ['tripId','shiftId','clientId','docketNumber']
     search_fields = ["docketNumber" , "shiftId"]
 
@@ -501,8 +496,6 @@ admin.site.register(DriverShiftTrip)
 
 admin.site.register(DriverBreak)
 admin.site.register(DriverReimbursement)
-
-
 
 
 class PreStartQuestionInline(admin.StackedInline):
@@ -524,7 +517,6 @@ class DriverPreStartAdmin(admin.ModelAdmin):
     # search_fields = ["adminTruckNumber"]
     inlines = [DriverPreStartQuestionInline]
 admin.site.register(DriverPreStart, DriverPreStartAdmin)
-
 
 
 class EscalationMailInline(admin.StackedInline):
