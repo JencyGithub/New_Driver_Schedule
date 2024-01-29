@@ -147,12 +147,68 @@ def appointmentSave(request,id=None):
     return redirect('Appointment:findJob')        
 
 def findJob(request):
-    jobs = Appointment.objects.filter(scheduled = False)
-    params = {
-        'jobs' : jobs
-    }
-    return render(request, 'Appointment/findJob.html',params)
+    return render(request, 'Appointment/findJob.html')
 
+@csrf_protect
+@api_view(['POST'])
+def cancelJob(request):
+    appointmentId = request.POST.get('appointmentId') 
+    appointmentObj = Appointment.objects.filter(pk=appointmentId).first()
+    if appointmentObj:
+        appointmentObj.Status = 'Cancelled'
+        appointmentObj.save()
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
+
+
+@csrf_protect
+@api_view(['POST'])
+def getDriverAppointmentData(request):
+    appointments = []
+    selectedJobs = request.POST.getlist('selectedStatus[]')
+    if len(selectedJobs) > 0:
+        appointments = Appointment.objects.filter(Status__in=selectedJobs)
+    else:
+        appointments = Appointment.objects.all()
+        
+    drivers = Driver.objects.all()
+
+    appointmentsList = []
+    for job in appointments:
+        appointment_data = {
+            'id' : job.id,
+            'start': str(job.Start_Date_Time).split('+')[0],
+            'end': str(job.End_Date_Time).split('+')[0],
+            'title': str(job.Title),
+            'status': str(job.Status),
+        }
+        driver = AppointmentDriver.objects.filter(appointmentId=job).first()
+        if driver:
+            appointment_data["resourceId"] = driver.driverName.driverId
+            appointment_data["driverName"] = driver.driverName.name
+        appointmentsList.append(appointment_data)
+    driversList = [{'id': driver.driverId, 'title': driver.name} for driver in drivers]
+    return JsonResponse({'status': True, 'appointments': appointmentsList, 'drivers': driversList})
+    
+@csrf_protect
+@api_view(['POST'])
+def getSingleAppointmentData(request):
+    appointmentId = request.POST.get('appointmentId')
+    appointmentObj = Appointment.objects.filter(pk=appointmentId).values().first()
+    appointmentObj['Created_by_id'] = User.objects.filter(pk=appointmentObj['Created_by_id']).first().username
+    originObj = BasePlant.objects.filter(pk=appointmentObj['Origin_id']).values().first()
+    appointmentObj['Origin_id'] = originObj['basePlant']
+
+    driverObj = AppointmentDriver.objects.filter(appointmentId=appointmentObj['id']).values().first()
+    driverObj = Driver.objects.filter(pk=driverObj['driverName_id']).values().first()
+
+    truckObj = AppointmentTruck.objects.filter(appointmentId=appointmentObj['id']).values().first()
+    truckObj = AdminTruck.objects.filter(pk=truckObj['truckNo_id']).values().first()
+
+    return JsonResponse({'status': True, 'appointmentObj': appointmentObj, 'driverObj': driverObj, 'truckObj': truckObj, 'originObj': originObj})
+    
+    
 @csrf_protect
 def getTruckAndDriver(request):
     startDateTime = request.POST.get('startDateTime')

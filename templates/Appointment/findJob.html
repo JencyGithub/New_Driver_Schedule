@@ -16,67 +16,20 @@
   <!-- Date range picker and multi select dropdown css -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.1/daterangepicker.css" />
-
-<style>
-  .dataTables_length{
-    display: inline-block!important;
-  }
-  #datatable-buttons_filter{
-    display: inline-block!important;
-    float: right!important;
-  }
-  .dt-buttons.btn-group {
-    float: right ! important;
-  }
-
-  /* Hide all buttons (copy,csv,excel,pdf,print) */
-  .dt-buttons.btn-group>a {
-    display: none !important;
-  }
-
-  .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #2a3f54!important;
-  }
-
-  .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #2a3f54!important;
-    border: 1px solid #2a3f54!important;
-    color: white;
-  }
-  .select2-container--default .select2-selection--multiple {
-    cursor: pointer!important;
-  }
-  input:hover{
-    cursor: pointer!important;
-  }
-
-  .dateRangePicker{
-    background-color: white;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    min-height: 32px;
-    padding: 0 0.5em;
-    color: gray;
-  }
-  .applyBtn {
-    background-color: #2a3f54!important;
-    border: 1px solid #2a3f54!important;
-    color: white;
-  }
-  .cancelBtn {
-    color: #2a3f54!important;
-    background-color: #ffffff!important;
-    border: 1px solid #2a3f54!important;
-  }
-</style>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css" />
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+<link href="{% static 'css/findJob.css' %}" rel="stylesheet">
 {% endblock %}
-{% block content %}
 
+{% block content %}
 <div class="right_col" role="main">
+
   <div class="">
     <div class="clearfix"></div>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-md-12 col-sm-12 ">
         <div class="x_panel d-flex justify-content-between">
           <select id="multiSelect" multiple="multiple" class="w-25">
@@ -134,16 +87,140 @@
           </div>
         </div>
       </div>
+    </div>  -->
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="x_panel text-right">
+          <select id="multiSelect" multiple="multiple" class="w-25">
+            <option value="Unassigned" data-badge-color="#E74C3C">Unassigned</option>
+            <option value="Assigned" data-badge-color="#ff8700">Assigned</option>
+            <option value="Dispatched" data-badge-color="#0084DD">Dispatched</option>
+            <option value="InProgress" data-badge-color="#00B140">InProgress</option>
+            <option value="Incomplete" data-badge-color="#0e6211">Incomplete</option>
+            <option value="Complete" data-badge-color="#A9A9A9">Complete</option>
+            <option value="Cancelled" data-badge-color="#000">Cancelled</option>
+          </select>
+        </div>
+        <div id="calendar"></div>
+      </div>
     </div>
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="appointmentModel" tabindex="-1" aria-labelledby="appointmentModelLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered  modal-lg">
+    <div class="modal-content" style="min-height: 30rem;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="appointmentModelLabel">Appointment Details</h5>
+        <span id="closeBtn" class="mr-2"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+      <div class="modal-body py-0">
+        <div class="container">
+            <div class="row">
+                <div class="x_panel border-0">
+                  <div class="x_content">
+                    <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
+                      <li class="nav-item">
+                        <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" id="driver-tab" data-toggle="tab" href="#driver" role="tab" aria-controls="driver" aria-selected="false">Driver</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" id="truck-tab" data-toggle="tab" href="#truck" role="tab" aria-controls="truck" aria-selected="false">Truck</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" id="origin-tab" data-toggle="tab" href="#origin" role="tab" aria-controls="origin" aria-selected="false">Origin</a>
+                      </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                      <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <p><strong>Title:</strong> <span id="appTitle" class="text-capitalize"></span></p>
+                                <p><strong>Start Date/Time:</strong> <span id="appStartDateTime" class="text-capitalize"></span></p>
+                                <p><strong>End Date/Time:</strong> <span id="appEndDateTime" class="text-capitalize"></span></p>
+                                <p><strong>Report to Origin:</strong> <span id="appReportOrigin" class="text-capitalize"></span></p>
+                                <p><strong>Status:</strong> <span id="appStatus" class="text-capitalize"></span></p>
+                                <p><strong>Origin:</strong> <span id="appOrigin" class="text-capitalize"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                              <p><strong>Shift Type:</strong> <span id="appShiftType" class="text-capitalize"></span></p>
+                              <p><strong>Created by:</strong> <span id="appCreatedBy" class="text-capitalize"></span></p>
+                              <p><strong>Created time:</strong> <span id="appCreatedTime" class="text-capitalize"></span></p>
+                              <p><strong>Pre-Start Window:</strong> <span id="appPreStart" class="text-capitalize"></span></p>
+                              <p><strong>Staff Notes:</strong> <span id="appStaffNotes" class="text-capitalize"></span></p>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="tab-pane fade" id="driver" role="tabpanel" aria-labelledby="driver-tab">
+                        <p><strong>Driver Name:</strong> <span id="driverName" class="text-capitalize"></span></p>
+                        <p><strong>Driver Phone:</strong> <span id="driverPhone" class="text-capitalize"></span></p>
+                        <p><strong>Driver Email:</strong> <span id="driverEmail" class="text-capitalize"></span></p>
+                      </div>
+                      <div class="tab-pane fade" id="truck" role="tabpanel" aria-labelledby="truck-tab">
+                        <p><strong>Truck Number:</strong> <span id="truckNum" class="text-capitalize"></span></p>
+                      </div>
+                      <div class="tab-pane fade" id="origin" role="tabpanel" aria-labelledby="origin-tab">
+                        <p><strong>Base Plant:</strong> <span id="originBasePlant" class="text-capitalize"></span></p>
+                        <p><strong>Address:</strong> <span id="originAddress" class="text-capitalize"></span></p>
+                        <p><strong>Phone:</strong> <span id="originPhone" class="text-capitalize"></span></p>
+                        <p><strong>Person On Name:</strong> <span id="originPersonOnName" class="text-capitalize"></span></p>
+                        <p><strong>Manager Name:</strong> <span id="originManagerName" class="text-capitalize"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" target="_blank" id="editBtn" class="btn btn-sm btn-outline-dark border-1" style="font-size: 0.7rem;">
+          Change Driver/Truck
+        </a>
+        <a href="#" id="cancleJonBtn" class="btn btn-sm btn-danger border-1" style="font-size: 0.7rem;">
+          Cancel job
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="cancelModel" aria-hidden="true" id="cancelModel">
+  <div class="modal-dialog modal-md ">
+    <div class="modal-content py-3 px-2 ">
+      <strong>Do you really want to cancel this job?</strong>
+      <div type="submit" class="btn btn-default"  onclick="cancelJob()" style="font-size: 0.7rem;">Yes</div>&nbsp;
+      <div type="button" class="btn btn-outline-dark " data-dismiss="modal" style="font-size: 0.7rem;">No</div>
+    </div>
+  </div>
+</div> -->
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="cancelModel" aria-hidden="true" id="cancelModel">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content py-3 px-2 ">
+      <div class="row">
+        <div class="col-12 d-flex align-items-center justify-content-between">
+          <strong>Do you really want to cancel this job?</strong>
+          <span>
+            <div class="btn btn-outline-dark" data-dismiss="modal" style="font-size: 0.7rem;">No</div>
+            <div class="btn btn-default" style="font-size: 0.7rem;" id="yes">Yes</div>&nbsp;
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}
 {% block footerStyleEnd %}
 <!-- Date range picker and multi select dropdown JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.1/daterangepicker.js"></script>
 <script src="{% static 'js/findJobFilters.js' %}"></script>
-
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.10/index.global.min.js'></script>
 
 <!-- Datatables -->
 <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
