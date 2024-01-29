@@ -30,6 +30,10 @@ urlpatterns = [
     path('appointmentForm/update/save/<int:id>/', views.appointmentSave,name="appointmentFormUpdateSave"),
     
     path('findJob/', views.findJob,name="findJob"),
+    path('cancelJob/', views.cancelJob,name="cancelJob"),
+    
+    path('get/driver-appointment/', views.getDriverAppointmentData,name="getDriverAppointment"),
+    path('get/single/appointment/', views.getSingleAppointmentData,name="getSingleAppointment"),
     
     path('getTruckAndDriver/', views.getTruckAndDriver ,name="getTruckAndDriver"),
     path('getOriginDetails/', views.getOriginDetails ,name="getOriginDetails"),
