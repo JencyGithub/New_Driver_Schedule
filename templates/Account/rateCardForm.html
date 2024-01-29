@@ -806,10 +806,11 @@
                                 {% if rateCardSurcharges %}
                                 {%for surcharge in rateCardSurcharges %}
                                 <div class="col-xl-4 col-md-6">
+                                    {% comment %} {{surcharge.id}},{{surcharge.surcharge.id}}  {% endcomment %}
                                     <label for="{{surcharge.id}}">{{surcharge.surcharge.surcharge_Name}} :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
-                                        name="{{surcharge.id}}"
+                                        name="{{surcharge.surcharge.id}}"
                                         value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
                                         readonly
                                         required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
@@ -819,6 +820,7 @@
                                 {% elif surchargesEntry %}
                                 {%for surcharge in surchargesEntry %}
                                 <div class="col-xl-4 col-md-6">
+                                     
                                     <label for="{{surcharge.id}}">{{surcharge.surcharge_Name}} :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"

@@ -179,3 +179,6 @@
 ['429', 'Tejinder Singh Mann', '1234567895', 'asc429@gmail.com', 'password094']
 ['456', 'Varun Brahma', '1234567895', 'asc456@gmail.com', 'password105']
 ['416', 'Vikramjeet Singh', '1234567895', 'asc416@gmail.com', 'password115']
+['359', 'Bikram Singh', '1234567895', 'asc359@gmail.com', 'password264']
+['516', 'Daljit Singh', '1234567895', 'asc516@gmail.com', 'password256']
+['648', 'Gagandeep Singh', '1234567895', 'asc648@gmail.com', 'password237']

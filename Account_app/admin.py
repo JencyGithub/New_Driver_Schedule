@@ -137,7 +137,6 @@ class DocketInline(admin.StackedInline):
 #     return response
 
 class DriverTrip_(admin.ModelAdmin):
-
     list_display = ['verified',"driverId", "clientName", 'truckNo',"shiftType", "startTime", 'endTime',"shiftDate"]
     # search_fields = ["driverId", 'clientName']
     list_filter = ('shiftType', 'clientName')
@@ -167,10 +166,8 @@ admin.site.register(DriverTrip,DriverTrip_)
 class clientTripAdmin(admin.ModelAdmin):
     # inlines = [WaitingTimeCost_ ,TransferKMSCost_]
     list_display = ["docketNumber","truckNo","clientName"]
-    
     search_fields = ["docketNumber","truckNo"]
-     
-     
+    
 admin.site.register(RCTI, clientTripAdmin)
 
 
@@ -178,11 +175,8 @@ admin.site.register(RCTI, clientTripAdmin)
 def download_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="ClientName.csv"'
-
     writer = csv.writer(response)
-
     writer.writerow(["clientId", "name", "docketGiven"])
-
     for s in queryset:
         writer.writerow([s.clientId, s.name, s.docketGiven])
 
@@ -263,7 +257,6 @@ def admin_truck_download_csv(modeladmin, request, queryset):
         # Only write the row if at least admin truck data is present
         if admin_truck.adminTruckNumber:
             writer.writerow(row_data)
-
     return response
 
 
@@ -293,14 +286,10 @@ admin.site.register(ClientTruckConnection,ClientTruckConnection_)
 def driver_download_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="DriverRegInfo.csv"'
-
     writer = csv.writer(response)
-
     writer.writerow(["driverId", "name", "phone" , "email" , "password"])
-
     for s in queryset:
         writer.writerow([s.driverId, s.name, s.phone, s.email , s.password])
-
     return response
 
 class Driver_(admin.ModelAdmin):
@@ -308,14 +297,11 @@ class Driver_(admin.ModelAdmin):
     list_display = ["driverId", "name", 'phone', 'password']
     search_fields = ["driverId",'name']
     # actions = [driver_download_csv]
-
     def upcoming_leave_requests(self, obj):
         now = timezone.now()
         upcoming_requests = obj.leaverequest_set.filter(start_date__gte=now).order_by('start_date')[:2]
         return ', '.join([str(request) for request in upcoming_requests])
-
     upcoming_leave_requests.short_description = 'Upcoming Leave Requests'
-
 admin.site.register(Driver, Driver_)
 
 # admin.site.register(LeaveRequest)
@@ -323,14 +309,10 @@ admin.site.register(Driver, Driver_)
 def leave_download_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="DriverLeave.csv"'
-
     writer = csv.writer(response)
-
     writer.writerow(["employee", "start_date", "end_date" , "reason" , "status"])
-
     for s in queryset:
         writer.writerholow([s.employee, s.start_date, s.end_date, s.reason , s.status])
-
     return response
 
 
@@ -392,24 +374,17 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 #     send_email_action.short_description = 'Send email to selected applicants'
 
 admin.site.register(Surcharge)
-
 admin.site.register(PublicHoliday)
 
 
 class RctiErrors_(admin.ModelAdmin):
-
     list_display = ['docketNumber',"status","docketDate","data"]
     search_fields = ["docketNumber"]
-
-
 admin.site.register(RctiErrors,RctiErrors_)
 
 class PastTripError_(admin.ModelAdmin):
-
     list_display = ['docketNumber',"status","errorFromPastTrip"]
     search_fields = ["docketNumber"]
-
-
 admin.site.register(PastTripError,PastTripError_)
 
 
@@ -456,53 +431,44 @@ class AppointmentAdmin(admin.ModelAdmin):
     send_email_action.short_description = 'Send email to selected applicants'
 
 class HolcimDocket_(admin.ModelAdmin):
-
     list_display = ['truckNo' ,'jobNo','tripId']
     search_fields = ["jobNo"]
 
 
 admin.site.register(HolcimDocket,HolcimDocket_)
 
-admin.site.register(RateCardSurchargeValue)
+# admin.site.register(RateCardSurchargeValue)
+class RateCardSurchargeValue_(admin.ModelAdmin):
+    list_display = ['rate_card_name','surcharge','start_date','end_date']
+    search_fields = ['start_date','end_date']
+admin.site.register(RateCardSurchargeValue,RateCardSurchargeValue_)
+
 
 class HolcimTrip_(admin.ModelAdmin):
-
     list_display = ['truckNo','shiftDate','numberOfLoads']
     search_fields = ["truckNo"]
-
-
 admin.site.register(HolcimTrip,HolcimTrip_)
 
 admin.site.register(AppointmentTruck)
 admin.site.register(AppointmentDriver)
 
 
-
-
 admin.site.register(RctiReport)
 admin.site.register(RctiAdjustment)
 class DriverShift_(admin.ModelAdmin):
-
     list_display = ['verified','shiftDate','driverId']
     search_fields = ["driverId"]
-
-
 admin.site.register(DriverShift,DriverShift_)
 
 class DriverShiftDocket_(admin.ModelAdmin):
-
     list_display = ['tripId','shiftId','clientId','docketNumber']
     search_fields = ["docketNumber" , "shiftId"]
 
 
 admin.site.register(DriverShiftDocket,DriverShiftDocket_)
-
 admin.site.register(DriverShiftTrip)
-
 admin.site.register(DriverBreak)
 admin.site.register(DriverReimbursement)
-
-
 
 
 class PreStartQuestionInline(admin.StackedInline):
@@ -524,7 +490,6 @@ class DriverPreStartAdmin(admin.ModelAdmin):
     # search_fields = ["adminTruckNumber"]
     inlines = [DriverPreStartQuestionInline]
 admin.site.register(DriverPreStart, DriverPreStartAdmin)
-
 
 
 class EscalationMailInline(admin.StackedInline):
