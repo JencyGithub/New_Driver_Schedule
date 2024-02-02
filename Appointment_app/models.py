@@ -28,7 +28,7 @@ class Appointment(models.Model):
     Staff_Notes	= models.CharField(max_length=1024)
     shiftType = models.CharField(max_length=10,choices=[('Day','Day'),('Night','Night')], default='Day')
     
-    Created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    Created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     Created_time = models.TimeField(default=timezone.now())
     preStartWindow = models.CharField(max_length=2,default='15')
     stop = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -76,7 +76,7 @@ class AppointmentDriver(models.Model):
 class PreStart(models.Model):
     preStartName = models.CharField(max_length=50, default='', null=True)
     createdDate = models.DateTimeField(default=None, null=True)
-
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return str(self.preStartName)

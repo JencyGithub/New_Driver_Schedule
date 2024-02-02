@@ -43,6 +43,7 @@ def loginCheck(request):
             if user is not None:
                 login(request, user)
                 CurrentUser_ = request.user
+                print('login', request.user)
                 if CurrentUser_.groups.filter(name='Driver').exists():
                     request.session['user_type'] = 'Driver'
                     return redirect('index')
@@ -50,6 +51,11 @@ def loginCheck(request):
                 elif CurrentUser_.groups.filter(name='Accounts').exists():
                     request.session['user_type'] = 'Accounts'
                     return redirect('Account:index')
+                
+                elif CurrentUser_.groups.filter(name='HR').exists():
+                    request.session['user_type'] = 'HR'
+                    return redirect('Account:index')
+
                 else:
                     request.session['user_type'] = 'SuperUser'
                     return redirect('Account:index')

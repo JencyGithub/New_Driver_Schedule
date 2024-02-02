@@ -239,6 +239,7 @@ def preStartSave(request):
     preStartObj = PreStart()
     preStartObj.preStartName = preStartName
     preStartObj.createdDate = currentDateTime
+    preStartObj.createdBy = request.user
     preStartObj.save()
     for question in range(1,int(questionCount)):
         questionObj = PreStartQuestion()

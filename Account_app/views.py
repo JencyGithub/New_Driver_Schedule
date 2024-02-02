@@ -591,12 +591,16 @@ def mapDataSave(request, recurring=None):
         lng = request.POST.get('longitude')
         date = request.POST.get('date')
         time = request.POST.get('time')
+        if not lat or not lng:
+            messages.error(request, "Please on the location")
+            return redirect(request.META.get('HTTP_REFERER'))
         
         shiftObj = DriverShift()
         shiftObj.latitude = lat
         shiftObj.longitude = lng
         shiftObj.shiftDate = date
         shiftObj.shiftType = result
+        shiftObj.verifiedBy = request.user
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
         shiftObj.save()
@@ -1302,9 +1306,9 @@ def rctiSave(request):
                 print('shiftObj',shiftObj)
                 pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
                 print('pastTripErrorObj',pastTripErrorObj)
-                if len(shiftObj) == 0 or len(pastTripErrorObj) ==0:
-                    messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                    return redirect(request.META.get('HTTP_REFERER'))
+                # if len(shiftObj) == 0 or len(pastTripErrorObj) ==0:
+                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                #     return redirect(request.META.get('HTTP_REFERER'))
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file already exists!")
@@ -1929,6 +1933,7 @@ def driverDocketUpdate(request):
     docketObj.docketNumber = docketNumber
     docketObj.save()
     return JsonResponse({'status': True})
+
 @csrf_protect
 def driverEntryUpdate(request, shiftId):
     # Update Trip Save
@@ -1977,9 +1982,10 @@ def driverEntryUpdate(request, shiftId):
             else:
                 docket.standByStartTime  = None
                 docket.standByEndTime = None
-                
-            docket.surchargeType = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first().id
-            docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
+            surchargeObj = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first()
+            if surchargeObj:
+                docket.surchargeType = surchargeObj.id
+                docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
             docket.cubicMl = request.POST.get(f'cubicMl{docket.id}')
             
             docket.others = request.POST.get(f'others{docket.id}')
@@ -1996,7 +2002,7 @@ def driverEntryUpdate(request, shiftId):
                 # tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj)
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
                         
-                if not  reconciliationDocketObj :
+                if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
                     
                     
@@ -2039,11 +2045,13 @@ def driverEntryUpdate(request, shiftId):
                 checkMissingComponents(reconciliationDocketObj)
                 reconciliationTotalCheck(reconciliationDocketObj)
                 shiftObj.verified = True
+                shiftObj.verifiedBy = request.user
                 shiftObj.save()
     
     messages.success(request, "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
     return redirect(request.META.get('HTTP_REFERER'))
+
 @csrf_protect
 def tripEntry(request,shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
@@ -2468,6 +2476,7 @@ def rateCardForm(request, id=None , clientId=None):
             oldRateCardEndDate = getOldRateCard.split('to')[1].strip()
 
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
@@ -2475,6 +2484,7 @@ def rateCardForm(request, id=None , clientId=None):
             
         else:
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
@@ -2521,24 +2531,16 @@ def checkOnOff(val_):
 
 
 @csrf_protect
-@api_view(['POST'])
 def rateCardSave(request, id=None, edit=0):
-
-        # surcharge.id = request.POST.get('surcharge.id')
-        # print(surcharge.surcharge_Name)
-    # return HttpResponse(request.POST.get('clientName'))
-    # print(type(request.POST.get('costParameters_start_date')))
-    # return HttpResponse('work')
     # Rate Card
     rateCardID = None
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    surchargeEntry = Surcharge.objects.all()
+    surchargeObjs = Surcharge.objects.all()
+    
     if not id:
         rateCard = RateCard()
         rateCard.rate_card_name=request.POST.get('rate_card_name')
-        # tds = float(request.POST.get('rate_card_tds'))
-        # rateCard.tds = tds
         clientId =request.POST.get('clientName')
         rateCard.clientName = Client.objects.filter(pk = clientId).first()
         rateCard.save()
@@ -2546,61 +2548,19 @@ def rateCardSave(request, id=None, edit=0):
 
     else:
         rateCardID = RateCard.objects.filter(pk=id).first()
-        
         # existingCostParameter = CostParameters.objects.filter(Q(rateCard=rateCardID) & (Q(start_date__range=(startDate, endDate)) | Q(end_date__range=(startDate, endDate))))
-        if edit == 0:
+        if edit == 0:            
             existingCostParameter = CostParameters.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingThresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingThresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             existingGrace = Grace.objects.filter(rate_card_name=rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
             rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
-            # return HttpResponse(rateCardSurchargeObj)
-            for surcharge in rateCardSurchargeObj:
-                surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
-                surcharge.start_date = startDate
-                surcharge.end_date = endDate
-                surcharge.save()
+
 
             if existingCostParameter or existingThresholdDayShift or existingThresholdNightShift or existingGrace:
                 messages.error(request, "Rate card rates already exist between given date.")
                 return redirect(request.META.get('HTTP_REFERER'))
 
-        # tds = float(request.POST.get('rate_card_tds'))
-        # rateCardID.tds = tds
-        # rateCardID.save()
-
-        # oldCostParameters = CostParameters.objects.get(
-        #     rate_card_name=rateCardID.id, end_date=None)
-        # oldCostParameters.end_date = getYesterdayDate(
-        #     request.POST.get('costParameters_start_date'))
-        # oldCostParameters.save()
-
-        # oldThresholdDayShift = ThresholdDayShift.objects.get(
-        #     rate_card_name=rateCardID.id, end_date=None)
-        # oldThresholdDayShift.end_date = getYesterdayDate(
-        #     request.POST.get('thresholdDayShift_start_date'))
-        # oldThresholdDayShift.save()
-
-        # oldThresholdNightShift = ThresholdNightShift.objects.get(
-        #     rate_card_name=rateCardID.id, end_date=None)
-        # oldThresholdNightShift.end_date = getYesterdayDate(
-        #     request.POST.get('thresholdNightShift_start_date'))
-        # oldThresholdNightShift.save()
-
-        # oldGrace = Grace.objects.get(
-        #     rate_card_name=rateCardID.id, end_date=None)
-        # oldGrace.end_date = getYesterdayDate(
-        #     request.POST.get('grace_start_date'))
-        # oldGrace.save()
-
-        # oldOnLease = OnLease.objects.get(
-        #     rate_card_name=rateCardID.id, end_date=None)
-        # oldOnLease.end_date = getYesterdayDate(
-        #     request.POST.get('onLease_start_date'))
-        # oldOnLease.save()
-
-    # CostParameters
-    # surchargeObj = Surcharge.objects.get(pk=request.POST.get('costParameters_surcharge_type'))
     updatedValues= []
     
     #  Get object according to type of save
@@ -2609,12 +2569,13 @@ def rateCardSave(request, id=None, edit=0):
         thresholdDayShifts = ThresholdDayShift()
         thresholdNightShifts = ThresholdNightShift()
         grace = Grace()
-        
-        for surcharge in surchargeEntry:
-            rateCardSurchargeObj = RateCardSurchargeValue() 
+
+        for surchargeObj in surchargeObjs:
+            print(surchargeObj.id, 'surchargeEntry' , surchargeObj , request.POST.get(f'{surchargeObj.id}'))
+            rateCardSurchargeObj = RateCardSurchargeValue()
             rateCardSurchargeObj.rate_card_name = rateCardID
-            rateCardSurchargeObj.surcharge = surcharge
-            rateCardSurchargeObj.surchargeValue = request.POST.get(f'{surcharge.id}')
+            rateCardSurchargeObj.surcharge = surchargeObj
+            rateCardSurchargeObj.surchargeValue = request.POST.get(f'{surchargeObj.id}')
             rateCardSurchargeObj.start_date = startDate
             rateCardSurchargeObj.end_date = endDate
             rateCardSurchargeObj.save()
@@ -2624,16 +2585,18 @@ def rateCardSave(request, id=None, edit=0):
         thresholdDayShifts = ThresholdDayShift.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
         thresholdNightShifts = ThresholdNightShift.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
         grace = Grace.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate).first()
-        rateCardSurchargeObj = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
-        for surcharge in rateCardSurchargeObj:
-            surcharge.surchargeValue = request.POST.get(f'{surcharge.id}')
-            surcharge.start_date = startDate
-            surcharge.end_date = endDate
-            surcharge.save()
+        rateCardSurchargeObjs = RateCardSurchargeValue.objects.filter(rate_card_name = rateCardID,start_date__lte = startDate,end_date__gte = startDate)
 
+        for rateCardSurchargeObj in rateCardSurchargeObjs:
+            print(rateCardSurchargeObj.id, 'surchargeEntry' , rateCardSurchargeObj , request.POST.get(f'{rateCardSurchargeObj.surcharge.id}'))
+            rateCardSurchargeObj.surchargeValue = request.POST.get(f'{rateCardSurchargeObj.surcharge.id}')
+            rateCardSurchargeObj.start_date = startDate
+            rateCardSurchargeObj.end_date = endDate
+            rateCardSurchargeObj.save()
+            
         # Edit Reconciliation and Past trips
-        # Cost parameters
         
+        # Cost parameters
         updatedValues.append('costParameters_loading_cost_per_cubic_meter') if costParameters.loading_cost_per_cubic_meter != float(request.POST.get('costParameters_loading_cost_per_cubic_meter')) else None
         updatedValues.append('costParameters_km_cost') if costParameters.km_cost != float(request.POST.get('costParameters_km_cost')) else None
         updatedValues.append('costParameters_transfer_cost') if costParameters.transfer_cost != float(request.POST.get('costParameters_transfer_cost')) else None
@@ -2703,6 +2666,9 @@ def rateCardSave(request, id=None, edit=0):
     costParameters.cancellation_fees=float(request.POST.get('costParameters_cancellation_fees'))
     costParameters.start_date=startDate  
     costParameters.end_date=endDate
+    if edit == 0:
+        costParameters.createdBy = request.user
+
     costParameters.save()
 
     # ThresholdDayShift
@@ -2794,7 +2760,7 @@ def rateCardSave(request, id=None, edit=0):
     # )
     # onLease.save()
 
-    messages.success(request, 'Data successfully add ')
+    messages.success(request, 'Data successfully add.')
     return redirect('gearBox:clientTable')
 
 

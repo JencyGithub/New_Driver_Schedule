@@ -87,7 +87,9 @@
                         <div class="x_title">
                             <h2> Add Rate Card Form :-</h2>
                             {% if rateCard %}
-                                <label id="editRateCard" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
+                                {% if request.session.user_type != 'Driver' and request.session.user_type != 'Accounts' and request.session.user_type != 'HR'  %}
+                                    <label id="editRateCard" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
+                                {% endif %}
                                 <label id="rateRevision" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
                            {% endif %}
                             <div class="clearfix"></div>
@@ -113,6 +115,14 @@
                                         <input class="form-control" value="{{clientId}}" name="clientName" type="hidden">
                                     </div>
                                 </div>
+                                {% if rateCard %}
+                                <div class="col-md-2 col-sm-2">
+                                    <label for="createdBy">Created By :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" value="{{costParameters.createdBy}}" readonly type="text" name="createdBy" required='required' style="padding: 0.25rem 0.2rem;" id="createdBy">
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -809,7 +819,7 @@
                                     <label for="{{surcharge.id}}">{{surcharge.surcharge.surcharge_Name}} :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control"  type="number"
-                                        name="{{surcharge.id}}"
+                                        name="{{surcharge.surcharge.id}}"
                                         value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
                                         readonly
                                         required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">

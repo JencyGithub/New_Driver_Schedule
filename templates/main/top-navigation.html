@@ -7,7 +7,7 @@
     </div>
     <nav class="nav navbar-nav">
       <ul class=" navbar-right">
-        {% if user.is_active and user.is_staff %}
+        {% if user.is_active and request.session.user_type != 'Driver' %}
 
         <!-- After login -->
         <li class="nav-item dropdown open" style="padding-left: 15px;">

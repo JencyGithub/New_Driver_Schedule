@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>PNR Group | Log in</title>
+    <title>ROBOTRACK | Log in</title>
 
     <!-- Bootstrap -->
     <link href="{%static 'Dashboard/vendors/bootstrap/dist/css/bootstrap.min.css'%}" rel="stylesheet">
@@ -65,7 +65,7 @@
                 <br />
 
                 <div>
-                  <h1><i class="fa fa-paw"></i> PNR Group</h1>
+                  <h1><i class="fa fa-paw"></i> ROBOTRACK</h1>
                   {% comment %} <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 4 template. Privacy and Terms</p> {% endcomment %}
                 </div>
               </div>
@@ -110,6 +110,8 @@
         </div>
       </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  
           <!-- JavaScript / alertify JS -->
   <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
   {% for message in messages %}
@@ -124,5 +126,19 @@
     {% endif %}
   </script>
 {% endfor %}
+<script>
+  $(document).ready(function(){
+
+    function success(position) {}
+    function error(err) {}
+    
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(success, error);
+    } else {
+        console.warn("Geolocation is not supported by this browser.");
+    }
+  });
+  
+</script>
   </body>
 </html>
