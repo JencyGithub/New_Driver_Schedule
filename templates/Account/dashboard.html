@@ -134,6 +134,7 @@
                   <tr>
                     <th scope="col">Client Name</th>
                     <th scope="col">Raise Date</th>
+                    <th scope="col">Last mail</th>
                     <th scope="col">Amount</th>
                   </tr>
                 </thead>
@@ -142,6 +143,7 @@
                     <tr>
                       <td class="text-capitalize">{{escalation.clientName.name}}</td>
                       <td>{{escalation.escalationDate}}</td>
+                      <td>{{escalation.lastMailDate}}</td>
                       <td>{{escalation.escalationAmount}}</td>
                     </tr>
                   {% endfor %}

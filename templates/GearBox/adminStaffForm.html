@@ -1,0 +1,173 @@
+{% extends "main/main.html" %} {% load static %} {% block title %} | Admin staff change{% endblock %} {% block headStyle %}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+{% endblock %} {% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{% if data %}Edit{% else %}Add{% endif %} admin staff</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <form action="{% if userObj %}{% url 'gearBox:adminStaffEditSave' id=userObj.id %}{% else %}{% url 'gearBox:adminStaffSave' %}{% endif %}" method="POST" novalidate>
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="firstName"
+                                            class="col-form-label col-md-3 col-sm-3 label-align">First name :<span
+                                                class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <input class="form-control" name="firstName" required="required"
+                                                id="firstName" type="text"
+                                                value="{% if userObj %}{{ userObj.first_name }}{% endif %}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="lastName"
+                                            class="col-form-label col-md-3 col-sm-3 label-align">Last name :<span
+                                                class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <input class="form-control" name="lastName" required="required"
+                                                id="lastName" type="text"
+                                                value="{% if userObj %}{{ userObj.last_name }}{% endif %}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="userType"
+                                            class="col-form-label col-md-3 col-sm-3 label-align">User type :<span
+                                                class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <select class="form-control" name="userType" required="required" id="userType">
+                                                <option value="">Select a type</option>
+                                                <option value="Admin" {% if userObj.groups.first.name == None %}selected{% endif %}>Admin</option>
+                                                <option value="Accounts" {% if userObj.groups.first.name == "Accounts" %}selected{% endif %}>Accounts</option>
+                                                <option value="HR" {% if userObj.groups.first.name == "HR" %}selected{% endif %}>Allocations</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="email" class="col-form-label col-md-3 col-sm-3 label-align">Email :<span class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <input class="form-control" name="email" required="required" id="email"
+                                                type="email" autocomplete="off"
+                                                value="{% if userObj %}{{ userObj.email }}{% endif %}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if not userObj %}
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12">
+                                            <label for="password" class="col-form-label col-md-3 col-sm-3 label-align">Password :<span class="required">*</span></label>
+                                            <div class="field item form-group col-md-6 col-sm-6">
+                                                <input class="form-control" name="password" required="required" id="password"
+                                                    type="password"   
+                                                    value="" autocomplete="off"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row credentialsDiv d-none">
+                                        <div class="col-md-12 col-sm-12">
+                                            <div class="col-md-3 col-sm-3"></div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <span style="font-size: 0.75rem;">Username will be : <b class="text-default username"></b> and Password will be: <b class="text-default password"></b></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12">
+                                            <div class="col-md-3 col-sm-3"></div>
+                                            <div class="field item form-group col-md-6 col-sm-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="isActive" id="isActive" name="isActive" {% if userObj.is_active %}checked{% endif %}>
+                                                    <label class="form-check-label" for="isActive" style="padding-top:1.5px;"><b>Active</b></label>
+                                                </div>
+                                                <span style="font-size: 0.75rem;" class="ml-auto">Username : <b class="text-default username">{{ userObj.username }}</b></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                              
+                                <div class="row">
+                                    <div class="col-md-9 col-sm-9 text-right">
+                                        <button type="submit" class="btn btn-sm btn-default px-3">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+    integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    // initialize a validator instance from the "FormValidator" constructor.
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator(
+        {
+            events: ["blur", "input", "change"],
+        },
+        document.forms[0]
+    );
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $(".toggleValidationTooltips").change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked) $("form .alert").remove();
+    })
+    .prop("checked", false);
+
+    $('#firstName').on('keyup', function(){
+        displayCredentials()
+    })
+    $('#password').on('keyup', function(){
+        displayCredentials()
+    })
+
+    function displayCredentials(){
+        console.log('Credential')
+        let username = $('#firstName').val().toLowerCase();
+        let password = $('#password').val();
+        $('.credentialsDiv .username').text(username)
+        $('.credentialsDiv .password').text(password)
+        $(".credentialsDiv").removeClass('d-none')
+    }
+</script>
+{% endblock %} {% endblock %}

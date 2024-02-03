@@ -50,6 +50,9 @@ def loginCheck(request):
                 elif CurrentUser_.groups.filter(name='Accounts').exists():
                     request.session['user_type'] = 'Accounts'
                     return redirect('Account:index')
+                elif CurrentUser_.groups.filter(name='HR').exists():
+                    request.session['user_type'] = 'HR'
+                    return redirect('Account:index')
                 else:
                     request.session['user_type'] = 'SuperUser'
                     return redirect('Account:index')

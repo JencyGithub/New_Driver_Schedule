@@ -16,34 +16,37 @@ class Appointment(models.Model):
     ]
     scheduled = models.BooleanField(default=False)
 
-    Title = models.CharField(max_length=255)
-    Start_Date_Time = models.DateTimeField(default=timezone.now())
-    End_Date_Time = models.DateTimeField(default=timezone.now())
-    report_to_origin = models.DateTimeField(default=timezone.now())
-    Status = models.CharField(
+    title = models.CharField(max_length=255, null=True, default='', blank=True)
+    # Start_Date_Time = models.DateTimeField(default=timezone.now(), null=True, blank=True)
+    # End_Date_Time = models.DateTimeField(default=timezone.now(), null=True, blank=True)
+    # report_to_origin = models.DateTimeField(default=timezone.now(), null=True, blank=True)
+    status = models.CharField(
         max_length=20, choices=TRIP_STATUS, default='incomplete'
     )
-    Origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE)
-    Recurring = models.CharField(max_length=255)
-    Staff_Notes	= models.CharField(max_length=1024)
+    origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE)
+    staffNotes	= models.CharField(max_length=2048, null=True, default='', blank=True)
     shiftType = models.CharField(max_length=10,choices=[('Day','Day'),('Night','Night')], default='Day')
     
-    Created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    Created_time = models.TimeField(default=timezone.now())
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
+    createdTime = models.TimeField(default=timezone.now(), null=True, blank=True)
     preStartWindow = models.CharField(max_length=2,default='15')
     stop = models.ForeignKey(Client, on_delete=models.CASCADE)
-
-    # preStart_Time = models.DateTimeField(default=Start_Date_Time-preStartWindow)
-    # Report_Time = models.TimeField()
-    # Dwell_Time = models.TimeField()
-    # Block_Time = models.TimeField()
-    # Total_Time = models.TimeField()
-
-    # driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    # truckNo = models.IntegerField(default=0)
-    # truckNo = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
     
-
+    startTime = models.TimeField(default=None, null=True, blank=True)
+    endTime = models.TimeField(default=None, null=True, blank=True)
+    reportingTime = models.TimeField(default=None, null=True, blank=True)
+    
+    startDate = models.DateField(default=None, null=True, blank=True)
+    endDate = models.DateField(default=None, null=True, blank=True)
+    
+    recurringType = models.CharField(max_length=20, choices=[('NoRecurring','NoRecurring'),('Daily','Daily'),('Custom','Custom')], default='NoRecurring')
+    sunday = models.BooleanField(default=False)
+    monday = models.BooleanField(default=False)
+    tuesday = models.BooleanField(default=False)
+    wednesday = models.BooleanField(default=False)
+    thursday = models.BooleanField(default=False)
+    friday = models.BooleanField(default=False)
+    saturday = models.BooleanField(default=False)
 
     def is_driver_available(self):
         leave_requests = self.driver.leaverequest_set.filter(
@@ -54,8 +57,7 @@ class Appointment(models.Model):
         return not leave_requests.exists()
     
     def __str__(self):
-        return self.Title
-    
+        return self.title
     
 
 class AppointmentTruck(models.Model):
@@ -73,17 +75,13 @@ class AppointmentDriver(models.Model):
     def __str__(self):
         return str(self.driverName.name)
 
+
 class PreStart(models.Model):
     preStartName = models.CharField(max_length=50, default='', null=True)
     createdDate = models.DateTimeField(default=None, null=True)
 
-
     def __str__(self):
-        return str(self.preStartName)
-
-    
-    
-    
+        return str(self.preStartName)    
     
     # fitForWork = models.BooleanField(default = False)
     # vehicleStatus = models.BooleanField(default = False)

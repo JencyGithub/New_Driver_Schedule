@@ -1,7 +1,9 @@
+{% load static %}
 <div class="col-md-3 left_col ">
   <div class="left_col scroll-view">
     <div class="navbar nav_title" style="border: 0;">
-      <a href="{% url 'Account:index'%}" class="site_title"><i class="fa fa-paw"></i> <span>PNR Group</span></a>
+      <!-- <a href="{% url 'Account:index'%}" class="site_title"><i class="fa fa-paw"></i> <span>ROBOTRACK</span></a> -->
+      <a href="{% url 'Account:index'%}"><img src="{% static 'img/logo.png' %}" class="w-100 py-1 px-4"></a>
     </div>
 
     <div class="clearfix"></div>
@@ -21,7 +23,8 @@
     <!-- sidebar menu -->
     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
       <div class="menu_section">
-        {% if user.is_active and user.is_staff %}
+        {% comment %} {% if user.is_active and user.is_staff %} {% endcomment %}
+        {% if request.session.user_type != 'Driver' %}
         <ul class="nav side-menu">
           {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
 
@@ -107,7 +110,7 @@
                       </ul> {% endcomment %}
                     </li>
                   </li>
-                  <li><a href="#">Admin Staff</a>
+                  <li><a href="{% url 'gearBox:adminStaffTable'%}">Admin Staff</a>
                   </li>
                 </ul>
               </li>

@@ -79,10 +79,10 @@
                               
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
-                                        <button type="reset" class="btn btn-success px-4">
+                                        <button type="reset" class="btn btn-sm btn-info px-3">
                                             Reset
                                         </button>
-                                        <button type="submit" class="btn btn-primary px-4">
+                                        <button type="submit" class="btn btn-sm btn-default px-3">
                                             Submit
                                         </button>
                                     </div>
@@ -127,11 +127,10 @@
         validator.reset();
     };
     // stuff related ONLY for this demo page:
-    $(".toggleValidationTooltips")
-        .change(function () {
-            validator.settings.alerts = !this.checked;
-            if (this.checked) $("form .alert").remove();
-        })
-        .prop("checked", false);
+    $(".toggleValidationTooltips").change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked) $("form .alert").remove();
+    })
+    .prop("checked", false);
 </script>
 {% endblock %} {% endblock %}

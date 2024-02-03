@@ -13,6 +13,7 @@ from django.http import Http404
 from django.contrib.auth.models import User , Group
 import os, colorama, subprocess
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password
 
 
 # Create your views here.
@@ -94,6 +95,61 @@ def driversView(request):
         'drivers' : drivers
     }
     return render(request,'GearBox/table/driverTable.html',params)
+
+def adminStaffView(request):
+    staff = User.objects.exclude(groups__name = "Driver")
+    params = {
+        'staff' : staff
+    }
+    return render(request,'GearBox/table/adminStaffTable.html',params)
+
+def adminStaffForm(request, id=None):
+    userObj = None
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+    params = {
+        'userObj' : userObj
+    }
+    return  render(request,'GearBox/adminStaffForm.html', params)
+
+@csrf_protect
+def adminStaffSave(request, id=None):
+    firstName = request.POST.get('firstName')
+    lastName = request.POST.get('lastName')
+    password = request.POST.get('password')
+    email = request.POST.get('email')
+    group = request.POST.get('userType')
+    isActive = True
+    userObj = None
+    msg = "Staff created successfully."
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+        isActive = request.POST.get('isActive')
+        msg = "Staff updated successfully."
+    else:
+        existingUser = User.objects.filter(Q(email=email) | Q(username=firstName.lower().strip())).first()
+        if existingUser:
+            messages.error( request, "This user is already Exist.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        userObj = User()
+        userObj.username=firstName.lower().strip()
+        userObj.password=make_password(password) 
+        
+    userObj.first_name=firstName
+    userObj.last_name=lastName
+    userObj.email=email
+    userObj.is_staff=True 
+    userObj.is_active= True if isActive else False 
+    userObj.save() 
+    
+    userObj.groups.clear()
+    
+    if group != 'Admin':
+        groupObj = Group.objects.get(name=group)
+        userObj.groups.add(groupObj)
+    
+    messages.success( request, msg)
+    return redirect('gearBox:adminStaffTable')
 
 
 def driverForm(request, id=None):

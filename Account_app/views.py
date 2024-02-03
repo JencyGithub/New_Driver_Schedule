@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.db.models import Q
 from itertools import chain
 from dateutil.relativedelta import relativedelta
-
+from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
 
 
@@ -37,19 +37,18 @@ def index(request):
     reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = 1 , docketDate__year=2023)
     
     openedEscalation = Escalation.objects.exclude(escalationStep=4)
-    
-    
     dateBefore3days = curDate - timedelta(days=3)
+    oldEscalation = []
+
     for escalation in openedEscalation:
         if escalation.escalationType == "External":
             lastMail = EscalationMail.objects.filter(escalationId=escalation).order_by('mailDate').first()
-            if lastMail.mailDate <= dateBefore3days:
+            if lastMail and lastMail.mailDate <= dateBefore3days:
                 if len(oldEscalation) <= 5:
+                    escalation.lastMailDate = lastMail.mailDate
                     oldEscalation.append(escalation)
                 else:
-                    continue
-            
-    
+                    break
 
     for shift in totalShiftsCount:
         # pre-start pending 
@@ -581,16 +580,20 @@ def mapDataSave(request, recurring=None):
     currentDateTime = getCurrentDateTimeObj()
     result = None
     if not recurring:
+        lat = request.POST.get('latitude')
+        lng = request.POST.get('longitude')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        if not lat or not lng:
+            messages.error(request, "Please on the location")
+            return redirect(request.META.get('HTTP_REFERER'))
+        
         currentHour = currentDateTime.time().hour
         if 6 <= currentHour <= 17 :
             result = "Day"
         else:
             result = "Night"
         
-        lat = request.POST.get('latitude')
-        lng = request.POST.get('longitude')
-        date = request.POST.get('date')
-        time = request.POST.get('time')
         
         shiftObj = DriverShift()
         shiftObj.latitude = lat
@@ -745,7 +748,8 @@ def driverShiftView(request, shiftId):
     tripObj = None
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
-
+    print(str(shiftObj.startDateTime))
+    minEndDateTime = str(shiftObj.startDateTime).split('+')[0]
     for trip in currentTrips:
         trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
         trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
@@ -764,7 +768,8 @@ def driverShiftView(request, shiftId):
         'clientObj' : truckConnectionObj.clientId,
         'truckObj' : truckConnectionObj,
         'breaks' : breaks,
-        'reimbursements' : reimbursements
+        'reimbursements' : reimbursements,
+        'minEndDateTime' : minEndDateTime
     }
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
@@ -796,6 +801,10 @@ def saveDriverBreak(request, shiftId):
     breakObj.endDateTime = request.POST.get('endDateTime')
     breakObj.location = request.POST.get('curLocation')
     breakObj.description = request.POST.get('description')
+    
+    if breakObj.startDateTime < str(shiftObj.startDateTime) or breakObj.startDateTime > breakObj.endDateTime:
+        messages.error(request, "Break time is not valid.")
+        return redirect(request.META.get('HTTP_REFERER')) 
 
     breakFile = request.FILES.get('breakFile')
     if breakFile:
@@ -854,10 +863,48 @@ def addReimbursementSave(request, shiftId):
     reimbursementObj.save()
     return redirect('Account:DriverPreStartSave', tripObj.id)
 
+@csrf_protect
 def collectDockets(request, shiftId, tripId, endShift=None):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+    driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    manualEndTime = request.POST.get('endDateTime')
+    
+    if manualEndTime:
+        manualEndTime = pytz.timezone(TIME_ZONE).localize(datetime.strptime(manualEndTime, '%Y-%m-%dT%H:%M'))
+        if manualEndTime < shiftObj.startDateTime:
+            messages.error(request, "End shift date-time is not valid.")
+            return redirect(request.META.get('HTTP_REFERER')) 
+        
+    shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (getCurrentDateTimeObj() - shiftObj.startDateTime).total_seconds() / 60
 
+    def checkBreaks(breaksObjs):
+        driverBreaksTimeList = []    
+        for breakObj in breaksObjs:
+            timeDiff = (breakObj.endDateTime - breakObj.startDateTime).total_seconds() / 60
+            if timeDiff >= 15:
+                driverBreaksTimeList.append([timeDiff, breakObj])
+        return driverBreaksTimeList
+
+    legalBreakList = checkBreaks(driverBreaks)
+    breaksIsAllReady = True
+    
+    if shiftTime > 315 and shiftTime < 331:
+        if len(legalBreakList) == 0:
+            breaksIsAllReady = False
+    elif shiftTime >= 331 and shiftTime < 481:
+        if len(legalBreakList) <= 2:
+            breaksIsAllReady = False
+    elif shiftTime > 481: 
+        if len(legalBreakList) <= 4:
+            breaksIsAllReady = False
+    
+    if not breaksIsAllReady:
+        messages.error(request, "You have not entered enough breaks.")
+        return redirect(request.META.get('HTTP_REFERER'))      
+        
+        
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
@@ -1302,9 +1349,9 @@ def rctiSave(request):
                 print('shiftObj',shiftObj)
                 pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
                 print('pastTripErrorObj',pastTripErrorObj)
-                if len(shiftObj) == 0 or len(pastTripErrorObj) ==0:
-                    messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                    return redirect(request.META.get('HTTP_REFERER'))
+                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                #     return redirect(request.META.get('HTTP_REFERER'))
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file already exists!")
@@ -1883,7 +1930,9 @@ def DriverTripEditForm(request, id):
         clientObj = Client.objects.filter(pk=i.clientId).first()
         i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
         for docket in i.tripDockets:
-            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
+            # clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
+            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId).first()
+            print(clientTruckConnectionObj)
             rateCard = clientTruckConnectionObj.rate_card_name
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
@@ -2069,6 +2118,17 @@ def tripEntry(request,shiftId):
         'basePlants': base_plant,
     }
     return render(request,'Account/shiftTripEntry.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def getDriverBreak(request):
+    shiftId = request.POST.get('shiftId')
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj).values()
+    
+    return JsonResponse({'status': True, 'driverBreaks': list(driverBreaks)})
+    
+    
 # ````````````````````````````````````
 # Reconciliation
 

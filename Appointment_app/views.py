@@ -30,18 +30,25 @@ def appointmentForm(request, id=None, update=None):
     currentUser = request.user
     drivers = Driver.objects.all()
     clients = Client.objects.all()
-    truckNos = AdminTruck.objects.all()
+    trucks = AdminTruck.objects.all()
+    origins = BasePlant.objects.all()
     params = {
         'drivers' : drivers,
-        'truckNos':truckNos,
+        'trucks':trucks,
         'clients' : clients,  
-        'currentUser' : currentUser 
+        'currentUser' : currentUser,
+        'origins' : origins
     }
     if id:
         data = Appointment.objects.filter(pk=id).first()
-        data.Start_Date_Time = convertDateTimeForTemplate(data.Start_Date_Time)
-        data.End_Date_Time = convertDateTimeForTemplate(data.End_Date_Time)
-        data.report_to_origin = convertDateTimeForTemplate(data.report_to_origin)
+        # print(str(data.startTime))
+        # return HttpResponse(data.startTime)
+
+        data.startTime = str(data.startTime)
+        data.endTime = str(data.endTime)
+        data.reportingTime = str(data.reportingTime)
+        data.startDate = dateConverterFromTableToPageFormate(data.startDate)
+        data.endDate = dateConverterFromTableToPageFormate(data.endDate)
         
         appointmentDriver = AppointmentDriver.objects.filter(appointmentId = data.id).last()
         appointmentTruck = AppointmentTruck.objects.filter(appointmentId = data.id).last()
@@ -50,38 +57,48 @@ def appointmentForm(request, id=None, update=None):
         params['appointmentDriver'] = appointmentDriver
         params['appointmentTruck'] = appointmentTruck
         
-        unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(Start_Date_Time__gte = data.Start_Date_Time,Start_Date_Time__lte = data.End_Date_Time)|Q(End_Date_Time__gte = data.Start_Date_Time,End_Date_Time__lte = data.End_Date_Time))
-        unavailableDriversQrySet = [] 
-        unavailableTrucksQrySet = [] 
+        # unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(startTime__gte = data.startTime,startTime__lte = data.endTime)|Q(endTime__gte = data.startTime,endTime__lte = data.endTime))
+        # unavailableDriversQrySet = [] 
+        # unavailableTrucksQrySet = [] 
         
+        # for obj in unavailableDriversAndTrucksQrySet:            
+        #     tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).last()
+        #     tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).last()
+        #     if tempDriver:
+        #         unavailableDriversQrySet.append({'driverId':tempDriver.driverName.driverId,'name':tempDriver.driverName.name})
+        #     if tempTruck:
+        #         unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.truckNo.adminTruckNumber})
 
-        for obj in unavailableDriversAndTrucksQrySet:            
-            tempDriver = AppointmentDriver.objects.filter(appointmentId = obj.id).last()
-            tempTruck = AppointmentTruck.objects.filter(appointmentId = obj.id).last()
-            if tempDriver:
-                unavailableDriversQrySet.append({'driverId':tempDriver.driverName.driverId,'name':tempDriver.driverName.name})
-            if tempTruck:
-                unavailableTrucksQrySet.append({'adminTruckNumber':tempTruck.truckNo.adminTruckNumber})
+        # drivers = Driver.objects.values('driverId','name')
+        # trucks =  AdminTruck.objects.values('adminTruckNumber')
 
-        drivers = Driver.objects.values('driverId','name')
-        trucks =  AdminTruck.objects.values('adminTruckNumber')
+        # availableDriversList = list(itertools.filterfalse(lambda x: x in list(drivers), unavailableDriversQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableDriversQrySet, list(drivers)))
+        # availableTrucksList = list(itertools.filterfalse(lambda x: x in list(trucks), unavailableTrucksQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableTrucksQrySet, list(trucks)))
 
-        availableDriversList = list(itertools.filterfalse(lambda x: x in list(drivers), unavailableDriversQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableDriversQrySet, list(drivers)))
-        availableTrucksList = list(itertools.filterfalse(lambda x: x in list(trucks), unavailableTrucksQrySet)) + list(itertools.filterfalse(lambda x: x in unavailableTrucksQrySet, list(trucks)))
-        
-        
+        availableDriversList = AdminTruck.objects.all()
+        availableTrucksList = Driver.objects.all()
         params['availableDriversList'] = availableDriversList
         params['availableTrucksList'] = availableTrucksList
         params['update'] = update
-        
-        print(availableDriversList,availableTrucksList)
-        
         
     return render(request, 'Appointment/appointmentForm.html',params)
 
 @csrf_protect
 def appointmentSave(request,id=None):
     appointmentObj = Appointment()
+    recurringType = request.POST.get('repeats')
+    startTime = request.POST.get('startTime')
+    endTime = request.POST.get('endTime')
+    shiftDate = request.POST.get('shiftDate')
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    reportingTime = request.POST.get('reportingTime')
+    shiftType = None
+    if 6 <= int(startTime.split(':')[0]) <= 17 :
+        shiftType = "Day"
+    else:
+        shiftType = "Night"
+
     if id:
         appointmentObj = Appointment.objects.filter(pk=id).first()
         messageStr = "Appointment Updated Successfully."
@@ -101,19 +118,36 @@ def appointmentSave(request,id=None):
             originObj.long = request.POST.get('originLongitude')
             originObj.save()
         else:
-            originObj = BasePlant.objects.filter(basePlant=request.POST.get('origin').upper().strip()).first()
+            originObj = BasePlant.objects.filter(basePlant=request.POST.get('origin')).first()
 
-        appointmentObj.Title = request.POST.get('title')
-        appointmentObj.Start_Date_Time = request.POST.get('startDateTime')
-        appointmentObj.End_Date_Time = request.POST.get('endDateTime')
-        appointmentObj.report_to_origin = request.POST.get('reportToOrigin')
-        appointmentObj.Recurring = request.POST.get('recurring')
-        appointmentObj.Staff_Notes = request.POST.get('staffNotes')
-        appointmentObj.Created_by = request.user
+        appointmentObj.title = request.POST.get('title')
+        appointmentObj.recurringType = recurringType
+        appointmentObj.startTime = startTime
+        appointmentObj.endTime = endTime
+        appointmentObj.reportingTime = reportingTime
+        appointmentObj.origin = originObj
+        appointmentObj.createdBy = request.user
         appointmentObj.stop = client
-        appointmentObj.Origin = originObj
-        appointmentObj.shiftType = request.POST.get('shiftType')
-        appointmentObj.Status = 'Unassigned'
+        appointmentObj.staffNotes = request.POST.get('staffNotes')
+        appointmentObj.shiftType = shiftType
+        appointmentObj.status = 'Unassigned'
+        
+        if recurringType == 'NoRecurring':
+            appointmentObj.startDate = shiftDate
+            appointmentObj.endDate = shiftDate
+        else:
+            appointmentObj.startDate = startDate
+            appointmentObj.endDate = endDate
+            if recurringType == 'Custom':
+                check_day = lambda day_input, condition_value: True if day_input == condition_value else False
+                appointmentObj.sunday = check_day(request.POST.get('sunday'), 'sunday')
+                appointmentObj.monday = check_day(request.POST.get('monday'), 'monday')
+                appointmentObj.tuesday = check_day(request.POST.get('tuesday'), 'tuesday')
+                appointmentObj.wednesday = check_day(request.POST.get('wednesday'), 'wednesday')
+                appointmentObj.thursday = check_day(request.POST.get('thursday'), 'thursday')
+                appointmentObj.friday = check_day(request.POST.get('friday'), 'friday')
+                appointmentObj.saturday = check_day(request.POST.get('saturday'), 'saturday')
+        
         appointmentObj.save()
         messageStr = "Appointment added successfully."
     
@@ -126,9 +160,8 @@ def appointmentSave(request,id=None):
         appointmentDriverObj.driverName = driver
         appointmentDriverObj.appointmentId = appointmentObj
         appointmentDriverObj.save()
+    truck = AdminTruck.objects.filter(pk=request.POST.get('truckNo')).first()
     
-    truck = AdminTruck.objects.filter(adminTruckNumber=request.POST.get('truckNo')).first()
-
     if truck:
         appointmentTruckObj = AppointmentTruck.objects.filter(appointmentId = appointmentObj.id).first()
         if not appointmentTruckObj:
@@ -139,7 +172,7 @@ def appointmentSave(request,id=None):
         appointmentTruckObj.save()
         
     if driver and truck:
-        appointmentObj.Status = "Assigned"
+        appointmentObj.status = "Assigned"
         appointmentObj.save()
         
     messages.success(request, messageStr)
@@ -147,6 +180,7 @@ def appointmentSave(request,id=None):
     return redirect('Appointment:findJob')        
 
 def findJob(request):
+<<<<<<< Updated upstream
     jobs = Appointment.objects.filter(scheduled = False)
     params = {
         'jobs' : jobs
@@ -154,11 +188,58 @@ def findJob(request):
     return render(request, 'Appointment/findJob.html',params)
 
 @csrf_protect
+=======
+    drivers = Driver.objects.all().order_by('name')
+    vehicles = AdminTruck.objects.all().order_by('adminTruckNumber')
+    locations = BasePlant.objects.all().order_by('basePlant')
+    
+    params = {
+        'drivers' : drivers,
+        'vehicles' : vehicles,
+        'locations' : locations
+    }
+    return render(request, 'Appointment/findJob.html', params)
+
+@csrf_protect
+@api_view(['POST'])
+def cancelJob(request):
+    appointmentId = request.POST.get('appointmentId') 
+    appointmentObj = Appointment.objects.filter(pk=appointmentId).first()
+    if appointmentObj:
+        appointmentObj.Status = 'Cancelled'
+        appointmentObj.save()
+        return JsonResponse({'status': True})
+    else:
+        return JsonResponse({'status': False})
+
+
+@csrf_protect
+@api_view(['POST'])
+def getSingleAppointmentData(request):
+    appointmentId = request.POST.get('appointmentId')
+    appointmentObj = Appointment.objects.filter(pk=appointmentId).values().first()
+    appointmentObj['createdBy_id'] = User.objects.filter(pk=appointmentObj['createdBy_id']).first().username
+    originObj = BasePlant.objects.filter(pk=appointmentObj['origin_id']).values().first()
+    appointmentObj['origin_id'] = originObj['basePlant']
+    appointmentObj['clientName'] = Client.objects.filter(pk = appointmentObj['stop_id']).first().name
+
+
+    driverObj = AppointmentDriver.objects.filter(appointmentId=appointmentObj['id']).values().first()
+    if driverObj:
+        driverObj = Driver.objects.filter(pk=driverObj['driverName_id']).values().first()
+
+    truckObj = AppointmentTruck.objects.filter(appointmentId=appointmentObj['id']).values().first()
+    if truckObj:
+        truckObj = AdminTruck.objects.filter(pk=truckObj['truckNo_id']).values().first()
+
+    return JsonResponse({'status': True, 'appointmentObj': appointmentObj, 'driverObj': driverObj, 'truckObj': truckObj, 'originObj': originObj})
+    
+    
+@csrf_protect
+>>>>>>> Stashed changes
 def getTruckAndDriver(request):
     startDateTime = request.POST.get('startDateTime')
     endDateTime = request.POST.get('endDateTime')
-    
-    print(startDateTime,endDateTime)
     
     try:
         startDateTime = datetime.strptime(startDateTime, '%Y-%m-%dT%H:%M:%S')
@@ -168,14 +249,14 @@ def getTruckAndDriver(request):
         endDateTime =  datetime.strptime(endDateTime, '%Y-%m-%dT%H:%M')
         
     # Qry logic
-    # Appointment.objects.get(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
+    # Appointment.objects.get(Q(startTime__gte = startDateTime,startTime__lte = endDateTime)|Q(endTime__gte = startDateTime,endTime__lte = endDateTime))
     #                               03-04              01-04            03-04            04-04               02-04             01-04              02-04             04-04                   
     # job = 1-4, 4-4        Data from form
     # d1 = 25-3 , 02-4      Entry from database
     # d2 = 03-4 , 10-4      Entry from database
     
     
-    unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(Start_Date_Time__gte = startDateTime,Start_Date_Time__lte = endDateTime)|Q(End_Date_Time__gte = startDateTime,End_Date_Time__lte = endDateTime))
+    unavailableDriversAndTrucksQrySet = Appointment.objects.filter(Q(startTime__gte = startDateTime,startTime__lte = endDateTime)|Q(endTime__gte = startDateTime,endTime__lte = endDateTime))
     unavailableDriversQrySet = [] 
     unavailableTrucksQrySet = [] 
 
@@ -319,3 +400,129 @@ def questionAddSave(request, id):
     messages.success(request, "Question added.")
     return redirect('Appointment:preStartTableView')
 
+
+@csrf_protect
+@api_view(['POST'])
+def getDriverAppointmentData(request):
+    appointments = []
+    selectedJobs = request.POST.getlist('selectedStatus[]')
+    selectedDrivers = request.POST.getlist('selectedDrivers[]')
+    selectedLocations = request.POST.getlist('selectedLocations[]')
+    selectedVehicles = request.POST.getlist('selectedVehicles[]')
+    selectedContents = request.POST.getlist('selectedContents[]')
+    
+    appointments = Appointment.objects.all()
+    drivers = None
+    
+    if len(selectedDrivers) > 0:
+        selectedDrivers = [int(item.replace('driver', '')) for item in selectedDrivers]
+        drivers = Driver.objects.filter(pk__in=selectedDrivers)
+    else:
+        drivers = Driver.objects.all()
+        
+    if len(selectedLocations) > 0:
+        selectedLocations = [int(item.replace('location', '')) for item in selectedLocations]
+
+    if len(selectedVehicles) > 0:
+        selectedVehicles = [int(item.replace('vehicle', '')) for item in selectedVehicles]
+    
+    
+    if len(selectedLocations) > 0 and len(selectedJobs) > 0 and len(selectedVehicles) > 0:
+        appointments = Appointment.objects.filter(appointmenttruck__truckNo__id__in=selectedVehicles, origin__id__in=selectedLocations, status__in=selectedJobs)        
+    elif len(selectedLocations) > 0 and len(selectedVehicles) > 0:
+        appointments = Appointment.objects.filter(appointmenttruck__truckNo__id__in=selectedVehicles, origin__id__in=selectedLocations)        
+    elif len(selectedJobs) > 0 and len(selectedVehicles) > 0:
+        appointments = Appointment.objects.filter(appointmenttruck__truckNo__id__in=selectedVehicles, status__in=selectedJobs)        
+    elif len(selectedLocations) > 0 and  len(selectedJobs) > 0:
+        appointments = Appointment.objects.filter(origin__id__in=selectedLocations, status__in=selectedJobs)
+    elif len(selectedJobs) > 0:
+        appointments = Appointment.objects.filter(status__in=selectedJobs)
+    elif len(selectedLocations) > 0:
+        appointments = Appointment.objects.filter(origin__id__in=selectedLocations)
+    elif len(selectedVehicles) > 0:
+        appointments = Appointment.objects.filter(appointmenttruck__truckNo__id__in=selectedVehicles)        
+    
+    appointmentsList = []
+    
+    def addJob(startDate, endDate, data, driverData, contents):
+        titleData = [f'{str(data.startTime)}-{str(data.endTime)}']
+
+        if len(contents) > 0:
+            if 'timeContent' not in contents:
+                titleData = []
+            if 'driverContent' in contents and driverData:
+                print("driverData", driverData.driverName.name)
+                titleData.append(driverData.driverName.name)
+            if 'titleContent' in contents:
+                titleData.append(data.title)
+            if 'customerContent' in contents:
+                titleData.append(data.stop.name)
+            if 'staffNotesContent' in contents:
+                titleData.append(data.staffNotes)
+            if 'reportingTimeContent' in contents:
+                titleData.append(data.reportingTime)
+            if 'shiftTypeContent' in contents:
+                titleData.append(data.shiftType)
+            if 'createdByContent' in contents:
+                titleData.append(data.createdBy.username)
+            if 'crestedTimeContent' in contents:
+                titleData.append(data.createdTime)
+            if 'addressContent' in contents:
+                titleData.append(data.origin.address)
+                
+            if 'vehicleContent' in contents:                    
+                vehicleInfo = AppointmentTruck.objects.filter(appointmentId=data).first()
+                if vehicleInfo:
+                    titleData.append(vehicleInfo.truckNo.adminTruckNumber)
+                
+        dataDict = {
+            'id': data.id,
+            'start': str(startDate) + ' ' + str(data.startTime),
+            'end': str(endDate) + ' ' + str(data.endTime),
+            'title': titleData,
+            'status': str(data.status)
+        }
+        if driverData:
+            dataDict["resourceId"] = driver.driverName.driverId
+            dataDict["driverName"] = driver.driverName.name
+        else:
+            dataDict["resourceId"] = 0
+            dataDict["driverName"] = 'Unassigned'
+        
+            
+        return dataDict
+    
+    for job in appointments:
+        driver = AppointmentDriver.objects.filter(appointmentId=job).first()
+        
+        if job.recurringType == "NoRecurring":
+            appointmentsList.append(addJob(startDate=job.startDate, endDate=job.endDate, data=job, driverData = driver, contents=selectedContents))
+            
+        elif job.recurringType == "Daily":
+            current_date = job.startDate
+            while current_date <= job.endDate:
+                appointmentsList.append(addJob(startDate=current_date, endDate=current_date, data=job, driverData = driver, contents=selectedContents))
+                current_date += timedelta(days=1)
+
+        elif  job.recurringType == "Custom":
+            weekdays = []            
+            current_date = job.startDate
+            
+            dayCheck = lambda val, number: weekdays.append(number) if val else None
+            dayCheck(job.monday, 0)
+            dayCheck(job.tuesday, 1)
+            dayCheck(job.wednesday, 2)
+            dayCheck(job.thursday, 3)
+            dayCheck(job.friday, 4)
+            dayCheck(job.saturday, 5)
+            dayCheck(job.sunday, 6)
+                
+            while current_date <= job.endDate:
+                if current_date.weekday() in weekdays:
+                    appointmentsList.append(addJob(startDate=current_date, endDate=current_date, data=job, driverData = driver, contents=selectedContents))
+                current_date += timedelta(days=1)
+                
+    driversList = [{'id': driver.driverId, 'title': driver.name} for driver in drivers]
+    
+    return JsonResponse({'status': True, 'appointments': appointmentsList, 'drivers': driversList})
+ 

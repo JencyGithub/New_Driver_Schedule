@@ -149,6 +149,7 @@ urlpatterns = [
     path('driverTrip/update/<int:shiftId>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
     path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
+    path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
