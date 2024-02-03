@@ -36,6 +36,10 @@
         margin-top: 0.2rem;
         margin-left: 0.3rem;
     }
+    .fa-solid.fa-circle-info{
+        font-size:0.8rem;
+        opacity:0.3
+    }
 </style>
 {% endblock %}
 
@@ -47,13 +51,13 @@
         <div class="row">
             {% if rateCard %}
                 <div class="x_panel col-md-12 col-sm-12">
-                    <h2>View old rate card :-</h2>
+                    <h2> View old rate card :- </h2>
                     <hr>
                     <form action="{% url 'Account:rateCardView' id=rateCard.id%}" method="post">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="oldRateCardStartDate">Start Date :<span class="required">*</span></label>
+                                <label for="oldRateCardStartDate" >Start Date :<span class="required">*</span></label>
                                 <div class="field item form-group">
                                     <input class="form-control" type="date" name="oldRateCardStartDate" required='required' onchange="setEndDate(this,'oldRateCardEndDate')" id="oldRateCardStartDate">
                                 </div>
@@ -85,13 +89,13 @@
                     <!--Start Rate Care Name  -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2> Add Rate Card Form :-</h2>
+                            <h2> Add Rate Card Form :- </h2>
                             {% if rateCard %}
                                 {% if request.session.user_type != 'Driver' and request.session.user_type != 'Accounts' and request.session.user_type != 'HR'  %}
                                     <label id="editRateCard" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
                                 {% endif %}
                                 <label id="rateRevision" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
-                           {% endif %}
+                            {% endif %}
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -115,14 +119,6 @@
                                         <input class="form-control" value="{{clientId}}" name="clientName" type="hidden">
                                     </div>
                                 </div>
-                                {% if rateCard %}
-                                <div class="col-md-2 col-sm-2">
-                                    <label for="createdBy">Created By :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" value="{{costParameters.createdBy}}" readonly type="text" name="createdBy" required='required' style="padding: 0.25rem 0.2rem;" id="createdBy">
-                                    </div>
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
 
@@ -139,8 +135,7 @@
                             <div class="custom-continer">
                                 <!-- loading_cost_per_cubic_meter,km_cost,surcharge_fixed_normal_cost,surcharge_fixed_sunday_cost -->
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="loading_cost_per_cubic_meter">Load Fee ($/m<sup>3</sup>):<span
-                                            class="required">*</span></label>
+                                    <label for="loading_cost_per_cubic_meter">Load Fee ($/m<sup>3</sup>):<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees per cubic meter" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" required type="number"
                                             name="costParameters_loading_cost_per_cubic_meter" pattern="[0-9]*" required
@@ -152,7 +147,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="km_cost">Run Rate($/m<sup>3</sup>/km) :<span class="required">*</span></label>
+                                    <label for="km_cost">Run Rate($/m<sup>3</sup>/km) :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees per one km for one cubic meter load" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_km_cost" required='required'
                                         value="{% if costParameters %}{{costParameters.km_cost}}{% endif %}" 
@@ -187,7 +182,7 @@
 
 
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="transfer_cost">Unloaded Kms($/m<sup>3</sup>) :<span class="required">*</span></label>
+                                    <label for="transfer_cost">Unloaded Kms($/m<sup>3</sup>) :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees per km when there is no load" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_transfer_cost"
                                         value="{% if costParameters %}{{costParameters.transfer_cost}}{% endif %}" 
@@ -196,7 +191,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="return_load_cost">Return Load cost :<span class="required">*</span></label>
+                                    <label for="return_load_cost">Return Load cost :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees per cubic meter when load is returned" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_return_load_cost" required='required'
                                         value="{% if costParameters %}{{costParameters.return_load_cost}}{% endif %}" 
@@ -205,7 +200,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="return_km_cost">Return Km cost :<span class="required">*</span></label>
+                                    <label for="return_km_cost">Return Km cost :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees per one km for one cubic meter load when is returned" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_return_km_cost" required='required'
                                         value="{% if costParameters %}{{costParameters.return_km_cost}}{% endif %}" 
@@ -215,7 +210,7 @@
                                 </div>
                                 <div class="col-md-3 col-sm-3">
                                     <label for="standby_time_slot_size">Standby time slot size :<span
-                                            class="required">*</span></label>
+                                            class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of minutes which make up a slot" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_standby_time_slot_size"
                                         value="{% if costParameters %}{{costParameters.standby_time_slot_size}}{% endif %}" 
@@ -226,7 +221,7 @@
                                 </div>
                                 <div class="col-md-3 col-sm-3">
                                     <label for="standby_cost_per_slot">Standby Cost ($/slot)  :<span
-                                            class="required">*</span></label>
+                                            class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees for one computed slot of standBy" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_standby_cost_per_slot"
                                         value="{% if costParameters %}{{costParameters.standby_cost_per_slot}}{% endif %}" 
@@ -239,7 +234,7 @@
                                 <!-- ,waiting_cost_per_minute,call_out_fees,demurrage_fees,start_date -->
                                 <div class="col-md-3 col-sm-3">
                                     <label for="waiting_cost_per_minute">Waiting Time($/min) :<span
-                                            class="required">*</span></label>
+                                            class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees for one minute of waiting" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" name="costParameters_waiting_cost_per_minute"
                                         value="{% if costParameters %}{{costParameters.waiting_cost_per_minute}}{% endif %}" 
@@ -258,7 +253,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="demurrage_fees">Demurrage fees :<span class="required">*</span></label>
+                                    <label for="demurrage_fees">Demurrage fees :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees when no jobs are assigned to a truck on site" ></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" min="0" name="costParameters_demurrage_fees"
                                         value="{% if costParameters %}{{costParameters.demurrage_fees}}{% endif %}" 
@@ -268,7 +263,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-sm-3">
-                                    <label for="costParameters_cancellation_fees">Cancellation fees :<span class="required">*</span></label>
+                                    <label for="costParameters_cancellation_fees">Cancellation fees :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Fees to be charged to be a cancled job"></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number" min="0" name="costParameters_cancellation_fees"
                                         value="{% if costParameters %}{{costParameters.cancellation_fees}}{% endif %}" 
@@ -334,7 +329,7 @@
                                                 </div>
                                             </div> -->
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="threshold_amount_per_day_shift">Threshold amount per day shift :<span class="required">*</span></label>
+                                                <label for="threshold_amount_per_day_shift">Threshold amount per day shift :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum ravenue to be made in a day shift" ></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_threshold_amount_per_day_shift" required='required'
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.threshold_amount_per_day_shift}}{% endif %}" 
@@ -343,7 +338,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="min_load_in_cubic_meters">Min load in cubic meters :<span class="required">*</span></label>
+                                                <label for="min_load_in_cubic_meters">Min load in cubic meters :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum chargable load for each docket"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_min_load_in_cubic_meters" pattern="[0-9]*" required 
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.min_load_in_cubic_meters}}{% endif %}" 
@@ -351,7 +346,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="min_load_in_cubic_meters_return_to_yard">Min load in cubic meters return to yard :<span class="required">*</span></label>
+                                                <label for="min_load_in_cubic_meters_return_to_yard">Min load for return to yard ($/m<sup>3</sup>) :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum chargable load for each docket when load is returned"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_min_load_in_cubic_meters_return_to_yard" required='required'
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.min_load_in_cubic_meters_return_to_yard}}{% endif %}" 
@@ -360,7 +355,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdDayShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span></label>
+                                                <label for="thresholdDayShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Non chargable load size in cubic meter for a return to yard"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_return_to_yard_grace" required='required'
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.return_to_yard_grace}}{% endif %}" 
@@ -369,7 +364,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdDayShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span></label>
+                                                <label for="thresholdDayShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Non chargable load size in cubic meter for a return to tipping"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdDayShift_return_to_tipping_grace" required='required'
                                                     value="{% if thresholdDayShift %}{{thresholdDayShift.return_to_tipping_grace}}{% endif %}" 
@@ -479,7 +474,7 @@
                                                 </div>
                                             </div> -->
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="thresholdNightShift_threshold_amount_per_night_shift">Threshold amount per night shift :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_threshold_amount_per_night_shift">Threshold amount per night shift :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum ravenue to be made in a day shift" ></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_threshold_amount_per_night_shift" required='required'
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.threshold_amount_per_night_shift}}{% endif %}" 
@@ -488,7 +483,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="thresholdNightShift_min_load_in_cubic_meters">Min load in cubic meters :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_min_load_in_cubic_meters">Min load in cubic meters :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum chargable load for each docket"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_min_load_in_cubic_meters" pattern="[0-9]*" required  
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.min_load_in_cubic_meters}}{% endif %}" 
@@ -496,7 +491,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-xl-4 col-md-6">
-                                                <label for="thresholdNightShift_min_load_in_cubic_meters_return_to_yard">Min load in cubic meters return to yard :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_min_load_in_cubic_meters_return_to_yard">Min load for return to yard ($/m<sup>3</sup>) :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Minimum chargable load for each docket when load is returned"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_min_load_in_cubic_meters_return_to_yard"
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.min_load_in_cubic_meters_return_to_yard}}{% endif %}" 
@@ -506,7 +501,7 @@
                                             </div>
 
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdNightShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_return_to_yard_grace">Return To Yard Grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Non chargable load size in cubic meter for a return to yard"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_return_to_yard_grace" required='required'
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.return_to_yard_grace}}{% endif %}" 
@@ -515,7 +510,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
-                                                <label for="thresholdNightShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span></label>
+                                                <label for="thresholdNightShift_return_to_tipping_grace">Return To tipping Site Grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Non chargable load size in cubic meter for a return to tipping"></i></label>
                                                 <div class="field item form-group">
                                                     <input class="form-control"  type="number" name="thresholdNightShift_return_to_tipping_grace" required='required'
                                                     value="{% if thresholdNightShift %}{{thresholdNightShift.return_to_tipping_grace}}{% endif %}" 
@@ -604,27 +599,27 @@
                             <div class="custom-continer">
                                 <!-- load_km_grace,transfer_km_grace,return_km_grace -->
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="load_km_grace">load km grace :<span class="required">*</span></label>
+                                    <label for="load_km_grace">load km grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of non-chargable kms"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control"  type="number"
                                         value="{% if grace %}{{grace.load_km_grace}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_load_km_grace"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="load_km_grace">
                                     </div>
                                 </div>
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="transfer_km_grace">Transfer km grace :<span class="required">*</span></label>
+                                    <label for="transfer_km_grace">Transfer km grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of non-chargable transfer kms"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.transfer_km_grace}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_transfer_km_grace"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="transfer_km_grace">
                                     </div>
                                 </div>
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="return_km_grace">Return km grace :<span class="required">*</span></label>
+                                    <label for="return_km_grace">Return km grace :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of non-chargable return kms"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control"  type="number"
                                         value="{% if grace %}{{grace.return_km_grace}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_return_km_grace"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="return_km_grace">
@@ -632,27 +627,27 @@
                                 </div>
                                 <!-- standby_time_grace_in_minutes,chargeable_standby_time_starts_after,waiting_time_grace_in_minutes -->
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="standby_time_grace_in_minutes">Standby time grace in minutes :<span class="required">*</span></label>
+                                    <label for="standby_time_grace_in_minutes">Standby time grace in minutes :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of non-chargable minuites to be waived off when calculating standBy slot"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.standby_time_grace_in_minutes}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_standby_time_grace_in_minutes"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="standby_time_grace_in_minutes">
                                     </div>
                                 </div>
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="chargeable_standby_time_starts_after">Chargeable standby time starts after :<span class="required">*</span></label>
+                                    <label for="chargeable_standby_time_starts_after">Chargeable standby time starts after :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of minuites after which standBy slots are considered for payment"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.chargeable_standby_time_starts_after}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_chargeable_standby_time_starts_after"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="chargeable_standby_time_starts_after">
                                     </div>
                                 </div>
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="waiting_time_grace_in_minutes">Waiting time grace in minutes :<span class="required">*</span></label>
+                                    <label for="waiting_time_grace_in_minutes">Waiting time grace in minutes :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of non-chargable minuites to be waived off when calculating waiting time"></i></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number"
+                                        <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.waiting_time_grace_in_minutes}}{% endif %}" 
                                         {% if grace %} readonly {% endif %} name="grace_waiting_time_grace_in_minutes"
                                             required='required' style="padding: 0.25rem 0.2rem;" id="waiting_time_grace_in_minutes">
@@ -660,7 +655,7 @@
                                 </div>
                                 <!-- chargeable_waiting_time_starts_after,start_date,end_date -->
                                 <div class="col-xl-4 col-md-6">
-                                    <label for="chargeable_waiting_time_starts_after">Chargeable waiting time starts after :<span class="required">*</span></label>
+                                    <label for="chargeable_waiting_time_starts_after">Chargeable waiting time starts after :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of minuites after which waiting time is considered for payment"></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number"
                                         value="{% if grace %}{{grace.chargeable_waiting_time_starts_after}}{% endif %}" 
@@ -814,31 +809,33 @@
                         <div class="x_content">         
                             <div class="custom-continer">
                                 {% if rateCardSurcharges %}
-                                {%for surcharge in rateCardSurcharges %}
-                                <div class="col-xl-4 col-md-6">
-                                    <label for="{{surcharge.id}}">{{surcharge.surcharge.surcharge_Name}} :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control"  type="number"
-                                        name="{{surcharge.surcharge.id}}"
-                                        value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
-                                        readonly
-                                        required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                    {%for surcharge in rateCardSurcharges %}
+                                    <div class="col-xl-4 col-md-6">
+                                        {% comment %} {{surcharge.id}},{{surcharge.surcharge.id}}  {% endcomment %}
+                                        <label for="{{surcharge.id}}">{{surcharge.surcharge.surcharge_Name}} :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control"  type="number"
+                                            name="{{surcharge.surcharge.id}}"
+                                            value = "{% if surcharge %}{{surcharge.surchargeValue}}{% endif %}"
+                                            readonly
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                        </div>
                                     </div>
-                                </div>
-                                {% endfor%}
+                                    {% endfor%}
                                 {% elif surchargesEntry %}
-                                {%for surcharge in surchargesEntry %}
-                                <div class="col-xl-4 col-md-6">
-                                    <label for="{{surcharge.id}}">{{surcharge.surcharge_Name}} :<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control"  type="number"
-                                        name="{{surcharge.id}}"
-                                        value = "0"
+                                    {%for surcharge in surchargesEntry %}
+                                    <div class="col-xl-4 col-md-6">
                                         
-                                        required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                        <label for="{{surcharge.id}}">{{surcharge.surcharge_Name}} :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control"  type="number"
+                                            name="{{surcharge.id}}"
+                                            value = "0"
+                                            
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="{{surcharge.id}}">
+                                        </div>
                                     </div>
-                                </div>
-                                {% endfor%}
+                                    {% endfor%}
                                 {% endif %}
 
                             </div>

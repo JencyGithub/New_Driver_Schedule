@@ -40,7 +40,7 @@
                 <ul class="nav child_menu">
                   <li><a>Register<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="{% url "gearBox:addGroups" %}">Groups</a></li>
+                      <li><a href="{% url 'gearBox:addGroups' %}">Groups</a></li>
                       <li><a href="{% url 'gearBox:addSubGroups' %}">Sub groups</a></li>
                       <li><a href="{% url 'gearBox:truckTable'%}">Trucks</a></li>
                       {% comment %} <li><a>Rate cards & Surcharge<span class="fa fa-chevron-down"></span></a>
@@ -108,7 +108,7 @@
                       </ul> {% endcomment %}
                     </li>
                   </li>
-                  <li><a href="#">Admin Staff</a>
+                  <li><a href="{% url 'gearBox:adminStaffTable'%}">Admin Staff</a>
                   </li>
                 </ul>
               </li>
