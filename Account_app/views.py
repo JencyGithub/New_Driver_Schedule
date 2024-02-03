@@ -594,12 +594,20 @@ def mapDataSave(request, recurring=None):
         else:
             result = "Night"
         
+        lat = request.POST.get('latitude')
+        lng = request.POST.get('longitude')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        if not lat or not lng:
+            messages.error(request, "Please on the location")
+            return redirect(request.META.get('HTTP_REFERER'))
         
         shiftObj = DriverShift()
         shiftObj.latitude = lat
         shiftObj.longitude = lng
         shiftObj.shiftDate = date
         shiftObj.shiftType = result
+        shiftObj.verifiedBy = request.user
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
         shiftObj.save()
@@ -1978,6 +1986,7 @@ def driverDocketUpdate(request):
     docketObj.docketNumber = docketNumber
     docketObj.save()
     return JsonResponse({'status': True})
+
 @csrf_protect
 def driverEntryUpdate(request, shiftId):
     # Update Trip Save
@@ -2026,9 +2035,10 @@ def driverEntryUpdate(request, shiftId):
             else:
                 docket.standByStartTime  = None
                 docket.standByEndTime = None
-                
-            docket.surchargeType = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first().id
-            docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
+            surchargeObj = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first()
+            if surchargeObj:
+                docket.surchargeType = surchargeObj.id
+                docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
             docket.cubicMl = request.POST.get(f'cubicMl{docket.id}')
             
             docket.others = request.POST.get(f'others{docket.id}')
@@ -2045,7 +2055,7 @@ def driverEntryUpdate(request, shiftId):
                 # tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj)
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
                         
-                if not  reconciliationDocketObj :
+                if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
                     
                     
@@ -2088,11 +2098,13 @@ def driverEntryUpdate(request, shiftId):
                 checkMissingComponents(reconciliationDocketObj)
                 reconciliationTotalCheck(reconciliationDocketObj)
                 shiftObj.verified = True
+                shiftObj.verifiedBy = request.user
                 shiftObj.save()
     
     messages.success(request, "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
     return redirect(request.META.get('HTTP_REFERER'))
+
 @csrf_protect
 def tripEntry(request,shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
@@ -2526,6 +2538,7 @@ def rateCardForm(request, id=None , clientId=None):
             oldRateCardEndDate = getOldRateCard.split('to')[1].strip()
 
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
@@ -2533,6 +2546,7 @@ def rateCardForm(request, id=None , clientId=None):
             
         else:
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
@@ -2579,7 +2593,6 @@ def checkOnOff(val_):
 
 
 @csrf_protect
-@api_view(['POST'])
 def rateCardSave(request, id=None, edit=0):
     # Rate Card
     rateCardID = None
@@ -2715,6 +2728,9 @@ def rateCardSave(request, id=None, edit=0):
     costParameters.cancellation_fees=float(request.POST.get('costParameters_cancellation_fees'))
     costParameters.start_date=startDate  
     costParameters.end_date=endDate
+    if edit == 0:
+        costParameters.createdBy = request.user
+
     costParameters.save()
 
     # ThresholdDayShift

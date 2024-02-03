@@ -1,19 +1,42 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-function getDataFilter(startDate, endDate, selectedStatus) {
+$(document).ready(function () {
+  $("#multiSelect").select2({
+    placeholder: "Select status",
+    templateResult: formatOption,
+  });
+
+  $("#multiSelect").on("change", function () {
+    var selectedStatus = $(this).val();
+    // // console.log(selectedStatus);
+    getDataFilter(selectedStatus);
+  });
+
+
+  $("#closeBtn").on('click', function(){
+    $('#appointmentModel').modal('hide');
+  })
+  getDataFilter(null);
+
+  $('#cancleJonBtn').on('click', function(){
+    $('#cancelModel').modal('show');
+  })
+});
+
+function getDataFilter(selectedStatus) {
   $.ajax({
-    url: "/account/job/selectedStatus/",
+    url: "/appointment/get/driver-appointment/",
     method: "POST",
     data: {
-        selectedStatus: selectedStatus,
-        startDate: startDate,
-        endDate: endDate,
+      selectedStatus: selectedStatus,
     },
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-CSRFToken", csrftoken);
     },
     success: function (data) {
-      setDataInTable("datatable-buttons", data.data);
+      if (data.status) {
+        setCalendar(data);
+      }
     },
   });
 }

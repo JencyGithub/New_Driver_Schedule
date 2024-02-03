@@ -55,6 +55,7 @@ class BasePlant(models.Model):
 
 class DriverShift(models.Model):
     verified = models.BooleanField(default=False)
+    verifiedBy = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')),default = 'Day')
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)

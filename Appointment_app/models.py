@@ -79,6 +79,7 @@ class AppointmentDriver(models.Model):
 class PreStart(models.Model):
     preStartName = models.CharField(max_length=50, default='', null=True)
     createdDate = models.DateTimeField(default=None, null=True)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def __str__(self):
         return str(self.preStartName)    

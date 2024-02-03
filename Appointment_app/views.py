@@ -179,16 +179,8 @@ def appointmentSave(request,id=None):
 
     return redirect('Appointment:findJob')        
 
-def findJob(request):
-<<<<<<< Updated upstream
-    jobs = Appointment.objects.filter(scheduled = False)
-    params = {
-        'jobs' : jobs
-    }
-    return render(request, 'Appointment/findJob.html',params)
-
 @csrf_protect
-=======
+def findJob(request):
     drivers = Driver.objects.all().order_by('name')
     vehicles = AdminTruck.objects.all().order_by('adminTruckNumber')
     locations = BasePlant.objects.all().order_by('basePlant')
@@ -236,7 +228,6 @@ def getSingleAppointmentData(request):
     
     
 @csrf_protect
->>>>>>> Stashed changes
 def getTruckAndDriver(request):
     startDateTime = request.POST.get('startDateTime')
     endDateTime = request.POST.get('endDateTime')
@@ -320,6 +311,7 @@ def preStartSave(request):
     preStartObj = PreStart()
     preStartObj.preStartName = preStartName
     preStartObj.createdDate = currentDateTime
+    preStartObj.createdBy = request.user
     preStartObj.save()
     for question in range(1,int(questionCount)):
         questionObj = PreStartQuestion()
