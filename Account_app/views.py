@@ -2461,11 +2461,9 @@ def rateCardForm(request, id=None , clientId=None):
     surchargesEntry =Surcharge.objects.all()
     rateCardDates = []
     if id:
-        rateCard = RateCard.objects.get(pk=id)
-        tds = rateCard.tds
-        
+        rateCard = RateCard.objects.get(pk=id)        
         costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values()
-       
+
         for obj in costParameters:
             rateCardDates.append(str(obj['start_date']) + ' to ' + str(obj['end_date']))
         
@@ -2764,7 +2762,6 @@ def rateCardSave(request, id=None, edit=0):
     return redirect('gearBox:clientTable')
 
 
-
 # ```````````````````````````````````
 # Past trip
 # ```````````````````````````````````
@@ -2896,6 +2893,8 @@ def surchargeSave(request, id=None):
     dataList = {
         'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
     }
+    print(dataList)
+    # return HttpResponse('here')
     if id is not None:
         updateIntoTable(record_id=id, tableName='Surcharge', dataSet=dataList)
         messages.success(request, 'Surcharge updated successfully')
@@ -2910,7 +2909,7 @@ def surchargeSave(request, id=None):
         cmd = ["python", "manage.py", "runscript", 'addSurchargeToRateCard','--continue-on-error']
         subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(request, 'Surcharge added successfully')
-        return redirect(request.META.get('HTTP_REFERER'))
+        # return redirect(request.META.get('HTTP_REFERER'))
 
     return redirect('Account:surchargeTable')
 
