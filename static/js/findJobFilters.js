@@ -69,77 +69,10 @@ function setDataInTable(tableId, data) {
 }
 
 $(document).ready(function () {
-<<<<<<< Updated upstream
-  $("#datatable-buttons").DataTable();
-
-  $("#multiSelect").select2({
-=======
   $("#status").select2({
->>>>>>> Stashed changes
     placeholder: "Select status",
   });
 
-<<<<<<< Updated upstream
-  var predefinedRanges = {
-    Today: [moment(), moment()],
-    Yesterday: [moment().subtract(1, "days"), moment().subtract(1, "days")],
-    "This Month": [moment().startOf("month"), moment().endOf("month")],
-    "This Year": [moment().startOf("year"), moment().endOf("year")],
-  };
-
-  // Set default date range to the last 7 days
-  var defaultStartDate = moment().subtract(1, "days");
-  var defaultEndDate = moment();
-
-  // Initialize the DateRangePicker with predefined ranges
-  dateRangePickerInstance= $("#dateRangePicker").daterangepicker({
-    ranges: predefinedRanges,
-    opens: "left",
-    startDate: defaultStartDate,
-    endDate: defaultEndDate,
-    placeholder: "Select Date",
-  });
-
-  // Optionally, define a callback function when the user applies the date range
-  $("#dateRangePicker").on("apply.daterangepicker", function (ev, picker) {
-    let startDate = picker.startDate.format("YYYY-MM-DD");
-    let endDate = picker.endDate.format("YYYY-MM-DD");
-    let selectedStatus = $("#multiSelect").val();
-
-    getDataFilter(startDate, endDate, selectedStatus);
-
-    // console.log('Start Date: ' + picker.startDate.format('YYYY-MM-DD'));
-    // console.log('End Date: ' + picker.endDate.format('YYYY-MM-DD'));
-  });
-  
-  // Event listener for changes in the selected values
-  $("#multiSelect").on("change", function () {
-
-    var startDate = $('#dateRangePicker').data('daterangepicker').startDate.format('YYYY-MM-DD');
-    var endDate = $('#dateRangePicker').data('daterangepicker').endDate.format('YYYY-MM-DD');
-
-    var selectedStatus = $(this).val();
-    console.log(selectedStatus)
-    getDataFilter(startDate, endDate, selectedStatus);
-    /*
-
-    $.ajax({
-      url: "/account/job/selectedStatus/",
-      method: "POST",
-      data: {
-        selectedStatus: selectedStatus,
-      },
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      },
-      success: function (data) {
-        setDataInTable("datatable-buttons", data.data);
-      },
-    });
-    */
-  });
-});
-=======
   $("#closeBtn").on("click", function () {
     $("#appointmentModel").modal("hide");
   });
@@ -411,4 +344,3 @@ function showAppointment(appointmentId) {
     },
   });
 }
->>>>>>> Stashed changes
