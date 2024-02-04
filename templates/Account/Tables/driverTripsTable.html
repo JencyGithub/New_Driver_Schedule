@@ -64,7 +64,7 @@
             </form>
             <div class="clearfix"></div>
           </div>
-          <div class="x_content" style="max-height: 120vh; overflow-y: auto;>
+          <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
             <div class="row">
               <div class="col-sm-12">
                 <div class="card-box table-responsive">
@@ -74,6 +74,7 @@
                         <th>ShiftType</th>
                         <th>driverName</th>
                         <th>shiftDate</th>
+                        <th>Verified By</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -84,6 +85,7 @@
                         <td>{{ shift.shiftType }}</td>
                         <td>{{ shift.driverName }}</td>
                         <td>{{ shift.shiftDate }}</td>
+                        <td>{{ shift.verifiedBy }}</td>
                         <td>
                             <a href="{% url 'Account:DriverTripEdit' id=shift.id%}" title="update">
                               <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>

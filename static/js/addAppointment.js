@@ -1,5 +1,30 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
+$(document).ready(function(){
+    checkRecurring()
+});
+
+$('#repeats').on('change', function(){
+    checkRecurring()
+})
+
+function checkRecurring() {
+    let repeats = $('#repeats').val();
+    if (repeats == 'NoRecurring') {
+        $('.noRecurring').removeClass('d-none');
+        $('.dailyRecurring').addClass('d-none');
+        $('.days').addClass('d-none');
+    }else if(repeats == 'Daily'){
+        $('.noRecurring').addClass('d-none');
+        $('.dailyRecurring').removeClass('d-none');
+        $('.days').addClass('d-none');
+    }else if(repeats == 'Custom'){
+        $('.noRecurring').addClass('d-none');
+        $('.dailyRecurring').removeClass('d-none');
+        $('.days').removeClass('d-none');
+    }
+}
+
 var validator = new FormValidator({
     "events": ['blur', 'input', 'change']
 }, document.forms[0]);
@@ -33,6 +58,7 @@ function setEndDateTime(dataRow){
 $('#startDateTime').on('change',function(){
     setTruckAndDriver(this);
 });
+
 
 function setTruckAndDriver(dataRow){
     startDateTime = $("#startDateTime").val()
@@ -94,21 +120,6 @@ function checkOrigin(){
                     $('#originLongitude').attr('readonly',true)
                     $('#locationDiv').addClass('d-none')
                     $('#errorMsgForOrigin').addClass('d-none')
-                }else{
-                    $('#originAddress').val('')
-                    $('#originPhone').val('')
-                    $('#originPersonOnName').val('')
-                    $('#originLatitude').val('')
-                    $('#originLongitude').val('')
-                    $('#errorMsgForOrigin').val('')
-                    $('#originAddress').removeAttr('readonly')
-                    $('#originPhone').removeAttr('readonly')
-                    $('#originPersonOnName').removeAttr('readonly')
-                    $('#originLatitude').removeAttr('readonly')
-                    $('#originLongitude').removeAttr('readonly')
-                    $('#errorMsgForOrigin').removeClass('d-none')
-                    $('#locationDiv').removeClass('d-none')
-                    $("#originAddVal").val(1)
                 }
             },
         });
@@ -120,8 +131,27 @@ function checkOrigin(){
 
 function openBox(checked,id){
     if ($(`#${checked.id}`).prop('checked')) {
-        $(`#${id}`).removeAttr('disabled')
+        $(`#${id}`).removeAttr('disabled');
+        $(`#${id}`).attr('required', 'true');
     }else{
         $(`#${id}`).attr('disabled', true)
+        $(`#${id}`).removeAttr('required');
     }
+}
+
+function addOrigin(){
+    $('#originAddress').val('')
+    $('#originPhone').val('')
+    $('#originPersonOnName').val('')
+    $('#originLatitude').val('')
+    $('#originLongitude').val('')
+    $('#errorMsgForOrigin').val('')
+    $('#originAddress').removeAttr('readonly')
+    $('#originPhone').removeAttr('readonly')
+    $('#originPersonOnName').removeAttr('readonly')
+    $('#originLatitude').removeAttr('readonly')
+    $('#originLongitude').removeAttr('readonly')
+    // $('#errorMsgForOrigin').removeClass('d-none')
+    $('#locationDiv').removeClass('d-none')
+    $("#originAddVal").val(1)
 }

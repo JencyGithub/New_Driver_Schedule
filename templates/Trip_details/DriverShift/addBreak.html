@@ -27,7 +27,7 @@
                             <hr>
                             <div class="col-md-6 col-12 my-1">
                                 <label for="startDateTime">Start break time:</label>
-                                <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" min="{{shiftObj.startDateTime}}" max="{{currentTime}}" required>
+                                <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" required>
                             </div>
                             <div class="col-md-6 col-12 my-1">
                                 <label for="endDateTime">End break time:</label>
@@ -68,7 +68,8 @@
             var startDateTimeValue = $(this).val();
     
             // Set the max attribute for the endDateTime input
-            $('#endDateTime').attr('min', startDateTimeValue).removeAttr('readonly');
+            // $('#endDateTime').attr('min', startDateTimeValue).removeAttr('readonly');
+            $('#endDateTime').removeAttr('readonly');
         });
     });
 </script>

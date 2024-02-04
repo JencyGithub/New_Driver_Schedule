@@ -40,13 +40,8 @@
         <div class="x_panel">
           <div class="x_title">
             <h2><i class="fa fa-bars"></i> Escalation <small>Table</small></h2>
-            <a href="{% url 'Account:EscalationForm' %}" class="btn btn-dark float-right">Add</a>
+            <a href="{% url 'Account:EscalationForm' %}" class="btn btn-dark btn-sm float-right">Add</a>
 
-            <ul class="nav navbar-right panel_toolbox">
-              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-              </li>
-              </li>
-            </ul>
             <div class="clearfix"></div>
           </div>
 
@@ -83,7 +78,7 @@
                                 <th>Added By</th>
                                 <th>EscalationDate</th>
                                 <th>EscalationAmount</th>
-                                <th>action</th>
+                                <th class="text-center w-25">Action</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -93,14 +88,12 @@
                                 <td class="text-capitalize">{{ data.userId.username }}</td>
                                 <td>{{ data.escalationDate }}</td>
                                 <td>{{ data.escalationAmount }}</td>
-                                <td>
-                                   <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update"
-                                    class="btn btn-default btn-sm ">Update</a>
+                                <td class="d-flex justify-content-around">
+                                  <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update"
+                                  class="btn btn-default btn-sm ">Update</a>
                                   </a> 
                                   
-                                  <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update">
-                                    <a href="{% url 'Account:ViewBulkEscalationData' escalationId=data.id %}" class="btn btn-default btn-sm float-right">View</a>
-                                  </a> 
+                                  <a href="{% url 'Account:ViewBulkEscalationData' escalationId=data.id %}" class="btn btn-default btn-sm">View</a>
                               </td>
                               </tr>
                               {% endfor %}

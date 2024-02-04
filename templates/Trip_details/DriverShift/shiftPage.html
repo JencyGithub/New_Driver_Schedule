@@ -71,9 +71,13 @@
                             </table>
                         </div>
                         <div class="col-md-7 my-3">
-                            <h6 class="card-title text-uppercase text-default">Trip Details :</h6>
+                            <h6 class="card-title text-uppercase text-default d-inline-block ">Trip Details :</h6>
+                            <div class="form-check form-check-inline float-end">
+                                <input class="form-check-input" type="checkbox" id="forgetEnd" name="forgetEnd" value="forgetEnd" style="width: 0.9em;height: 0.9em;">
+                                <label class="form-check-label" for="forgetEnd" style="font-size: 0.9rem;cursor: pointer;">Forgot to end shift earlier</label>
+                            </div>
                             {% for trip in currentTrips %}
-                                <table class="table mt-3 mb-2 bg-light">
+                                <table class="table my-2 bg-light">
                                     <tr>
                                         <th class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}">Client Name: </th>
                                         <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %} text-capitalize">{{trip.clientName}}</td>
@@ -91,8 +95,25 @@
                                         <td class="py-2 {% if not trip.endDateTime %}bg-secondary text-white{% endif %}"><span>{{trip.truckNum}}</span></td>
                                     </tr>
                                 </table>
-                            {% endfor %}    
-                            <a href="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" class="btn btn-sm btn-default w-auto float-end px-3">End Trip</a>
+                            {% endfor %} 
+                            <form action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" method="post">
+                                {% csrf_token %}
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-8 col-sm-8 my-2">
+                                            <div class="endDateTime d-none">
+                                                <label for="endDateTime" style="font-size: 0.8em;">End date Time:<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control"  type="datetime-local" name="endDateTime" style="padding: 0.25rem 0.2rem;" id="endDateTime">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 d-flex justify-content-end mt-auto my-2">
+                                            <button type="submit" class="btn btn-sm btn-default w-auto float-end px-3" id="endShift">End Shift</button>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -182,5 +203,28 @@
 {% endblock %}
 
 {% block footerStyleEnd %}
+<script>
+    $(document).ready(function(){
+        $('#forgetEnd').on('change', function(){
+            if($(this).is(':checked')){
+                $('.endDateTime').removeClass('d-none');
+                $('.endDateTime input').attr('required', true);
+            }else{
+                $('.endDateTime').addClass('d-none');
+                $('.endDateTime input').removeAttr('required');
+            }
+        })
 
+        $('#endShift').on('click', function(event) {
+            if ($('#forgetEnd').is(':checked')) {
+                if(!$('#endDateTime').val()){
+                    console.log($('#endDateTime').val())
+                    alert("Please enter the End Time");
+                    event.preventDefault();
+                }
+            }
+        });
+    });
+
+</script>
 {% endblock %}

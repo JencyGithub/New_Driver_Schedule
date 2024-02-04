@@ -15,7 +15,6 @@ def timeDifference(startTime,endTime):
     start_datetime = datetime.strptime(startTime, '%H:%M:%S')
     end_datetime = datetime.strptime(endTime, '%H:%M:%S')
     time_difference_minutes = (end_datetime - start_datetime).total_seconds() / 60
-# Calculate the difference in minutes
     return  time_difference_minutes
 
     

@@ -13,6 +13,7 @@ from django.http import Http404
 from django.contrib.auth.models import User , Group
 import os, colorama, subprocess
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password
 
 
 # Create your views here.
@@ -95,6 +96,61 @@ def driversView(request):
     }
     return render(request,'GearBox/table/driverTable.html',params)
 
+def adminStaffView(request):
+    staff = User.objects.exclude(groups__name = "Driver")
+    params = {
+        'staff' : staff
+    }
+    return render(request,'GearBox/table/adminStaffTable.html',params)
+
+def adminStaffForm(request, id=None):
+    userObj = None
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+    params = {
+        'userObj' : userObj
+    }
+    return  render(request,'GearBox/adminStaffForm.html', params)
+
+@csrf_protect
+def adminStaffSave(request, id=None):
+    firstName = request.POST.get('firstName')
+    lastName = request.POST.get('lastName')
+    password = request.POST.get('password')
+    email = request.POST.get('email')
+    group = request.POST.get('userType')
+    isActive = True
+    userObj = None
+    msg = "Staff created successfully."
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+        isActive = request.POST.get('isActive')
+        msg = "Staff updated successfully."
+    else:
+        existingUser = User.objects.filter(Q(email=email) | Q(username=firstName.lower().strip())).first()
+        if existingUser:
+            messages.error( request, "This user is already Exist.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        userObj = User()
+        userObj.username=firstName.lower().strip()
+        userObj.password=make_password(password) 
+        
+    userObj.first_name=firstName
+    userObj.last_name=lastName
+    userObj.email=email
+    userObj.is_staff=True 
+    userObj.is_active= True if isActive else False 
+    userObj.save() 
+    
+    userObj.groups.clear()
+    
+    if group != 'Admin':
+        groupObj = Group.objects.get(name=group)
+        userObj.groups.add(groupObj)
+    
+    messages.success( request, msg)
+    return redirect('gearBox:adminStaffTable')
+
 
 def driverForm(request, id=None):
     data = None
@@ -107,7 +163,6 @@ def driverForm(request, id=None):
 
 
 @csrf_protect
-@api_view(['POST'])
 def driverFormSave(request, id= None):
     users = User.objects.all()
     drivers = Driver.objects.all()
@@ -221,6 +276,7 @@ def truckForm(request, id=None):
         for i in connections:
             i['count'] = count_
             count_ += 1
+            i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
             preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
             i['pre_start_name'] = preStartObj.preStartName
             # return HttpResponse(i['pre_start_name'])
@@ -239,7 +295,6 @@ def truckForm(request, id=None):
     return render(request,'GearBox/truck/truckForm.html',params)
 
 @csrf_protect
-@api_view(['POST'])
 def truckFormSave(request):
     return redirect('gearBox:truckAxlesFormView')
     
@@ -317,7 +372,6 @@ def truckConnectionForm(request, id):
     return render(request,'GearBox/clientTruckConnectionForm.html',params)
 
 @csrf_protect
-@api_view(['POST'])
 def truckConnectionSave(request,id):
     adminTruck = AdminTruck.objects.get(id=id)
     rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
@@ -330,7 +384,8 @@ def truckConnectionSave(request,id):
         'clientTruckId' : request.POST.get('clientTruckNumber'),
         'truckType' : request.POST.get('truckType'),
         'startDate' : request.POST.get('startDate'),
-        'endDate' : request.POST.get('endDate')
+        'endDate' : request.POST.get('endDate'),
+        'createdBy' : request.user
     }
 
     existingData = ClientTruckConnection.objects.filter(Q(truckNumber = adminTruck,clientId=dataList['clientId'],startDate__gte = dataList['startDate'],startDate__lte = dataList['endDate'])|Q(truckNumber = adminTruck,clientId=dataList['clientId'],endDate__gte = dataList['startDate'],endDate__lte = dataList['endDate'])).first()
@@ -387,21 +442,33 @@ def clientForm(request, id=None):
     return render(request, 'GearBox/clientForm.html', params)
 
 @csrf_protect
-@api_view(['POST'])
 def clientChange(request, id=None):
-    
-    dataList = {
-        'name' : request.POST.get('name').lower().strip(),
-        'email' : request.POST.get('email'),
-        'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False
-    }
-    
+    clientObj = None
     if id:
-        updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
-        messages.success(request,'Updated successfully')
+        clientObj = Client.objects.filter(pk=id).first()
     else:
-        insertIntoTable(tableName='Client',dataSet=dataList)
-        messages.success(request,'Added successfully')
+        clientObj = Client()
+
+    clientObj.name = request.POST.get('name').lower().strip()  
+    clientObj.email = request.POST.get('email')
+    clientObj.docketGiven = True if request.POST.get('docketGiven') == 'on' else False  
+    clientObj.createdBy = request.user 
+    clientObj.save()
+
+    
+    # dataList =  {
+    #     'name' : request.POST.get('name').lower().strip(),
+    #     'email' : request.POST.get('email'),
+    #     'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False,
+    #     'createdBy' : request.user
+    # }
+    
+    # if id:
+    #     updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
+    #     messages.success(request,'Updated successfully')
+    # else:
+    #     insertIntoTable(tableName='Client',dataSet=dataList)
+    #     messages.success(request,'Added successfully')
 
     return redirect('gearBox:clientTable')
 

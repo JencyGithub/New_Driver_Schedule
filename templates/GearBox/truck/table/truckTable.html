@@ -51,6 +51,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Truck No</th>
+                                                <th>Created By</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -58,6 +59,7 @@
                                             {% for truck in adminTrucks %}
                                             <tr>
                                                 <td>{{ truck.adminTruckNumber}}</td>
+                                                <td>{{ truck.createdBy.username }}</td>
                                                 <td>
                                                     <a href="{% url 'gearBox:truckView' id=truck.id %}">
                                                         <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>

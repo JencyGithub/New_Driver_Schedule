@@ -50,6 +50,15 @@ urlpatterns = [
     path('driverForm/edit/<int:id>/', views.driverForm, name='driverFormEdit'),
     path('driverForm/edit/save/<int:id>/', views.driverFormSave, name='driverFormEditSave'),
     
+
+    # Admin staff 
+    path('admin-staff/', views.adminStaffView, name='adminStaffTable'),
+    path('admin-staff/add/view/', views.adminStaffForm, name='adminStaffForm'),
+    path('admin-staff/add/save/', views.adminStaffSave, name='adminStaffSave'),
+
+    path('admin-staff/edit/view/<int:id>/', views.adminStaffForm, name='adminStaffEdit'),
+    path('admin-staff/edit/save/<int:id>/', views.adminStaffSave, name='adminStaffEditSave'),
+
     # Truck Table 
     
     path('truckTable', views.truckTable, name='truckTable'),

@@ -1,0 +1,283 @@
+--------------------------------------1------------------------------------
+1. SELECT movie_id, title, AVG(rating) AS average_rating
+FROM Movies
+JOIN Reviews ON Movies.movie_id = Reviews.movie_id
+GROUP BY movie_id, title
+HAVING AVG(rating) > 4;
+
+2.SELECT cinema_id, name, location, COUNT(*) AS booking_count
+FROM Cinemas
+JOIN Screenings ON Cinemas.cinema_id = Screenings.cinema_id
+JOIN Bookings ON Screenings.screening_id = Bookings.screening_id
+WHERE MONTH(Screenings.start_time) = [your_month]
+GROUP BY cinema_id, name, location
+ORDER BY booking_count DESC
+LIMIT 1;
+
+3.SELECT user_id, username, COUNT(*) AS booking_count
+FROM Users
+JOIN Bookings ON Users.user_id = Bookings.user_id
+GROUP BY user_id, username
+ORDER BY booking_count DESC
+LIMIT 5;
+
+4.SELECT movie_id, title
+FROM Movies
+WHERE movie_id NOT IN (SELECT DISTINCT movie_id FROM Reviews);
+
+5.SELECT cinema_id, name, location, SUM(Ticket_Price) AS total_revenue
+FROM Cinemas
+JOIN Screenings ON Cinemas.cinema_id = Screenings.cinema_id
+JOIN Bookings ON Screenings.screening_id = Bookings.screening_id
+WHERE YEAR(Screenings.start_time) = [your_year]
+GROUP BY cinema_id, name, location;
+
+6.SELECT movie_id, title, MAX(consecutive_screenings) AS max_consecutive_screenings
+FROM (
+    SELECT movie_id, title, cinema_id,
+           ROW_NUMBER() OVER (PARTITION BY movie_id, cinema_id ORDER BY start_time) -
+           ROW_NUMBER() OVER (PARTITION BY movie_id, cinema_id ORDER BY end_time) AS consecutive_screenings
+    FROM Screenings
+) AS consecutive_movies
+GROUP BY movie_id, title
+ORDER BY max_consecutive_screenings DESC
+LIMIT 1;
+
+7.SELECT u.user_id, u.username, COUNT(*) AS booking_count
+FROM Users u
+JOIN Bookings b ON u.user_id = b.user_id
+JOIN Screenings s ON b.screening_id = s.screening_id
+JOIN Movies m ON s.movie_id = m.movie_id
+WHERE m.genre = '[your_genre]'
+GROUP BY u.user_id, u.username;
+
+8.SELECT cinema_id, name, location
+FROM Cinemas
+WHERE capacity <= (
+    SELECT COUNT(*)
+    FROM Bookings
+    JOIN Screenings ON Bookings.screening_id = Screenings.screening_id
+    WHERE Screenings.cinema_id = Cinemas.cinema_id
+    AND Screenings.start_time = '[your_date_and_time]'
+);
+
+9.SELECT m.movie_id, m.title, AVG(r.rating) AS average_rating
+FROM Movies m
+JOIN Reviews r ON m.movie_id = r.movie_id
+WHERE m.release_date >= DATE_SUB(CURRENT_DATE, INTERVAL 3 MONTH)
+GROUP BY m.movie_id, m.title;
+
+10.SELECT user_id, username, movie_id, COUNT(DISTINCT cinema_id) AS num_cinemas_booked
+FROM Users
+JOIN Bookings ON Users.user_id = Bookings.user_id
+GROUP BY user_id, username, movie_id
+HAVING num_cinemas_booked > 1;
+
+
+---------------------------2----------------------------------
+
+1.SELECT *
+FROM Employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM Employee_Projects);
+
+2.SELECT project_id, project_name, (actual_spent - budget) AS over_budget_amount
+FROM Projects
+WHERE actual_spent > budget;
+
+3.SELECT e.*
+FROM Employees e
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+JOIN Projects p ON ep.project_id = p.project_id
+JOIN Departments d ON e.department_id = d.department_id
+WHERE e.employee_id = d.manager_id;
+
+4.SELECT e.first_name, e.last_name
+FROM Employees e
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+JOIN Projects p ON ep.project_id = p.project_id
+GROUP BY e.employee_id
+HAVING COUNT(DISTINCT p.project_id) > 1 AND SUM(p.budget) > [specified_amount];
+
+5.SELECT d.department_id, d.department_name, COUNT(e.employee_id) AS total_employees
+FROM Departments d
+LEFT JOIN Employees e ON d.department_id = e.department_id
+GROUP BY d.department_id, d.department_name;
+
+6.SELECT p.project_id, p.project_name, SUM(ep.hours_worked) AS total_hours_worked
+FROM Projects p
+JOIN Employee_Projects ep ON p.project_id = ep.project_id
+GROUP BY p.project_id, p.project_name
+ORDER BY total_hours_worked DESC
+LIMIT 1;
+
+7.SELECT e.first_name, e.last_name
+FROM Employees e
+WHERE e.employee_id NOT IN (
+    SELECT DISTINCT e.employee_id
+    FROM Employees e
+    JOIN Departments d ON e.department_id = d.department_id
+    JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+    JOIN Projects p ON ep.project_id = p.project_id
+    WHERE e.employee_id = d.manager_id
+);
+
+8.SELECT *
+FROM Projects
+WHERE start_date > CURRENT_DATE;
+
+9.SELECT e.employee_id, e.first_name, e.last_name, ep.project_id, SUM(ep.hours_worked) AS total_hours_worked
+FROM Employees e
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name, ep.project_id
+ORDER BY total_hours_worked DESC
+LIMIT 1;
+
+10.SELECT project_id, project_name, budget
+FROM Projects
+ORDER BY budget DESC
+LIMIT 1
+
+UNION
+
+SELECT project_id, project_name, budget
+FROM Projects
+ORDER BY budget ASC
+LIMIT 1;
+
+11.SELECT d.department_id, d.department_name, AVG(ep.hourly_rate) AS average_hourly_rate
+FROM Departments d
+JOIN Employees e ON d.department_id = e.department_id
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+GROUP BY d.department_id, d.department_name
+HAVING AVG(ep.hourly_rate) > [specified_value];
+
+12.SELECT e.employee_id, e.first_name, e.last_name
+FROM Employees e
+WHERE NOT EXISTS (
+    SELECT DISTINCT p.project_id
+    FROM Projects p
+    WHERE NOT EXISTS (
+        SELECT ep.project_id
+        FROM Employee_Projects ep
+        WHERE ep.employee_id = e.employee_id AND ep.project_id = p.project_id
+    )
+);
+
+13.SELECT p1.project_id AS project1_id, p1.project_name AS project1_name,
+       p2.project_id AS project2_id, p2.project_name AS project2_name,
+       p1.start_date
+FROM Projects p1
+JOIN Projects p2 ON p1.project_id < p2.project_id AND p1.start_date = p2.start_date;
+
+14.SELECT e.employee_id, e.first_name, e.last_name
+FROM Employees e
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+JOIN Projects p ON ep.project_id = p.project_id
+WHERE p.budget > (SELECT AVG(budget) FROM Projects);
+
+15.SELECT e.employee_id, e.first_name, e.last_name
+FROM Employees e
+JOIN Employee_Projects ep ON e.employee_id = ep.employee_id
+JOIN Projects p ON ep.project_id = p.project_id
+JOIN Employees e2 ON e2.employee_id = e.employee_id AND e2.department_id <> e.department_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(DISTINCT e2.department_id) > 1;
+
+
+----------------------3----------------------
+1.SELECT student_id, first_name, last_name, COUNT(DISTINCT course_id) AS enrolled_courses_count
+FROM Enrollments
+JOIN Students ON Enrollments.student_id = Students.student_id
+GROUP BY student_id, first_name, last_name
+HAVING COUNT(DISTINCT course_id) > 1;
+
+2.SELECT c.course_id, course_name, d.department_name, COUNT(DISTINCT e.student_id) AS total_students_enrolled
+FROM Courses c
+JOIN Departments d ON c.department_id = d.department_id
+LEFT JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_id, course_name, d.department_name;
+
+3.SELECT c.course_id, course_name, AVG(grade) AS average_grade
+FROM Courses c
+JOIN Enrollments e ON c.course_id = e.course_id
+WHERE c.department_id = [your_department_id]
+GROUP BY c.course_id, course_name;
+
+4.SELECT s.student_id, s.first_name, s.last_name, s.enrollment_date, COUNT(DISTINCT e.course_id) AS enrolled_courses_count
+FROM Students s
+LEFT JOIN Enrollments e ON s.student_id = e.student_id
+GROUP BY s.student_id, s.first_name, s.last_name, s.enrollment_date;
+
+5.WITH DepartmentAverageGrade AS (
+    SELECT d.department_id, d.department_name, AVG(e.grade) AS average_grade
+    FROM Departments d
+    JOIN Courses c ON d.department_id = c.department_id
+    LEFT JOIN Enrollments e ON c.course_id = e.course_id
+    GROUP BY d.department_id, d.department_name
+)
+
+SELECT *
+FROM DepartmentAverageGrade
+WHERE average_grade = (SELECT MAX(average_grade) FROM DepartmentAverageGrade)
+
+UNION
+
+SELECT *
+FROM DepartmentAverageGrade
+WHERE average_grade = (SELECT MIN(average_grade) FROM DepartmentAverageGrade);
+
+6.SELECT c.course_id, course_name, COUNT(e.student_id) AS total_enrollments,
+       MAX(e.grade) AS highest_grade, MIN(e.grade) AS lowest_grade
+FROM Courses c
+LEFT JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY c.course_id, course_name;
+
+7.WITH CourseAverageGrade AS (
+    SELECT c.course_id, course_name, AVG(e.grade) AS average_grade
+    FROM Courses c
+    LEFT JOIN Enrollments e ON c.course_id = e.course_id
+    GROUP BY c.course_id, course_name
+)
+
+SELECT c.course_id, course_name, average_grade, s.first_name AS highest_grade_student
+FROM CourseAverageGrade c
+JOIN Enrollments e ON c.course_id = e.course_id
+JOIN Students s ON e.student_id = s.student_id
+WHERE e.grade = (SELECT MAX(grade) FROM Enrollments WHERE course_id = c.course_id)
+
+UNION
+
+SELECT c.course_id, course_name, average_grade, s.first_name AS lowest_grade_student
+FROM CourseAverageGrade c
+JOIN Enrollments e ON c.course_id = e.course_id
+JOIN Students s ON e.student_id = s.student_id
+WHERE e.grade = (SELECT MIN(grade) FROM Enrollments WHERE course_id = c.course_id);
+
+8.WITH DepartmentEnrollment AS (
+    SELECT d.department_id, d.department_name, COUNT(DISTINCT e.student_id) AS enrolled_students_count
+    FROM Departments d
+    JOIN Courses c ON d.department_id = c.department_id
+    LEFT JOIN Enrollments e ON c.course_id = e.course_id
+    GROUP BY d.department_id, d.department_name
+)
+
+SELECT d.department_id, d.department_name, enrolled_students_count, AVG(e.grade) AS average_grade
+FROM DepartmentEnrollment d
+LEFT JOIN Courses c ON d.department_id = c.department_id
+LEFT JOIN Enrollments e ON c.course_id = e.course_id
+GROUP BY d.department_id, d.department_name, enrolled_students_count;
+
+9.SELECT student_id, first_name, last_name, AVG(grade) AS average_grade
+FROM Enrollments
+JOIN Students ON Enrollments.student_id = Students.student_id
+GROUP BY student_id, first_name, last_name
+ORDER BY average_grade DESC
+LIMIT 1;
+
+10.SELECT s.student_id, s.first_name, s.last_name, d.department_name
+FROM Students s
+JOIN Departments d ON s.department_id = d.department_id
+WHERE s.student_id NOT IN (SELECT DISTINCT student_id FROM Enrollments);
+
+
+
