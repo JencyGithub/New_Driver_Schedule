@@ -56,6 +56,30 @@ urlpatterns = [
     path('truckForm', views.truckForm, name='truckForm'),
     path('truckForm/add/', views.truckFormSave, name='truckFormAdd'),
     
+    path('truckForm/Axles/View', views.truckAxlesFormView, name='truckAxlesFormView'),
+    path('truckForm/Axles/Save', views.truckAxlesFormSave, name='truckAxlesFormSave'),
+    
+    path('truckForm/Setting/View', views.truckSettingFormView, name='truckSettingFormView'),
+    path('truckForm/Setting/Save', views.truckSettingFormSave, name='truckSettingFormSave'),
+    
+    path('truckForm/Reminders/View', views.truckRemindersFormView, name='truckRemindersFormView'),
+    path('truckForm/Reminders/Save', views.truckRemindersFormSave, name='truckRemindersFormSave'),
+    
+    path('truckForm/Parts/View', views.truckPartsFormView, name='truckPartsFormView'),
+    path('truckForm/Parts/Save', views.truckPartsFormSave, name='truckPartsFormSave'),
+    
+    path('truckForm/History/View', views.truckHistoryFormView, name='truckHistoryFormView'),
+    path('truckForm/History/Save', views.truckHistoryFormSave, name='truckHistoryFormSave'),
+    
+    path('truckForm/Odometer/View', views.truckOdometerFormView, name='truckOdometerFormView'),
+    path('truckForm/Odometer/Save', views.truckOdometerFormSave, name='truckOdometerFormSave'),
+    
+    path('truckForm/Compliance/View', views.truckComplianceFormView, name='truckComplianceFormView'),
+    path('truckForm/Compliance/Save', views.truckComplianceFormSave, name='truckComplianceFormSave'),
+    
+    path('truckForm/Documents/View', views.truckDocumentsFormView, name='truckDocumentsFormView'),
+    path('truckForm/Documents/Save', views.truckDocumentsFormSave, name='truckDocumentsFormSave'),
+    
     path('truck/view/<int:id>/', views.truckForm, name='truckView'),
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
@@ -63,8 +87,7 @@ urlpatterns = [
     path('getRateCard/', views.getRateCard, name='getRateCard'),
     
     # dockument 
-    path('document/', views.documentView, name="documentView"),
-    path('document/form', views.documentForm, name="documentForm"),
+    # path('document/', views.documentView, name="do
     # Client Table
     
     path('clientTable', views.clientTable, name='clientTable'),

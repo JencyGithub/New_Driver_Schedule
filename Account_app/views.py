@@ -2105,7 +2105,7 @@ def reconciliationForm(request, dataType):
 def reconciliationAnalysis(request,dataType):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-
+    
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
