@@ -55,44 +55,49 @@
                       
                     </ul>
                   </li>
-                  <li><a href="#">Repairs</a></li>
-                  <li><a href="#">Services</a></li>
-                  <li><a href="#">Tyres</a></li>
-                  <li><a href="#">Fuel</a></li>
-                  <li><a href="#">Accidents</a></li>
-                  <li><a href="#">Tolls</a></li>
+                  {% if request.session.user_type == "SuperUser" %}
+                    <li><a href="#">Repairs</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Tyres</a></li>
+                    <li><a href="#">Fuel</a></li>
+                    <li><a href="#">Accidents</a></li>
+                    <li><a href="#">Tolls</a></li>
+                  {% endif %}
                 </ul>
               </li>
-              <li><a>Complince<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li><a href="#">Accredited Vehicles</a></li>
-                  <li><a href="#">Book Register</a></li>
-                  <li><a href="#">Inspection</a></li>
-                  <li><a href="#">Permits</a></li>
-                  <li><a href="#">Risk Assesments</a></li>
-                  <li><a href="#">Non Conformances</a></li>
-                  <li><a href="#">Reviews</a></li>
-                  <li><a href="#">Reminders</a></li>
-                </ul>
-              </li>
-              <li><a>Suppliers<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li><a href="#">Approved</a></li>
-                  <li><a href="#">Archived</a></li>
-                </ul>
-              </li>
-              <li><a>Inventory<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li><a href="#">Purchase Order</a></li>
-                  <li><a href="#">Current Stocks</a></li>
-                  <li><a href="#">Re-Order Stocks</a></li>
-                  <li><a href="#">Stores</a></li>
-                  <li><a href="#">Parts Usage</a></li>
-                </ul>
-              </li>              
+              {% if request.session.user_type == "SuperUser" %}
+                <li><a>Complince<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#">Accredited Vehicles</a></li>
+                    <li><a href="#">Book Register</a></li>
+                    <li><a href="#">Inspection</a></li>
+                    <li><a href="#">Permits</a></li>
+                    <li><a href="#">Risk Assesments</a></li>
+                    <li><a href="#">Non Conformances</a></li>
+                    <li><a href="#">Reviews</a></li>
+                    <li><a href="#">Reminders</a></li>
+                  </ul>
+                </li>
+                <li><a>Suppliers<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#">Approved</a></li>
+                    <li><a href="#">Archived</a></li>
+                  </ul>
+                </li>
+                <li><a>Inventory<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li><a href="#">Purchase Order</a></li>
+                    <li><a href="#">Current Stocks</a></li>
+                    <li><a href="#">Re-Order Stocks</a></li>
+                    <li><a href="#">Stores</a></li>
+                    <li><a href="#">Parts Usage</a></li>
+                  </ul>
+                </li>   
+              {% endif %}           
               <li><a href="{% url "Appointment:preStartTableView" %}">Pre start</a>
-
-              <li><a href="#">Settings</a>
+              {% if request.session.user_type == "SuperUser" %}
+                <li><a href="#">Settings</a>
+              {% endif %}
             </ul>
           </li>
           {% comment %} Employee section {% endcomment %}
@@ -114,31 +119,33 @@
                   </li>
                 </ul>
               </li>
-              <li><a>Compliance<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="#">Medicals</a>
-                  </li>
-                  <li><a href="#">Training</a>
-                  </li>
-                </ul>
-              </li>
-              <li><a>Safety<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  <li class="sub_menu"><a href="#">Vehicle Accident</a>
-                  </li>
-                  <li><a href="#">Incedents</a>
-                  </li>
-                  <li><a href="#">Injury</a>
-                  </li>
-                  <li><a href="#">Equipment Issue</a>
-                  </li>
-                </ul>
-              </li>
-              <li><a>Reminder<span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                  
-                </ul>
-              </li>
+              {% if request.session.user_type == "SuperUser" %}
+                <li><a>Compliance<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li class="sub_menu"><a href="#">Medicals</a>
+                    </li>
+                    <li><a href="#">Training</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a>Safety<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    <li class="sub_menu"><a href="#">Vehicle Accident</a>
+                    </li>
+                    <li><a href="#">Incedents</a>
+                    </li>
+                    <li><a href="#">Injury</a>
+                    </li>
+                    <li><a href="#">Equipment Issue</a>
+                    </li>
+                  </ul>
+                </li>
+                <li><a>Reminder<span class="fa fa-chevron-down"></span></a>
+                  <ul class="nav child_menu">
+                    
+                  </ul>
+                </li>
+              {% endif %}
               <li><a>Availability<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                   <li><a>Leaves section<span class="fa fa-chevron-down"></span></a>
@@ -151,7 +158,9 @@
                   </li>
                 </ul>
               </li>
-              <li><a href="#">Settings</a>
+              {% if request.session.user_type == "SuperUser" %}
+                <li><a href="#">Settings</a>
+              {% endif %}
             </ul>
           </li>
           {% comment %} Jobs section {% endcomment %}
@@ -218,18 +227,16 @@
                   <li><a href="{% url 'Account:reconciliationForm' dataType=1 %}">Short Paid Report</a>
                   </li>
                   <li><a href="{% url 'Account:reconciliationForm' dataType=3 %}">Write Off Report</a>
-                  </li>
-                  
+                  </li>                  
                   <li><a href="#">Expense Report</a>
                   </li>
                   <li><a href="#">Custom Report</a>
                   </li>
                 </ul>
               </li>
-              <li><a href="#">Settings</a>
-
-
-              
+              {% if request.session.user_type == "SuperUser" %}
+                <li><a href="#">Settings</a>
+              {% endif %}            
               
             </ul>
           </li>
