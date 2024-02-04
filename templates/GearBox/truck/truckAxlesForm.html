@@ -6,34 +6,26 @@
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <style>
-    .custom-continer {
-        margin: 0 5rem;
+    .brick-wrapper {
+        padding: 5px;
+        margin-bottom: 15px; 
     }
-
-    .errorMsg {
-        font-size: 0.7rem;
-        color: rgb(255, 0, 0);
-        margin-top: 0.3rem;
-        list-style-type: none;
+    .brick {
+        background: #fff;
+        border: 2px solid #000;
+        height: 40px; 
+        margin-right: 15px; 
     }
-
-    .isInvalid {
-        border: 1px solid rgb(255, 0, 0) !important;
-        border-radius: 7px !important;
+    .brick-row .col:last-child .brick {
+        margin-right: 0;
     }
-
-
-
     @media (max-width: 576px) {
-        .custom-continer {
-            margin: 0;
+        .brick {
+            height: 50px; 
+            margin-right: 10px; 
         }
-    }
-
-    @media (max-width: 768px) {
-
-        .custom-continer {
-            margin: 0;
+        .brick-wrapper {
+            margin-bottom: 10px; 
         }
     }
 </style>
@@ -48,10 +40,12 @@
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
+                        {% comment %} <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
                         {% if data %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
+                        <div class="clearfix"></div> {% endcomment %}
+                        <h2 class="text-uppercase">Axles tab</h2>
                         <div class="clearfix"></div>
                     </div>
                
@@ -136,7 +130,159 @@
                     
                     <form action="{% url 'gearBox:truckAxlesFormSave' %}" method="post">
                         {% csrf_token %}
-                        <h2>Axles Form </h2>
+                        {% comment %} <h2>Axles Form </h2> {% endcomment %}
+                        <div class="x_title">
+                            <h6>Axle Configuration</h6>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>    
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>    
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>                    
+                        </div>
+                        <div class="x_content mt-5">
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>    
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>    
+                            <div class="col-md-5 col-sm-5">
+                                <div class="row brick-row pb-1">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>  
+                            <div class="col-md-2 col-sm-2">
+                            </div>
+                            <div class="col-md-5 col-sm-5 pb-1">
+                                <div class="row brick-row">
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                    <div class="col brick"></div>
+                                </div>
+                            </div>                    
+                        </div>
                         <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
                             <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
                         </div>

@@ -125,9 +125,8 @@
                         </ul>
                     </div> 
                     <!-- {% url 'gearBox:truckFormAdd' %} -->
-                    <form action="{% url 'gearBox:truckComplianceFormSave' %}" method="post">
+                    <form action="{% url 'gearBox:truckFormAdd' %}" method="post" class="" novalidate>
                         {% csrf_token %}
-                        {% comment %} <h2>Compliance Form </h2> {% endcomment %}
                         <div class="x_title">
                             <h6>Accreditation / Compliance</h6>
                             <div class="clearfix"></div>
@@ -186,9 +185,6 @@
                                     </div>                
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
-                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
                         </div>
                     </form>
                 </div>

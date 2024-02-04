@@ -420,6 +420,16 @@ def getRateCard(request):
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
 
+# Settings Form 
+
+def settingsForm(request):
+    return render(request,'GearBox/truck/settingsForm.html')
+
+# Compliance Form 
+
+def complianceForm(request):
+    return render(request,'GearBox/truck/complianceForm.html')
+
 # ```````````````````````````````````
 # Client 
 # ```````````````````````````````````

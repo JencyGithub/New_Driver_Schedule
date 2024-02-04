@@ -97,6 +97,13 @@ urlpatterns = [
     
     # dockument 
     # path('document/', views.documentView, name="do
+
+    # setting form 
+    path("settingsForm/", views.settingsForm, name="settingsForm"),
+
+    # Compliance form 
+    path("complianceForm/", views.complianceForm, name="complianceForm"),
+
     # Client Table
     
     path('clientTable', views.clientTable, name='clientTable'),
