@@ -498,6 +498,8 @@ class Escalation(models.Model):
     
     # 1:1st step, 2:2nd step, 3:3rd step, 4:4th step, 5:complete
     escalationStep = models.PositiveIntegerField(default=1)
+    
+    
     escalationAmount = models.IntegerField(default=0)
     errorId = models.PositiveIntegerField(default=None, null=True)
     

@@ -3187,6 +3187,7 @@ def EscalationTable(request):
     }
     return render(request,'Account/Tables/escalationTable.html' , params)
 def EscalationForm(request ,id = None):
+    truckConnectionObj = ClientTruckConnection.objects.all()
     escalationDocketObj = None
     escalationObj  = None
     clientNames = Client.objects.all()
@@ -3199,12 +3200,14 @@ def EscalationForm(request ,id = None):
     params ={
         'escalationObj':escalationObj,
         'clientNames':clientNames,
-        'escalationDocketObj':escalationDocketObj
+        'escalationDocketObj':escalationDocketObj,
+        'truckConnectionObj' : truckConnectionObj
     }
     return render(request , 'Account/manuallyEscalationForm1.html' , params)
 
 @csrf_protect
 def manuallyEscalationForm1Save(request):
+    return HttpResponse('here')
     docketNumber = request.POST.get('docketNumber')
     docketDate = request.POST.get('docketDate')
     invoiceFile = request.FILES.get('invoiceFile')
