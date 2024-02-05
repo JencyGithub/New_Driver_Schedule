@@ -251,6 +251,41 @@ def driverFormSave(request, id= None):
 
 # ````````````````````````````````````````
 
+# Compliance Section 
+
+# ````````````````````````````````````````````````
+
+def medicalsTable(request):
+    return render(request,'GearBox/Compliance/medicalsTable.html')
+
+def trainingTable(request):
+    return render(request, 'GearBox/Compliance/trainingTable.html')
+
+
+# ````````````````````````````````````````
+
+# Safety
+
+# ````````````````````````````````````````````````
+
+
+def vehicleAccidentsTable(request):
+    return render(request, 'GearBox/Safety/vehicleAccidentsTable.html')
+
+def equipmentIssueTable(request):
+    return render(request, 'GearBox/Safety/equipmentIssueTable.html')
+
+# ````````````````````````````````````````
+
+# Reminder
+
+# ````````````````````````````````````````````````
+
+def reminderTable(request):
+    return render(request, 'GearBox/reminderTable.html')
+
+# ````````````````````````````````````````
+
 # Truck Section 
 
 # ````````````````````````````````````````````````

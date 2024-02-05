@@ -1,8 +1,7 @@
-{% extends "main/main.html" %}
-{% load static %}
-{% block title %} | History tab {% endblock %}
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Vehicle Accidents Table {% endblock %} 
 {% block headStyle %}
-
 <!-- Datatables -->
 <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
@@ -66,8 +65,8 @@
     }
 </style>
 {% endblock %}
-{% block content %}
 
+{% block content %}
 <div class="right_col" role="main">
     <div class="">
         <div class="clearfix"></div>
@@ -75,91 +74,34 @@
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2 class="text-uppercase">History tab</h2>
+                        <h2 class="text-uppercase"> Vehicle Accidents</h2>
                         <div class="clearfix"></div>
                     </div>
-                    <div id="wizard" class="form_wizard wizard_horizontal">
-                        <ul class="wizard_steps">
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Information" fdprocessedid="pifgeg"><i class="fa fa-info"></i></span>
-                                <span class="step_descr">
-                                    <br/>
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no"title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Axles" fdprocessedid="pifgeg"><i class="fa fa-bars"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Settings" fdprocessedid="pifgeg"><i class="fa fa-gear"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Reminders" fdprocessedid="pifgeg"><i class="fa fa-bell-o"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Parts" fdprocessedid="pifgeg"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="History" fdprocessedid="pifgeg"><i class="fa fa-history"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Odometer" fdprocessedid="pifgeg"><i class="fa  fa-tachometer"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Compliance" fdprocessedid="pifgeg"><i class="fa fa-comments"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Documents" fdprocessedid="pifgeg"><i class="fa fa-file-pdf-o"></i></span>
-                                <span class="step_descr">
-                                    <br/>
-                                </span>
-                            </a>
-                          </li>
-                        </ul>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label for="registration" style="margin-bottom: 0.3rem!important;">Accidents Type:</label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="" type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="registration" style="margin-bottom: 0.3rem!important;">Groups:</label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="" type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="registration" style="margin-bottom: 0.3rem!important;">SubGroups:</label>
+                                <div class="field item form-group">
+                                    <input class="form-control" value="" type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <form action="{% url 'gearBox:truckHistoryFormSave' %}" method="post">
+                    <form action="#" method="post">
                         {% csrf_token %}
-                        {% comment %} <h2>History Form </h2> {% endcomment %}
                         <div class="x_title">
-                            <h6>Maintenance History</h6>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -170,15 +112,15 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Number</th>
+                                                    <th>Accidents #</th>
+                                                    <th>Date</th>
+                                                    <th>Employee</th>
+                                                    <th>Fleet #</th>
+                                                    <th>registration</th>
                                                     <th>Type</th>
-                                                    <th>Date Open</th>
-                                                    <th>Date Closed</th>
-                                                    <th>Kilometres Closed</th>
-                                                    <th>Hours Closed</th>
-                                                    <th>Fault</th>
-                                                    <th>Repairer/Notes</th>
-                                                    <th>Cost/Invoice</th>
+                                                    <th>Location</th>
+                                                    <th>Reference</th>
+                                                    <th>Closed</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -199,9 +141,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
+                        {% comment %} <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
                             <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
-                        </div>
+                        </div> {% endcomment %}
                     </form>
                 </div>
             </div>
@@ -209,6 +151,8 @@
     </div>
 </div>
 {% endblock %}
+
+
 {% block footerStyleEnd %}
 <script>
     const redirectButton = document.getElementById('redirectButton');
