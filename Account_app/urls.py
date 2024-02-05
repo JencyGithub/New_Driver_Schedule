@@ -70,6 +70,14 @@ urlpatterns = [
     path('driver/pre-start/view/<int:shiftId>/<int:tripId>/', views.showPreStartForm, name='showPreStartForm'),
     path('driver/shift/view/<int:shiftId>/', views.driverShiftView, name='driverShiftView'),
     path('driver/select/client-docket/view/<int:shiftId>/', views.showClientAndTruckNumGet, name='showClientAndTruckNumGet'),
+
+    # Leave section
+    path('driver/leave-request/show/', views.driverLeaveRequestShow, name='driverLeaveRequestShow'),
+    path('driver/leave-request/save/', views.driverLeaveRequestSave, name='driverLeaveRequestSave'),
+
+    path('driver/past-leaves/view/', views.pastLeaveRequestShow, name='pastLeaveRequestShow'),
+    path('driver/cancel-request/<int:id>/', views.cancelLeaveRequest, name='cancelLeaveRequest'),
+
     
     
     # Driver trip path end

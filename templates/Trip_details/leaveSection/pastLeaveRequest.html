@@ -1,0 +1,94 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Past Leave request{% endblock title %}
+
+{% block headStyle %}
+<style>
+    label{
+        font-size: 0.9rem;
+    }
+    .pills i{
+        font-size: 1.2rem;
+        padding-top: 1.5px;
+    }
+    .cancelBtn{
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+    @media (max-width: 560px) {
+        .pills b
+        {
+            font-size: 0.9rem;
+        }
+        .pills i{
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container" id="formSection">
+    <div class="row">
+        <div class="col-md-1"></div>
+
+        <div class="col-md-10 py-2 px-0">
+            <!-- For validation -->
+            <form action="{% url 'Account:driverLeaveRequestSave' %}" method="post" id="preStartForm">
+                {% csrf_token %}
+                <div class="card border-0">
+                    <div class="card-body pills">
+                        <h5>Past requests</h5>
+                        <hr>
+                        {% for obj in leaveObjs %}
+                            <div class="col-12 border p-3 my-1  px-lg-4 rounded-5 d-flex justify-content-between align-content-center text-white {% if obj.status == 'Pending' %} bg-default {% elif  obj.status == 'Approved' %} bg-success {% elif obj.status == 'Denied' %} bg-danger {% else %} bg-secondary {% endif %}">
+                                <b>{{ obj.start_date }} - {{ obj.end_date }} </b>
+                                {% if obj.status == 'Pending' %} 
+                                    <i class="fa-regular fa-circle-xmark cancelBtn" title="Cancel" id="{{obj.id}}"></i>
+                                {% elif  obj.status == 'Approved' %}
+                                    <i class="fa-regular fa-circle-check" title="Approved"></i>
+                                {% elif obj.status == 'Denied' %}
+                                    <i class="fa-solid fa-ban" title="Denied"></i>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                           
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="cancelModel" aria-hidden="true" id="cancelModel">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content p-3">
+        <div class="row">
+          <div class="col-12 d-flex align-items-center justify-content-between">
+            <strong>Do you really want to cancel this job?</strong>
+            <span>
+              <div class="btn btn-outline-dark noBtn" style="font-size: 0.7rem;">No</div>
+              <a href="#" class="btn btn-default" style="font-size: 0.7rem;" id="yes">Yes</a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script>
+    $('.cancelBtn').on('click', function(){
+        var id = $(this).attr('id');
+        $('#cancelModel a').attr('href', `/account/driver/cancel-request/${id}/`)
+        $("#cancelModel").modal('show');
+    })
+    $(".noBtn").on('click', function(){
+        $("#cancelModel").modal('hide');
+    })
+</script>
+
+{% endblock %}

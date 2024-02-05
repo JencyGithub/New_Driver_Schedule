@@ -18,7 +18,7 @@ from django.contrib.auth.hashers import make_password
 
 # Create your views here.
 def leaveReq(request):
-    leave_requests = LeaveRequest.objects.all()
+    leave_requests = LeaveRequest.objects.all().order_by('-status')
     return render(request, 'gearBox/table/LeaveReq.html', {'leave_requests': leave_requests})
 
 def natureOfLeaves(request):
@@ -64,27 +64,27 @@ def leaveReqForm(request,id=None):
     return render(request,'gearBox/LeaveReqForm.html',params)
         
 @csrf_protect
-@api_view(['POST'])
 def changeLeaveRequest(request,id=None):
-    
-    employee = Driver.objects.get(driverId = request.POST.get('driverId'))
-    reason = NatureOfLeave.objects.get(id = request.POST.get('Reason'))
-    
-    data = {
-        'employee' : employee,
-        'start_date' : request.POST.get('StartDate'),
-        'end_date' : request.POST.get('EndDate'),
-        'reason' :reason,
-    }
     if id == None:
+        employee = Driver.objects.get(driverId = request.POST.get('driverId'))
+        reason = NatureOfLeave.objects.get(id = request.POST.get('Reason'))
+        
+        data = {
+            'employee' : employee,
+            'start_date' : request.POST.get('StartDate'),
+            'end_date' : request.POST.get('EndDate'),
+            'reason' :reason,
+        }
         data['status'] = 'Pending'
         insert = insertIntoTable(tableName='LeaveRequest',dataSet=data)
         messages.success(request,'Adding successfully')
     else:
-        data['status'] = request.POST.get('Status')
-        update = updateIntoTable(record_id=id,tableName='LeaveRequest',dataSet=data)
-        messages.success(request,'Updated successfully')
-        
+        requestObj = LeaveRequest.objects.filter(pk=id).first()
+        requestObj.status = request.POST.get('status')
+        requestObj.comment = request.POST.get('comment')
+        requestObj.closedBy = request.user
+        requestObj.save()
+        messages.success(request,'Updated successfully')        
         
     return redirect('gearBox:leaveReq')
 

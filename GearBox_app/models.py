@@ -239,8 +239,11 @@ class LeaveRequest(models.Model):
     start_date = models.DateField(null=True, default=None)
     end_date = models.DateField(null=True, default=None)
     reason = models.ForeignKey(NatureOfLeave,on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Denied', 'Denied')], default='Pending')
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Denied', 'Denied'), ('Cancel', 'Cancel')], default='Pending')
     # Add other fields as needed
+
+    comment = models.CharField(max_length=2048, default='', null=True, blank=True)
+    closedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
 
     def __str__(self):
         return f"{self.employee} - {self.start_date} to {self.end_date}"

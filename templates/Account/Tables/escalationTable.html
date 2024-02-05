@@ -77,8 +77,9 @@
                               <tr>
                                 <th>Added By</th>
                                 <th>EscalationDate</th>
+                                <th>EscalationType</th>
                                 <th>EscalationAmount</th>
-                                <th class="text-center w-25">Action</th>
+                                <th class="text-center">Action</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -87,13 +88,15 @@
         
                                 <td class="text-capitalize">{{ data.userId.username }}</td>
                                 <td>{{ data.escalationDate }}</td>
+                                <td>{{ data.escalationType }}</td>
                                 <td>{{ data.escalationAmount }}</td>
                                 <td class="d-flex justify-content-around">
-                                  <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update"
-                                  class="btn btn-default btn-sm ">Update</a>
-                                  </a> 
-                                  
-                                  <a href="{% url 'Account:ViewBulkEscalationData' escalationId=data.id %}" class="btn btn-default btn-sm">View</a>
+                                  <a href="{% if data.escalationStep == 2 %}{% url 'Account:showReconciliationEscalation2' escalationId=data.id %}{% else %}{% url 'Account:reconciliationEscalationForm3' id=data.id %} {% endif %}" title="update">
+                                    <i class="fa-solid fa-pen-to-square" style="font-size:1.1rem"></i>
+                                  </a>
+                                  <a href="{% url 'Account:ViewBulkEscalationData' escalationId=data.id %}">
+                                    <i class="fa-solid fa-eye" style="font-size:1.1rem"></i>
+                                  </a>
                               </td>
                               </tr>
                               {% endfor %}

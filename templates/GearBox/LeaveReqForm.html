@@ -26,7 +26,7 @@ request {% endblock %} {% block headStyle %}
                                             class="col-form-label col-md-3 col-sm-3 label-align">DriverId :<span
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                                <select class="form-control" name="driverId" required="required" id="driverId">
+                                                <select class="form-control" name="driverId" required="required" id="driverId" {% if data %}disabled{% endif %}>
                                                     <option value="">Select a driver</option>
                                                     {% for driver in drivers %}
                                                         <option value="{{ driver.driverId }}" {% if data and data.employee.driverId == driver.driverId %}selected{% endif %}>{{ driver.driverId }}</option>
@@ -41,8 +41,8 @@ request {% endblock %} {% block headStyle %}
                                             class="col-form-label col-md-3 col-sm-3 label-align">Start Date :<span
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="StartDate" required="required"
-                                                id="StartDate" type="date" value="{% if data %}{{data.start_date}}{% else %}' '{% endif %}"/>
+                                            <input class="form-control" name="StartDate" required="required" {% if data %}disabled{% endif %}
+                                                id="StartDate" type="date" value="{% if data %}{{data.start_date}}{% endif %}"/>
                                         </div>
                                     </div>
                                 </div>
@@ -51,8 +51,8 @@ request {% endblock %} {% block headStyle %}
                                         <label for="EndDate" class="col-form-label col-md-3 col-sm-3 label-align">End
                                             Date :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="EndDate" required="required" id="EndDate"
-                                                type="date" value="{% if data %}{{data.end_date}}{% else %}' '{% endif %}"/>
+                                            <input class="form-control" name="EndDate" required="required" id="EndDate" {% if data %}disabled{% endif %}
+                                                type="date" value="{% if data %}{{data.end_date}}{% endif %}"/>
                                         </div>
                                     </div>
                                 </div>
@@ -61,7 +61,7 @@ request {% endblock %} {% block headStyle %}
                                         <label for="Reason" class="col-form-label col-md-3 col-sm-3 label-align">Reason
                                             :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <select class="form-control" required id="Reason" name="Reason">
+                                            <select class="form-control" required id="Reason" name="Reason" {% if data %}disabled{% endif %}>
                                                 <option value="" disabled selected>
                                                     Select Reason
                                                 </option>
@@ -72,28 +72,33 @@ request {% endblock %} {% block headStyle %}
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="Status" class="col-form-label col-md-3 col-sm-3 label-align">Status
-                                            :<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select class="form-control" required id="Status" name="Status">
-                                                <option value="" disabled selected>
-                                                    Select status
-                                                </option>                                                
-                                                <option value="Pending" {% if data.status == 'Pending' %}selected="selected"{% endif %}>Pending</option>
-                                                <option value="Approved" {% if data.status == 'Approved' %}selected="selected"{% endif %}>Approved</option>
-                                                <option value="Denied" {% if data.status == 'Denied' %}selected="selected"{% endif %}>Denied</option> 
-                                            </select>
+                                {% if data and data.status != 'Cancel' %}
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12">
+                                            <label for="comment" class="col-form-label col-md-3 col-sm-3 label-align">Comment :<span class="required">*</span></label>
+                                            <div class="field item form-group col-md-6 col-sm-6">
+                                                <textarea class="form-control" name="comment" required="required" id="comment"></textarea>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-3"></div>
+                                        <div class="col-md-9 col-sm-9">
+                                            <div class="form-check form-check-inline">
+                                              <input class="form-check-input" type="radio" name="status" id="Approved" value="Approved" checked>
+                                              <label class="form-check-label" for="Approved">Approve</label>
+                                            </div>
+                                          
+                                            <div class="form-check form-check-inline">
+                                              <input class="form-check-input" type="radio" name="status" id="Denied" value="Denied">
+                                              <label class="form-check-label" for="Denied">Denied</label>
+                                            </div>
+                                          </div>
+                                    </div>
+                                {% endif %}
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
-                                        <button type="reset" class="btn btn-success px-4">
-                                            Reset
-                                        </button>
-                                        <button type="submit" class="btn btn-primary px-4">
+                                        <button type="submit" class="btn btn-sm btn-default px-3">
                                             Submit
                                         </button>
                                     </div>

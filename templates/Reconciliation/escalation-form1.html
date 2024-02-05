@@ -147,14 +147,26 @@
             success: function (data) {
                 if (data.status) {
                     let tableContent = ''
+                    let total = [0, 0, 0]
                     $.each(data.params, function (key, value) {
+                        total[0] += value[0]
+                        total[1] += value[1]
+                        total[2] += value[2]
                         tableContent += `<tr>`
-                        tableContent += `<th scope="row" class="text-capitalize  ${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${key}</th>`
-                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[0]}</td>`
-                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[1]}</td>`
-                        tableContent += `<td class="${key == "Total Cost" ? 'bg-secondary text-white' : ''}">${value[2]}</td>`
+                        tableContent += `<th scope="row" class="text-capitalize">${key}</th>`
+                        tableContent += `<td>${value[0]}</td>`
+                        tableContent += `<td>${value[1]}</td>`
+                        tableContent += `<td>${value[2]}</td>`
                         tableContent += `</tr>`
                     });
+                    // For get total
+                    tableContent += `<tr>`
+                    tableContent += `<th scope="row" class="text-capitalize bg-secondary text-white">Total</th>`
+                    tableContent += `<td class="bg-secondary text-white">${total[0]}</td>`
+                    tableContent += `<td class="bg-secondary text-white">${total[1]}</td>`
+                    tableContent += `<td class="bg-secondary text-white">${total[2]}</td>`
+                    tableContent += `</tr>`
+                    
                     $(".modal-body table tbody").empty().append(tableContent)
                     $('#costModal').modal('show')
                 }

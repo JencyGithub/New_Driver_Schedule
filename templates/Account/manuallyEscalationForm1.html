@@ -9,9 +9,7 @@
         margin-bottom: 0.1rem;
     }
 </style>
-
 {% endblock %}
-
 
 {% block content %}
 <div class="right_col">
@@ -24,171 +22,214 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    <form action="#" method="POST" class="form-horizontal form-label-left" enctype="multipart/form-data">
-                    {% csrf_token%}
-                    <div class="row">
-                        <div class="col-md-4 my-1">
-                            <label for="docketNumber">Docket number <span class="required">*</span></label>
-                            <input class="form-control" minlength="3" maxlength="10" {% if escalationDocketObj %} readonly {% endif %}   type="text" value="{{escalationDocketObj.docketNumber}}"
-                                    name="docketNumber" required='required' style="padding: 0.25rem 0.2rem;" id="docketNumber">
-                        </div>
-                        <div class="col-md-4 my-1">
-                            <label  for="docketDate">Docket date <span class="required">*</span></label>
-                            <input class="form-control" {% if escalationDocketObj %} readonly {% endif %}  value="{{escalationDocketObj.docketDate}}"   type="date"  
-                                        name="docketDate" required='required' style="padding: 0.25rem 0.2rem;" id="docketDate">
-                        </div>
-                        <div class="col-md-4 my-1">
-                            <label for="clientName">Client name</label>
-                            <select class="form-control" {% if escalationDocketObj %} readonly {% endif %}    required id="clientName"  name="clientName">
-                                <option value="" disabled selected>Select Client Name</option>
-                                {% for clientName in clientNames %}
-                                    {% if escalationObj %}
-                                        <option value="{{ clientName.clientId }}" {% if clientName.id == escalationObj.clientName.id %} selected {% endif %}>{{ clientName.name }}</option>
-                                    {% else %}
-                                        <option value="{{ clientName.clientId }}" >{{ clientName.name }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-4 my-1">
-                            <label for="invoiceFile">Invoice File <span class="required">*</span></label>
-                            <input class="form-control" type="file" name="invoiceFile" required='required' style="padding: 0.25rem 0.2rem;" id="invoiceFile">
-                        </div>
-                        <div class="col-md-4 my-1">
-                            <label for="truckId">Truck no <span class="required">*</span></label>
-                            <select class="form-control" required id="truckId" name="truckId">
-                                <option value="" disabled selected>Select Truck</option>
-                                {% for truckObj in truckConnectionObj %}
-                                <option value="{{truckObj.id}}">{{truckObj.clientTruckId}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-4 my-1">
-                            <label for="escalation">Escalation Type</label>
-                            <select class="form-control" {% if escalationObj.escalationType == 'External' or  escalationObj.escalationType == 'Internal'  %}  disabled {% endif %} required id="escalation"  name="escalation">
-                                <option value="" disabled selected>Select Escalation Type</option>
-                                <option value="Internal" {% if escalationObj.escalationType == 'Internal' %} selected {% endif %} >Internally Closed</option>
-                                <option value="External" {% if escalationObj.escalationType == 'External' %} selected {% endif %} >Forward to Client</option>  
-                            </select>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableCallOutFees">Call Out Fees</label>
-                                <input type="checkbox" id="enableCallOutFees" onchange="handleCheckbox(this,'callOutFees')">
+                    <form action="{% url 'Account:manuallyEscalationForm1Save' %}" method="POST" class="form-horizontal form-label-left" id="manuallyEscalationForm" enctype="multipart/form-data">
+                        {% csrf_token%}
+                        <div class="row">
+                            <div class="col-md-4 my-1">
+                                <label for="truckId">Truck no <span class="required">*</span></label>
+                                <select class="form-control" required id="truckId" name="truckId">
+                                    <option value="" disabled selected>Select Truck</option>
+                                    {% for truckObj in truckConnectionObj %}
+                                    <option value="{{truckObj.id}}">{{truckObj.clientTruckId}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="callOutFees" 
-                                        id="callOutFees" 
-                                        readonly >
+                            <div class="col-md-4 my-1">
+                                <label for="docketNumber">Docket number <span class="required">*</span></label>
+                                <input class="form-control" minlength="3" maxlength="10" {% if escalationDocketObj %} readonly {% endif %}   type="text" value="{{escalationDocketObj.docketNumber}}"
+                                        name="docketNumber" required='required' style="padding: 0.25rem 0.2rem;" id="docketNumber">
+                            </div>
+                            <div class="col-md-4 my-1">
+                                <label  for="docketDate">Docket date <span class="required">*</span></label>
+                                <input class="form-control" {% if escalationDocketObj %} readonly {% endif %}  value="{{escalationDocketObj.docketDate}}"   type="date"  
+                                            name="docketDate" required='required' style="padding: 0.25rem 0.2rem;" id="docketDate">
+                            </div>
+                            <div class="col-md-4 my-1">
+                                <label for="clientName">Client name</label>
+                                <select class="form-control" {% if escalationDocketObj %} readonly {% endif %}    required id="clientName"  name="clientName">
+                                    <option value="" disabled selected>Select Client Name</option>
+                                    {% for clientName in clientNames %}
+                                        {% if escalationObj %}
+                                            <option value="{{ clientName.clientId }}" {% if clientName.id == escalationObj.clientName.id %} selected {% endif %}>{{ clientName.name }}</option>
+                                        {% else %}
+                                            <option value="{{ clientName.clientId }}" >{{ clientName.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 my-1">
+                                <label for="escalation">Escalation Type</label>
+                                <select class="form-control" {% if escalationObj.escalationType == 'External' or  escalationObj.escalationType == 'Internal'  %}  disabled {% endif %} required id="escalation"  name="escalation">
+                                    <option value="" disabled selected>Select Escalation Type</option>
+                                    <option value="Internal" {% if escalationObj.escalationType == 'Internal' %} selected {% endif %} >Internally Closed</option>
+                                    <option value="External" {% if escalationObj.escalationType == 'External' %} selected {% endif %} >Forward to Client</option>  
+                                </select>
+                            </div>
+                            <div class="col-md-4 my-1">
+                                <label for="invoiceFile">Invoice File <span class="required">*</span></label>
+                                <input class="form-control" type="file" name="invoiceFile" required='required' style="padding: 0.25rem 0.2rem;" id="invoiceFile">
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableDemurrageFees">Demurrage Fees</label>
-                                <input type="checkbox" id="enableDemurrageFees" onchange="handleCheckbox(this,'demurrageFees')">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableCallOut">Call Out Charge</label>
+                                    <input type="checkbox" id="enableCallOut" name="enableCallOut" onchange="handleCheckbox(this,'callOutCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="callOutCharge" 
+                                            id="callOutCharge" 
+                                            readonly>
+                                </div>
                             </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="demurrageFees" 
-                                        id="demurrageFees" 
-                                        readonly>
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableDemurrage">Demurrage Charge</label>
+                                    <input type="checkbox" id="enableDemurrage" name="enableDemurrage" onchange="handleCheckbox(this,'demurrageCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="demurrageCharge" 
+                                            id="demurrageCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableCancellation">Cancellation Charge</label>
+                                    <input type="checkbox" id="enableCancellation" name="enableCancellation" onchange="handleCheckbox(this,'cancellationCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="cancellationCharge" 
+                                            id="cancellationCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableTransferKm">Transfer Km Charge</label>
+                                    <input type="checkbox" id="enableTransferKm" name="enableTransferKm" onchange="handleCheckbox(this,'transferKmCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="transferKmCharge" 
+                                            id="transferKmCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableWaitingTime">Waiting Time Charge</label>
+                                    <input type="checkbox" id="enableWaitingTime" name="enableWaitingTime" onchange="handleCheckbox(this,'waitingTimeCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="waitingTimeCharge" 
+                                            id="waitingTimeCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableStandBy">StandBy Charge</label>
+                                    <input type="checkbox" id="enableStandBy" name="enableStandBy" onchange="handleCheckbox(this,'standByCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="standByCharge" 
+                                            id="standByCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableLoadKm">Load Km Charge</label>
+                                    <input type="checkbox" id="enableLoadKm" name="enableLoadKm" onchange="handleCheckbox(this,'loadKmCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="loadKmCharge" 
+                                            id="loadKmCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableSurcharge">Surcharge</label>
+                                    <input type="checkbox" id="enableSurcharge" name="enableSurcharge" onchange="handleCheckbox(this,'surcharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="surcharge" 
+                                            id="surcharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableReturnKm">Return Km Charge</label>
+                                    <input type="checkbox" id="enableReturnKm" name="enableReturnKm" onchange="handleCheckbox(this,'returnKmCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="returnKmCharge" 
+                                            id="returnKmCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableBlowBack">Blow Back Charge</label>
+                                    <input type="checkbox" id="enableBlowBack" name="enableBlowBack" onchange="handleCheckbox(this,'blowBackCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="blowBackCharge" 
+                                            id="blowBackCharge" 
+                                            readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3 my-1">
+                                <div class="d-flex justify-content-between">
+                                    <label for="enableCustom">Custom</label>
+                                    <input type="checkbox" checked id="enableCustom" name="enableCustom" onchange="handleCheckbox(this,'customCharge')" value="checked">
+                                </div>
+                                <div class="input-group">
+                                    <input class="form-control" 
+                                            type="number" step=0.01
+                                            name="customCharge" 
+                                            id="customCharge" 
+                                            required>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableCancellationFees">Cancellation Fees</label>
-                                <input type="checkbox" id="enableCancellationFees" onchange="handleCheckbox(this,'cancellationFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="cancellationFees" 
-                                        id="cancellationFees" 
-                                        readonly>
+                        <div class="row">
+                            <div class="col-md-12 mt-3 text-right">
+                                <button type="submit" class=" btn btn-sm btn-default px-3">Next</button>
+                                {% comment %} <button type="button" onclick="validateForm()" class=" btn btn-sm btn-default px-3">Next</button> {% endcomment %}
                             </div>
                         </div>
-                        
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableTransferKmFees">Transfer Km Fees</label>
-                                <input type="checkbox" id="enableTransferKmFees" onchange="handleCheckbox(this,'transferKmFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="transferKmFees" 
-                                        id="transferKmFees" 
-                                        readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableWaitingTimeFees">Waiting Time Fees</label>
-                                <input type="checkbox" id="enableWaitingTimeFees" onchange="handleCheckbox(this,'waitingTimeFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="waitingTimeFees" 
-                                        id="waitingTimeFees" 
-                                        readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableStandByFees">StandBy Fees</label>
-                                <input type="checkbox" id="enableStandByFees" onchange="handleCheckbox(this,'standByFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="standByFees" 
-                                        id="standByFees" 
-                                        readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableReturnFees">Return Fees</label>
-                                <input type="checkbox" id="enableReturnFees" onchange="handleCheckbox(this,'returnFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="returnFees" 
-                                        id="returnFees" 
-                                        readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-3 my-1">
-                            <div class="d-flex justify-content-between">
-                                <label for="enableCustomFees">Custom</label>
-                                <input type="checkbox" checked id="enableCustomFees" onchange="handleCheckbox(this,'customFees')">
-                            </div>
-                            <div class="input-group">
-                                <input class="form-control" 
-                                        type="number" 
-                                        name="customFees" 
-                                        id="customFees" 
-                                        required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mt-3 text-right">
-                            <button type="submit" class=" btn btn-sm btn-default px-3">Next</button>
-                        </div>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -201,6 +242,34 @@
 {% block footerStyle %}
 
 <script>
+
+    $('#manuallyEscalationForm').on('submit', function(e) {
+        // Prevent the default form submission
+        e.preventDefault();
+
+        // Call the validateForm function before submitting
+        validateForm();
+    });
+
+    function validateForm() {
+        var isAtLeastOneChecked = false;
+        $("[id^='enable']").each(function () {
+            var id = this.id.replace("enable", "").toLowerCase();
+            var costInput = $("#" + id);
+            
+            if ($(this).prop("checked") && costInput.val() !== "") {
+                isAtLeastOneChecked = true;
+                return false; // exit the loop
+            }
+        });
+
+        if (!isAtLeastOneChecked) {
+            alert("Please check and fill at least one cost.");
+        } else {
+            // If at least one cost is checked and filled, submit the form
+            $('#manuallyEscalationForm').off('submit').submit();
+        }
+    }
     function handleCheckbox(checkBox, id) {
         var isChecked = $(`#${checkBox.id}`).prop("checked");
         var inputElement = $(`#${id}`);
@@ -214,7 +283,7 @@
             inputElement.prop("readonly", true);
         }
     }
-
+   
 </script>
 {% endblock %} 
 

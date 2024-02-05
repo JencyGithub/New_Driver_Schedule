@@ -1,0 +1,74 @@
+{% extends "Trip_details/main/main.html" %}
+{% load static %}
+{% block title %}Leave request{% endblock title %}
+
+{% block headStyle %}
+<style>
+    label{
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container" id="formSection">
+    <div class="row">
+        <div class="col-md-1"></div>
+
+        <div class="col-md-10 py-2 px-0">
+            <!-- For validation -->
+            <form action="{% url 'Account:driverLeaveRequestSave' %}" method="post" id="preStartForm">
+                {% csrf_token %}
+                <div class="card border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+
+                            <h5>Raise request</h5>
+                            <a href="{% url 'Account:pastLeaveRequestShow' %}" class="text-default text-decoration-none" style="font-size: 0.9rem;">View past</a>
+                        </div>
+                        <hr class="mt-0">
+                        <div class="form-group row pb-2">
+                            <div class="col-md-4 col-sm-4">
+                                <label for="from">From:</label>
+                                <input type="date" name="from" id="from" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="to">To:</label>
+                                <input type="date" name="to" id="to" class="form-control" readonly required>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="reasonId">Reason:</label>
+                                <select name="reasonId" id="reasonId" class="form-control" required>
+                                    <option disabled selected>Select reason</option>
+                                    {% for reason in reasons %}
+                                        <option value="{{reason.id}}">{{reason.reason}}</option>
+                                    {% endfor %}
+                                   
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-default float-end float-right">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+
+<script>
+    $(document).ready(function(){
+        var currentDate = new Date().toISOString().split('T')[0];
+        $('#from').attr('min', currentDate);
+        
+        $('#from').on('change', function(){
+            $('#to').attr('min', $(this).val()).removeAttr('readonly');
+        });
+    });
+</script>
+
+{% endblock %}
