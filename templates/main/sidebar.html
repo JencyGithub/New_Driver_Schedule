@@ -122,28 +122,25 @@
               {% if request.session.user_type == "SuperUser" %}
                 <li><a>Compliance<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li class="sub_menu"><a href="#">Medicals</a>
+                    <li class="sub_menu"><a href="{% url 'gearBox:medicalsTable' %}">Medicals</a>
                     </li>
-                    <li><a href="#">Training</a>
+                    <li><a href="{% url 'gearBox:trainingTable' %}">Training</a>
                     </li>
                   </ul>
                 </li>
                 <li><a>Safety<span class="fa fa-chevron-down"></span></a>
                   <ul class="nav child_menu">
-                    <li class="sub_menu"><a href="#">Vehicle Accident</a>
+                    <li class="sub_menu"><a href="{% url 'gearBox:vehicleAccidentsTable' %}">Vehicle Accident</a>
                     </li>
                     <li><a href="#">Incedents</a>
                     </li>
                     <li><a href="#">Injury</a>
                     </li>
-                    <li><a href="#">Equipment Issue</a>
+                    <li><a href="{% url 'gearBox:equipmentIssueTable' %}">Equipment Issue</a>
                     </li>
                   </ul>
                 </li>
-                <li><a>Reminder<span class="fa fa-chevron-down"></span></a>
-                  <ul class="nav child_menu">
-                    
-                  </ul>
+                <li><a href="{% url 'gearBox:reminderTable' %}">Reminder</a>
                 </li>
               {% endif %}
               <li><a>Availability<span class="fa fa-chevron-down"></span></a>

@@ -59,6 +59,18 @@ urlpatterns = [
     path('admin-staff/edit/view/<int:id>/', views.adminStaffForm, name='adminStaffEdit'),
     path('admin-staff/edit/save/<int:id>/', views.adminStaffSave, name='adminStaffEditSave'),
 
+
+    # Compliance 
+    path('medicalsTable', views.medicalsTable, name='medicalsTable'),
+    path('trainingTable', views.trainingTable, name='trainingTable'),
+
+    # Safety
+    path('vehicleAccidentsTable', views.vehicleAccidentsTable, name='vehicleAccidentsTable'),
+    path('equipmentIssueTable', views.equipmentIssueTable, name='equipmentIssueTable'),
+
+    # Reminder
+    path('reminderTable', views.reminderTable, name='reminderTable'),    
+
     # Truck Table 
     
     path('truckTable', views.truckTable, name='truckTable'),
