@@ -296,15 +296,66 @@ def truckForm(request, id=None):
 
 @csrf_protect
 def truckFormSave(request):
+    return redirect('gearBox:truckAxlesFormView')
+    
     # return HttpResponse(request.POST.get('truckNo'))
-    dataList = {
-        'adminTruckNumber' : request.POST.get('truckNo'),
-        'createdBy' : request.user
-    }
-    insertIntoTable(tableName='AdminTruck',dataSet=dataList)
+    # dataList = {
+    #     'adminTruckNumber' : request.POST.get('truckNo'),
+    # }
+    # insertIntoTable(tableName='AdminTruck',dataSet=dataList)
 
-    messages.success(request,'Adding successfully')
-    return redirect('gearBox:truckTable')
+    # messages.success(request,'Adding successfully')
+    # return redirect('gearBox:truckTable')
+
+def truckAxlesFormView(request):
+    return render(request,'GearBox/truck/truckAxlesForm.html')
+
+def truckAxlesFormSave(request):
+    return redirect('gearBox:truckSettingFormView')
+
+def  truckSettingFormView(request):
+    return render(request,'GearBox/truck/truckSettingForm.html')
+
+def truckSettingFormSave(request):
+    return redirect('gearBox:truckRemindersFormView')
+
+def  truckRemindersFormView(request):
+    return render(request,'GearBox/truck/truckRemindersForm.html')
+
+def truckRemindersFormSave(request):
+    return redirect('gearBox:truckPartsFormView')
+
+def  truckPartsFormView(request):
+    return render(request,'GearBox/truck/truckPartsForm.html')
+
+def truckPartsFormSave(request):
+    return redirect('gearBox:truckHistoryFormView')
+
+def  truckHistoryFormView(request):
+    return render(request,'GearBox/truck/truckHistoryForm.html')
+
+def truckHistoryFormSave(request):
+    return redirect('gearBox:truckOdometerFormView')
+
+def  truckOdometerFormView(request):
+    return render(request,'GearBox/truck/truckOdometerForm.html')
+
+def truckOdometerFormSave(request):
+    return redirect('gearBox:truckComplianceFormView')
+
+def  truckComplianceFormView(request):
+    return render(request,'GearBox/truck/truckComplianceForm.html')
+
+def truckComplianceFormSave(request):
+    return redirect('gearBox:truckDocumentsFormView')
+
+def  truckDocumentsFormView(request):
+    return render(request,'GearBox/truck/truckDocumentsForm.html')
+
+def truckDocumentsFormSave(request):
+    return HttpResponse('Stop')
+    # return redirect('gearBox:truckDocumentsFormView')
+
 
 def truckConnectionForm(request, id):
     clientIds = Client.objects.all()
@@ -368,11 +419,16 @@ def getRateCard(request):
     print(rateCardList)
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
-def documentView(request):
-    return render(request,'GearBox/truck/table/document.html')
 
-def documentForm(request):
-    return render(request,'GearBox/truck/documentForm.html')
+# Settings Form 
+
+def settingsForm(request):
+    return render(request,'GearBox/truck/settingsForm.html')
+
+# Compliance Form 
+
+def complianceForm(request):
+    return render(request,'GearBox/truck/complianceForm.html')
 
 # ```````````````````````````````````
 # Client 

@@ -1410,6 +1410,9 @@ def rctiSave(request):
                 # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
                 #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
                 #     return redirect(request.META.get('HTTP_REFERER'))
+                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                #     return redirect(request.META.get('HTTP_REFERER'))
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file already exists!")
@@ -1792,7 +1795,7 @@ def rctiCsvForm(request):
 
 
 def driverSampleCsv(request):
-    return FileResponse(open(f'static/Account/sampleDriverEntry.xlsx', 'rb'), as_attachment=True)
+    return FileResponse(open(f'static/Account/sampleDriverEntry.csv', 'rb'), as_attachment=True)
 
 
 @csrf_protect
@@ -2227,7 +2230,7 @@ def reconciliationForm(request, dataType):
 def reconciliationAnalysis(request,dataType):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-
+    
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
@@ -2257,7 +2260,9 @@ def reconciliationDocketView(request, reconciliationId):
     # try:
     reconciliationData = ReconciliationReport.objects.filter(pk=reconciliationId).first()
     clientObj = Client.objects.filter(pk=reconciliationData.clientId).first()
-    rctiDocket = RCTI.objects.filter(clientName = clientObj ,truckNo =reconciliationData.truckConnectionId, docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=reconciliationData.truckConnectionId).first() 
+    rctiDocket = RCTI.objects.filter(clientName = clientObj , docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
+    # rctiDocket = RCTI.objects.filter(clientName = clientObj ,truckNo = truckConnectionObj.truckNumber.adminTruckNumber, docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
     # rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
     surcharges = Surcharge.objects.all()
     base_plant = BasePlant.objects.all()

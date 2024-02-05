@@ -1,0 +1,259 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Accreditation / Compliance tab {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+
+<style>
+    .input-group-section {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+      
+    .yellow { background-color: #fcf8e3; }
+    .blue { background-color: #d9edf7; }
+    .green { background-color: #dff0d8; }
+    .pink { background-color: #f2dede; }
+      
+    label {
+    font-weight: bold;
+    }
+      
+    @media (min-width: 992px) {
+    .input-group-section {
+        padding: 20px;
+    }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="custom-container">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                     {% comment %} <div class="x_title">
+                        <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
+                        {% if data %}
+                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
+                        {% endif %}
+                        <div class="clearfix"></div>
+                     </div> {% endcomment %}
+               
+                    <div class="x_title">
+                        <h2 class="text-uppercase">Accreditation / Compliance tab</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="wizard" class="form_wizard wizard_horizontal">
+                        <ul class="wizard_steps">
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Information" fdprocessedid="pifgeg"><i class="fa fa-info"></i></span>
+                                <span class="step_descr">
+                                    <br/>
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no"title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Axles" fdprocessedid="pifgeg"><i class="fa fa-bars"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Settings" fdprocessedid="pifgeg"><i class="fa fa-gear"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Reminders" fdprocessedid="pifgeg"><i class="fa fa-bell-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Parts" fdprocessedid="pifgeg"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="History" fdprocessedid="pifgeg"><i class="fa fa-history"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Odometer" fdprocessedid="pifgeg"><i class="fa  fa-tachometer"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Compliance" fdprocessedid="pifgeg"><i class="fa fa-comments"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Documents" fdprocessedid="pifgeg"><i class="fa fa-file-pdf-o"></i></span>
+                                <span class="step_descr">
+                                    <br/>
+                                </span>
+                            </a>
+                          </li>
+                        </ul>
+                    </div> 
+                    <!-- {% url 'gearBox:truckFormAdd' %} -->
+                    <form action="{% url 'gearBox:truckComplianceFormSave' %}" method="post">
+                        {% csrf_token %}
+                        {% comment %} <h2>Compliance Form </h2> {% endcomment %}
+                        <div class="x_title">
+                            <h6>Accreditation / Compliance</h6>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="input-group-section yellow">
+                                          <label for="maintenance-entry-date">Maintenance entry date</label>
+                                          <input type="number" id="maintenance-entry-date" class="form-control mb-2">
+                                          <label for="maintenance-exit-date">Maintenance exit date</label>
+                                          <input type="number" id="maintenance-exit-date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="input-group-section blue">
+                                            <label for="mass-entry-date">Mass entry date</label>
+                                            <input type="number" id="mass-entry-date" class="form-control mb-2">
+                                            <label for="mass-exit-date">Mass exit date</label>
+                                            <input type="number" id="mass-exit-date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="input-group-section green">
+                                          <label for="nhvas-label-number">NHVAS Label Number</label>
+                                          <input type="number" id="nhvas-label-number" class="form-control mb-2">
+                                          
+                                          <label for="intercept-book-number">Intercept Book Number</label>
+                                          <input type="number" id="intercept-book-number" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3 mb-3">
+                                        <div class="input-group-section pink">
+                                          <label for="nhvas-label-number">Accreditation</label>
+                                            <select name="Accreditation" id="Accreditation" class="form-control mb-2">
+                                            </select>
+                                          <label for="intercept-book-number">Contractor</label>
+                                            <select name="Accreditation" id="Accreditation" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>    
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 mb-3">
+                                    <div class="x_title">
+                                        <h6>Accreditation / Compliance</h6>
+                                        <div class="clearfix"></div>
+                                    </div>                
+                                </div>
+                                <div class="col-md-6 col-lg-6 mb-3">
+                                    <div class="x_title">
+                                        <h6>Mass limits</h6>
+                                        <div class="clearfix"></div>
+                                    </div>                
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
+                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+{% endblock %}
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+<script>
+
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
+   
+
+</script>
+{% endblock %}
+
+{% block footerStyleEnd %} 
+<script type="text/javascript" src="https://cdn.rawgit.com/prashantchaudhary/ddslick/master/jquery.ddslick.min.js" ></script>
+<script>
+    $("#informationIcon").ddslick({
+        width:"100%",
+        imagePosition: "left",
+        selectText: "select Your Social Network",
+        onSelected: function(data){
+            $('input[name="informationIcon"]').val(data.selectedData.value);
+        }
+    })
+    function registered(data) {
+        var isChecked = $(data).prop("checked");
+        if(isChecked){
+            $("#registrationSection input").prop("disabled", true);
+            $("#registrationSection select").prop("disabled", true);
+        }else{
+            $("#registrationSection input").prop("disabled", false);
+            $("#registrationSection select").prop("disabled", false);
+        }
+        console.log(isChecked);
+    }
+
+</script>
+
+{% endblock %}
