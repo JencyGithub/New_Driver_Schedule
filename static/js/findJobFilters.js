@@ -234,9 +234,8 @@ function setCalendar(data) {
   });
   calendar.render();
   var newDriver = {
-    id: "0", // Replace with a unique identifier for the driver
-    title: "Unassigned", // Driver name
-    // Add any other properties you need for the driver
+    id: "0", 
+    title: "Unassigned"    
   };
 
   calendar.addResource(newDriver);

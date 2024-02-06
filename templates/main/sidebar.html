@@ -26,13 +26,13 @@
         {% comment %} {% if user.is_active and user.is_staff %} {% endcomment %}
         {% if request.session.user_type != 'Driver' %}
         <ul class="nav side-menu">
-          {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
+          {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' or request.session.user_type == 'HR' %}
 
           <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-desktop"></i> Dashboard</a></li>
           {% endif %}
           <li class=""><a href="{% url 'Account:mapFormView' %}"><i class="fa fa-truck"></i> DriverTrip</a></li>
         </ul>
-        {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' %}
+        {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' or request.session.user_type == 'HR' %}
         <ul class="nav side-menu">
           {% comment %} Fleet/Truck section {% endcomment %}
           <li>
@@ -143,6 +143,7 @@
                 <li><a href="{% url 'gearBox:reminderTable' %}">Reminder</a>
                 </li>
               {% endif %}
+              {% if request.session.user_type == "SuperUser" or request.session.user_type == "HR" %}
               <li><a>Availability<span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                   <li><a>Leaves section<span class="fa fa-chevron-down"></span></a>
@@ -155,6 +156,8 @@
                   </li>
                 </ul>
               </li>
+              {% endif %}
+
               {% if request.session.user_type == "SuperUser" %}
                 <li><a href="#">Settings</a>
               {% endif %}
