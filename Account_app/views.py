@@ -20,6 +20,7 @@ from itertools import chain
 from dateutil.relativedelta import relativedelta
 from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
+from django.core.serializers import serialize
 
 
 def index(request):
@@ -1490,8 +1491,64 @@ def getRctiError(request):
     rctiErrorData = RctiErrors.objects.filter(pk=request.POST.get('id')).values().first()
     return JsonResponse({'status': True,'data': rctiErrorData})
 
+def expensesFilterView(request):
+    clientObj = Client.objects.all()
+    # return HttpResponse(clientObj)
+    clientTruckConnectionObj = ClientTruckConnection.objects.all()
+    basePlantObj = BasePlant.objects.all()
+    params = {
+        'clientObj':clientObj,
+        'clientTruckConnectionObj':clientTruckConnectionObj,
+        'basePlantObj':basePlantObj,
+    }
+    return render(request, 'Account/expensesFilterView.html',params)
+
+@csrf_protect
+def expensesTableView(request):
+    # rcti_expenses_query = None
+    startDate = request.POST.get('startDate_')
+    endDate = request.POST.get('endDate_')
+    clientName = request.POST.get('clientName_')
+    clientTruckNo = request.POST.get('truckNo_')
+    clientDocketYard = request.POST.get('docketYard_')
+    startDate = datetime.strptime(startDate, '%B %d, %Y').strftime('%Y-%m-%d')
+    endDate = datetime.strptime(endDate, '%B %d, %Y').strftime('%Y-%m-%d')  
+    data = []
+    if clientName:
+        clientName = Client.objects.filter(clientId = clientName).first()
+    if clientTruckNo:
+        clientTruckNo = ClientTruckConnection.objects.filter(id = clientTruckNo).first()
+    if clientDocketYard:
+        clientDocketYard =BasePlant.objects.filter(id =clientDocketYard).first()
+        
+    
+    # return HttpResponse('work')
+    if clientName :
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName).values()
+        
+    if clientTruckNo:
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),truckNo= clientTruckNo.clientTruckId).values()
+        
+    if clientDocketYard :
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant).values()
+        
+    if clientName and clientTruckNo :
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName,truckNo= clientTruckNo.clientTruckId).values()
+        
+    if  clientName and clientDocketYard :
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName , docketYard=clientDocketYard.basePlant).values()
+        
+    if clientTruckNo and clientDocketYard  :
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId).values()
+        
+    if clientName and clientDocketYard  and clientTruckNo:
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName, docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId).values()
+
+    data.extend(rcti_expenses_query)
+    return JsonResponse({'status': True,'data': data})
 
 def expanseForm(request, id = None):
+
     rctiExpense = None
     if id:
         rctiExpense = RctiExpense.objects.filter(id = id).first()
@@ -1504,7 +1561,7 @@ def expanseForm(request, id = None):
 
 @csrf_protect
 def expanseSave(request):
-    clientNameObj = Client.filter(name = 'boral').first()
+    clientNameObj = Client.objects.filter(name = 'boral').first()
     RctiExpenseObj = RctiExpense()
     RctiExpenseObj.clientName  = clientNameObj
     RctiExpenseObj.truckNo = request.POST.get('truckNo')
@@ -2210,7 +2267,7 @@ def reconciliationForm(request, dataType):
         'clients': clients,
         'trucks': trucks ,
     }
-    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue 10 - expenses
     if dataType == 0:
         params['dataType'] = 'Reconciliation Report'
         params['dataTypeInt'] = 0
@@ -2223,6 +2280,9 @@ def reconciliationForm(request, dataType):
     elif dataType ==  7:
         params['dataType'] = 'Revenue Report'
         params['dataTypeInt'] = 7
+    elif dataType ==  10:
+        params['dataType'] = 'Expenses Report'
+        params['dataTypeInt'] = 10
         
     return render(request, 'Reconciliation/reconciliation.html', params)
 
@@ -2248,6 +2308,21 @@ def reconciliationAnalysis(request,dataType):
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
         params['dataType'] = 'Revenue'
         params['dataTypeInt'] = 7
+    elif dataType == 10:
+        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate))
+        clientObj = Client.objects.all()
+        clientTruckConnectionObj = ClientTruckConnection.objects.all()
+        basePlantObj = BasePlant.objects.all()
+        params = {
+            'clientObj':clientObj,
+            'clientTruckConnectionObj':clientTruckConnectionObj,
+            'basePlantObj':basePlantObj,
+            'dataList':dataList,
+            'startDate':startDate,
+            'endDate':endDate,
+        }
+        return render(request, 'Account/Tables/expensesTable.html',params)
+    
     for data in dataList:        
         data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
     params['dataList'] = dataList
