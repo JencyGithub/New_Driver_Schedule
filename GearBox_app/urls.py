@@ -50,11 +50,56 @@ urlpatterns = [
     path('driverForm/edit/<int:id>/', views.driverForm, name='driverFormEdit'),
     path('driverForm/edit/save/<int:id>/', views.driverFormSave, name='driverFormEditSave'),
     
+
+    # Admin staff 
+    path('admin-staff/', views.adminStaffView, name='adminStaffTable'),
+    path('admin-staff/add/view/', views.adminStaffForm, name='adminStaffForm'),
+    path('admin-staff/add/save/', views.adminStaffSave, name='adminStaffSave'),
+
+    path('admin-staff/edit/view/<int:id>/', views.adminStaffForm, name='adminStaffEdit'),
+    path('admin-staff/edit/save/<int:id>/', views.adminStaffSave, name='adminStaffEditSave'),
+
+
+    # Compliance 
+    path('medicalsTable', views.medicalsTable, name='medicalsTable'),
+    path('trainingTable', views.trainingTable, name='trainingTable'),
+
+    # Safety
+    path('vehicleAccidentsTable', views.vehicleAccidentsTable, name='vehicleAccidentsTable'),
+    path('equipmentIssueTable', views.equipmentIssueTable, name='equipmentIssueTable'),
+
+    # Reminder
+    path('reminderTable', views.reminderTable, name='reminderTable'),    
+
     # Truck Table 
     
     path('truckTable', views.truckTable, name='truckTable'),
     path('truckForm', views.truckForm, name='truckForm'),
     path('truckForm/add/', views.truckFormSave, name='truckFormAdd'),
+    
+    path('truckForm/Axles/View', views.truckAxlesFormView, name='truckAxlesFormView'),
+    path('truckForm/Axles/Save', views.truckAxlesFormSave, name='truckAxlesFormSave'),
+    
+    path('truckForm/Setting/View', views.truckSettingFormView, name='truckSettingFormView'),
+    path('truckForm/Setting/Save', views.truckSettingFormSave, name='truckSettingFormSave'),
+    
+    path('truckForm/Reminders/View', views.truckRemindersFormView, name='truckRemindersFormView'),
+    path('truckForm/Reminders/Save', views.truckRemindersFormSave, name='truckRemindersFormSave'),
+    
+    path('truckForm/Parts/View', views.truckPartsFormView, name='truckPartsFormView'),
+    path('truckForm/Parts/Save', views.truckPartsFormSave, name='truckPartsFormSave'),
+    
+    path('truckForm/History/View', views.truckHistoryFormView, name='truckHistoryFormView'),
+    path('truckForm/History/Save', views.truckHistoryFormSave, name='truckHistoryFormSave'),
+    
+    path('truckForm/Odometer/View', views.truckOdometerFormView, name='truckOdometerFormView'),
+    path('truckForm/Odometer/Save', views.truckOdometerFormSave, name='truckOdometerFormSave'),
+    
+    path('truckForm/Compliance/View', views.truckComplianceFormView, name='truckComplianceFormView'),
+    path('truckForm/Compliance/Save', views.truckComplianceFormSave, name='truckComplianceFormSave'),
+    
+    path('truckForm/Documents/View', views.truckDocumentsFormView, name='truckDocumentsFormView'),
+    path('truckForm/Documents/Save', views.truckDocumentsFormSave, name='truckDocumentsFormSave'),
     
     path('truck/view/<int:id>/', views.truckForm, name='truckView'),
     
@@ -63,8 +108,14 @@ urlpatterns = [
     path('getRateCard/', views.getRateCard, name='getRateCard'),
     
     # dockument 
-    path('document/', views.documentView, name="documentView"),
-    path('document/form', views.documentForm, name="documentForm"),
+    # path('document/', views.documentView, name="do
+
+    # setting form 
+    path("settingsForm/", views.settingsForm, name="settingsForm"),
+
+    # Compliance form 
+    path("complianceForm/", views.complianceForm, name="complianceForm"),
+
     # Client Table
     
     path('clientTable', views.clientTable, name='clientTable'),

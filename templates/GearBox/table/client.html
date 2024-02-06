@@ -52,6 +52,7 @@
                                             <tr>
                                                 <th>Client Name</th>
                                                 <th>Email</th>
+                                                <th>Created by</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -60,6 +61,7 @@
                                             <tr>
                                                 <td>{{ client.name }}</td>
                                                 <td>{{ client.email }}</td>
+                                                <td>{{ client.createdBy.username }}</td>
                                                 <td>
                                                     <a href="{% url 'gearBox:clientEdit' id=client.clientId %}">
                                                         <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>

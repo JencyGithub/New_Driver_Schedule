@@ -13,11 +13,12 @@ from django.http import Http404
 from django.contrib.auth.models import User , Group
 import os, colorama, subprocess
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password
 
 
 # Create your views here.
 def leaveReq(request):
-    leave_requests = LeaveRequest.objects.all()
+    leave_requests = LeaveRequest.objects.all().order_by('-status')
     return render(request, 'gearBox/table/LeaveReq.html', {'leave_requests': leave_requests})
 
 def natureOfLeaves(request):
@@ -63,27 +64,27 @@ def leaveReqForm(request,id=None):
     return render(request,'gearBox/LeaveReqForm.html',params)
         
 @csrf_protect
-@api_view(['POST'])
 def changeLeaveRequest(request,id=None):
-    
-    employee = Driver.objects.get(driverId = request.POST.get('driverId'))
-    reason = NatureOfLeave.objects.get(id = request.POST.get('Reason'))
-    
-    data = {
-        'employee' : employee,
-        'start_date' : request.POST.get('StartDate'),
-        'end_date' : request.POST.get('EndDate'),
-        'reason' :reason,
-    }
     if id == None:
+        employee = Driver.objects.get(driverId = request.POST.get('driverId'))
+        reason = NatureOfLeave.objects.get(id = request.POST.get('Reason'))
+        
+        data = {
+            'employee' : employee,
+            'start_date' : request.POST.get('StartDate'),
+            'end_date' : request.POST.get('EndDate'),
+            'reason' :reason,
+        }
         data['status'] = 'Pending'
         insert = insertIntoTable(tableName='LeaveRequest',dataSet=data)
         messages.success(request,'Adding successfully')
     else:
-        data['status'] = request.POST.get('Status')
-        update = updateIntoTable(record_id=id,tableName='LeaveRequest',dataSet=data)
-        messages.success(request,'Updated successfully')
-        
+        requestObj = LeaveRequest.objects.filter(pk=id).first()
+        requestObj.status = request.POST.get('status')
+        requestObj.comment = request.POST.get('comment')
+        requestObj.closedBy = request.user
+        requestObj.save()
+        messages.success(request,'Updated successfully')        
         
     return redirect('gearBox:leaveReq')
 
@@ -94,6 +95,61 @@ def driversView(request):
         'drivers' : drivers
     }
     return render(request,'GearBox/table/driverTable.html',params)
+
+def adminStaffView(request):
+    staff = User.objects.exclude(groups__name = "Driver")
+    params = {
+        'staff' : staff
+    }
+    return render(request,'GearBox/table/adminStaffTable.html',params)
+
+def adminStaffForm(request, id=None):
+    userObj = None
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+    params = {
+        'userObj' : userObj
+    }
+    return  render(request,'GearBox/adminStaffForm.html', params)
+
+@csrf_protect
+def adminStaffSave(request, id=None):
+    firstName = request.POST.get('firstName')
+    lastName = request.POST.get('lastName')
+    password = request.POST.get('password')
+    email = request.POST.get('email')
+    group = request.POST.get('userType')
+    isActive = True
+    userObj = None
+    msg = "Staff created successfully."
+    if id:
+        userObj = User.objects.filter(pk=id).first()
+        isActive = request.POST.get('isActive')
+        msg = "Staff updated successfully."
+    else:
+        existingUser = User.objects.filter(Q(email=email) | Q(username=firstName.lower().strip())).first()
+        if existingUser:
+            messages.error( request, "This user is already Exist.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        userObj = User()
+        userObj.username=firstName.lower().strip()
+        userObj.password=make_password(password) 
+        
+    userObj.first_name=firstName
+    userObj.last_name=lastName
+    userObj.email=email
+    userObj.is_staff=True 
+    userObj.is_active= True if isActive else False 
+    userObj.save() 
+    
+    userObj.groups.clear()
+    
+    if group != 'Admin':
+        groupObj = Group.objects.get(name=group)
+        userObj.groups.add(groupObj)
+    
+    messages.success( request, msg)
+    return redirect('gearBox:adminStaffTable')
 
 
 def driverForm(request, id=None):
@@ -107,7 +163,6 @@ def driverForm(request, id=None):
 
 
 @csrf_protect
-@api_view(['POST'])
 def driverFormSave(request, id= None):
     users = User.objects.all()
     drivers = Driver.objects.all()
@@ -196,6 +251,41 @@ def driverFormSave(request, id= None):
 
 # ````````````````````````````````````````
 
+# Compliance Section 
+
+# ````````````````````````````````````````````````
+
+def medicalsTable(request):
+    return render(request,'GearBox/Compliance/medicalsTable.html')
+
+def trainingTable(request):
+    return render(request, 'GearBox/Compliance/trainingTable.html')
+
+
+# ````````````````````````````````````````
+
+# Safety
+
+# ````````````````````````````````````````````````
+
+
+def vehicleAccidentsTable(request):
+    return render(request, 'GearBox/Safety/vehicleAccidentsTable.html')
+
+def equipmentIssueTable(request):
+    return render(request, 'GearBox/Safety/equipmentIssueTable.html')
+
+# ````````````````````````````````````````
+
+# Reminder
+
+# ````````````````````````````````````````````````
+
+def reminderTable(request):
+    return render(request, 'GearBox/reminderTable.html')
+
+# ````````````````````````````````````````
+
 # Truck Section 
 
 # ````````````````````````````````````````````````
@@ -221,6 +311,7 @@ def truckForm(request, id=None):
         for i in connections:
             i['count'] = count_
             count_ += 1
+            i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
             preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
             i['pre_start_name'] = preStartObj.preStartName
             # return HttpResponse(i['pre_start_name'])
@@ -239,16 +330,67 @@ def truckForm(request, id=None):
     return render(request,'GearBox/truck/truckForm.html',params)
 
 @csrf_protect
-@api_view(['POST'])
 def truckFormSave(request):
+    return redirect('gearBox:truckAxlesFormView')
+    
     # return HttpResponse(request.POST.get('truckNo'))
-    dataList = {
-        'adminTruckNumber' : request.POST.get('truckNo'),
-    }
-    insertIntoTable(tableName='AdminTruck',dataSet=dataList)
+    # dataList = {
+    #     'adminTruckNumber' : request.POST.get('truckNo'),
+    # }
+    # insertIntoTable(tableName='AdminTruck',dataSet=dataList)
 
-    messages.success(request,'Adding successfully')
-    return redirect('gearBox:truckTable')
+    # messages.success(request,'Adding successfully')
+    # return redirect('gearBox:truckTable')
+
+def truckAxlesFormView(request):
+    return render(request,'GearBox/truck/truckAxlesForm.html')
+
+def truckAxlesFormSave(request):
+    return redirect('gearBox:truckSettingFormView')
+
+def  truckSettingFormView(request):
+    return render(request,'GearBox/truck/truckSettingForm.html')
+
+def truckSettingFormSave(request):
+    return redirect('gearBox:truckRemindersFormView')
+
+def  truckRemindersFormView(request):
+    return render(request,'GearBox/truck/truckRemindersForm.html')
+
+def truckRemindersFormSave(request):
+    return redirect('gearBox:truckPartsFormView')
+
+def  truckPartsFormView(request):
+    return render(request,'GearBox/truck/truckPartsForm.html')
+
+def truckPartsFormSave(request):
+    return redirect('gearBox:truckHistoryFormView')
+
+def  truckHistoryFormView(request):
+    return render(request,'GearBox/truck/truckHistoryForm.html')
+
+def truckHistoryFormSave(request):
+    return redirect('gearBox:truckOdometerFormView')
+
+def  truckOdometerFormView(request):
+    return render(request,'GearBox/truck/truckOdometerForm.html')
+
+def truckOdometerFormSave(request):
+    return redirect('gearBox:truckComplianceFormView')
+
+def  truckComplianceFormView(request):
+    return render(request,'GearBox/truck/truckComplianceForm.html')
+
+def truckComplianceFormSave(request):
+    return redirect('gearBox:truckDocumentsFormView')
+
+def  truckDocumentsFormView(request):
+    return render(request,'GearBox/truck/truckDocumentsForm.html')
+
+def truckDocumentsFormSave(request):
+    return HttpResponse('Stop')
+    # return redirect('gearBox:truckDocumentsFormView')
+
 
 def truckConnectionForm(request, id):
     clientIds = Client.objects.all()
@@ -265,7 +407,6 @@ def truckConnectionForm(request, id):
     return render(request,'GearBox/clientTruckConnectionForm.html',params)
 
 @csrf_protect
-@api_view(['POST'])
 def truckConnectionSave(request,id):
     adminTruck = AdminTruck.objects.get(id=id)
     rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
@@ -278,7 +419,8 @@ def truckConnectionSave(request,id):
         'clientTruckId' : request.POST.get('clientTruckNumber'),
         'truckType' : request.POST.get('truckType'),
         'startDate' : request.POST.get('startDate'),
-        'endDate' : request.POST.get('endDate')
+        'endDate' : request.POST.get('endDate'),
+        'createdBy' : request.user
     }
 
     existingData = ClientTruckConnection.objects.filter(Q(truckNumber = adminTruck,clientId=dataList['clientId'],startDate__gte = dataList['startDate'],startDate__lte = dataList['endDate'])|Q(truckNumber = adminTruck,clientId=dataList['clientId'],endDate__gte = dataList['startDate'],endDate__lte = dataList['endDate'])).first()
@@ -312,11 +454,16 @@ def getRateCard(request):
     print(rateCardList)
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
-def documentView(request):
-    return render(request,'GearBox/truck/table/document.html')
 
-def documentForm(request):
-    return render(request,'GearBox/truck/documentForm.html')
+# Settings Form 
+
+def settingsForm(request):
+    return render(request,'GearBox/truck/settingsForm.html')
+
+# Compliance Form 
+
+def complianceForm(request):
+    return render(request,'GearBox/truck/complianceForm.html')
 
 # ```````````````````````````````````
 # Client 
@@ -340,21 +487,33 @@ def clientForm(request, id=None):
     return render(request, 'GearBox/clientForm.html', params)
 
 @csrf_protect
-@api_view(['POST'])
 def clientChange(request, id=None):
-    
-    dataList = {
-        'name' : request.POST.get('name').lower().strip(),
-        'email' : request.POST.get('email'),
-        'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False
-    }
-    
+    clientObj = None
     if id:
-        updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
-        messages.success(request,'Updated successfully')
+        clientObj = Client.objects.filter(pk=id).first()
     else:
-        insertIntoTable(tableName='Client',dataSet=dataList)
-        messages.success(request,'Added successfully')
+        clientObj = Client()
+
+    clientObj.name = request.POST.get('name').lower().strip()  
+    clientObj.email = request.POST.get('email')
+    clientObj.docketGiven = True if request.POST.get('docketGiven') == 'on' else False  
+    clientObj.createdBy = request.user 
+    clientObj.save()
+
+    
+    # dataList =  {
+    #     'name' : request.POST.get('name').lower().strip(),
+    #     'email' : request.POST.get('email'),
+    #     'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False,
+    #     'createdBy' : request.user
+    # }
+    
+    # if id:
+    #     updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
+    #     messages.success(request,'Updated successfully')
+    # else:
+    #     insertIntoTable(tableName='Client',dataSet=dataList)
+    #     messages.success(request,'Added successfully')
 
     return redirect('gearBox:clientTable')
 

@@ -1,0 +1,428 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Truck Form {% endblock %}
+{% block headStyle %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<style>
+    .dd-selected{
+        color: black;
+    }
+    .dd-select a{
+        background-color:white;
+    }
+    .custom-continer {
+        margin: 0 5rem;
+    }
+
+    .errorMsg {
+        font-size: 0.7rem;
+        color: rgb(255, 0, 0);
+        margin-top: 0.3rem;
+        list-style-type: none;
+    }
+
+    .isInvalid {
+        border: 1px solid rgb(255, 0, 0) !important;
+        border-radius: 7px !important;
+    }
+    ul.wizard_steps{
+        padding-left: 0;
+    }
+
+    @media (max-width: 576px) {
+        .custom-continer {
+            margin: 0;
+        }
+        .form_wizard{
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .custom-continer {
+            margin: 0;
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="custom-container">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2 class="text-uppercase">Settings tab</h2>
+                        <div class="clearfix"></div>
+                        {% comment %} <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
+                        {% if data %}
+                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
+                        {% endif %}
+                        <div class="clearfix"></div> {% endcomment %}
+                    </div>
+               
+                    <div id="wizard" class="form_wizard wizard_horizontal">
+                        <ul class="wizard_steps">
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="selected">
+                                <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="History"><i class="fa fa-history"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0)" class="disabled">
+                                <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
+                                <span class="step_descr">
+                                    <br />
+                                </span>
+                            </a>
+                          </li>
+                        </ul>
+                       
+  
+                    </div> 
+                    
+                    <form action="{% url 'gearBox:truckSettingFormSave' %}" method="post">
+                        {% csrf_token %}
+
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h6>Configuration</h6>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Fueltype" style="margin-bottom: 0.3rem!important;">Fuel Type: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select name="Fueltype" id="Fueltype" class="form-control">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="FuelCreditCategory" style="margin-bottom: 0.3rem!important;">Fuel Credit Category: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select name="FuelCreditCategory" id="FuelCreditCategory" class="form-control">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="adbluePercent" style="margin-bottom: 0.3rem!important;">Adblue percent: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="adbluePercent" style="padding: 0.25rem 0.2rem;" id="adbluePercent">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="kilometresOffset" style="margin-bottom: 0.3rem!important;">Kilometres offset: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="kilometresOffset" style="padding: 0.25rem 0.2rem;" id="kilometresOffset">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="hoursOffset" style="margin-bottom: 0.3rem!important;">Hours offset: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="hoursOffset" style="padding: 0.25rem 0.2rem;" id="hoursOffset">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="prestartChecklist" style="margin-bottom: 0.3rem!important;">Prestart Checklist: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select name="prestartChecklist" id="prestartChecklist" class="form-control">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="trailers" style="margin-bottom: 0.3rem!important;">Attached Assets/Trailers: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="trailers" style="padding: 0.25rem 0.2rem;" id="trailers">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                      
+                            </div>
+                        </div>
+
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h6>Dimensions</h6>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="GCM" style="margin-bottom: 0.3rem!important;">GCM : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="GCM"  style="padding: 0.25rem 0.2rem;" id="GCM">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="GVM" style="margin-bottom: 0.3rem!important;">GVM : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="GVM"  style="padding: 0.25rem 0.2rem;" id="GVM">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="TARE" style="margin-bottom: 0.3rem!important;">TARE : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="TARE" style="padding: 0.25rem 0.2rem;" id="TARE">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="ATM" style="margin-bottom: 0.3rem!important;">ATM : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="ATM" style="padding: 0.25rem 0.2rem;" id="ATM">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Length" style="margin-bottom: 0.3rem!important;">Length : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="Length" style="padding: 0.25rem 0.2rem;" id="Length">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Height" style="margin-bottom: 0.3rem!important;">Height : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="Height" style="padding: 0.25rem 0.2rem;" id="Height">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Width" style="margin-bottom: 0.3rem!important;">Width : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="Width" style="padding: 0.25rem 0.2rem;" id="Width">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Volume" style="margin-bottom: 0.3rem!important;">Volume : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="Volume" style="padding: 0.25rem 0.2rem;" id="Volume">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="Pallets" style="margin-bottom: 0.3rem!important;">Pallets : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="Pallets" style="padding: 0.25rem 0.2rem;" id="Pallets">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                      
+                            </div>
+                        </div>
+
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h6>Custom Fields</h6>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField7" style="margin-bottom: 0.3rem!important;">Spare Field 7: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField7" style="padding: 0.25rem 0.2rem;" id="spareField7">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField8" style="margin-bottom: 0.3rem!important;">Spare Field 8: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField8" style="padding: 0.25rem 0.2rem;" id="spareField8">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField9" style="margin-bottom: 0.3rem!important;">Spare Field 9: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField9" style="padding: 0.25rem 0.2rem;" id="spareField9">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField10" style="margin-bottom: 0.3rem!important;">Spare Field 10: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField10" style="padding: 0.25rem 0.2rem;" id="spareField10">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField11" style="margin-bottom: 0.3rem!important;">Spare Field 11: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField11" style="padding: 0.25rem 0.2rem;" id="spareField11">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField12" style="margin-bottom: 0.3rem!important;">Spare Field 12: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField12" style="padding: 0.25rem 0.2rem;" id="spareField12">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField13" style="margin-bottom: 0.3rem!important;">Spare Field 13: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField13" style="padding: 0.25rem 0.2rem;" id="spareField13">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField14" style="margin-bottom: 0.3rem!important;">Spare Field 14: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField14" style="padding: 0.25rem 0.2rem;" id="spareField14">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField15" style="margin-bottom: 0.3rem!important;">Spare Field 15: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField15" style="padding: 0.25rem 0.2rem;" id="spareField15">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField16" style="margin-bottom: 0.3rem!important;">Spare Field 16: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField16" style="padding: 0.25rem 0.2rem;" id="spareField16">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField17" style="margin-bottom: 0.3rem!important;">Spare Field 17: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField17" style="padding: 0.25rem 0.2rem;" id="spareField17">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField18" style="margin-bottom: 0.3rem!important;">Spare Field 18: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField18" style="padding: 0.25rem 0.2rem;" id="spareField18">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField19" style="margin-bottom: 0.3rem!important;">Spare Field 19: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField19" style="padding: 0.25rem 0.2rem;" id="spareField19">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <label for="spareField20" style="margin-bottom: 0.3rem!important;">Spare Field 20: <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="" type="text" name="spareField20" style="padding: 0.25rem 0.2rem;" id="spareField20">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            <label for="description" style="margin-bottom: 0.3rem!important;">Description : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <textarea name="description" id="description" rows="1" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                      
+                            </div>
+                        </div>
+                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
+                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+    integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+
+    // initialize a validator instance from the "FormValidator" constructor.
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
+</script>
+{% endblock %}
+{% endblock %}

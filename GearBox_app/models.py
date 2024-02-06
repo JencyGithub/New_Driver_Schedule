@@ -2,6 +2,8 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator,RegexValidator
 from datetime import date
 from django.utils import timezone
+from django.contrib.auth.models import User
+
 
 TRUCK_TYPE_CHOICES = (
     ('Embedded','Embedded'),
@@ -17,6 +19,7 @@ class Client(models.Model):
     name = models.CharField(max_length=200)
     email = models.CharField(max_length=255,default=None, null=True, blank=True)
     docketGiven = models.BooleanField(default=False)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def __str__(self) -> str:
         return str(self.name) 
@@ -44,16 +47,20 @@ class RateCard(models.Model):
     tds = models.FloatField(default=0)
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE , default=1)
 
+
     def __str__(self) -> str:
         return str(self.rate_card_name)
 
 class Surcharge(models.Model):
     surcharge_Name = models.CharField(max_length=255)
+    # createdBy = models.ForeignKey('auth.user', on_delete=models.CASCADE, default=None)
+
     
     def __str__(self) -> str:
         return str(self.surcharge_Name)
     
 class CostParameters(models.Model):
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     loading_cost_per_cubic_meter = models.FloatField(default=0)
     km_cost = models.FloatField(default=0)
@@ -73,6 +80,7 @@ class CostParameters(models.Model):
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
 
 class RateCardSurchargeValue(models.Model):
+    # createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     surcharge = models.ForeignKey(Surcharge, on_delete=models.CASCADE)
     surchargeValue = models.FloatField(default=0)
@@ -178,6 +186,7 @@ class AdminTruck(models.Model):
     # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     adminTruckNumber = models.PositiveIntegerField(unique=True)
     truckStatus = models.BooleanField(default=False)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     
     def __str__(self):
         return str(self.adminTruckNumber)
@@ -209,6 +218,8 @@ class ClientTruckConnection(models.Model):
     # clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  
     startDate = models.DateField(default=timezone.now())  
     endDate = models.DateField(null=True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+
 
     def __str__(self):
         return str(self.truckNumber) + str(self.clientId)
@@ -228,8 +239,11 @@ class LeaveRequest(models.Model):
     start_date = models.DateField(null=True, default=None)
     end_date = models.DateField(null=True, default=None)
     reason = models.ForeignKey(NatureOfLeave,on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Denied', 'Denied')], default='Pending')
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Denied', 'Denied'), ('Cancel', 'Cancel')], default='Pending')
     # Add other fields as needed
+
+    comment = models.CharField(max_length=2048, default='', null=True, blank=True)
+    closedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
 
     def __str__(self):
         return f"{self.employee} - {self.start_date} to {self.end_date}"

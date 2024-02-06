@@ -87,12 +87,15 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
     </div>  -->
 
     <div class="row">
       <div class="col-md-12">
-        <div class="x_panel text-right">
-          <select id="multiSelect" multiple="multiple" class="w-25">
+        <div class="x_panel d-flex justify-content-between flex-wrap">
+          <select id="status" multiple="multiple" style="width:25%">
             <option value="Unassigned" data-badge-color="#E74C3C">Unassigned</option>
             <option value="Assigned" data-badge-color="#ff8700">Assigned</option>
             <option value="Dispatched" data-badge-color="#0084DD">Dispatched</option>
@@ -101,13 +104,16 @@
             <option value="Complete" data-badge-color="#A9A9A9">Complete</option>
             <option value="Cancelled" data-badge-color="#000">Cancelled</option>
           </select>
+          <span class="btn btn-outline-dark btn-sm" id="filterBtn">Filters</span>
         </div>
         <div id="calendar"></div>
       </div>
     </div>
   </div>
 </div>
-<!-- Modal -->
+
+<!-- Modals -->
+<!-- Appointment View modal -->
 <div class="modal fade" id="appointmentModel" tabindex="-1" aria-labelledby="appointmentModelLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered  modal-lg">
     <div class="modal-content" style="min-height: 30rem;">
@@ -139,6 +145,7 @@
                         <div class="row mt-4">
                             <div class="col-md-6">
                                 <p><strong>Title:</strong> <span id="appTitle" class="text-capitalize"></span></p>
+                                <p><strong>Client:</strong> <span id="appClient" class="text-capitalize"></span></p>
                                 <p><strong>Start Date/Time:</strong> <span id="appStartDateTime" class="text-capitalize"></span></p>
                                 <p><strong>End Date/Time:</strong> <span id="appEndDateTime" class="text-capitalize"></span></p>
                                 <p><strong>Report to Origin:</strong> <span id="appReportOrigin" class="text-capitalize"></span></p>
@@ -179,7 +186,7 @@
         <a href="#" target="_blank" id="editBtn" class="btn btn-sm btn-outline-dark border-1" style="font-size: 0.7rem;">
           Change Driver/Truck
         </a>
-        <a href="#" id="cancleJonBtn" class="btn btn-sm btn-danger border-1" style="font-size: 0.7rem;">
+        <a href="#" id="cancelJobBtn" class="btn btn-sm btn-danger border-1" style="font-size: 0.7rem;">
           Cancel job
         </a>
       </div>
@@ -187,16 +194,7 @@
   </div>
 </div>
 
-<!-- <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="cancelModel" aria-hidden="true" id="cancelModel">
-  <div class="modal-dialog modal-md ">
-    <div class="modal-content py-3 px-2 ">
-      <strong>Do you really want to cancel this job?</strong>
-      <div type="submit" class="btn btn-default"  onclick="cancelJob()" style="font-size: 0.7rem;">Yes</div>&nbsp;
-      <div type="button" class="btn btn-outline-dark " data-dismiss="modal" style="font-size: 0.7rem;">No</div>
-    </div>
-  </div>
-</div> -->
-
+<!-- Cancel job modal -->
 <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="cancelModel" aria-hidden="true" id="cancelModel">
   <div class="modal-dialog modal-md">
     <div class="modal-content py-3 px-2 ">
@@ -213,6 +211,180 @@
   </div>
 </div>
 
+<!-- Filters modal -->
+<!-- data-backdrop="static" data-keyboard="false" ----------THIS TWO PROPERTY FOR OUTSIDE CLICK MODAL CLOSE STOP------------>
+<div class="modal fade bd-example-modal-xl" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="filterModalLabel">Set Filters</h6>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body py-0">
+        <div class="container">
+          <div class="row">
+            <div class="x_panel border-0 p-1">
+              <div class="x_content">
+                <ul class="nav nav-tabs bar_tabs p-0" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="filterContent-tab" data-toggle="tab" href="#filterContent" role="tab" aria-controls="filterContent" aria-selected="true">Content</a>
+                    </li>
+                  
+                    <li class="nav-item">
+                        <a class="nav-link" id="filterDriver-tab" data-toggle="tab" href="#filterDriver" role="tab" aria-controls="filterDriver" aria-selected="false">Driver</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="filterLocation-tab" data-toggle="tab" href="#filterLocation" role="tab" aria-controls="filterLocation" aria-selected="false">Location</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="filterVehicle-tab" data-toggle="tab" href="#filterVehicle" role="tab" aria-controls="filterVehicle" aria-selected="false">Vehicle</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="filterGroup-tab" data-toggle="tab" href="#filterGroup" role="tab" aria-controls="filterGroup" aria-selected="false">Group</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                  <div class="tab-pane fade show active" id="filterContent" role="tabpanel" aria-labelledby="filterContent-tab">
+                    <div class="row px-3">
+                      <div class="col-12 text-right border-bottom pb-2 mb-2">
+                        <b class="text-dark" style="font-size: 0.75rem;" id="clearDrivers" onclick="clearFilter('filterContent')">Clear contents</b>
+                      </div>
+                      <!-- Content will place here -->
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="driverContent" id="driverContent" name="driverContent">
+                            <label class="form-check-label" for="driverContent"><b>Driver</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="timeContent" id="timeContent" name="timeContent">
+                            <label class="form-check-label" for="timeContent"><b>Start time and End time</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="vehicleContent" id="vehicleContent" name="vehicleContent">
+                            <label class="form-check-label" for="vehicleContent"><b>Vehicle</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="titleContent" id="titleContent" name="titleContent">
+                            <label class="form-check-label" for="titleContent"><b>Title</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="customerContent" id="customerContent" name="customerContent">
+                            <label class="form-check-label" for="customerContent"><b>Customer</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="addressContent" id="addressContent" name="addressContent">
+                            <label class="form-check-label" for="addressContent"><b>Address</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="staffNotesContent" id="staffNotesContent" name="staffNotesContent">
+                            <label class="form-check-label" for="staffNotesContent"><b>Staff notes</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="reportingTimeContent" id="reportingTimeContent" name="reportingTimeContent">
+                            <label class="form-check-label" for="reportingTimeContent"><b>Reporting time</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="shiftTypeContent" id="shiftTypeContent" name="shiftTypeContent">
+                            <label class="form-check-label" for="shiftTypeContent"><b>Shift type</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="createdByContent" id="createdByContent" name="createdByContent">
+                            <label class="form-check-label" for="createdByContent"><b>Created by</b></label>
+                        </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="crestedTimeContent" id="crestedTimeContent" name="crestedTimeContent">
+                            <label class="form-check-label" for="crestedTimeContent"><b>Created time</b></label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="filterDriver" role="tabpanel" aria-labelledby="driver-tab">
+                    <div class="row px-3">
+                      <div class="col-12 text-right border-bottom pb-2 mb-2">
+                        <b class="text-dark" style="font-size: 0.75rem;" id="clearDrivers" onclick="clearFilter('filterDriver')">Clear drivers</b>
+                      </div>
+                      <!-- Drivers will place here -->
+                      {% for driver in drivers %}
+                        <div class="col-md-3 col-sm-3">
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="driver{{ driver.driverId }}" id="driver{{ driver.driverId }}" name="driver{{ driver.driverId }}">
+                              <label class="form-check-label text-capitalize" for="driver{{ driver.driverId }}"><b>{{ driver.name }}</b></label>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="filterLocation" role="tabpanel" aria-labelledby="filterLocation-tab">
+                    <div class="row px-3">
+                      <div class="col-12 text-right border-bottom pb-2 mb-2">
+                        <b class="text-dark" style="font-size: 0.75rem;" id="clearLocation" onclick="clearFilter('filterLocation')">Clear locations</b>
+                      </div>
+                      <!-- Locations will place here -->
+                      {% for location in locations %}
+                        <div class="col-md-3 col-sm-3">
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="location{{ location.id }}" id="location{{ location.id }}" name="location{{ location.id }}">
+                              <label class="form-check-label" for="location{{ location.id }}"><b>{{ location.basePlant }}</b></label>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="filterVehicle" role="tabpanel" aria-labelledby="filterVehicle-tab">
+                    <div class="row px-3">
+                      <div class="col-12 text-right border-bottom pb-2 mb-2">
+                        <b class="text-dark" style="font-size: 0.75rem;" id="clearVehicle" onclick="clearFilter('filterVehicle')">Clear vehicles</b>
+                      </div>
+                      <!-- Vehicle will place here -->
+                      {% for vehicle in vehicles %}
+                        <div class="col-md-2 col-sm-2">
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="vehicle{{ vehicle.id }}" id="vehicle{{ vehicle.id }}" name="vehicle{{ vehicle.id }}">
+                              <label class="form-check-label" for="vehicle{{ vehicle.id }}"><b>{{ vehicle.adminTruckNumber }}</b></label>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="filterGroup" role="tabpanel" aria-labelledby="filterGroup-tab">
+                    <div class="row px-3">
+                    </div>
+                  </div>
+                </div>
+              </div>            
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer py-2 px-3">
+        <button type="button" class="btn btn-sm btn-outline-danger px-2" style="font-size: 0.75rem;" id="clearAllBtn" onclick="clearFilter('filterModal')">Clear all filters</button>
+        <button type="button" class="btn btn-sm btn-outline-dark px-3" style="font-size: 0.75rem;" id="filterApplyBtn">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 {% block footerStyleEnd %}

@@ -55,6 +55,7 @@ class BasePlant(models.Model):
 
 class DriverShift(models.Model):
     verified = models.BooleanField(default=False)
+    verifiedBy = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     shiftType = models.CharField(max_length=200,choices=(('Day','Day'),('Night','Night')),default = 'Day')
     latitude = models.CharField(max_length=20, null=True, blank=True)
     longitude = models.CharField(max_length=20, null=True, blank=True)
@@ -497,8 +498,10 @@ class Escalation(models.Model):
     
     # 1:1st step, 2:2nd step, 3:3rd step, 4:4th step, 5:complete
     escalationStep = models.PositiveIntegerField(default=1)
-    escalationAmount = models.IntegerField(default=0)
+   
+    escalationAmount = models.FloatField(default=0)
     errorId = models.PositiveIntegerField(default=None, null=True)
+    
     
     def __str__(self) -> str:
         return str(self.id) + ' ' + str(self.escalationType)
@@ -511,6 +514,66 @@ class EscalationDocket(models.Model):
     remark = models.CharField(max_length=1024, default='')
     invoiceFile = models.FileField(default=None, null=True, blank=True)
     
+    
+    truckNo = models.ForeignKey(ClientTruckConnection, on_delete=models.CASCADE, default=None)
+
+    callOut = models.BooleanField(default=False)
+    callOutCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    demurrage = models.BooleanField(default=False)
+    demurrageCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    cancellation = models.BooleanField(default=False)
+    cancellationCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    transferKm = models.BooleanField(default=False)
+    transferKmCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    waitingTime = models.BooleanField(default=False)
+    waitingTimeCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    standBy = models.BooleanField(default=False)
+    standByCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    returnKm = models.BooleanField(default=False)
+    returnKmCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    # ------------------
+    surcharge = models.BooleanField(default=False)
+    surchargeCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    loadKm = models.BooleanField(default=False)
+    loadKmCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    blowBack = models.BooleanField(default=False)
+    blowBackCharge = models.FloatField(default=0, null=True, blank=True)
+    # ------------------
+        
+    custom = models.BooleanField(default=False)
+    customCharge = models.FloatField(default=0, null=True, blank=True)
+    
+    
+    def save(self, *args, **kwargs):
+        # Calculate the total amount based on charges
+        total_charge = sum([
+            self.callOutCharge,
+            self.demurrageCharge,
+            self.cancellationCharge,
+            self.transferKmCharge,
+            self.waitingTimeCharge,
+            self.standByCharge,
+            self.returnKmCharge,
+            self.customCharge,
+            self.surchargeCharge,
+            self.loadKmCharge,
+            self.blowBackCharge,
+        ])
+
+        # Update the Total amount field
+        self.amount = total_charge
+
+        super().save(*args, **kwargs)
+        
     def __str__(self) -> str:
         return str(self.docketNumber) + ' ' + str(self.docketDate)
 

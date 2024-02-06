@@ -405,14 +405,45 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
 
+# admin.site.register(AppointmentTruck)
+# admin.site.register(AppointmentDriver)
+
+# @admin.register(Appointment)
+# class AppointmentAdmin(admin.ModelAdmin):
+#     # search_fields = ('client',)
+#     list_display = ["title", "startTime", "endTime", "status","scheduled"]
+#     list_filter = ["status"]
+#     actions = ['send_email_action']
+
+#     def send_email_action(self, request, queryset):
+#         subject = 'Your job application status'
+#         message = 'Your job application status has been updated.'
+#         from_email = 'siddhantethansrec@example.com'  # Set your email address
+#         recipient_list = [applicant.driver.email for applicant in queryset]
+#         print(recipient_list)
+        
+#         # Send emails to selected applicants
+#         for applicant in queryset:
+#             send_mail(subject, message, from_email, [applicant.driver.email])
+#             # send_notification_email(applicant.progress_set.latest('date_updated'))
+        
+#         self.message_user(request, f'Emails sent to {len(queryset)} applicants.')
+    
+#     send_email_action.short_description = 'Send email to selected applicants'
 
 
-@admin.register(Appointment)
+class AppointmentTruckInline(admin.StackedInline):
+    model = AppointmentTruck
+    extra = 0
+class AppointmentDriverInline(admin.StackedInline):
+    model = AppointmentDriver
+    extra = 0
+    
 class AppointmentAdmin(admin.ModelAdmin):
-    search_fields = ('client',)
-    list_display = ["Title", "Start_Date_Time", "End_Date_Time", "Status","scheduled"]
-    list_filter = ["Status"]
+    list_display = ["title", "startTime", "endTime", "status","scheduled"]
+    list_filter = ["status"]
     actions = ['send_email_action']
+    inlines = [AppointmentTruckInline, AppointmentDriverInline]
 
     def send_email_action(self, request, queryset):
         subject = 'Your job application status'
@@ -429,6 +460,9 @@ class AppointmentAdmin(admin.ModelAdmin):
         self.message_user(request, f'Emails sent to {len(queryset)} applicants.')
     
     send_email_action.short_description = 'Send email to selected applicants'
+admin.site.register(Appointment, AppointmentAdmin)
+
+
 
 class HolcimDocket_(admin.ModelAdmin):
     list_display = ['truckNo' ,'jobNo','tripId']
@@ -437,7 +471,6 @@ class HolcimDocket_(admin.ModelAdmin):
 
 admin.site.register(HolcimDocket,HolcimDocket_)
 
-# admin.site.register(RateCardSurchargeValue)
 class RateCardSurchargeValue_(admin.ModelAdmin):
     list_display = ['rate_card_name','surcharge','start_date','end_date']
     search_fields = ['start_date','end_date']
@@ -449,8 +482,7 @@ class HolcimTrip_(admin.ModelAdmin):
     search_fields = ["truckNo"]
 admin.site.register(HolcimTrip,HolcimTrip_)
 
-admin.site.register(AppointmentTruck)
-admin.site.register(AppointmentDriver)
+
 
 
 admin.site.register(RctiReport)

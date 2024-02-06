@@ -70,6 +70,14 @@ urlpatterns = [
     path('driver/pre-start/view/<int:shiftId>/<int:tripId>/', views.showPreStartForm, name='showPreStartForm'),
     path('driver/shift/view/<int:shiftId>/', views.driverShiftView, name='driverShiftView'),
     path('driver/select/client-docket/view/<int:shiftId>/', views.showClientAndTruckNumGet, name='showClientAndTruckNumGet'),
+
+    # Leave section
+    path('driver/leave-request/show/', views.driverLeaveRequestShow, name='driverLeaveRequestShow'),
+    path('driver/leave-request/save/', views.driverLeaveRequestSave, name='driverLeaveRequestSave'),
+
+    path('driver/past-leaves/view/', views.pastLeaveRequestShow, name='pastLeaveRequestShow'),
+    path('driver/cancel-request/<int:id>/', views.cancelLeaveRequest, name='cancelLeaveRequest'),
+
     
     
     # Driver trip path end
@@ -149,6 +157,7 @@ urlpatterns = [
     path('driverTrip/update/<int:shiftId>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
     path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
+    path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
@@ -232,11 +241,11 @@ urlpatterns = [
     
 
     # EscalationForm 
-    path('Escalation/Form', views.EscalationForm, name='EscalationForm'),
-    path('Escalation/Table', views.EscalationTable, name='EscalationTable'),
-    path('Escalation/Form/View/<int:id>', views.EscalationForm, name='EscalationFormView'),
+    path('Manually-Escalation/Form/', views.EscalationForm, name='EscalationForm'),
+    path('Escalation/Table/', views.EscalationTable, name='EscalationTable'),
+    path('Escalation/Form/View/<int:id>/', views.EscalationForm, name='EscalationFormView'),
     path('Manually/Escalation/Forma/Save/', views.manuallyEscalationForm1Save, name='manuallyEscalationForm1Save'),
-    path('Escalation/View/<int:escalationId>', views.ViewBulkEscalationData, name='ViewBulkEscalationData'),
+    path('Escalation/View/<int:escalationId>/', views.ViewBulkEscalationData, name='ViewBulkEscalationData'),
 
     # Find job filters
     path('job/selectedStatus/', views.jobSelectedStatus, name='jobSelectedStatus'),

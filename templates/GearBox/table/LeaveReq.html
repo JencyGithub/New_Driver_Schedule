@@ -39,7 +39,7 @@
         <div class="x_panel">
           <div class="x_title">
             <h2>Leave request</h2>
-            <a href="{% url 'gearBox:leaveReqForm'%}" class="btn btn-dark float-right">Add</a>
+            <a href="{% url 'gearBox:leaveReqForm'%}" class="btn btn-sm btn-dark float-right">Add</a>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -54,7 +54,6 @@
                         <th>End date</th>
                         <th>Reason</th>
                         <th>Status</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -64,13 +63,13 @@
                         <td>{{ leave_request.start_date }}</td>
                         <td>{{ leave_request.end_date }}</td>
                         <td>{{ leave_request.reason.reason }}</td>
-                        <td>{{ leave_request.status }}</td>
                         <td>
-                          <label type="button" class="btn" id="redirectButton">
-                            <a href="{% url 'gearBox:leaveReqEdit' id=leave_request.id%}">
-                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                          {{ leave_request.status }}
+                          {% if leave_request.status == "Pending" %}
+                            <a href="{% url 'gearBox:leaveReqEdit' id=leave_request.id%}" class="ml-2">
+                              <i class="fa-solid fa-arrow-right" style="font-size:1.1rem"></i>
                             </a>
-                          </label>
+                          {% endif %} 
                         </td>
                       </tr>
                       {% endfor %}

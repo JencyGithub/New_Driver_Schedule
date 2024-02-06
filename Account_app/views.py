@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.db.models import Q
 from itertools import chain
 from dateutil.relativedelta import relativedelta
-
+from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
 
 
@@ -37,19 +37,18 @@ def index(request):
     reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = 1 , docketDate__year=2023)
     
     openedEscalation = Escalation.objects.exclude(escalationStep=4)
-    
-    
     dateBefore3days = curDate - timedelta(days=3)
+    oldEscalation = []
+
     for escalation in openedEscalation:
         if escalation.escalationType == "External":
             lastMail = EscalationMail.objects.filter(escalationId=escalation).order_by('mailDate').first()
-            if lastMail.mailDate <= dateBefore3days:
+            if lastMail and lastMail.mailDate <= dateBefore3days:
                 if len(oldEscalation) <= 5:
+                    escalation.lastMailDate = lastMail.mailDate
                     oldEscalation.append(escalation)
                 else:
-                    continue
-            
-    
+                    break
 
     for shift in totalShiftsCount:
         # pre-start pending 
@@ -581,6 +580,14 @@ def mapDataSave(request, recurring=None):
     currentDateTime = getCurrentDateTimeObj()
     result = None
     if not recurring:
+        lat = request.POST.get('latitude')
+        lng = request.POST.get('longitude')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        if not lat or not lng:
+            messages.error(request, "Please on the location")
+            return redirect(request.META.get('HTTP_REFERER'))
+        
         currentHour = currentDateTime.time().hour
         if 6 <= currentHour <= 17 :
             result = "Day"
@@ -591,12 +598,16 @@ def mapDataSave(request, recurring=None):
         lng = request.POST.get('longitude')
         date = request.POST.get('date')
         time = request.POST.get('time')
+        if not lat or not lng:
+            messages.error(request, "Please on the location")
+            return redirect(request.META.get('HTTP_REFERER'))
         
         shiftObj = DriverShift()
         shiftObj.latitude = lat
         shiftObj.longitude = lng
         shiftObj.shiftDate = date
         shiftObj.shiftType = result
+        shiftObj.verifiedBy = request.user
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
         shiftObj.save()
@@ -745,7 +756,8 @@ def driverShiftView(request, shiftId):
     tripObj = None
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
-
+    print(str(shiftObj.startDateTime))
+    minEndDateTime = str(shiftObj.startDateTime).split('+')[0]
     for trip in currentTrips:
         trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
         trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
@@ -764,7 +776,8 @@ def driverShiftView(request, shiftId):
         'clientObj' : truckConnectionObj.clientId,
         'truckObj' : truckConnectionObj,
         'breaks' : breaks,
-        'reimbursements' : reimbursements
+        'reimbursements' : reimbursements,
+        'minEndDateTime' : minEndDateTime
     }
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
@@ -796,6 +809,10 @@ def saveDriverBreak(request, shiftId):
     breakObj.endDateTime = request.POST.get('endDateTime')
     breakObj.location = request.POST.get('curLocation')
     breakObj.description = request.POST.get('description')
+    
+    if breakObj.startDateTime < str(shiftObj.startDateTime) or breakObj.startDateTime > breakObj.endDateTime:
+        messages.error(request, "Break time is not valid.")
+        return redirect(request.META.get('HTTP_REFERER')) 
 
     breakFile = request.FILES.get('breakFile')
     if breakFile:
@@ -854,10 +871,48 @@ def addReimbursementSave(request, shiftId):
     reimbursementObj.save()
     return redirect('Account:DriverPreStartSave', tripObj.id)
 
+@csrf_protect
 def collectDockets(request, shiftId, tripId, endShift=None):
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+    driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    manualEndTime = request.POST.get('endDateTime')
+    
+    if manualEndTime:
+        manualEndTime = pytz.timezone(TIME_ZONE).localize(datetime.strptime(manualEndTime, '%Y-%m-%dT%H:%M'))
+        if manualEndTime < shiftObj.startDateTime:
+            messages.error(request, "End shift date-time is not valid.")
+            return redirect(request.META.get('HTTP_REFERER')) 
+        
+    shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (getCurrentDateTimeObj() - shiftObj.startDateTime).total_seconds() / 60
 
+    def checkBreaks(breaksObjs):
+        driverBreaksTimeList = []    
+        for breakObj in breaksObjs:
+            timeDiff = (breakObj.endDateTime - breakObj.startDateTime).total_seconds() / 60
+            if timeDiff >= 15:
+                driverBreaksTimeList.append([timeDiff, breakObj])
+        return driverBreaksTimeList
+
+    legalBreakList = checkBreaks(driverBreaks)
+    breaksIsAllReady = True
+    
+    if shiftTime > 315 and shiftTime < 331:
+        if len(legalBreakList) == 0:
+            breaksIsAllReady = False
+    elif shiftTime >= 331 and shiftTime < 481:
+        if len(legalBreakList) <= 2:
+            breaksIsAllReady = False
+    elif shiftTime > 481: 
+        if len(legalBreakList) <= 4:
+            breaksIsAllReady = False
+    
+    if not breaksIsAllReady:
+        messages.error(request, "You have not entered enough breaks.")
+        return redirect(request.META.get('HTTP_REFERER'))      
+        
+        
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
@@ -941,6 +996,56 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         
         return redirect('Account:recurringTrip', 1)
     
+    
+def driverLeaveRequestShow(request):
+    reasons = NatureOfLeave.objects.all()
+    params = {
+        'reasons' : reasons
+    }
+    return render(request, 'Trip_details/leaveSection/leaveRequestForm.html', params)
+
+
+def pastLeaveRequestShow(request):
+    driverObj =  Driver.objects.filter(name=request.user.username).first()
+    leaveObjs = LeaveRequest.objects.filter(employee=driverObj)
+    params = {
+        'leaveObjs' : leaveObjs
+    }
+    return render(request, 'Trip_details/leaveSection/pastLeaveRequest.html', params)
+
+
+def cancelLeaveRequest(request, id):
+    requestObj = LeaveRequest.objects.filter(pk=id).first()
+    requestObj.status = "Cancel"
+    requestObj.save()
+    return redirect('Account:pastLeaveRequestShow')
+    
+@csrf_protect
+def driverLeaveRequestSave(request):
+    startDate = request.POST.get('from')
+    endDate = request.POST.get('to')
+    reasonId = request.POST.get('reasonId')
+    leaveReason = NatureOfLeave.objects.filter(pk=reasonId).first()
+    driverObj =  Driver.objects.filter(name=request.user.username).first()
+    
+    existingRequest = LeaveRequest.objects.filter(
+        Q(start_date__range=(startDate, endDate)) |
+        Q(end_date__range=(startDate, endDate)) |
+        (Q(start_date__lte=startDate) & Q(end_date__gte=endDate)),
+        ~Q(status='Cancel')
+    ).first()
+    if existingRequest:
+        messages.error(request, "Oops! It seems you've already requested leave for these dates.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    
+    leaveObj = LeaveRequest()
+    leaveObj.employee = driverObj
+    leaveObj.start_date = startDate
+    leaveObj.end_date = endDate
+    leaveObj.reason = leaveReason
+    leaveObj.save()
+    
+    return redirect('Account:pastLeaveRequestShow')
     
 @csrf_protect
 @api_view(['POST'])
@@ -1302,9 +1407,12 @@ def rctiSave(request):
                 print('shiftObj',shiftObj)
                 pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
                 print('pastTripErrorObj',pastTripErrorObj)
-                if len(shiftObj) == 0 or len(pastTripErrorObj) ==0:
-                    messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                    return redirect(request.META.get('HTTP_REFERER'))
+                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                #     return redirect(request.META.get('HTTP_REFERER'))
+                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+                #     return redirect(request.META.get('HTTP_REFERER'))
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file already exists!")
@@ -1687,7 +1795,7 @@ def rctiCsvForm(request):
 
 
 def driverSampleCsv(request):
-    return FileResponse(open(f'static/Account/sampleDriverEntry.xlsx', 'rb'), as_attachment=True)
+    return FileResponse(open(f'static/Account/sampleDriverEntry.csv', 'rb'), as_attachment=True)
 
 
 @csrf_protect
@@ -1883,7 +1991,9 @@ def DriverTripEditForm(request, id):
         clientObj = Client.objects.filter(pk=i.clientId).first()
         i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
         for docket in i.tripDockets:
-            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
+            # clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
+            clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId).first()
+            print(clientTruckConnectionObj)
             rateCard = clientTruckConnectionObj.rate_card_name
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
@@ -1929,6 +2039,7 @@ def driverDocketUpdate(request):
     docketObj.docketNumber = docketNumber
     docketObj.save()
     return JsonResponse({'status': True})
+
 @csrf_protect
 def driverEntryUpdate(request, shiftId):
     # Update Trip Save
@@ -1977,9 +2088,10 @@ def driverEntryUpdate(request, shiftId):
             else:
                 docket.standByStartTime  = None
                 docket.standByEndTime = None
-                
-            docket.surchargeType = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first().id
-            docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
+            surchargeObj = Surcharge.objects.filter(pk = request.POST.get(f'surcharge_type{docket.id}')).first()
+            if surchargeObj:
+                docket.surchargeType = surchargeObj.id
+                docket.surcharge_duration = request.POST.get(f'surcharge_duration{docket.id}')
             docket.cubicMl = request.POST.get(f'cubicMl{docket.id}')
             
             docket.others = request.POST.get(f'others{docket.id}')
@@ -1996,7 +2108,7 @@ def driverEntryUpdate(request, shiftId):
                 # tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj)
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
                         
-                if not  reconciliationDocketObj :
+                if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
                     
                     
@@ -2039,11 +2151,13 @@ def driverEntryUpdate(request, shiftId):
                 checkMissingComponents(reconciliationDocketObj)
                 reconciliationTotalCheck(reconciliationDocketObj)
                 shiftObj.verified = True
+                shiftObj.verifiedBy = request.user
                 shiftObj.save()
     
     messages.success(request, "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
     return redirect(request.META.get('HTTP_REFERER'))
+
 @csrf_protect
 def tripEntry(request,shiftId):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
@@ -2069,6 +2183,17 @@ def tripEntry(request,shiftId):
         'basePlants': base_plant,
     }
     return render(request,'Account/shiftTripEntry.html',params)
+
+@csrf_protect
+@api_view(['POST'])
+def getDriverBreak(request):
+    shiftId = request.POST.get('shiftId')
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj).values()
+    
+    return JsonResponse({'status': True, 'driverBreaks': list(driverBreaks)})
+    
+    
 # ````````````````````````````````````
 # Reconciliation
 
@@ -2105,7 +2230,7 @@ def reconciliationForm(request, dataType):
 def reconciliationAnalysis(request,dataType):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-
+    
     params = {}
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
@@ -2135,31 +2260,36 @@ def reconciliationDocketView(request, reconciliationId):
     # try:
     reconciliationData = ReconciliationReport.objects.filter(pk=reconciliationId).first()
     clientObj = Client.objects.filter(pk=reconciliationData.clientId).first()
-    rctiDocket = RCTI.objects.filter(clientName = clientObj ,truckNo =reconciliationData.truckConnectionId, docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=reconciliationData.truckConnectionId).first() 
+    rctiDocket = RCTI.objects.filter(clientName = clientObj , docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
+    # rctiDocket = RCTI.objects.filter(clientName = clientObj ,truckNo = truckConnectionObj.truckNumber.adminTruckNumber, docketDate = reconciliationData.docketDate ,docketNumber=reconciliationData.docketNumber).first()
     # rctiDocket = RCTI.objects.filter(docketNumber=docketNumber).first()
-    # for driverDocket view 
-    driverDocket = DriverShiftDocket.objects.filter(clientId = reconciliationData.clientId , shiftDate = reconciliationData.docketDate , truckConnectionId = reconciliationData.truckConnectionId,docketNumber=reconciliationData.docketNumber).first()
-    
-    driverDocket.basePlantName = BasePlant.objects.filter(pk=driverDocket.basePlant).first().basePlant
-    
     surcharges = Surcharge.objects.all()
     base_plant = BasePlant.objects.all()
-    shiftObj = DriverShift.objects.filter(pk =driverDocket.shiftId).first()
-    clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=driverDocket.truckConnectionId,startDate__lte = driverDocket.shiftDate,endDate__gte = driverDocket.shiftDate, clientId = clientObj).first()
-    rateCard = clientTruckConnectionObj.rate_card_name
-    costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
-    graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
+    
+    # for driverDocket view 
+    driverDocket = DriverShiftDocket.objects.filter(clientId = reconciliationData.clientId , shiftDate = reconciliationData.docketDate , truckConnectionId = reconciliationData.truckConnectionId,docketNumber=reconciliationData.docketNumber).first()
 
-    if driverDocket.waitingTimeStart and driverDocket.waitingTimeEnd:
-        driverDocket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-    if driverDocket.standByStartTime and driverDocket.standByEndTime:
-        driverDocket.standBySlot = DriverTripCheckStandByTotal(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-
-    if rctiDocket:
-        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
     if driverDocket:
         driverDocket.shiftDate = dateConverterFromTableToPageFormate(driverDocket.shiftDate)
         driverDocket.docketNumber = str(driverDocket.docketNumber)
+        
+        driverDocket.basePlantName = BasePlant.objects.filter(pk=driverDocket.basePlant).first().basePlant
+        shiftObj = DriverShift.objects.filter(pk=driverDocket.shiftId).first()    
+    
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=driverDocket.truckConnectionId,startDate__lte = driverDocket.shiftDate,endDate__gte = driverDocket.shiftDate, clientId = clientObj).first()
+        rateCard = clientTruckConnectionObj.rate_card_name
+        costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
+        graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = driverDocket.shiftDate,end_date__gte = driverDocket.shiftDate).first()
+
+        if driverDocket.waitingTimeStart and driverDocket.waitingTimeEnd:
+            driverDocket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+        if driverDocket.standByStartTime and driverDocket.standByEndTime:
+            driverDocket.standBySlot = DriverTripCheckStandByTotal(docketObj=driverDocket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+       
+
+    if rctiDocket:
+        rctiDocket.docketDate = dateConverterFromTableToPageFormate(rctiDocket.docketDate)
 
     params = {
         'rctiDocket': rctiDocket,
@@ -2229,37 +2359,44 @@ def showReconciliationEscalation1(request, reconciliationId, clientName):
 @api_view(['POST'])
 def getCostDifference(request):
     reconciliationId = request.POST.get('reconciliationId')
-    print(reconciliationId)
     params = {}
     reconciliationData = ReconciliationReport.objects.filter(pk=reconciliationId).first()
 
     loadKmCostDifference= reconciliationData.driverLoadAndKmCost - reconciliationData.rctiLoadAndKmCost
-    if loadKmCostDifference != 0:
+    if loadKmCostDifference > 0:
         params['Load Fees'] = [reconciliationData.driverLoadAndKmCost, reconciliationData.rctiLoadAndKmCost, round(loadKmCostDifference,2)]
+        
     surchargeCostDifference= reconciliationData.driverSurchargeCost - reconciliationData.rctiSurchargeCost
-    if surchargeCostDifference != 0:
+    if surchargeCostDifference > 0:
         params['Surcharge'] = [reconciliationData.driverSurchargeCost, reconciliationData.rctiSurchargeCost, round(surchargeCostDifference,2)]
+
     waitingTimeCostDifference= reconciliationData.driverWaitingTimeCost - reconciliationData.rctiWaitingTimeCost
-    if waitingTimeCostDifference != 0:
+    if waitingTimeCostDifference > 0:
         params['Waiting Cost'] = [reconciliationData.driverWaitingTimeCost, reconciliationData.rctiWaitingTimeCost, round(waitingTimeCostDifference,2)]
+
     transferKmCostDifference= reconciliationData.driverTransferKmCost - reconciliationData.rctiTransferKmCost
-    if transferKmCostDifference != 0:
+    if transferKmCostDifference > 0:
         params['Transfer Cost'] = [reconciliationData.driverTransferKmCost, reconciliationData.rctiTransferKmCost, round(transferKmCostDifference,2)]
+
     returnKmCostDifference= reconciliationData.driverReturnKmCost - reconciliationData.rctiReturnKmCost
-    if returnKmCostDifference != 0:
+    if returnKmCostDifference > 0:
         params['Return Cost'] = [reconciliationData.driverReturnKmCost, reconciliationData.rctiReturnKmCost, round(returnKmCostDifference,2)]
+
     otherCostDifference= reconciliationData.driverOtherCost - reconciliationData.rctiOtherCost
-    if otherCostDifference != 0:
+    if otherCostDifference > 0:
         params['Other Cost'] = [reconciliationData.driverOtherCost, reconciliationData.rctiOtherCost, round(otherCostDifference,2)]
+
     standByCostDifference= reconciliationData.driverStandByCost - reconciliationData.rctiStandByCost
-    if standByCostDifference != 0:
+    if standByCostDifference > 0:
         params['Stand By Cost'] = [reconciliationData.driverStandByCost, reconciliationData.rctiStandByCost, round(standByCostDifference,2)]
+
     loadDeficitDifference= reconciliationData.driverLoadDeficit - reconciliationData.rctiLoadDeficit
-    if loadDeficitDifference != 0:
+    if loadDeficitDifference > 0:
         params['Load Deficit'] = [reconciliationData.driverLoadDeficit, reconciliationData.rctiLoadDeficit, loadDeficitDifference]
-    totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
-    if totalCostDifference != 0:
-        params['Total Cost'] = [reconciliationData.driverTotalCost, reconciliationData.rctiTotalCost, round(totalCostDifference,2)]
+        
+    # totalCostDifference= reconciliationData.driverTotalCost - reconciliationData.rctiTotalCost
+    # if totalCostDifference > 0:
+    #     params['Total Cost'] = [reconciliationData.driverTotalCost, reconciliationData.rctiTotalCost, round(totalCostDifference,2)]
     
     return JsonResponse({ 'status':True, 'params':params })
     
@@ -2274,6 +2411,7 @@ def createReconciliationEscalation(request, reconciliationIdStr, clientName):
     escalationObj.escalationDate = getCurrentDateTimeObj().date()
     escalationObj.escalationType = escalationType
     escalationObj.clientName = Client.objects.filter(pk=clientName).first()
+    escalationObj.escalationStep = 2
     escalationObj.save()
 
     for rId in reconciliationList:
@@ -2287,8 +2425,48 @@ def createReconciliationEscalation(request, reconciliationIdStr, clientName):
         escalationDocketObj.docketNumber = recObj.docketNumber
         escalationDocketObj.docketDate = recObj.docketDate
         escalationDocketObj.escalationId = escalationObj
-        escalationDocketObj.amount = round(recObj.driverTotalCost - recObj.rctiTotalCost, 2)
-        escalationDocketObj.invoiceFile = driverDocketObj.docketFile
+        escalationDocketObj.truckNo = ClientTruckConnection.objects.filter(pk=recObj.truckConnectionId).first()
+        
+        if driverDocketObj and driverDocketObj.docketFile:
+            escalationDocketObj.invoiceFile = driverDocketObj.docketFile
+
+        # Cost count
+        if (recObj.driverCallOut - recObj.rctiCallOut) > 0:
+            escalationDocketObj.callOut = True
+            escalationDocketObj.callOutCharge = float(recObj.driverCallOut - recObj.rctiCallOut)
+            
+        if (recObj.driverTransferKmCost - recObj.rctiTransferKmCost) > 0:
+            escalationDocketObj.transferKm = True
+            escalationDocketObj.transferKmCharge = float(recObj.driverTransferKmCost - recObj.rctiTransferKmCost)
+            
+        if (recObj.driverWaitingTimeCost - recObj.rctiWaitingTimeCost) > 0:
+            escalationDocketObj.waitingTime = True
+            escalationDocketObj.waitingTimeCharge = float(recObj.driverWaitingTimeCost - recObj.rctiWaitingTimeCost)
+            
+        if (recObj.driverStandByCost - recObj.rctiStandByCost) > 0:
+            escalationDocketObj.standBy = True
+            escalationDocketObj.standByCharge = float(recObj.driverStandByCost - recObj.rctiStandByCost)
+            
+        if (recObj.driverReturnKmCost - recObj.rctiReturnKmCost) > 0:
+            escalationDocketObj.returnKm = True
+            escalationDocketObj.returnKmCharge = float(recObj.driverReturnKmCost - recObj.rctiReturnKmCost)
+
+        if (recObj.driverOtherCost - recObj.rctiOtherCost) > 0:
+            escalationDocketObj.custom = True
+            escalationDocketObj.customCharge = float(recObj.driverOtherCost - recObj.rctiOtherCost)
+
+        if (recObj.driverBlowBack - recObj.rctiBlowBack) > 0:
+            escalationDocketObj.blowBack = True
+            escalationDocketObj.blowBackCharge = float(recObj.driverBlowBack - recObj.rctiBlowBack)
+
+        if (recObj.driverSurchargeCost - recObj.rctiSurchargeCost) > 0:
+            escalationDocketObj.surcharge = True
+            escalationDocketObj.surchargeCharge = float(recObj.driverSurchargeCost - recObj.rctiSurchargeCost)
+
+        if (recObj.driverLoadAndKmCost - recObj.rctiLoadAndKmCost) > 0:
+            escalationDocketObj.loadKm = True
+            escalationDocketObj.loadKmCharge = float(recObj.driverLoadAndKmCost - recObj.rctiLoadAndKmCost)
+            
         escalationDocketObj.save()
         totalAmt += escalationDocketObj.amount
 
@@ -2466,6 +2644,7 @@ def rateCardForm(request, id=None , clientId=None):
             oldRateCardEndDate = getOldRateCard.split('to')[1].strip()
 
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id, start_date = oldRateCardStartDate, end_date = oldRateCardEndDate).values().first()
@@ -2473,6 +2652,7 @@ def rateCardForm(request, id=None , clientId=None):
             
         else:
             costParameters = CostParameters.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
+            costParameters['createdBy'] = User.objects.filter(pk=costParameters['createdBy_id']).first().username
             thresholdDayShift = ThresholdDayShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             thresholdNightShift = ThresholdNightShift.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
             grace = Grace.objects.filter(rate_card_name=rateCard.id).order_by('-end_date').values().first()
@@ -2519,7 +2699,6 @@ def checkOnOff(val_):
 
 
 @csrf_protect
-@api_view(['POST'])
 def rateCardSave(request, id=None, edit=0):
     # Rate Card
     rateCardID = None
@@ -2655,6 +2834,9 @@ def rateCardSave(request, id=None, edit=0):
     costParameters.cancellation_fees=float(request.POST.get('costParameters_cancellation_fees'))
     costParameters.start_date=startDate  
     costParameters.end_date=endDate
+    if edit == 0:
+        costParameters.createdBy = request.user
+
     costParameters.save()
 
     # ThresholdDayShift
@@ -3110,7 +3292,9 @@ def EscalationTable(request):
         'completeEscalationObj':completeEscalationObj,
     }
     return render(request,'Account/Tables/escalationTable.html' , params)
+
 def EscalationForm(request ,id = None):
+    truckConnectionObj = ClientTruckConnection.objects.all()
     escalationDocketObj = None
     escalationObj  = None
     clientNames = Client.objects.all()
@@ -3123,7 +3307,8 @@ def EscalationForm(request ,id = None):
     params ={
         'escalationObj':escalationObj,
         'clientNames':clientNames,
-        'escalationDocketObj':escalationDocketObj
+        'escalationDocketObj':escalationDocketObj,
+        'truckConnectionObj' : truckConnectionObj
     }
     return render(request , 'Account/manuallyEscalationForm1.html' , params)
 
@@ -3133,31 +3318,82 @@ def manuallyEscalationForm1Save(request):
     docketDate = request.POST.get('docketDate')
     invoiceFile = request.FILES.get('invoiceFile')
     clientNameId = request.POST.get('clientName')
-    escalationAmount = request.POST.get('escalationAmount')
     escalationType = request.POST.get('escalation')
+    truckId = request.POST.get('truckId')
+    
     escalationDocketObj = EscalationDocket.objects.filter(docketNumber = docketNumber , docketDate= docketDate).first()
     if escalationDocketObj:
-        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id).first()
-        return redirect('Account:showReconciliationEscalation2',escalationObj.id)
+        escalationObj = Escalation.objects.filter(pk = escalationDocketObj.escalationId.id, escalationStep__in = [1, 2, 3]).first()
+        if escalationObj:
+            messages.warning(request,'Last Escalation is open for this docket.')
+            return redirect('Account:showReconciliationEscalation2',escalationObj.id)
+    
+    
+    callOut = True if request.POST.get('enableCallOut') == "checked" else False
+    demurrage = True if request.POST.get('enableDemurrage') == "checked" else False
+    cancellation = True if request.POST.get('enableCancellation') == "checked" else False
+    transferKm = True if request.POST.get('enableTransferKm') == "checked" else False
+    waitingTime = True if request.POST.get('enableWaitingTime') == "checked" else False
+    standBy = True if request.POST.get('enableStandBy') == "checked" else False
+    returnKm = True if request.POST.get('enableReturnKm') == "checked" else False
+    custom = True if request.POST.get('enableCustom') == "checked" else False
+    
+    loadKm = True if request.POST.get('enableLoadKm') == "checked" else False
+    surcharge = True if request.POST.get('enableSurcharge') == "checked" else False
+    blowBack = True if request.POST.get('enableBlowBack') == "checked" else False
     
     currentDate = getCurrentDateTimeObj().date()
     clientObj = Client.objects.filter(clientId=clientNameId).first()
     
     escalationObj = Escalation()
-    
     escalationObj.userId = request.user
     escalationObj.escalationDate = currentDate
     escalationObj.clientName = clientObj
-    escalationObj.escalationStep = 1
-    escalationObj.escalationAmount = escalationAmount
+    escalationObj.escalationStep = 2
     escalationObj.escalationType = escalationType
     escalationObj.save()
+    
     escalationDocketObj = EscalationDocket()
-
     escalationDocketObj.docketNumber = docketNumber
     escalationDocketObj.docketDate = docketDate
-    escalationDocketObj.amount = escalationAmount
     escalationDocketObj.escalationId = escalationObj
+    escalationDocketObj.truckNo = ClientTruckConnection.objects.filter(pk=truckId).first() 
+     
+    if callOut:
+        escalationDocketObj.callOut = True
+        escalationDocketObj.callOutCharge = float(request.POST.get('callOutCharge'))
+    if demurrage:
+        escalationDocketObj.demurrage = True
+        escalationDocketObj.demurrageCharge = float(request.POST.get('demurrageCharge'))
+    if cancellation:
+        escalationDocketObj.cancellation = True
+        escalationDocketObj.cancellationCharge = float(request.POST.get('cancellationCharge'))
+    if transferKm:
+        escalationDocketObj.transferKm = True
+        escalationDocketObj.transferKmCharge = float(request.POST.get('transferKmCharge'))
+    if waitingTime:
+        escalationDocketObj.waitingTime = True
+        escalationDocketObj.waitingTimeCharge = float(request.POST.get('waitingTimeCharge'))
+    if standBy:
+        escalationDocketObj.standBy = True
+        escalationDocketObj.standByCharge = float(request.POST.get('standByCharge'))
+    if returnKm:
+        escalationDocketObj.returnKm = True
+        escalationDocketObj.returnKmCharge = float(request.POST.get('returnKmCharge'))
+    if custom:
+        escalationDocketObj.custom = True
+        escalationDocketObj.customCharge = float(request.POST.get('customCharge'))
+        
+    if surcharge:
+        escalationDocketObj.surcharge = True
+        escalationDocketObj.surchargeCharge = float(request.POST.get('surcharge'))
+    if loadKm:
+        escalationDocketObj.loadKm = True
+        escalationDocketObj.loadKmCharge = float(request.POST.get('loadKmCharge'))
+    if blowBack:
+        escalationDocketObj.blowBack = True
+        escalationDocketObj.blowBackCharge = float(request.POST.get('blowBackCharge'))
+    
     if invoiceFile:
         time = getCurrentTimeInString()
         attachmentPath = 'static/Account/manuallyEscalation/'
@@ -3171,7 +3407,11 @@ def manuallyEscalationForm1Save(request):
             return redirect(request.META.get('HTTP_REFERER'))
             
         escalationDocketObj.invoiceFile = f'static/Account/manuallyEscalation/{convertedFileName}'
-        escalationDocketObj.save()
+
+    escalationDocketObj.save()
+    
+    escalationObj.escalationAmount = escalationDocketObj.amount
+    escalationObj.save()
 
     messages.success(request, "Escalation Entry Successfully.")
     return redirect('Account:showReconciliationEscalation2', escalationObj.id)

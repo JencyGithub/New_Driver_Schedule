@@ -73,3 +73,21 @@ input:hover {
     font-size: 1.2rem;
     cursor: pointer;
 }
+
+button:focus{
+    outline: none;
+}
+
+.modal label{
+    cursor: pointer;
+}
+
+#filterModal b{
+    cursor: pointer;
+}
+.event-title{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: auto;
+}
