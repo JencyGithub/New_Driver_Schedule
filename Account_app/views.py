@@ -1513,7 +1513,7 @@ def expensesTableView(request):
     clientDocketYard = request.POST.get('docketYard_')
     startDate = datetime.strptime(startDate, '%B %d, %Y').strftime('%Y-%m-%d')
     endDate = datetime.strptime(endDate, '%B %d, %Y').strftime('%Y-%m-%d')  
-    
+    data = []
     if clientName:
         clientName = Client.objects.filter(clientId = clientName).first()
     if clientTruckNo:
@@ -1524,29 +1524,28 @@ def expensesTableView(request):
     
     # return HttpResponse('work')
     if clientName :
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName).values()
         
     if clientTruckNo:
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),truckNo= clientTruckNo.clientTruckId)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),truckNo= clientTruckNo.clientTruckId).values()
         
     if clientDocketYard :
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant).values()
         
     if clientName and clientTruckNo :
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName,truckNo= clientTruckNo.clientTruckId)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName,truckNo= clientTruckNo.clientTruckId).values()
         
     if  clientName and clientDocketYard :
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName , docketYard=clientDocketYard.basePlant)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName , docketYard=clientDocketYard.basePlant).values()
         
     if clientTruckNo and clientDocketYard  :
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId).values()
         
     if clientName and clientDocketYard  and clientTruckNo:
-        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName, docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId)
+        rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName, docketYard=clientDocketYard.basePlant ,truckNo= clientTruckNo.clientTruckId).values()
 
-    rcti_expenses_json = serialize('json', rcti_expenses_query)
-    return JsonResponse({'status': True,'rcti_expenses_query': rcti_expenses_json})
-    # return render(request, 'Account/Tables/expensesTable.html',params)
+    data.extend(rcti_expenses_query)
+    return JsonResponse({'status': True,'data': data})
 
 def expanseForm(request, id = None):
 

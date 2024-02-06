@@ -122,7 +122,6 @@
                                         style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th>Client Name</th>
                                                 <th>Expense Date</th>
                                                 <th>Truck No</th>
                                                 <th>Yard</th>
@@ -136,7 +135,6 @@
                                         <tbody>
                                             {% for expensesObj in dataList %}
                                                 <tr>
-                                                    <td>{{ expensesObj.clientName.name }}</td>
                                                     <td>{{ expensesObj.docketDate }}</td>
                                                     <td>{{ expensesObj.truckNo }}</td>
                                                     <td>{{ expensesObj.docketYard }}</td>

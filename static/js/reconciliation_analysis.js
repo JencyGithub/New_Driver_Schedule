@@ -20,7 +20,7 @@ function expenseFilterFun(startDate, endDate) {
           xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function (data) {
-        setDataInTable("datatable-buttons", data.rcti_expenses_query);
+        setDataInTable("datatable-buttons", data.data);
       },
       error: function (xhr, status, error) {
           console.error("Error fetching data:", error);
@@ -36,7 +36,6 @@ function setDataInTable(tableId, data) {
   $.each(data, function (index, item) {
       // Construct the row data array
       var rowData = [
-          item.clientName,
           item.docketDate,
           item.truckNo,
           item.docketYard,
