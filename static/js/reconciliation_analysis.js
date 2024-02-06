@@ -1,5 +1,60 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
+
+function expenseFilterFun(startDate, endDate) {
+  var clientName = $('#clientName').val();
+  var truckNo = $('#truckNo').val();
+  var docketYard = $('#docketYard').val();
+
+  $.ajax({
+      url: "/account/expense/table/view/",
+      method: "POST",
+      data: {
+          startDate_: startDate,
+          endDate_: endDate,
+          clientName_: clientName,
+          truckNo_: truckNo,
+          docketYard_: docketYard,
+      },
+      beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (data) {
+        setDataInTable("datatable-buttons", data.rcti_expenses_query);
+      },
+      error: function (xhr, status, error) {
+          console.error("Error fetching data:", error);
+      }
+  });
+}
+
+function setDataInTable(tableId, data) {
+  var table = $(`#${tableId}`).DataTable();
+  table.clear().draw();
+  
+  // Iterate over each item in the data array
+  $.each(data, function (index, item) {
+      // Construct the row data array
+      var rowData = [
+          item.clientName,
+          item.docketDate,
+          item.truckNo,
+          item.docketYard,
+          item.invoiceQuantity,
+          item.unit,
+          item.unitPrice,
+          item.total,
+          `<a href="{% url 'Account:expanseView' id=item.id %}" target="_blank"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></a>`
+      ];
+
+      // Add the row to the DataTable
+      table.row.add(rowData).draw();
+  });
+}
+
+
+
+
 function formatDate(date) {
   var year = date.getFullYear();
   var month = String(date.getMonth() + 1).padStart(2, '0');

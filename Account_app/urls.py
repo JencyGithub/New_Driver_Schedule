@@ -101,9 +101,11 @@ urlpatterns = [
     
     
     # Expanse entry manually
-    path('expanse/', views.expanseForm, name='expanseForm'), 
-    path('expanse/save/', views.expanseSave, name='expanseFormSave'), 
-    path('expanse/<int:id>', views.expanseForm, name='expanseView'),  
+    path('expense/', views.expanseForm, name='expanseForm'), 
+    path('expense/save/', views.expanseSave, name='expanseFormSave'), 
+    path('expense/<int:id>', views.expanseForm, name='expanseView'),  
+    path('expense/filter/view', views.expensesFilterView, name='expensesFilterView'),  
+    path('expense/table/view/', views.expensesTableView, name='expensesTableView'),  
     
     
     
