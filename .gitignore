@@ -14,7 +14,6 @@ runserver.py
 nginx_waitress
 
 manuallyEscalation
-RCTI
 breakFiles
 mailAttachment
 preStartImages
