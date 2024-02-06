@@ -36,19 +36,9 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
-                     {% comment %} <div class="x_title">
-                        <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
-                        {% if data %}
-                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
-                        {% endif %}
-                        <div class="clearfix"></div>
-                     </div> {% endcomment %}
-               
-                    <div class="x_title">
-                        <h2 class="text-uppercase">Accreditation / Compliance tab</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div id="wizard" class="form_wizard wizard_horizontal">
+                    <h2 class="text-uppercase">Accreditation / Compliance tab</h2>
+                    
+                    {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
                         <ul class="wizard_steps">
                           <li>
                             <a href="javascript:void(0)" class="selected">
@@ -123,24 +113,22 @@
                             </a>
                           </li>
                         </ul>
-                    </div> 
-                    <!-- {% url 'gearBox:truckFormAdd' %} -->
-                    <form action="{% url 'gearBox:truckComplianceFormSave' %}" method="post">
-                        {% csrf_token %}
-                        {% comment %} <h2>Compliance Form </h2> {% endcomment %}
-                        <div class="x_title">
-                            <h6>Accreditation / Compliance</h6>
-                            <div class="clearfix"></div>
-                        </div>
+                    </div>  {% endcomment %}
+                </div>
+                <!-- {% url 'gearBox:truckFormAdd' %} -->
+                <form action="{% url 'gearBox:truckComplianceFormSave' %}" method="post">
+                    {% csrf_token %}
+                    {% comment %} <h2>Compliance Form </h2> {% endcomment %}
+                    <div class="x_panel">
                         <div class="x_content">
                             <div class="col-md-12 col-sm-12">
                                 <div class="row">
                                     <div class="col-md-6 col-lg-3 mb-3">
                                         <div class="input-group-section yellow">
-                                          <label for="maintenance-entry-date">Maintenance entry date</label>
-                                          <input type="number" id="maintenance-entry-date" class="form-control mb-2">
-                                          <label for="maintenance-exit-date">Maintenance exit date</label>
-                                          <input type="number" id="maintenance-exit-date" class="form-control">
+                                            <label for="maintenance-entry-date">Maintenance entry date</label>
+                                            <input type="number" id="maintenance-entry-date" class="form-control mb-2">
+                                            <label for="maintenance-exit-date">Maintenance exit date</label>
+                                            <input type="number" id="maintenance-exit-date" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-lg-3 mb-3">
@@ -153,45 +141,48 @@
                                     </div>
                                     <div class="col-md-6 col-lg-3 mb-3">
                                         <div class="input-group-section green">
-                                          <label for="nhvas-label-number">NHVAS Label Number</label>
-                                          <input type="number" id="nhvas-label-number" class="form-control mb-2">
-                                          
-                                          <label for="intercept-book-number">Intercept Book Number</label>
-                                          <input type="number" id="intercept-book-number" class="form-control">
+                                            <label for="nhvas-label-number">NHVAS Label Number</label>
+                                            <input type="number" id="nhvas-label-number" class="form-control mb-2">
+                                            
+                                            <label for="intercept-book-number">Intercept Book Number</label>
+                                            <input type="number" id="intercept-book-number" class="form-control">
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-lg-3 mb-3">
                                         <div class="input-group-section pink">
-                                          <label for="nhvas-label-number">Accreditation</label>
+                                            <label for="nhvas-label-number">Accreditation</label>
                                             <select name="Accreditation" id="Accreditation" class="form-control mb-2">
                                             </select>
-                                          <label for="intercept-book-number">Contractor</label>
+                                            <label for="intercept-book-number">Contractor</label>
                                             <select name="Accreditation" id="Accreditation" class="form-control">
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>    
-                            <div class="row">
-                                <div class="col-md-6 col-lg-6 mb-3">
-                                    <div class="x_title">
-                                        <h6>Accreditation / Compliance</h6>
-                                        <div class="clearfix"></div>
-                                    </div>                
-                                </div>
-                                <div class="col-md-6 col-lg-6 mb-3">
-                                    <div class="x_title">
-                                        <h6>Mass limits</h6>
-                                        <div class="clearfix"></div>
-                                    </div>                
-                                </div>
+                        </div>
+                    </div>
+                    <div class="x_panel">
+                        <div class="row">
+                            <div class="col-md-6 col-lg-6 mb-3">
+                                <div class="x_title">
+                                    <h6>Inspection Types</h6>
+                                    <div class="clearfix"></div>
+                                </div>                
+                            </div>
+                            <div class="col-md-6 col-lg-6 mb-3">
+                                <div class="x_title">
+                                    <h6>Mass limits</h6>
+                                    <div class="clearfix"></div>
+                                </div>                
                             </div>
                         </div>
-                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
-                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
+                        <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>

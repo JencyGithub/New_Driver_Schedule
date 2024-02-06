@@ -9,27 +9,21 @@
     .custom-continer {
         margin: 0 5rem;
     }
-
     .errorMsg {
         font-size: 0.7rem;
         color: rgb(255, 0, 0);
         margin-top: 0.3rem;
         list-style-type: none;
     }
-
     .isInvalid {
         border: 1px solid rgb(255, 0, 0) !important;
         border-radius: 7px !important;
     }
-
-
-
     @media (max-width: 576px) {
         .custom-continer {
             margin: 0;
         }
     }
-
     @media (max-width: 768px) {
 
         .custom-continer {
@@ -47,15 +41,9 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
-                    <div class="x_title">
-                        <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
-                        {% if data %}
-                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
-                        {% endif %}
-                        <div class="clearfix"></div>
-                    </div>
+                    <h2>Truck Documents</h2>
                
-                    <div id="wizard" class="form_wizard wizard_horizontal">
+                    {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
                         <ul class="wizard_steps">
                           <li>
                             <a href="javascript:void(0)" class="selected">
@@ -132,10 +120,11 @@
                         </ul>
                        
   
-                    </div> 
-                    
-                    <form action="#" method="post">
-                        {% csrf_token %}
+                    </div>  {% endcomment %}
+                </div>
+                <form action="#" method="post">
+                    {% csrf_token %}
+                    <div class="x_panel">
                         <div class="x_content">
                             <div class="col-md-4 col-sm-4">
                                 <label for="truckNo" style="margin-bottom: 0.3rem!important;">Fleet : <span class="required">*</span></label>
@@ -161,16 +150,15 @@
                                 <div class="field item form-group">
                                     <textarea name="description" id="description" rows="2" class="form-control"></textarea>
                                 </div>
-                            </div>
-                            <div class="col-md-12 col-am-12 text-right">
-                                {% if not data  %}
-                                <button type='submit' class="btn btn-default px-5 mt-4">Submit</button> 
-                                {% endif %}
-                            </div>                       
+                            </div>                      
                         </div>
-                    </form>
-
-                </div>
+                    </div>
+                    {% if not data  %}
+                        <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
+                            <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Submit</button>
+                        </div>                                
+                    {% endif %}
+                </form>
             </div>
         </div>
     </div>

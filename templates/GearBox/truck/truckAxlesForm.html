@@ -39,102 +39,90 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
-                    <div class="x_title">
-                        {% comment %} <h2>{% if data %}View truck detailsAdd Truck {% endif %}</h2>
-                        {% if data %}
-                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
-                        {% endif %}
-                        <div class="clearfix"></div> {% endcomment %}
-                        <h2 class="text-uppercase">Axles tab</h2>
-                        <div class="clearfix"></div>
-                    </div>
-               
-                    <div id="wizard" class="form_wizard wizard_horizontal">
-                        <ul class="wizard_steps">
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="selected">
-                                <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="History"><i class="fa fa-history"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="javascript:void(0)" class="disabled">
-                                <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
-                                <span class="step_descr">
-                                    <br />
-                                </span>
-                            </a>
-                          </li>
-                        </ul>
-                       
-  
-                    </div> 
-                    
-                    <form action="{% url 'gearBox:truckAxlesFormSave' %}" method="post">
-                        {% csrf_token %}
-                        {% comment %} <h2>Axles Form </h2> {% endcomment %}
-                        <div class="x_title">
-                            <h6>Axle Configuration</h6>
-                            <div class="clearfix"></div>
-                        </div>
+                    <h2 class="text-uppercase">Axles tab</h2>
+                </div>
+                {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
+                    <ul class="wizard_steps">
+                    <li>
+                        <a href="javascript:void(0)" class="selected">
+                            <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="selected">
+                            <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="History"><i class="fa fa-history"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" class="disabled">
+                            <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
+                            <span class="step_descr">
+                                <br />
+                            </span>
+                        </a>
+                    </li>
+                    </ul>
+                
+
+                </div>  {% endcomment %}
+                <form action="{% url 'gearBox:truckAxlesFormSave' %}" method="post">
+                    {% csrf_token %}
+                    <div class="x_panel">
+
                         <div class="x_content">
                             <div class="col-md-5 col-sm-5">
                                 <div class="row brick-row pb-1">
@@ -282,13 +270,13 @@
                                     <div class="col brick"></div>
                                 </div>
                             </div>                    
-                        </div>
-                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
-                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
-                        </div>
-                    </form>
+                        </div>                        
+                    </div>
+                    <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
+                        <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
+                    </div>
+                </form>
 
-                </div>
             </div>
         </div>
     </div>

@@ -44,11 +44,9 @@
                         <div class="clearfix"></div>
                      </div> {% endcomment %}
                
-                    <div class="x_title">
-                        <h2 class="text-uppercase">Accreditation / Compliance tab</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div id="wizard" class="form_wizard wizard_horizontal">
+                    <h2 class="text-uppercase">Accreditation / Compliance tab</h2>
+                
+                    {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
                         <ul class="wizard_steps">
                           <li>
                             <a href="javascript:void(0)" class="disabled">
@@ -123,7 +121,7 @@
                             </a>
                           </li>
                         </ul>
-                    </div> 
+                    </div>  {% endcomment %}
                     <!-- {% url 'gearBox:truckFormAdd' %} -->
                     <form action="{% url 'gearBox:truckFormAdd' %}" method="post" class="" novalidate>
                         {% csrf_token %}

@@ -4,6 +4,15 @@
 
 {% block headStyle %}
 <style>
+    .fa-circle-info{
+        margin-left: 0.4rem;
+        font-size:0.85rem!important;
+        cursor:pointer;
+    }
+    .dropdown-item:hover {
+        color: #000000!important;
+        background-color: transparent!important;
+    }
     label{
         font-size: 0.9rem;
     }
@@ -39,10 +48,19 @@
                 {% csrf_token %}
                 <div class="card border-0">
                     <div class="card-body pills">
-                        <h5>Past requests</h5>
+                        <h5>Past requests
+                            <i class="fa-solid fa-circle-info " data-toggle="dropdown" aria-expanded="false"></i>
+                            <div class="dropdown-menu">
+                                <span class="dropdown-item"><i class="fa-solid fa-square" style="color: #2a3f54;"></i> Pending</span>
+                                <span class="dropdown-item"><i class="fa-solid fa-square" style="color: #198754;"></i> Approved</span>
+                                <span class="dropdown-item"><i class="fa-solid fa-square" style="color: #dc3545;"></i> Denied</span>
+                                <span class="dropdown-item"><i class="fa-solid fa-square" style="color: #6c757d;"></i> Canceled</span>
+                            </div>
+                        </h5>
+                            
                         <hr>
                         {% for obj in leaveObjs %}
-                            <div class="col-12 border p-3 my-1  px-lg-4 rounded-5 d-flex justify-content-between align-content-center text-white {% if obj.status == 'Pending' %} bg-default {% elif  obj.status == 'Approved' %} bg-success {% elif obj.status == 'Denied' %} bg-danger {% else %} bg-secondary {% endif %}">
+                            <div class="col-12 border my-1 p-lg-3 p-sm-3 p-2 px-lg-4 px-sm-4 px-3 rounded-5 d-flex justify-content-between align-content-center text-white {% if obj.status == 'Pending' %} bg-default {% elif  obj.status == 'Approved' %} bg-success {% elif obj.status == 'Denied' %} bg-danger {% else %} bg-secondary {% endif %}">
                                 <b>{{ obj.start_date }} - {{ obj.end_date }} </b>
                                 {% if obj.status == 'Pending' %} 
                                     <i class="fa-regular fa-circle-xmark cancelBtn" title="Cancel" id="{{obj.id}}"></i>

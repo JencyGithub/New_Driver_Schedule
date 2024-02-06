@@ -74,11 +74,9 @@
         <div class="row">
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
-                    <div class="x_title">
-                        <h2 class="text-uppercase">History tab</h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div id="wizard" class="form_wizard wizard_horizontal">
+                    <h2 class="text-uppercase">History tab</h2>
+                </div>
+                    {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
                         <ul class="wizard_steps">
                           <li>
                             <a href="javascript:void(0)" class="selected">
@@ -153,11 +151,12 @@
                             </a>
                           </li>
                         </ul>
-                    </div>
+                    </div> {% endcomment %}
 
-                    <form action="{% url 'gearBox:truckHistoryFormSave' %}" method="post">
-                        {% csrf_token %}
-                        {% comment %} <h2>History Form </h2> {% endcomment %}
+                <form action="{% url 'gearBox:truckHistoryFormSave' %}" method="post">
+                    {% csrf_token %}
+                    {% comment %} <h2>History Form </h2> {% endcomment %}
+                    <div class="x_panel">
                         <div class="x_title">
                             <h6>Maintenance History</h6>
                             <div class="clearfix"></div>
@@ -166,7 +165,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="card-box table-responsive">
-                                        <table id="datatable-buttons" class="table table-striped table-bordered"
+                                        <table id="maintenanceTable" class="table table-striped table-bordered"
                                             style="width:100%">
                                             <thead>
                                                 <tr>
@@ -199,11 +198,42 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
-                            <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
+                    </div>
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h6>Accidents History<small> (Vehicle Notes)</small></h6>
+                            <div class="clearfix"></div>
                         </div>
-                    </form>
-                </div>
+                        <div class="x_content">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card-box table-responsive">
+                                        <table id="vehicleTable" class="table table-striped table-bordered"
+                                            style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>User</th>
+                                                    <th>Comments</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>                                                    
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
+                        <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -221,7 +251,8 @@
 </script>
 <script>
     $(document).ready(function () {
-        $('#datatable-buttons').DataTable();
+        $('#maintenanceTable').DataTable();
+        $('#vehicleTable').DataTable();
     });
 </script>
 <!-- Datatables -->
