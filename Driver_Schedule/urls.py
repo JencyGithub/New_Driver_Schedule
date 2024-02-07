@@ -24,7 +24,7 @@ urlpatterns = [
 
     # main index page
     path('index', views.index, name='index'),
-    path('',views.loginCall, name='login'),
+    path('login/',views.loginCall, name='login'),
     path('loginCheck',views.loginCheck, name='login-check'),
     path('logout',views.CustomLogOut, name='logout'),
     path('forget/password',views.CustomForgetPassword, name='forget-password'),
@@ -32,6 +32,9 @@ urlpatterns = [
 
     path('changePassword/',views.changePasswordView, name='changePasswordView'),
     path('changePassword/change/',views.changePasswordChange, name='changePasswordChange'),
+
+    # GSS routes
+    path('',include('Gss_app.urls'), name='home'),
 
     # Account routes
     path('account/',include('Account_app.urls')),   
@@ -41,5 +44,7 @@ urlpatterns = [
 
     # Appointment routes 
     path('appointment/',include('Appointment_app.urls')),
+    
+    
     
 ]

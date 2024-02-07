@@ -1,0 +1,94 @@
+<style>
+    #services {
+      color: #8bd8bd
+  }
+  </style>
+{% load static %}
+
+{% include "frontend_design/header.html" %}
+
+    <!-- Header Start -->
+    <div class="container-fluid hero-header" style="background-color:white">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 mb-3 animated slideInDown">Services</h1>
+                    <nav aria-label="breadcrumb animated slideInDown">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{% url 'frontend_app:index'%}" style="color:#8bd8bd!important">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Services</li>
+                        </ol>
+                    </nav>
+                </div>  
+                <div class="col-lg-6 animated fadeIn">
+                    <img class="img-fluid animated pulse infinite" style="animation-duration: 3s;" src="{% static 'assets/img/GLOBAL_SMART_SOLUTIONS_LOGO.jpg'%}"
+                        alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+
+
+    <!-- Service Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <h1 class="display-6">Services</h1>
+                <p class="text-primary fs-5 mb-5" style="color:#8bd8bd!important">Buy, Sell And Exchange Cryptocurrency</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-7.png'%}" alt="">
+                        <h5 class="mb-3">Ekart Logistics</h5>
+                        <p>Streamline logistics with innovative solutions. Reduce costs, enhance performance.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-3.png'%}" alt="">
+                        <h5 class="mb-3">Warehousing</h5>
+                        <p>Secure, reliable supply chain support with advanced tracking and management.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-9.png'%}" alt="">
+                        <h5 class="mb-3">Transportation</h5>
+                        <p>Cost-effective logistics strategies. Quality services tailored to your needs.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-5.png'%}" alt="">
+                        <h5 class="mb-3">Inventory management</h5>
+                        <p>Secure, climate-controlled storage solutions. Safeguard your goods' integrity.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-2.png'%}" alt="">
+                        <h5 class="mb-3">Order fulfillment</h5>
+                        <p>Comprehensive insurance for cargo. Mitigate risks from pickup to delivery.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="service-item bg-white p-5">
+                        <img class="img-fluid mb-4" src="{%static 'assets/img/icon-8.png'%}" alt="">
+                        <h5 class="mb-3">Port services</h5>
+                        <p>24/7 support for logistics queries, ensuring smooth supply chain management.</p>
+                        <a href="" style="color:#8bd8bd!important">Read More <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Service End -->
+
+{% include "frontend_design/footer.html" %}

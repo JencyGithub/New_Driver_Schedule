@@ -1,0 +1,73 @@
+
+
+{% load static %}
+
+{% include "frontend_design/header.html" %}
+
+
+
+<!-- Contact Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-md-3"></div>
+            <div class="col-lg-7 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <h4 class="mb-4">Job Application Form</h4>
+                <form action="{% url 'frontend_app:get_job_form'%}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" name="name" id="name" placeholder="Your Name" required>
+                                <label for="name">Your Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
+                                <label for="email">Your Email</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="url" id="linkedin" name="linkedin_profile" class="form-control">
+                                <label for="linkedin">LinkedIn Profile:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="url" id="github" name="github_profile" class="form-control">
+                                <label for="github">GitHub Profile:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="file" name="resume" style="cursor: pointer;" class="form-control" id="resume" accept=".pdf" required >
+                                <label for="resume">Resume (PDF):</label>                                
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" readonly id="appliedfor" value="{{title}}" name="applied_for" class="form-control">
+                                <label for="applied_for">Applied For:</label>
+                                
+                            <a href="/{{description_file}}" target="_blank" style="color:black">Job Description PDF</a>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <button class="btn btn-primary py-2 rounded ms-auto d-block w-100 px-4" type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+
+        </div>
+    </div>
+</div>
+<!-- Contact End -->
+
+
+
+{% include "frontend_design/footer.html" %}
