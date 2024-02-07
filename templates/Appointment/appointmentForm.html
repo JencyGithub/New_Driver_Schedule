@@ -127,11 +127,11 @@
                                 </div>
                                 <div class="col-md-8 col-sm-8">
                                     <label for="origin">origin :<span class="required">*</span></label>
-                                    {% if not data %}
+                                    {% comment %} {% if not data %}
                                         <span class="float-right">
                                             <span class="text-primary font-weight-bold" style="cursor: pointer;" onclick="addorigin()">Add origin</span>
                                         </span>
-                                    {% endif %}
+                                    {% endif %} {% endcomment %}
                                     <div class="field item form-group">
                                         <select name="origin" required class="form-select form-control text-capitalize" id="origin" {% if data %}disabled{% endif %} >
                                             <option selected disabled>Select origin</option>
@@ -258,44 +258,6 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 
 <script src="{% static 'js/addAppointment.js' %}"></script>
-{% comment %} <script>
-    $('#origin').on('change', function(){
-        console.log('here')
-        let originName = $("#origin").val()
-        if(originName){
-            $("#origin").removeClass('isInvalid')
-            $.ajax({
-                url: "/appointment/getOriginDetails/",
-                method: "POST",
-                data: {
-                    'originName' : originName
-                },
-                beforeSend: function (xhr) {
-                  xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                success: function (data) {
-                    
-                    if(data.status == true){
-                        $('#originAddress').val(data.origin.address);
-                        $('#originPhone').val(data.origin.phone)
-                        $('#originPersonOnName').val(data.origin.personOnName)
-                        $('#originLatitude').val(data.origin.lat)
-                        $('#originLongitude').val(data.origin.long)
-                        $('#originAddress').attr('readonly',true)
-                        $('#originPhone').attr('readonly',true)
-                        $('#originPersonOnName').attr('readonly',true)
-                        $('#originLatitude').attr('readonly',true)
-                        $('#originLongitude').attr('readonly',true)
-                        $('#locationDiv').addClass('d-none')
-                        $('#errorMsgForOrigin').addClass('d-none')
-                    }
-                },
-            });
-            
-        }else{
-            $("#origin").addClass('isInvalid')
-        }
-    })
-</script> {% endcomment %}
+
 
 {% endblock %}
