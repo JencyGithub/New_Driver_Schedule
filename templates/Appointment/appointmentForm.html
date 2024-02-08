@@ -10,7 +10,9 @@
     label, select{
         cursor: pointer;
     }
-
+    label{
+        margin-bottom: 0.2rem!important;
+    }
 </style>
 {% endblock %}
 
@@ -63,7 +65,7 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="shiftDate">Shift date:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="date" name="shiftDate" {% if data %}readonly{% endif %} value="{% if data %}{{data.startDate}}{% endif %}" required='required' style="padding: 0.25rem 0.2rem;" id="shiftDate">
+                                        <input class="form-control"  type="date" name="shiftDate" min="{{curDate}}" {% if data %}readonly{% endif %} value="{% if data %}{{data.startDate}}{% endif %}" required='required' style="padding: 0.25rem 0.2rem;" id="shiftDate">
                                     </div>
                                 </div>
                             </div>
@@ -125,22 +127,7 @@
                                             required='required' style="padding: 0.25rem 0.2rem;" id="title">
                                     </div>
                                 </div>
-                                <div class="col-md-8 col-sm-8">
-                                    <label for="origin">origin :<span class="required">*</span></label>
-                                    {% comment %} {% if not data %}
-                                        <span class="float-right">
-                                            <span class="text-primary font-weight-bold" style="cursor: pointer;" onclick="addorigin()">Add origin</span>
-                                        </span>
-                                    {% endif %} {% endcomment %}
-                                    <div class="field item form-group">
-                                        <select name="origin" required class="form-select form-control text-capitalize" id="origin" {% if data %}disabled{% endif %} >
-                                            <option selected disabled>Select origin</option>
-                                            {% for origin in origins %}
-                                                <option class="text-capitalize text-lowercase" {% if data.origin.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.basePlant}}">{{ origin.basePlant }} - {{ origin.address }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
+                                
                                 <div class="col-md-4 col-sm-4">
                                     <label for="stopName">Client name :<span class="required">*</span></label>
                                     <div class="field item form-group">
@@ -152,11 +139,11 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="driverName">Select Driver:<span class="required">*</span></label>
+                                    <label for="driverName">Select Driver:</label>
                                     <span class="float-right">
-                                        <input type="checkbox" name="addDriver" {% if data %} disabled {% endif %} id="addDriver" style="cursor: pointer;" onchange="openBox(this,'driverName')" {% if appointmentDriver %}checked{% endif %}>
+                                        <input type="checkbox" name="addDriver" {% if data %} disabled {% endif %} id="addDriver" style="cursor: pointer;" onchange="openBox(this,'driverName')" {% if appointmentDriver %}checked{% endif %} title="Check for add driver">
                                     </span>
-                                    <select name="driverName" class="form-select form-control" id="driverName" required {% if not data  %} disabled {% endif %} style="font-size: 0.9rem;">
+                                    <select name="driverName" class="form-select form-control" id="driverName"  {% if not data  %} disabled {% endif %} style="font-size: 0.9rem;">
                                         <!-- Drivers will be placed here -->
                                         <option selected disabled>Select Driver</option>
                                         {% for driver in drivers %}
@@ -164,12 +151,34 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+
+                                <div class="col-md-6 col-6">
+                                    <label for="staffNotes">Staff notes :</label>
+                                    <div class="field item form-group">
+                                        <textarea name="staffNotes" id="staffNotes" rows="2" class="form-control" {% if data %}readonly{% endif %}>{% if data %}{{ data.staffNotes }}{% endif %}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-6">
+                                    <label for="driverNotes">Driver notes :</label>
+                                    <div class="field item form-group">
+                                        <textarea name="driverNotes" id="driverNotes" rows="2" class="form-control" {% if data %}readonly{% endif %}>{% if data %}{{ data.driverNotes }}{% endif %}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="x_panel">
+                    <div class="x_content">
+                        <div class="custom-continer">
+                            <div class="row">
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="truckNo">Select Truck:<span class="required">*</span></label>
+                                    <label for="truckNo">Select Truck:</label>
                                     <span class="float-right">
-                                        <input type="checkbox" name="addTruck" id="addTruck" {% if data %} disabled {% endif %} style="cursor: pointer;" onchange="openBox(this,'truckNo')" {% if appointmentTruck %}checked{% endif %}>
+                                        <input type="checkbox" name="addTruck" id="addTruck" {% if data %} disabled {% endif %} style="cursor: pointer;" {% if appointmentTruck %}checked{% endif %} title="Check for add truck">
                                     </span>
-                                    <select name="truckNo" class="form-select form-control" id="truckNo" {% if not data %} disabled {% endif %} required style="font-size: 0.9rem;">
+                                    <select name="truckNo" class="form-select form-control" id="truckNo" {% if not data %} disabled {% endif %} style="font-size: 0.9rem;">
                                         <!-- Trucks will be placed here -->
                                         <option selected disabled>Select Truck</option>
                                         {% for truck in trucks %}
@@ -177,12 +186,15 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                
-
-                                <div class="col-md-12 col-12">
-                                    <label for="staffNotes">Staff notes :<span class="required">*</span></label>
+                                <div class="col-md-8 col-sm-8">
+                                    <label for="origin">origin :</label>
                                     <div class="field item form-group">
-                                        <textarea name="staffNotes" id="staffNotes" rows="2" class="form-control" {% if data %}readonly{% endif %}>{% if data %}{{ data.staffNotes }}{% endif %}</textarea>
+                                        <select name="origin" class="form-select form-control text-capitalize" id="origin" {% if not data %} disabled {% endif %}>
+                                            <option selected disabled>Select origin</option>
+                                            {% for origin in origins %}
+                                                <option class="text-capitalize text-lowercase" {% if data.origin.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -191,9 +203,9 @@
                 </div>
             </div>
             <div class="col-md-3 col-sm-3">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>origin detail</h2> 
+                <div class="x_panel pb-1">
+                    <div class="x_title mb-0">
+                        <h2>origin details</h2> 
                         <div class="float-right d-none" id="locationDiv">
                             <input type="checkbox" id="typeLocation" value="typeLocation" name="basePlantType"style="margin-top: .5rem;" {% if basePlant.basePlantType is False %} checked {% endif %}>
                             <label for="typeLocation">Location</label>
@@ -202,46 +214,67 @@
                         <input type="hidden" id="originAddVal" name="originAddVal">
                     </div>
                     <div class="row">
+                        <div class="col-12 m-0 mb-1 text-right">
+                            <span class="text-info" style="font-size: 0.65rem;">Default stop will be selected origin.</span>
+                        </div>
                         <div class="col-md-12">
                             <label for="originAddress">Address : <span class="required">*</span></label>
                             <div class="field item form-group">
-                                <input class="form-control" type="text" name="originAddress" readonly
-                                   required style="padding: 0.25rem 0.2rem;" id="originAddress"  value="{% if data %}{{ data.origin.address }}{% endif %}">
+                                <textarea name="originAddress" id="originAddress" rows="2" class="form-control" style="padding: 0.25rem 0.2rem;" readonly>
+                                    {% if appointmentStop %}{{appointmentStop.stopName.address}}{% elif data %}{{ data.origin.address }}{% endif %}
+                                </textarea>
+                                <!-- <input class="form-control" type="text" name="originAddress" readonly
+                                    style="padding: 0.25rem 0.2rem;" id="originAddress"  value="{% if appointmentStop %}{{appointmentStop.stopName.address}}{% elif data %}{{ data.origin.address }}{% endif %}"> -->
                             </div>
                         </div>
                         <div class="col-md-12">
                             <label for="originPhone">Phone :<span class="required">*</span></label>
                             <div class="field item form-group">
                                 <input class="form-control" type="number" name="originPhone" readonly
-                                   required style="padding: 0.25rem 0.2rem;" id="originPhone" value="{% if data %}{{ data.origin.phone }}{% endif %}">
+                                    style="padding: 0.25rem 0.2rem;" id="originPhone" value="{% if appointmentStop %}{{appointmentStop.stopName.phone}}{% elif data %}{{ data.origin.phone }}{% endif %}">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <label for="originPersonOnName">Person Name :<span class="required">*</span></label>
                             <div class="field item form-group">
                                 <input class="form-control" type="text" name="originPersonOnName" readonly
-                                   required style="padding: 0.25rem 0.2rem;" id="originPersonOnName" value="{% if data %}{{ data.origin.personOnName }}{% endif %}">
+                                    style="padding: 0.25rem 0.2rem;" id="originPersonOnName" value="{% if appointmentStop %}{{appointmentStop.stopName.personOnName}}{% elif data %}{{ data.origin.personOnName }}{% endif %}">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <label for="originLatitude">Latitude: <span class="required">*</span></label>
                             <div class="field item form-group">
                                 <input class="form-control" type="number" name="originLatitude" readonly
-                                   required style="padding: 0.25rem 0.2rem;" id="originLatitude" value="{% if data %}{{ data.origin.lat }}{% endif %}">
+                                    style="padding: 0.25rem 0.2rem;" id="originLatitude" value="{% if appointmentStop %}{{appointmentStop.stopName.lat}}{% elif data %}{{ data.origin.lat }}{% endif %}">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <label for="originLongitude">Longitude: <span class="required">*</span></label>
                             <div class="field item form-group">
                                 <input class="form-control" type="number" name="originLongitude" readonly
-                                   required style="padding: 0.25rem 0.2rem;" id="originLongitude" value="{% if data %}{{ data.origin.long }}{% endif %}">
+                                    style="padding: 0.25rem 0.2rem;" id="originLongitude" value="{% if appointmentStop %}{{appointmentStop.stopName.long}}{% elif data %}{{ data.origin.long }}{% endif %}">
                             </div>
                         </div>
                     </div>
                 </div> 
+                <div class="x_panel stopDiv p-2 {% if not data %} d-none {% endif %}">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="appStop">Select Stop :</label>
+                            <div class="field item form-group">
+                                <select name="appStop" class="form-select form-control text-capitalize" id="appStop" {% if not data %} disabled {% endif %}>
+                                    <option selected disabled>Select Stop</option>
+                                    {% for origin in origins %}
+                                        <option class="text-capitalize text-lowercase" {% if appointmentStop.stopName.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             {% if not data or update == 1 %}
-                <div class="col-md-12 text-right p-0">
+                <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
                     <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Save</button>
                 </div>
             {% endif %}

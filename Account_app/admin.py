@@ -438,12 +438,15 @@ class AppointmentTruckInline(admin.StackedInline):
 class AppointmentDriverInline(admin.StackedInline):
     model = AppointmentDriver
     extra = 0
+class AppointmentStopInline(admin.StackedInline):
+    model = AppointmentStop
+    extra = 0
     
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ["title", "startTime", "endTime", "status","scheduled"]
     list_filter = ["status"]
     actions = ['send_email_action']
-    inlines = [AppointmentTruckInline, AppointmentDriverInline]
+    inlines = [AppointmentTruckInline, AppointmentDriverInline, AppointmentStopInline]
 
     def send_email_action(self, request, queryset):
         subject = 'Your job application status'

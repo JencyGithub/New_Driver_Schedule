@@ -270,10 +270,12 @@ function showAppointment(appointmentId) {
         $("#appStatus").text(data.appointmentObj.status);
         $("#appOrigin").text(data.appointmentObj.origin_id);
         $("#appStaffNotes").text(data.appointmentObj.staffNotes);
+        $("#appDriverNotes").text(data.appointmentObj.driverNotes);
         $("#appShiftType").text(data.appointmentObj.shiftType);
         $("#appCreatedBy").text(data.appointmentObj.createdBy_id);
         $("#appCreatedTime").text(data.appointmentObj.createdTime);
         $("#appPreStart").text(data.appointmentObj.preStartWindow);
+
         if (data.truckObj) {
           $("#truckNum").text(data.truckObj.adminTruckNumber);
         } else {
@@ -294,12 +296,30 @@ function showAppointment(appointmentId) {
           $("#driverPhone").text("Not assigned");
           $("#driverEmail").text("Not assigned");
         }
+        if (data.originObj) {
+          $("#originBasePlant").text(data.originObj.basePlant);
+          $("#originAddress").text(data.originObj.address);
+          $("#originPhone").text(data.originObj.phone);
+          $("#originPersonOnName").text(data.originObj.personOnName);
+          $("#originManagerName").text(data.originObj.managerName);
+        }else{
+          $("#originBasePlant").text('Not assigned');
+          $("#originAddress").text('Not assigned');
+          $("#originPhone").text('Not assigned');
+          $("#originPersonOnName").text('Not assigned');
+          $("#originManagerName").text('Not assigned');
+        }
 
-        $("#originBasePlant").text(data.originObj.basePlant);
-        $("#originAddress").text(data.originObj.address);
-        $("#originPhone").text(data.originObj.phone);
-        $("#originPersonOnName").text(data.originObj.personOnName);
-        $("#originManagerName").text(data.originObj.managerName);
+        if (data.stopObj) {
+          $(".modalStopSection").removeClass('d-none');
+          $("#originStopName").text(data.stopObj.basePlant);
+          $("#originStopAddress").text(data.stopObj.address);
+          $("#originStopPhone").text(data.stopObj.phone);
+          $("#originStopPersonOnName").text(data.stopObj.personOnName);
+          $("#originStopManagerName").text(data.stopObj.managerName);
+        }else{
+          $(".modalStopSection").addClass('d-none');
+        }
 
         $("#editBtn").attr(
           "href",

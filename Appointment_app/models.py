@@ -23,8 +23,9 @@ class Appointment(models.Model):
     status = models.CharField(
         max_length=20, choices=TRIP_STATUS, default='incomplete'
     )
-    origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE)
+    origin = models.ForeignKey(BasePlant, on_delete=models.CASCADE, null=True)
     staffNotes	= models.CharField(max_length=2048, null=True, default='', blank=True)
+    driverNotes	= models.CharField(max_length=2048, null=True, default='', blank=True)
     shiftType = models.CharField(max_length=10,choices=[('Day','Day'),('Night','Night')], default='Day')
     
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -74,6 +75,14 @@ class AppointmentDriver(models.Model):
     
     def __str__(self):
         return str(self.driverName.name)
+
+
+class AppointmentStop(models.Model):
+    appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE, default=None)
+    stopName = models.ForeignKey(BasePlant,on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.stopName.basePlant)
 
 
 class PreStart(models.Model):
