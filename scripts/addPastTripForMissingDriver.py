@@ -38,7 +38,7 @@ for i in matchingData:
         endTime = datetime.strptime(str(data[7].strip()), '%H:%M:%S').time()
         endTimeDateTime = datetime.combine(shiftDate.date(),endTime)
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
-        clientObj = Client.objects.filter(name = 'boral').first()
+        clientObj = Client.objects.filter(name = i.clientName).first()
         
         driverObj = Driver.objects.filter(name = driverName).first()
 
@@ -49,7 +49,7 @@ for i in matchingData:
                 basePlant = BasePlant.objects.filter(basePlant = data[24].strip().upper()).first() 
                 if basePlant is None:
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -65,7 +65,7 @@ for i in matchingData:
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1].strip() , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
                 if clientTruckConnectionObj is None:
                     pastTripErrorObj = PastTripError(
-                        clientName = 'boral',
+                        clientName = i.clientName,
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],
@@ -92,7 +92,6 @@ for i in matchingData:
                 
                 tripObj = DriverShiftTrip.objects.filter(shiftId = shiftId , truckConnectionId = clientTruckConnectionObj.id).first()
                 if tripObj is None:
-                    # print('Creating New Trip')
                     
                     tripObj = DriverShiftTrip()
                     tripObj.verified = True
@@ -100,11 +99,8 @@ for i in matchingData:
                     tripObj.clientId = clientObj.clientId
                     
                     tripObj.truckConnectionId = clientTruckConnectionObj.id
-                    # print('truckConnection ',clientTruckConnectionObj,tripObj)
                     
                     tripObj.save()
-                #     print('Trip Obj Created')
-                # print('tripId',tripObj.id)
 
                 # Docket save
                 # existingDockets = DriverShiftDocket.objects.filter(tripId = tripObj.id,shiftId = shiftObj.id).count()
@@ -121,10 +117,9 @@ for i in matchingData:
                     startTimeDateTime = datetime.strptime(startTimeDateTime, '%Y-%m-%d %H:%M:%S')
                     endTimeDateTime = datetime.strptime(endTimeDateTime, '%Y-%m-%d %H:%M:%S')
                     
-                    # print(startTimeDateTime, endTimeDateTime)
                 except Exception as e:
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -138,26 +133,20 @@ for i in matchingData:
                     continue
                 
                 try:
-                    # print(startTimeDateTime.tzinfo, startTimeDateTime)
-                    # print(endTimeDateTime.tzinfo, endTimeDateTime)
+
                     if tripObj.startDateTime and tripObj.endDateTime :
-                        # print('Start Date time Inside if')
-                        # print(data[5], tripObj.startDateTime.date(),startTimeDateTime.date() , tripObj.startDateTime.time() , startTimeDateTime.time())
+
                         if tripObj.startDateTime.date() == startTimeDateTime.date() and tripObj.startDateTime.time() > startTimeDateTime.time():
                             tripObj.startDateTime = startTimeDateTime
-                            # print('Updating Start Time trip match')
                         if tripObj.endDateTime.date() == endTimeDateTime.date() and tripObj.endDateTime.time() < endTimeDateTime.time():
                             tripObj.endDateTime = endTimeDateTime
-                            # print('Updating End Time trip match')
                             
                     else:
-                        # print('Start Date time Inside Else')
                         tripObj.startDateTime =startTimeDateTime
                         tripObj.endDateTime = endTimeDateTime
-                        # print('Saved Start Time : ', startTimeDateTime ,  'Saved End Time' ,endTimeDateTime )
                 except Exception as e:
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -174,7 +163,6 @@ for i in matchingData:
                 
                 shiftObj.startDateTime = tripObj.startDateTime
                 
-                # print('shift' , shiftObj.startDateTime)
                                     
                 shiftObj.endDateTime = tripObj.endDateTime
                 shiftObj.save()
@@ -184,7 +172,7 @@ for i in matchingData:
                 docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                 if docketObj :
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -197,18 +185,16 @@ for i in matchingData:
                     pastTripErrorObj.save()
                     continue
                 docketObj = DriverShiftDocket()                
-                # print('Docket Obj Created.')
 
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1].strip() , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
 
                 if clientTruckConnectionObj:
-                    # print("finding ratecard")
                     rateCard = clientTruckConnectionObj.rate_card_name 
                     graceObj = Grace.objects.filter(rate_card_name = rateCard,start_date__lte = shiftObj.shiftDate,end_date__gte = shiftObj.shiftDate).first()
 
                     if not graceObj:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -218,7 +204,6 @@ for i in matchingData:
                             exceptionText = "No matching grace card for the date.",
                             data = data
                         ) 
-                        # print('grace card not found')                   
                         pastTripErrorObj.save()
                         continue
 
@@ -226,7 +211,7 @@ for i in matchingData:
 
                     if not costParameterObj:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -237,7 +222,6 @@ for i in matchingData:
                             data = data
                         )                    
                         pastTripErrorObj.save()
-                        # print('COST PARAMETER not found')
                         continue
                         
 
@@ -275,7 +259,7 @@ for i in matchingData:
                         docketObj.save()
                     except Exception as e:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -333,10 +317,9 @@ for i in matchingData:
                         reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
                         reconciliationDocketObj.fromDriver = True 
                         reconciliationDocketObj.save()
-                        # print("reconciliation done!!!!")
                     except Exception as e:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -351,7 +334,7 @@ for i in matchingData:
                 
                 else:
                     pastTripErrorObj = PastTripError(
-                        clientName = 'boral',
+                        clientName = i.clientName,
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],
@@ -363,7 +346,7 @@ for i in matchingData:
                     pastTripErrorObj.save()
             except Exception as e:       
                 pastTripErrorObj = PastTripError(
-                    clientName = 'boral',
+                    clientName = i.clientName,
                     tripDate = res_,
                     docketNumber = data[5],
                     truckNo = data[1],
@@ -378,7 +361,7 @@ for i in matchingData:
             continue
     except Exception as e:
         pastTripErrorObj = PastTripError(
-            clientName = 'boral',
+            clientName = i.clientName,
             tripDate = res_,
             docketNumber = data[5],
             truckNo = data[1],

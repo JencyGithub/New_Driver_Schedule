@@ -40,7 +40,7 @@ for i in matchingData:
         endTime = datetime.strptime(str(data[7].strip()), '%H:%M:%S').time()
         endTimeDateTime = datetime.combine(shiftDate.date(),endTime)
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
-        clientObj = Client.objects.filter(name = 'boral').first()
+        clientObj = Client.objects.filter(name = i.clientName).first()
         driverName = data[4].strip().replace(' ','').lower()
         driverObj = Driver.objects.filter(name = driverName).first()
         basePlant = BasePlant.objects.filter(basePlant = basePlantName).first()
@@ -51,7 +51,7 @@ for i in matchingData:
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = data[1].strip() , startDate__lte = shiftDate,endDate__gte = shiftDate, clientId = clientObj.clientId).first()
                 if clientTruckConnectionObj is None:
                     pastTripErrorObj = PastTripError(
-                        clientName = 'boral',
+                        clientName = i.clientName,
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],
@@ -110,7 +110,7 @@ for i in matchingData:
                     # print(startTimeDateTime, endTimeDateTime)
                 except Exception as e:
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -143,7 +143,7 @@ for i in matchingData:
                         # print('Saved Start Time : ', startTimeDateTime ,  'Saved End Time' ,endTimeDateTime )
                 except Exception as e:
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -170,7 +170,7 @@ for i in matchingData:
                 docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                 if docketObj :
                     pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -194,7 +194,7 @@ for i in matchingData:
 
                     if not graceObj:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -212,7 +212,7 @@ for i in matchingData:
 
                     if not costParameterObj:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -261,7 +261,7 @@ for i in matchingData:
                         docketObj.save()
                     except Exception as e:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -321,7 +321,7 @@ for i in matchingData:
                         # print("reconciliation done!!!!")
                     except Exception as e:
                         pastTripErrorObj = PastTripError(
-                            clientName = 'boral',
+                            clientName = i.clientName,
                             tripDate = res_,
                             docketNumber = data[5],
                             truckNo = data[1],
@@ -336,7 +336,7 @@ for i in matchingData:
                 
                 else:
                     pastTripErrorObj = PastTripError(
-                        clientName = 'boral',
+                        clientName = i.clientName,
                         tripDate = res_,
                         docketNumber = data[5],
                         truckNo = data[1],
@@ -348,7 +348,7 @@ for i in matchingData:
                     pastTripErrorObj.save()
             except Exception as e:       
                 pastTripErrorObj = PastTripError(
-                    clientName = 'boral',
+                    clientName = i.clientName,
                     tripDate = res_,
                     docketNumber = data[5],
                     truckNo = data[1],
@@ -362,7 +362,7 @@ for i in matchingData:
 
     except Exception as e:
         pastTripErrorObj = PastTripError(
-            clientName = 'boral',
+            clientName = i.clientName,
             tripDate = res_,
             docketNumber = data[5],
             truckNo = data[1],

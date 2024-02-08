@@ -341,6 +341,7 @@ def truckFormSave(request):
 
     # messages.success(request,'Adding successfully')
     # return redirect('gearBox:truckTable')
+    return redirect('gearBox:truckAxlesFormView')
 
 def truckAxlesFormView(request):
     return render(request,'GearBox/truck/truckAxlesForm.html')

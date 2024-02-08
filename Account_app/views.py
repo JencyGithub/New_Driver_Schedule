@@ -1515,8 +1515,9 @@ def expensesTableView(request):
     clientName = request.POST.get('clientName_')
     clientTruckNo = request.POST.get('truckNo_')
     clientDocketYard = request.POST.get('docketYard_')
-    startDate = datetime.strptime(startDate, '%B %d, %Y').strftime('%Y-%m-%d')
-    endDate = datetime.strptime(endDate, '%B %d, %Y').strftime('%Y-%m-%d')  
+    # startDate = datetime.strptime(startDate, '%B %d, %Y').strftime('%Y-%m-%d')
+    # endDate = datetime.strptime(endDate, '%B %d, %Y').strftime('%Y-%m-%d')  
+    print(startDate,endDate)
     data = []
     if clientName:
         clientName = Client.objects.filter(clientId = clientName).first()
@@ -2316,8 +2317,38 @@ def reconciliationAnalysis(request,dataType):
         params['dataType'] = 'Revenue'
         params['dataTypeInt'] = 7
     elif dataType == 9:
-        params['dataType'] = 'Custom'
-        params['dataTypeInt'] = 9
+        # params['dataType'] = 'Custom'
+        # params['dataTypeInt'] = 9
+
+        from django.db.models import Q
+
+# Filter the LeaveRequest objects to include only those with 'Approved' status
+        leave_requests = LeaveRequest.objects.filter(status='Approved').annotate(
+            start_date_cast=Cast('start_date', output_field=fields.DateField()),
+            end_date_cast=Cast('end_date', output_field=fields.DateField())
+        )
+
+        # Dictionary to store leave days for each driver
+        driver_leave_days_dict = defaultdict(int)
+
+        # Calculate leave days for each driver
+        for leave in leave_requests:
+            if leave.start_date_cast and leave.end_date_cast:
+                duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
+                driver_leave_days_dict[leave.employee.name] += duration
+
+        # Prepare a list of dictionaries containing driver names and their leave days
+        driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+
+        # Prepare parameters to pass to the template
+        params = {
+            'response_content': driver_leave_days_list,
+            'dataType': 'Custom',
+            'dataTypeInt': 9,
+        }
+
+        # Render the template with the parameters
+        return render(request, 'Account/Tables/customTable.html', params)
 
         # leave_requests = LeaveRequest.objects.annotate(
         # start_date_cast=Cast('start_date', output_field=fields.DateField()),
@@ -2331,38 +2362,21 @@ def reconciliationAnalysis(request,dataType):
         #         duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
         #         driver_leave_days_dict[leave.employee.name] += duration
 
+        # all_drivers = Driver.objects.all()
+
+        # for driver in all_drivers:
+        #     if driver.name not in driver_leave_days_dict:
+        #         driver_leave_days_dict[driver.name] = 0
+
         # driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+
+        # driver_leave_days_list = sorted(driver_leave_days_list, key=lambda x: x['days'])
+
+        # # for item in driver_leave_days_list:
+        # #     print(item['driver'], item['days'])
 
         # context = {'response_content': driver_leave_days_list}
         # return render(request, 'Account/Tables/customTable.html', context)
-
-        leave_requests = LeaveRequest.objects.annotate(
-        start_date_cast=Cast('start_date', output_field=fields.DateField()),
-        end_date_cast=Cast('end_date', output_field=fields.DateField())
-        )
-
-        driver_leave_days_dict = defaultdict(int)
-
-        for leave in leave_requests:
-            if leave.start_date_cast and leave.end_date_cast:
-                duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
-                driver_leave_days_dict[leave.employee.name] += duration
-
-        all_drivers = Driver.objects.all()
-
-        for driver in all_drivers:
-            if driver.name not in driver_leave_days_dict:
-                driver_leave_days_dict[driver.name] = 0
-
-        driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
-
-        driver_leave_days_list = sorted(driver_leave_days_list, key=lambda x: x['days'])
-
-        # for item in driver_leave_days_list:
-        #     print(item['driver'], item['days'])
-
-        context = {'response_content': driver_leave_days_list}
-        return render(request, 'Account/Tables/customTable.html', context)
 
 
     elif dataType == 10:
@@ -2375,8 +2389,8 @@ def reconciliationAnalysis(request,dataType):
             'clientTruckConnectionObj':clientTruckConnectionObj,
             'basePlantObj':basePlantObj,
             'dataList':dataList,
-            'startDate':startDate,
-            'endDate':endDate,
+            'startDate':dateConverterFromTableToPageFormate(startDate),
+            'endDate':dateConverterFromTableToPageFormate(endDate),
         }
         return render(request, 'Account/Tables/expensesTable.html',params)
     
@@ -3140,20 +3154,27 @@ def pastTripSave(request):
             f.write(monthAndYear)
                         
         with open("pastTrip_entry.txt", 'w') as f:
-            f.write(newFileName)
-        if save == 1 :
+            f.write(newFileName+','+clientName)
             
-            if clientName == 'boral':
-                colorama.AnsiToWin32.stream = None
-                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
-                subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            elif clientName == 'holcim':
-                return HttpResponse('work in progress')
-                colorama.AnsiToWin32.stream = None
-                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                cmd = ["python", "manage.py", "runscript", 'holcim','--continue-on-error']
-                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        if save == 1 :
+            colorama.AnsiToWin32.stream = None
+            os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+            cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
+            subprocess.Popen(cmd, stdout=subprocess.PIPE)
+           
+        # if save == 1 :
+            
+        #     if clientName == 'boral':
+        #         colorama.AnsiToWin32.stream = None
+        #         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        #         cmd = ["python", "manage.py", "runscript", 'PastDataSave','--continue-on-error']
+        #         subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        #     elif clientName == 'holcim':
+        #         return HttpResponse('work in progress')
+        #         colorama.AnsiToWin32.stream = None
+        #         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        #         cmd = ["python", "manage.py", "runscript", 'holcim','--continue-on-error']
+        #         subprocess.Popen(cmd, stdout=subprocess.PIPE)
         messages.success(request, "Please wait for some time, it takes some time to update the data.")
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
