@@ -61,7 +61,7 @@
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
-                        <h2 class="text-uppercas d-inline-block">Information tab</h2>
+                        <h2 class="text-uppercase d-inline-block" style="font-weight:bold">Information tab</h2>
                         {% if data %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
@@ -149,7 +149,7 @@
                     <!-- Mandatory fields -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6>Mandatory Fields</h6>
+                            <h6 style="font-weight:bold">Mandatory Fields</h6>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -177,8 +177,8 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="vehicleType" style="margin-bottom: 0.8rem!important;">Vehicle type : <span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="vehicleType" id="vehicleType"  class="form-control">
-                                            <option value="Tipper">Tipper</option>
+                                        <select name="vehicleType" required id="vehicleType" class="form-control">
+                                            <option value="Tipper">None</option>
                                         </select>
                                     </div>
                                 </div>
@@ -212,7 +212,7 @@
                     <!-- Custom fields -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6>Custom fields</h6>
+                            <h6 style="font-weight:bold">Custom fields</h6>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -221,15 +221,16 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customFuelCard" style="margin-bottom: 0.3rem!important;">Fuel Card :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customFuelCard" style="padding: 0.25rem 0.2rem;" id="customFuelCard">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customFuelCard" style="padding: 0.25rem 0.2rem;" id="customFuelCard" >
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="customOldFeetNumber" style="margin-bottom: 0.3rem!important;">Old Fleet Number :</label>
+                                        <label for="customRegOwner" style="margin-bottom: 0.3rem!important;">Registered Owner :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customOldFeetNumber" style="padding: 0.25rem 0.2rem;" id="customOldFeetNumber" data-validate-minmax="1000,9999">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customRegOwner" style="padding: 0.25rem 0.2rem;" id="customRegOwner" required>
                                         </div>
                                     </div>
+                                    
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customOldRego" style="margin-bottom: 0.3rem!important;">Old Rego :</label>
                                         <div class="field item form-group">
@@ -237,9 +238,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="customRegOwner" style="margin-bottom: 0.3rem!important;">Registered Owner :</label>
+                                        <label for="customOldFeetNumber" style="margin-bottom: 0.3rem!important;">Old Fleet Number :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customRegOwner" style="padding: 0.25rem 0.2rem;" id="customRegOwner">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customOldFeetNumber" style="padding: 0.25rem 0.2rem;" id="customOldFeetNumber" data-validate-minmax="1000,9999" >
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -250,8 +251,9 @@
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customPdd" style="margin-bottom: 0.3rem!important;">PDD number :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999">
+                                        {% comment %} concrite truck: Mandatory | tippers truck: not Mandatory {% endcomment %}
+                                        <div class="field item form-group"> 
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999" required>
                                         </div>
                                     </div>
                                 </div>
@@ -262,7 +264,7 @@
                     <!-- Information -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6>Information</h6>
+                            <h6 style="font-weight:bold">Information</h6>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -326,7 +328,7 @@
                     <!-- Registration -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6 class="d-inline-block">Registration</h6>
+                            <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
                             <span class="float-right">
                                 <input type="checkbox" name="unRegistration" id="unRegistration" onchange="registered(this)">
                                 <label for="unRegistration">Un-Registered</label>
@@ -339,26 +341,26 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registrationCode" style="margin-bottom: 0.3rem!important;">Code :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select name="registrationState" id="registrationState"  class="form-control">
+                                            <select name="registrationState" required id="registrationState"  class="form-control">
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationDueDate" style="margin-bottom: 0.3rem!important;">Registration Due Date :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate">
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -377,7 +379,7 @@
                     <!-- Engine Information -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6 class="d-inline-block">Engine Information</h6>
+                            <h6 class="d-inline-block" style="font-weight:bold">Engine Information</h6>
                             <span class="float-right">
                                 <input type="checkbox" name="powered" id="powered">
                                 <label for="powered">Powered</label>
@@ -389,25 +391,25 @@
                                 <div class="col-md-6 col-sm-6">
                                     <label for="engine" style="margin-bottom: 0.3rem!important;">Engine # :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engine"  style="padding: 0.25rem 0.2rem;" id="engine">
+                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engine"  style="padding: 0.25rem 0.2rem;" id="engine" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
                                     <label for="engineMake" style="margin-bottom: 0.3rem!important;">Make :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineMake" style="padding: 0.25rem 0.2rem;" id="engineMake">
+                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineMake" style="padding: 0.25rem 0.2rem;" id="engineMake" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="engineModel" style="margin-bottom: 0.3rem!important;">Model :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineModel" style="padding: 0.25rem 0.2rem;" id="engineModel">
+                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineModel" style="padding: 0.25rem 0.2rem;" id="engineModel" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="engineCapacity" style="margin-bottom: 0.3rem!important;">Capacity :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineCapacity" style="padding: 0.25rem 0.2rem;" id="engineCapacity">
+                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineCapacity" style="padding: 0.25rem 0.2rem;" id="engineCapacity" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">

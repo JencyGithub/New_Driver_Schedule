@@ -306,20 +306,20 @@
                                                                 <td>{{ error.errorFromPastTrip }}</td>
                                                                 <td>{{ error.fileName }}</td>
                                                                 <td>
-                                                                    <a href="{% url 'Account:archivePastTrip' errorId=error.id %}"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+                                                                    <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
 
-                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'boral' %}
-                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
+                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
 
                                                                     {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
                                                                     {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
+                                                                    <a href="{% url 'gearBox:truckTable' %}" style="font-size:0.6rem;" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
 
-                                                                    {% elif error.clientName == 'boral' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+                                                                    {% elif   'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" style="font-size:0.6rem;" class="btn btn-sm btn-primary">  Add depot  </a>
 
-                                                                    {% elif error.clientName == 'boral' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
+                                                                    {% elif   not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}"style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
                                                                     {% comment %} HOLCIM  {% endcomment %}
                                                                     
                                                                     {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
@@ -373,7 +373,7 @@
                                                                 <th>Docket Number</th>
                                                                 <th>Error Description</th>
                                                                 <th>File name</th>
-                                                                <th>Action</th>
+                                                                <th style="width:13%;">Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -387,8 +387,8 @@
                                                                 <td>{{ solve.errorFromPastTrip }}</td>
                                                                 <td>{{ solve.fileName }}</td>
                                                                 <td>
-                                                                    <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
-                                                                    <a class="btn btn-success btn-sm text-light" type="button" onclick="showSolveErrorModel(this)" id="solveDocket{{solve.id}}" value="{{solve.id}}"> Docket</a>
+                                                                    <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}" style="font-size:0.7rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+                                                                    <a class="btn btn-success btn-sm text-light" style="font-size:0.7rem;" type="button" onclick="showSolveErrorModel({{solve.id}})" id="solveDocket{{solve.id}}"> Docket</a>
                                                                 </td>
                                                             </tr>
                                                             {% endfor %}
@@ -418,7 +418,7 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="card-box table-responsive">
-                                                    <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                                                    <table id="archive-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
                                                         <thead>
                                                             <tr>
                                                                 <th>Id</th>
@@ -644,6 +644,7 @@
     $(document).ready(function () {
         $('#datatable-buttons').DataTable();
         $('#solved-datatable-buttons').DataTable();
+        $('#archive-datatable-buttons').DataTable();
 
         $('#no').click(function(){
             $('#save_').prop('checked', false);
@@ -682,7 +683,7 @@
     }
     function showSolveErrorModel(data)
     {
-        solveId = data.value
+        solveId = data
         $.ajax({
             type: "POST",
             url: "/account/pastTrip/solve/error/get/",

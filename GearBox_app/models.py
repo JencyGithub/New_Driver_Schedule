@@ -207,6 +207,7 @@ class Driver(models.Model):
     
     def __str__(self) -> str:
         return str(self.driverId) + str(self.name)
+        
 
 class ClientTruckConnection(models.Model):
     truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)

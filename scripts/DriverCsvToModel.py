@@ -6,6 +6,7 @@ def run():
     f = open("Driver_reg_file.txt", 'r')
     file_name = f.read()
 
+
     fileName = f'static/Account/DriverEntry/{file_name}'
 
     # fileName = 'static/Account/DriverEntry/20231207043947@_!sampleDriverEntry.csv'
@@ -35,7 +36,7 @@ def run():
             # print(usernames,email_addresses)
             try:
                 driverName = dump[1].lower().strip().replace(' ','').replace('-','').replace('(','').replace(')','')
-                if dump[2] == M_pattern and driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
+                if  driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
                     DriverObj = Driver()
                     DriverObj.driverId = dump[0]
                     DriverObj.name = driverName.lower()
@@ -56,10 +57,11 @@ def run():
                     user_.save()
                     DriverObj.save()
                 else:
+                    
                     with open("Driver_skip.txt", 'a')as f:
-                        f.write(str(dump)+'\n')
+                        f.write(str(dump)+ str(file_name) + '\n')
             except Exception as e:
-                with open("Driver_reg_file.txt", 'a')as f:
+                with open("Driver_entry_error.txt", 'a')as f:
                     f.write(str(e)+str(data)+'\n')
             
 
