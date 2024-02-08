@@ -2,6 +2,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 $(document).ready(function(){
     checkRecurring()
+    console.log('reload')
 });
 
 $('#repeats').on('change', function(){
@@ -93,7 +94,8 @@ function setTruckAndDriver(dataRow){
     }
 }
 
-function checkOrigin(){
+$('#origin').on('change', function(){
+    
     let originName = $("#origin").val()
     if(originName){
         $("#origin").removeClass('isInvalid')
@@ -107,6 +109,7 @@ function checkOrigin(){
               xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: function (data) {
+                
                 if(data.status == true){
                     $('#originAddress').val(data.origin.address);
                     $('#originPhone').val(data.origin.phone)
@@ -127,7 +130,43 @@ function checkOrigin(){
     }else{
         $("#origin").addClass('isInvalid')
     }
-}
+})
+
+// function checkOrigin(){
+//     let originName = $("#origin").val()
+//     if(originName){
+//         $("#origin").removeClass('isInvalid')
+//         $.ajax({
+//             url: "/appointment/getOriginDetails/",
+//             method: "POST",
+//             data: {
+//                 'originName' : originName
+//             },
+//             beforeSend: function (xhr) {
+//               xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//             },
+//             success: function (data) {
+//                 if(data.status == true){
+//                     $('#originAddress').val(data.origin.address);
+//                     $('#originPhone').val(data.origin.phone)
+//                     $('#originPersonOnName').val(data.origin.personOnName)
+//                     $('#originLatitude').val(data.origin.lat)
+//                     $('#originLongitude').val(data.origin.long)
+//                     $('#originAddress').attr('readonly',true)
+//                     $('#originPhone').attr('readonly',true)
+//                     $('#originPersonOnName').attr('readonly',true)
+//                     $('#originLatitude').attr('readonly',true)
+//                     $('#originLongitude').attr('readonly',true)
+//                     $('#locationDiv').addClass('d-none')
+//                     $('#errorMsgForOrigin').addClass('d-none')
+//                 }
+//             },
+//         });
+        
+//     }else{
+//         $("#origin").addClass('isInvalid')
+//     }
+// }
 
 function openBox(checked,id){
     if ($(`#${checked.id}`).prop('checked')) {

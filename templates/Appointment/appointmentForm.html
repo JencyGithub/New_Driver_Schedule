@@ -127,13 +127,13 @@
                                 </div>
                                 <div class="col-md-8 col-sm-8">
                                     <label for="origin">origin :<span class="required">*</span></label>
-                                    {% if not data %}
+                                    {% comment %} {% if not data %}
                                         <span class="float-right">
                                             <span class="text-primary font-weight-bold" style="cursor: pointer;" onclick="addorigin()">Add origin</span>
                                         </span>
-                                    {% endif %}
+                                    {% endif %} {% endcomment %}
                                     <div class="field item form-group">
-                                        <select name="origin" required class="form-select form-control text-capitalize" id="origin" {% if data %}disabled{% endif %} onchange="checkorigin()">
+                                        <select name="origin" required class="form-select form-control text-capitalize" id="origin" {% if data %}disabled{% endif %} >
                                             <option selected disabled>Select origin</option>
                                             {% for origin in origins %}
                                                 <option class="text-capitalize text-lowercase" {% if data.origin.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.basePlant}}">{{ origin.basePlant }} - {{ origin.address }}</option>
@@ -258,5 +258,6 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 
 <script src="{% static 'js/addAppointment.js' %}"></script>
+
 
 {% endblock %}

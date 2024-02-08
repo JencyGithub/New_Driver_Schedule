@@ -1,45 +1,42 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 $(document).ready(function () {
-  $("#multiSelect").select2({
+  $("#status").select2({
     placeholder: "Select status",
     templateResult: formatOption,
   });
 
-  $("#multiSelect").on("change", function () {
+  $("#status").on("change", function () {
     var selectedStatus = $(this).val();
-    // // console.log(selectedStatus);
+    // console.log(selectedStatus);
     getDataFilter(selectedStatus);
   });
 
-
-  $("#closeBtn").on('click', function(){
-    $('#appointmentModel').modal('hide');
-  })
+  $("#closeBtn").on("click", function () {
+    $("#appointmentModel").modal("hide");
+  });
   getDataFilter(null);
 
-  $('#cancleJonBtn').on('click', function(){
-    $('#cancelModel').modal('show');
-  })
+  $("#cancelJobBtn").on("click", function () {
+    $("#cancelModel").modal("show");
+  });
+
+  $("#filterBtn").on("click", function () {
+    $("#filterModal").modal("show");
+  });
+
+  $("#status").on("change", function () {
+    // var selectedStatus = $(this).val();
+    getDataFilter();
+  });
+
+  $("#filterApplyBtn").on("click", function () {
+    $("#filterModal").modal("hide");
+    getDataFilter();
+  });
 });
 
-function getDataFilter(selectedStatus) {
-  $.ajax({
-    url: "/appointment/get/driver-appointment/",
-    method: "POST",
-    data: {
-      selectedStatus: selectedStatus,
-    },
-    beforeSend: function (xhr) {
-      xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    },
-    success: function (data) {
-      if (data.status) {
-        setCalendar(data);
-      }
-    },
-  });
-}
+
 
 function setDataInTable(tableId, data) {
   var table = $(`#${tableId}`).DataTable();
@@ -67,35 +64,6 @@ function setDataInTable(tableId, data) {
       .draw();
   });
 }
-
-$(document).ready(function () {
-  $("#status").select2({
-    placeholder: "Select status",
-  });
-
-  $("#closeBtn").on("click", function () {
-    $("#appointmentModel").modal("hide");
-  });
-  getDataFilter(null);
-
-  $("#cancelJobBtn").on("click", function () {
-    $("#cancelModel").modal("show");
-  });
-
-  $("#filterBtn").on("click", function () {
-    $("#filterModal").modal("show");
-  });
-
-  $("#status").on("change", function () {
-    // var selectedStatus = $(this).val();
-    getDataFilter();
-  });
-
-  $("#filterApplyBtn").on("click", function () {
-    $("#filterModal").modal("hide");
-    getDataFilter();
-  });
-});
 
 function clearFilter(id) {
   $(`#${id} input[type="checkbox"]`).each(function () {
@@ -343,3 +311,22 @@ function showAppointment(appointmentId) {
     },
   });
 }
+
+
+// function getDataFilter(selectedStatus) {
+//   $.ajax({
+//     url: "/appointment/get/driver-appointment/",
+//     method: "POST",
+//     data: {
+//       selectedStatus: selectedStatus,
+//     },
+//     beforeSend: function (xhr) {
+//       xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//     },
+//     success: function (data) {
+//       if (data.status) {
+//         setCalendar(data);
+//       }
+//     },
+//   });
+// }

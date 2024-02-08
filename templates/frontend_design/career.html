@@ -1,0 +1,44 @@
+<style>
+  #career {
+    color: #8bd8bd
+  }
+</style>
+{% load static %}
+
+{% include "frontend_design/header.html" %}
+
+<!-- Service Start -->
+<div class="container-xxl bg-light py-5 my-5">
+  <div class="container py-5">
+    <div class="text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+      <h1 class="display-6">Opening</h1>
+      {% comment %} <p class="text-primary fs-5 mb-5" style="color:#8bd8bd!important">Lorem ipsum dolor sit amet consectetur adipis</p> {% endcomment %}
+    </div>
+    <div class="row g-4 mt-4">
+      {% if joblisting is not None %}
+        {% for job in joblisting %}
+          {% if job.currently_accepting %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp " data-wow-delay="0.1s">
+              <div class="service-item bg-white p-5">
+                <h5 class="mb-3">{{ job.title }}</h5>
+                <p>{{ job.description }}</p>
+                <a href="{% url 'frontend_app:job_opening_form' job_id=job.id %}" class="btn btn-primary w-25 d-block ms-auto"
+                  type="submit">Apply</a>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <h4 class="text-center text-secondary">No jobs available</h4>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- Service End -->
+
+
+
+
+
+
+{% include "frontend_design/footer.html" %}

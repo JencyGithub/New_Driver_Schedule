@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'Account_app',
     'GearBox_app',   
     'Appointment_app',
+    'Gss_app',
 ]
 
 MIDDLEWARE = [

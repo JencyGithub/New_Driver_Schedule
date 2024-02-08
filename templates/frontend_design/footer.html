@@ -1,0 +1,100 @@
+{% load static %}
+ 
+ <!-- Footer Start -->
+ <div class="container-fluid bg-light footer pt-5 wow fadeIn" data-wow-delay="0.1s">
+  <div class="container py-5">
+      <div class="row g-5">
+          <div class="col-md-12">
+              <h1 class="text-primary mb-4" style="color:#8bd8bd!important">
+                {% comment %} <img class="img-fluid me-2" src="static/assets/img/icon-1.png" alt=""
+                      style="width: 45px;"> {% endcomment %}
+                      GSS</h1>
+                      <p class="text-secondary" style="font-size:1em">Enhance your supply chain efficiency with our tailored logistics solutions. Our expertise in global logistics ensures your goods are handled with care and precision, from origin to destination. Experience seamless operations and unparalleled service quality with us, as we navigate the complexities of logistics to deliver success to your business.</p>
+          </div>
+          {% comment %} <div class="col-md-6">
+              <h5 class="mb-4">Newsletter</h5>
+              <p>Clita erat ipsum et lorem et sit, sed stet lorem sit clita.</p>
+              <div class="position-relative">
+                  <input class="form-control bg-transparent w-100 py-3 ps-4 pe-5" type="text"
+                      placeholder="Your email">
+                  <button type="button"
+                      class="btn btn-primary py-2 px-3 position-absolute top-0 end-0 mt-2 me-2">SignUp</button>
+              </div>
+          </div> {% endcomment %}
+          <div class="col-lg-4 col-md-4">
+              <h5 class="mb-4">Get In Touch</h5>
+              <p><i class="fa fa-map-marker-alt me-3"></i>Office # 001, 2<sup>nd</sup> Floor, Teneil IT Tower, Sector 75, Mohali, Punjab 160069</p>
+              {% comment %} <p><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p> {% endcomment %}
+              <p><i class="fa fa-envelope me-3"></i>info@globalsmartsolutions.biz</p>
+          </div>
+          {% comment %} <div class="col-lg-3 col-md-6">
+              <h5 class="mb-4">Our Services</h5>
+              <a class="btn btn-link" href="">Currency Wallet</a>
+              <a class="btn btn-link" href="">Currency Transaction</a>
+              <a class="btn btn-link" href="">Bitcoin Investment</a>
+              <a class="btn btn-link" href="">Token Sale</a>
+          </div> {% endcomment %}
+          <div class="col-lg-4 col-md-4">
+              <h5 class="mb-4">Quick Links</h5>
+              <a class="btn btn-link" href="{% url 'frontend_app:about'%}">About Us</a>
+              <a class="btn btn-link" href="{% url 'frontend_app:contact'%}">Contact Us</a>
+              <a class="btn btn-link" href="{% url 'frontend_app:services'%}">Our Services</a>
+              <a class="btn btn-link" href="">Terms & Condition</a>
+          </div>
+          <div class="col-lg-4 col-md-4">
+              <h5 class="mb-4">Follow Us</h5>
+              <div class="d-flex">
+                  <a class="btn btn-square rounded-circle me-1" href="javascript:void(0)"><i class="fab fa-twitter"></i></a>
+                  <a class="btn btn-square rounded-circle me-1" href="javascript:void(0)"><i class="fab fa-facebook-f"></i></a>
+                  <a class="btn btn-square rounded-circle me-1" href="javascript:void(0)"><i class="fab fa-youtube"></i></a>
+                  <a class="btn btn-square rounded-circle me-1" href="javascript:void(0)"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="container-fluid copyright">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                  &copy; <a href="#">GLOBAL SMART SOLUTIONS</a>, All Right Reserved.
+              </div>
+              <div class="col-md-6 text-center text-md-end">
+                  <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. */-->
+                  {% comment %} Designed By <a href="https://htmlcodex.com">HTML Codex</a> Distributed By <a
+                      href="https://themewagon.com">ThemeWagon</a> {% endcomment %}
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+<!-- Footer End -->
+
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top"><i
+      class="bi bi-arrow-up"></i></a>
+
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'assets/lib/wow/wow.min.js'%}"></script>
+<script src="{% static 'assets/lib/easing/easing.min.js'%}"></script>
+<script src="{% static 'assets/lib/waypoints/waypoints.min.js'%}"></script>
+<script src="{% static 'assets/lib/owlcarousel/owl.carousel.min.js'%}"></script>
+<script src="{% static 'assets/lib/counterup/counterup.min.js'%}"></script>
+<script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+
+<!-- alertify message -->
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+{% for message_flash in messages %}
+<script>
+    alertify.set('notifier', 'position', 'top-right');
+    alertify.success('{{ message_flash }}');
+</script>
+{% endfor %}
+<!-- Template Javascript -->
+<script src="{% static 'assets/js/main.js'%}"></script>
+</body>
+
+</html>
