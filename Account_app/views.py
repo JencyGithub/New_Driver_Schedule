@@ -21,6 +21,10 @@ from dateutil.relativedelta import relativedelta
 from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
+from django.db.models import F, ExpressionWrapper, fields
+from django.db.models.functions import Cast
+import datetime
+from collections import defaultdict
 
 
 def index(request):
@@ -2267,7 +2271,7 @@ def reconciliationForm(request, dataType):
         'clients': clients,
         'trucks': trucks ,
     }
-    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of 7 -revenue 10 - expenses
+    # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of, 7: revenue, 10: expenses, 9: custom report
     if dataType == 0:
         params['dataType'] = 'Reconciliation Report'
         params['dataTypeInt'] = 0
@@ -2283,6 +2287,9 @@ def reconciliationForm(request, dataType):
     elif dataType ==  10:
         params['dataType'] = 'Expenses Report'
         params['dataTypeInt'] = 10
+    elif dataType ==  9:
+        params['dataType'] = 'Custom Report'
+        params['dataTypeInt'] = 9
         
     return render(request, 'Reconciliation/reconciliation.html', params)
 
@@ -2308,6 +2315,56 @@ def reconciliationAnalysis(request,dataType):
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
         params['dataType'] = 'Revenue'
         params['dataTypeInt'] = 7
+    elif dataType == 9:
+        params['dataType'] = 'Custom'
+        params['dataTypeInt'] = 9
+
+        # leave_requests = LeaveRequest.objects.annotate(
+        # start_date_cast=Cast('start_date', output_field=fields.DateField()),
+        # end_date_cast=Cast('end_date', output_field=fields.DateField())
+        # )
+
+        # driver_leave_days_dict = defaultdict(int)
+
+        # for leave in leave_requests:
+        #     if leave.start_date_cast and leave.end_date_cast:
+        #         duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
+        #         driver_leave_days_dict[leave.employee.name] += duration
+
+        # driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+
+        # context = {'response_content': driver_leave_days_list}
+        # return render(request, 'Account/Tables/customTable.html', context)
+
+        leave_requests = LeaveRequest.objects.annotate(
+        start_date_cast=Cast('start_date', output_field=fields.DateField()),
+        end_date_cast=Cast('end_date', output_field=fields.DateField())
+        )
+
+        driver_leave_days_dict = defaultdict(int)
+
+        for leave in leave_requests:
+            if leave.start_date_cast and leave.end_date_cast:
+                duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
+                driver_leave_days_dict[leave.employee.name] += duration
+
+        all_drivers = Driver.objects.all()
+
+        for driver in all_drivers:
+            if driver.name not in driver_leave_days_dict:
+                driver_leave_days_dict[driver.name] = 0
+
+        driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+
+        driver_leave_days_list = sorted(driver_leave_days_list, key=lambda x: x['days'])
+
+        # for item in driver_leave_days_list:
+        #     print(item['driver'], item['days'])
+
+        context = {'response_content': driver_leave_days_list}
+        return render(request, 'Account/Tables/customTable.html', context)
+
+
     elif dataType == 10:
         dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate))
         clientObj = Client.objects.all()
