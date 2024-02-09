@@ -298,15 +298,16 @@ def truckTable(request):
     return render(request , 'GearBox/truck/table/truckTable.html',params)
 
 def truckForm(request, id=None):
+    
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
-    data=connections = None
+    adminTruckObj=truckInformationObj=connections = None
     count_ = 1
     if id:
-        data = AdminTruck.objects.get(pk=id)
+        adminTruckObj = AdminTruck.objects.filter(pk=id).first()
+        truckInformationObj = adminTruckObj.truckInformation
         connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
-        # return HttpResponse(connections)
         
         for i in connections:
             i['count'] = count_
@@ -323,7 +324,8 @@ def truckForm(request, id=None):
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
-        'data' : data,
+        'adminTruckObj' : adminTruckObj,
+        'truckInformationObj':truckInformationObj,
         'connections' : connections,
         'preStarts':preStarts
     }
@@ -338,37 +340,95 @@ def truckFormSave(request):
         return redirect(request.META.get('HTTP_REFERER'))
     else:
         adminTruckObj = AdminTruck()
-        adminTruckObj.adminTruckNo = truckNo
+        adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
-        # adminTruckObj.save()
+        # return HttpResponse(truckNo)
         
-        adminTruckObj = AdminTruck.objects.filter(pk = adminTruckObj.id).first()
         
         truckInformationObj = TruckInformation()
-        truckInformationObj.truckNo = request.POST.get('truckNo')
+        truckInformationObj.fleet = truckNo
         truckInformationObj.groups = request.POST.get('groups')
         truckInformationObj.subGroups = request.POST.get('subGroups')
         truckInformationObj.vehicleType = request.POST.get('vehicleType')
         truckInformationObj.serviceGroup = request.POST.get('serviceGroup')
+
         truckImg1 = request.FILES.get('truckImg1')
         truckImg2 = request.FILES.get('truckImg2')
         truckImg3 = request.FILES.get('truckImg3')
-        print(truckImg1)
         if truckImg1:
-            print('Inside ', truckImg1)
-            truckInformationObj.loadSheet = truckFileSave(truckImg1)
-        return HttpResponse('here')
+            truckInformationObj.truckImg1 = truckFileSave(truckImg1)
+        if truckImg2:
+            truckInformationObj.truckImg2 = truckFileSave(truckImg2)
+        if truckImg3:
+            truckInformationObj.truckImg3 = truckFileSave(truckImg3)
+        truckInformationObj.customFuelCard = request.POST.get('customFuelCard')
+        truckInformationObj.customFuelOldFleetNumber = request.POST.get('customRegOwner')
+        truckInformationObj.customOldRego = request.POST.get('customOldRego')
+        truckInformationObj.customRegisteredOwner = request.POST.get('customOldFeetNumber')
+        truckInformationObj.customRoadsideAssistance = request.POST.get('customRoadsideAssistance')
+        truckInformationObj.customPDDNumber = request.POST.get('customPdd')
+        
+        truckInformationObj.informationMake = request.POST.get('informationMake')
+        truckInformationObj.informationModel = request.POST.get('informationModel')
+        truckInformationObj.informationConfiguration = request.POST.get('informationConfiguration')
+        truckInformationObj.informationChassis = request.POST.get('informationChassis')
+        truckInformationObj.informationBuildYear = request.POST.get('informationBuildYear')
+        truckInformationObj.informationIcon = request.POST.get('informationIcon')
+        
+        truckInformationObj.registered = True if request.POST.get('unRegistration') =='on' else False
+        truckInformationObj.registration = request.POST.get('registration')
+        truckInformationObj.registrationCode = request.POST.get('registrationCode')
+        truckInformationObj.registrationSate = request.POST.get('registrationState')
+        truckInformationObj.registrationDueDate = request.POST.get('registrationDueDate')
+        truckInformationObj.registrationInterval = request.POST.get('registrationInterval')
+        
+        truckInformationObj.powered = True if request.POST.get('powered') =='on' else False
+        truckInformationObj.engine = request.POST.get('engine')
+        truckInformationObj.engineMake = request.POST.get('engineMake')
+        truckInformationObj.engineModel = request.POST.get('engineModel')
+        truckInformationObj.engineCapacity = request.POST.get('engineCapacity')
+        truckInformationObj.engineGearBox = request.POST.get('engineGearbox')
+            
+        truckInformationObj.save()
+        adminTruckObj.save()
+        
+        adminTruckObj = AdminTruck.objects.filter(pk = adminTruckObj.id).first()
+        adminTruckObj.truckInformation = truckInformationObj
+        adminTruckObj.save()
+        
         messages.success(request,'Adding successfully')
-        return redirect('gearBox:truckAxlesFormView')
+        return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id)
 
-def truckAxlesFormView(request):
-    return render(request,'GearBox/truck/truckAxlesForm.html')
+def truckAxlesFormView(request,truckId):
+    adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    params={
+        'adminTruckObj':adminTruckObj
+    }
+    return render(request,'GearBox/truck/truckAxlesForm.html',params)
 
-def truckAxlesFormSave(request):
-    return redirect('gearBox:truckSettingFormView')
+def truckAxlesFormSave(request,truckId):
+    truckAxlesObj = Axles()
+    truckAxlesObj.vehicle_axle1 = request.POST.get('vehicle_axle1')
+    truckAxlesObj.vehicle_axle2 = request.POST.get('vehicle_axle2')
+    truckAxlesObj.vehicle_axle3 = request.POST.get('vehicle_axle3')
+    truckAxlesObj.vehicle_axle4 = request.POST.get('vehicle_axle4')
+    truckAxlesObj.vehicle_axle5 = request.POST.get('vehicle_axle5')
+    truckAxlesObj.vehicle_axle6 = request.POST.get('vehicle_axle6')
+    truckAxlesObj.vehicle_axle7 = request.POST.get('vehicle_axle7')
+    truckAxlesObj.vehicle_axle8 = request.POST.get('vehicle_axle8')
+    truckAxlesObj.save()
+    adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    adminTruckObj.truckAxles = truckAxlesObj.id
+    adminTruckObj.save()
+    messages.success(request,'Adding successfully')
+    return redirect('gearBox:truckSettingFormView',truckId=adminTruckObj.id)
 
-def  truckSettingFormView(request):
-    return render(request,'GearBox/truck/truckSettingForm.html')
+def  truckSettingFormView(request,truckId):
+    adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    params={
+        'adminTruckObj':adminTruckObj
+    }
+    return render(request,'GearBox/truck/truckSettingForm.html',params)
 
 def truckSettingFormSave(request):
     return redirect('gearBox:truckRemindersFormView')

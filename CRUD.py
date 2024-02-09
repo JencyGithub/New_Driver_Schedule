@@ -96,13 +96,14 @@ def loadFileSave(loadFile):
     return 'static/img/finalloadSheet/' + load_new_filename
 
 def truckFileSave(truckFile):
-    timestamp = str(timezone.now()).replace(':', '').replace('-', '').replace(' ', '').split('.')[0]
+    time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+    time = time[0]
     file_path = 'static/TruckFiles'
-    truck_file_name = truckFile.name
-    new_filename = f'truck Files{timestamp}!_@{truck_file_name.replace(" ", "")}'
-    
+    truckFileName = truckFile.name
+    new_filename = 'truck Files' + time +  '!_@' + truckFileName.replace(" ", "").replace("\t", "")   ##time + '!_@' +  '.' + fileName.split('.')[-1]
     pfs = FileSystemStorage(location=file_path)
     pfs.save(new_filename, truckFile)
+    return 'static/TruckFiles/' + new_filename
 
 
 def getYesterdayDate(curDate):

@@ -77,10 +77,10 @@ urlpatterns = [
     path('truckForm', views.truckForm, name='truckForm'),
     path('truckForm/add/', views.truckFormSave, name='truckFormSave'),
     
-    path('truckForm/Axles/View', views.truckAxlesFormView, name='truckAxlesFormView'),
-    path('truckForm/Axles/Save', views.truckAxlesFormSave, name='truckAxlesFormSave'),
+    path('truckForm/Axles/View/<int:truckId>', views.truckAxlesFormView, name='truckAxlesFormView'),
+    path('truckForm/Axles/Save/<int:truckId>', views.truckAxlesFormSave, name='truckAxlesFormSave'),
     
-    path('truckForm/Setting/View', views.truckSettingFormView, name='truckSettingFormView'),
+    path('truckForm/Setting/View/<int:truckId>', views.truckSettingFormView, name='truckSettingFormView'),
     path('truckForm/Setting/Save', views.truckSettingFormSave, name='truckSettingFormSave'),
     
     path('truckForm/Reminders/View', views.truckRemindersFormView, name='truckRemindersFormView'),

@@ -62,6 +62,20 @@
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
                         <h2 class="text-uppercase d-inline-block" style="font-weight:bold">Information tab</h2>
+                        {% if truckInformationObj %}
+                                <div class="text-danger float-right" >Path:- 
+                                    {% if truckInformationObj.truckImg1 %}
+                                    <a href="/{{truckInformationObj.truckImg1}}" target="_blank">File1 ,</a>
+                                    {% endif %}
+                                    {% if truckInformationObj.truckImg2 %}
+                                    <a href="/{{truckInformationObj.truckImg2}}" target="_blank">File2 ,</a>
+                                    {% endif %}
+                                    {% if truckInformationObj.truckImg3 %}
+                                    <a href="/{{truckInformationObj.truckImg3}}" target="_blank">File3</a>
+                                    {% endif %}
+                                </div>
+                            <div class="clearfix"></div>
+                            {% endif %}
                         {% if data.truckActive is True %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
@@ -72,14 +86,14 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h6 style="font-weight:bold">Mandatory Fields</h6>
-                            <div class="clearfix"></div>
+                            
                         </div>
                         <div class="x_content">
                             <div class="col-md-8 col-sm-8">
                                 <div class="col-md-6 col-sm-6">
                                     <label for="truckNo" style="margin-bottom: 0.8rem!important;">Fleet : <span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if data %}{{ data.adminTruckNumber }}{% endif %}" {% if data %}readonly{% endif %} type="number" name="truckNo"  style="padding: 0.25rem 0.2rem;" id="truckNo" required>
+                                        <input class="form-control" value="{% if adminTruckObj %}{{ adminTruckObj.adminTruckNumber }}{% endif %}" {% if adminTruckObj %}readonly{% endif %} type="number" name="truckNo"  style="padding: 0.25rem 0.2rem;" id="truckNo" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
@@ -101,8 +115,8 @@
                                     <div class="field item form-group">
                                         <select name="vehicleType" required required onchange=(vehicleTypeFun()) id="vehicleType" class="form-control">
                                             <option disabled selected>Select vehicle Type</option>
-                                            <option value="Tipper">Tipper</option>
-                                            <option value="Concrite">Concrite</option>
+                                            <option  {% if truckInformationObj.vehicleType == 'Tipper' %}selected{% endif %}  value="Tipper">Tipper</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Concrite' %}selected{% endif %} value="Concrite">Concrite</option>
                                         </select>
                                     </div>
                                 </div>
@@ -110,7 +124,10 @@
                                     <label for="serviceGroup" style="margin-bottom: 0.8rem!important;">Service group : <span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select name="serviceGroup" id="serviceGroup"  class="form-control">
-                                            <option value="Tipper">Tipper</option>
+                                            <option disabled selected>Select vehicle Type</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Tipper' %}selected{% endif %} value="Tipper">Tipper</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Concrite' %}selected{% endif %} value="Concrite">Concrite</option>
+
                                         </select>
                                     </div>
                                 </div>
@@ -231,7 +248,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationIcon" style="margin-bottom: 0.3rem!important;">Icon : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select id="informationIcon">
+                                            <select id="informationIcon" name="informationIcon">
                                                 <option value="Truck_1" 
                                                     data-imagesrc="{% static 'img/truckIcons/truck01.gif' %}"></option>
                                                 <option value="Truck_2" 
@@ -254,7 +271,7 @@
                         <div class="x_title">
                             <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
                             <span class="float-right">
-                                <input type="checkbox" name="unRegistration" id="unRegistration" onchange="registered(this)">
+                                <input type="checkbox"  name="unRegistration" id="unRegistration" onchange="registered(this)">
                                 <label for="unRegistration">Un-Registered</label>
                             </span>
                             <div class="clearfix"></div>
@@ -293,6 +310,8 @@
                                         <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="registrationInterval" id="registrationInterval"  class="form-control">
+                                                <option value="NY">New York</option>
+
                                             </select>
                                         </div>
                                     </div>
@@ -349,11 +368,9 @@
                     </div>
 
                     <!-- Submit  -->
-                    {% if not data  %}
                         <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
                             <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
                         </div>
-                    {% endif %}
 
                     {% if connections %}
                         {% for connection in connections %}
