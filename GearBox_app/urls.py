@@ -128,7 +128,8 @@ urlpatterns = [
 
     # Groups
 
-    path('groups/add/', views.addGroups, name='addGroups'),
+    path('truck/groups/view', views.groupsView, name='groupsView'),
+    path('truck/groups/add/save/', views.addGroupsSave, name='addGroupsSave'),
 
     # Sub groups 
     path('subgroups/add/', views.addSubGroups, name='addSubGroups'),

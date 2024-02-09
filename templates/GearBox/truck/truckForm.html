@@ -66,84 +66,6 @@
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
 
-                        <!-- <div id="wizard" class="form_wizard wizard_horizontal">
-                            <ul class="wizard_steps">
-                            <li>
-                                <a href="javascript:void(0)" class="selected">
-                                    <span class="step_no" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Information" fdprocessedid="pifgeg"><i class="fa fa-info"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no"title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Axles" fdprocessedid="pifgeg"><i class="fa fa-bars"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Settings" fdprocessedid="pifgeg"><i class="fa fa-gear"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Reminders" fdprocessedid="pifgeg"><i class="fa fa-bell-o"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Parts" fdprocessedid="pifgeg"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="History" fdprocessedid="pifgeg"><i class="fa fa-history"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Odometer" fdprocessedid="pifgeg"><i class="fa  fa-tachometer"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Compliance" fdprocessedid="pifgeg"><i class="fa fa-comments"></i></span>
-                                    <span class="step_descr">
-                                        <br />
-                                    </span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" class="disabled">
-                                    <span class="step_no" title="" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Documents" fdprocessedid="pifgeg"><i class="fa fa-file-pdf-o"></i></span>
-                                    <span class="step_descr">
-                                        <br/>
-                                    </span>
-                                </a>
-                            </li>
-                            </ul>
-                        </div>  -->
-                        <!-- {% url 'gearBox:truckFormAdd' %} -->
-
                     </div>
                     
                     <!-- Mandatory fields -->
@@ -354,6 +276,8 @@
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="registrationState" required id="registrationState"  class="form-control">
+                                                <option value="NY">New York</option>
+                                                <option value="CA">California</option>
                                             </select>
                                         </div>
                                     </div>

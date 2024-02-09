@@ -518,8 +518,20 @@ def clientChange(request, id=None):
 
     return redirect('gearBox:clientTable')
 
-def addGroups(request):
+# def addGroups(request):
+#     return render(request,'GearBox/groupsForm.html')
+
+def groupsView(request):
     return render(request,'GearBox/groupsForm.html')
+
+
+@csrf_protect
+def addGroupsSave(request):
+    groupName = request.POST.get('groupName')
+    truckGroupObj = TruckGroup(name=groupName)
+    truckGroupObj.save()
+    messages.success(request,'Group added Successfully')
+    return redirect('gearBox:groupsView')
 
 def addSubGroups(request):
     return render(request, 'GearBox/subgroupsForm.html')

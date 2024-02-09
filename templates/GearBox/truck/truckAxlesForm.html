@@ -39,241 +39,167 @@
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 <div class="x_panel">
-                    <h2 class="text-uppercase">Axles tab</h2>
+                    <h2 class="text-uppercase" style="font-weight:bold">Axles tab</h2>
                 </div>
-                {% comment %} <div id="wizard" class="form_wizard wizard_horizontal">
-                    <ul class="wizard_steps">
-                    <li>
-                        <a href="javascript:void(0)" class="selected">
-                            <span class="step_no" title="Information"><i class="fa fa-info"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="selected">
-                            <span class="step_no" title="Axles"><i class="fa fa-bars"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Settings"><i class="fa fa-gear"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Reminders"><i class="fa fa-bell-o"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Parts"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="History"><i class="fa fa-history"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Odometer"><i class="fa  fa-tachometer"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Compliance"><i class="fa fa-comments"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="disabled">
-                            <span class="step_no" title="Documents"><i class="fa fa-file-pdf-o"></i></span>
-                            <span class="step_descr">
-                                <br />
-                            </span>
-                        </a>
-                    </li>
-                    </ul>
-                
-
-                </div>  {% endcomment %}
                 <form action="{% url 'gearBox:truckAxlesFormSave' %}" method="post">
                     {% csrf_token %}
+                    {% comment %} <h2>Axles Form </h2> {% endcomment %}
                     <div class="x_panel">
-
                         <div class="x_content">
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle1" name="vehicle_axle1" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle2" name="vehicle_axle2" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                            
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle3" name="vehicle_axle3" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle4" name="vehicle_axle4" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle5" name="vehicle_axle5" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle6" name="vehicle_axle6" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle7" name="vehicle_axle7" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <select class="form-control"  id="vehicle_axle8" name="vehicle_axle8" >
+                                                <option selected="selected" value="0">None</option>
+                                                <option  value="1" data-select2-id="3187">Single</option>
+                                                <option value="2">Dual</option>
+                                                <option value="3">Triple</option>
+                                                <option value="4">Quad</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
+
                             </div>
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>    
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>    
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>                    
                         </div>
-                        <div class="x_content mt-5">
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>    
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>    
-                            <div class="col-md-5 col-sm-5">
-                                <div class="row brick-row pb-1">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>  
-                            <div class="col-md-2 col-sm-2">
-                            </div>
-                            <div class="col-md-5 col-sm-5 pb-1">
-                                <div class="row brick-row">
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                    <div class="col brick"></div>
-                                </div>
-                            </div>                    
-                        </div>                        
                     </div>
+
                     <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
-                        <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
+                        <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
                     </div>
                 </form>
 
@@ -282,6 +208,9 @@
     </div>
 </div>
 <!-- /page content -->
+
+{% endblock %}
+
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -293,7 +222,40 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    $(document).ready(function() {
+        $('.col-md-3').each(function() {
+            var $bricks = $(this).find('.brick');
+            var $selectBox = $(this).find('select');
+
+            $bricks.click(function() {
+                // Reset background color of all bricks within this column
+                {% comment %} $bricks.css('background-color', ''); {% endcomment %}
+
+                // Set background color of clicked brick
+                // $(this).css('background-color', 'black');
+
+                // Get the index of the clicked brick within its column
+                var index = $(this).index();
+
+                
+                if(index <= 3) {
+                    // Change the color of the first n bricks where n is the index + 1
+                    $bricks.slice(0, index + 1).css('background-color', 'black');
+
+                    // Change the color of the last n bricks where n is the total bricks count - index
+                    $bricks.slice(-index - 1).css('background-color', 'black');
+
+                    // Update select box value based on the number of bricks selected
+                    var numBricks = index + 1;
+                    $selectBox.val(numBricks); // Set the value of the select dropdown
+                }
+            });
+        });
+    });
 
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
@@ -319,5 +281,4 @@
     }).prop('checked', false);
 
 </script>
-{% endblock %}
 {% endblock %}

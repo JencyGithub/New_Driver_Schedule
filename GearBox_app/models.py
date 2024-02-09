@@ -185,13 +185,12 @@ class OnLease(models.Model):
 class AdminTruck(models.Model):
     # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     adminTruckNumber = models.PositiveIntegerField(unique=True)
-    truckStatus = models.BooleanField(default=False)
+    truckActive = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     
     def __str__(self):
         return str(self.adminTruckNumber)
-
-
+    
 class Driver(models.Model):
     # driverId = models.IntegerField(primary_key=True, unique=True, default=generate_4digit_unique_key, editable=False)
     driverId = models.IntegerField(primary_key=True, unique=True)
@@ -249,6 +248,16 @@ class LeaveRequest(models.Model):
     def __str__(self):
         return f"{self.employee} - {self.start_date} to {self.end_date}"
 
+# -----------------------------------
+# Group
+# -----------------------------------
+    
+class TruckGroup(models.Model):
+    name = models.CharField(max_length=100, default=None)
+
+    def __str__(self):
+        return self.name
+
 
 # -----------------------------------
 # Truck Gearbox section
@@ -271,7 +280,6 @@ class TruckInformation(models.Model):
     informationBuildYear = models.PositiveIntegerField(default=0)
     informationIcon = models.CharField(max_length=100, default='', null=True, blank=True)
     customFuelCard = models.CharField(max_length=100, default='', null=True, blank=True)
-    customFuelCard = models.CharField(max_length=100, default='', null=True, blank=True)
     customFuelOldFleetNumber = models.CharField(max_length=100, default='', null=True, blank=True)
     customOldRego = models.CharField(max_length=100, default='', null=True, blank=True)
     customRegisteredOwner = models.CharField(max_length=100, default='', null=True, blank=True)
@@ -289,6 +297,31 @@ class TruckInformation(models.Model):
     engineModel = models.CharField(max_length=100, default='', null=True, blank=True)
     engineCapacity = models.CharField(max_length=100, default='', null=True, blank=True)
     engineGearBox = models.CharField(max_length=100, default='', null=True, blank=True)
+
+# AXLES TAB
+class Axles(models.Model):
+    AXLES_CHOICES = (
+        (0, 'None'),
+        (1, 'Single'),
+        (2, 'Dual'),
+        (3, 'Triple'),
+        (4, 'Quad'),
+    )
+    vehicle_axle1 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle2 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle3 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle4 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle5 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle6 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle7 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    vehicle_axle8 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+
+    def __str__(self):
+            return str(self.id)
+
+#SETTINGS TAB
+# class Settings(models.Model):
+
 
 # DOCUMENTS TAB
 class TruckDocument(models.Model):
