@@ -23,7 +23,7 @@ def run():
             data = row.strip().split(',')
             # with open("Expense_error.txt", 'a')as f:
             #     f.write(str(data)+'\n')
-            dump = data[:5]
+            dump = data[:8]
 
             if len(str(dump[2])) == 10:
                 M_pattern =  dump[2]  
@@ -47,7 +47,7 @@ def run():
                     DriverObj.email = dump[3].strip().replace(' ','')
                     DriverObj.password = dump[4].strip()
 
-                    DriverObj.firstname = dump[5].strip()
+                    DriverObj.firstName = dump[5].strip()
                     DriverObj.middleName = dump[6].strip() if dump[6].strip() else ''
                     DriverObj.lastName = dump[7].strip()
 
@@ -55,8 +55,8 @@ def run():
                         username=DriverObj.name,
                         email=DriverObj.email,
                         password=DriverObj.password,
-                        first_name = DriverObj.firstname,
-                        last_name = DriverObj.lastname,
+                        first_name = DriverObj.firstName,
+                        last_name = DriverObj.lastName,
                         is_staff=True,
                     )
                     group = Group.objects.get(name='Driver')
@@ -69,6 +69,7 @@ def run():
                     with open("Driver_skip.txt", 'a')as f:
                         f.write(str(dump)+ str(file_name) + '\n')
             except Exception as e:
+                # print(e)
                 with open("Driver_entry_error.txt", 'a')as f:
                     f.write(str(e)+str(data)+'\n')
             

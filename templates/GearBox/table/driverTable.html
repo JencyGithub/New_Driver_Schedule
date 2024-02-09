@@ -52,7 +52,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Driver ID</th>
-                                                <th>Driver name</th>
+                                                <th>First name</th>
+                                                <th>Last name</th>
                                                 <th>Contact</th>
                                                 <th>Email</th>
                                                 <th>Action</th>
@@ -62,7 +63,8 @@
                                             {% for driver in drivers %}
                                             <tr>
                                                 <td>{{ driver.driverId }}</td>
-                                                <td>{{ driver.name }}</td>
+                                                <td>{{ driver.firstName }}</td>
+                                                <td>{{ driver.lastName }}</td>
                                                 <td>{{ driver.phone }}</td>
                                                 <td>{{ driver.email }}</td>
                                                 <td>
