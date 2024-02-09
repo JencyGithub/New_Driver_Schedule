@@ -346,20 +346,26 @@ def truckForm(request, id=None):
     return render(request,'GearBox/truck/truckForm.html',params)
 
 @csrf_protect
-def truckFormSave(request):
+def truckFormSave(request,truckId=None):
     truckNo = request.POST.get('truckNo')
     truckObj = AdminTruck.objects.filter(adminTruckNumber = truckNo).first()
-    if truckObj:
+    if truckObj and truckId is None:
         messages.error(request,'Truck number already exist')
         return redirect(request.META.get('HTTP_REFERER'))
     else:
-        adminTruckObj = AdminTruck()
+        if truckId:
+            adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+            truckInformationObj = adminTruckObj.truckInformation
+            # truckInformationObj = TruckInformation.objects.filter(pk=adminTruckObj.truckInformation).first()
+        else:
+            adminTruckObj = AdminTruck()
+            truckInformationObj = TruckInformation()
+
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
         # return HttpResponse(truckNo)
         
         
-        truckInformationObj = TruckInformation()
         truckInformationObj.fleet = truckNo
         truckInformationObj.groups = request.POST.get('groups')
         truckInformationObj.subGroups = request.POST.get('subGroups')
@@ -376,9 +382,9 @@ def truckFormSave(request):
         if truckImg3:
             truckInformationObj.truckImg3 = truckFileSave(truckImg3)
         truckInformationObj.customFuelCard = request.POST.get('customFuelCard')
-        truckInformationObj.customFuelOldFleetNumber = request.POST.get('customRegOwner')
+        truckInformationObj.customFuelOldFleetNumber = request.POST.get('customOldFeetNumber')
         truckInformationObj.customOldRego = request.POST.get('customOldRego')
-        truckInformationObj.customRegisteredOwner = request.POST.get('customOldFeetNumber')
+        truckInformationObj.customRegisteredOwner = request.POST.get('customRegOwner')
         truckInformationObj.customRoadsideAssistance = request.POST.get('customRoadsideAssistance')
         truckInformationObj.customPDDNumber = request.POST.get('customPdd')
         
@@ -409,9 +415,15 @@ def truckFormSave(request):
         adminTruckObj = AdminTruck.objects.filter(pk = adminTruckObj.id).first()
         adminTruckObj.truckInformation = truckInformationObj
         adminTruckObj.save()
-        
-        messages.success(request,'Adding successfully')
+
+        if truckId:
+            messages.success(request,'Updated successfully')
+        else:
+            messages.success(request,'Adding successfully')
         return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id)
+
+
+
 
 def truckAxlesFormView(request,truckId):
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
@@ -432,7 +444,7 @@ def truckAxlesFormSave(request,truckId):
     truckAxlesObj.vehicle_axle8 = request.POST.get('vehicle_axle8')
     truckAxlesObj.save()
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
-    adminTruckObj.truckAxles = truckAxlesObj.id
+    adminTruckObj.truckAxles = truckAxlesObj
     adminTruckObj.save()
     messages.success(request,'Adding successfully')
     return redirect('gearBox:truckSettingFormView',truckId=adminTruckObj.id)

@@ -56,13 +56,13 @@
 <div class="right_col" role="main">
     <div class="custom-container">
         <div class="clearfix"></div>
-        <form action="{% url 'gearBox:truckFormSave' %}" method="post" class="" novalidate enctype="multipart/form-data" >
+        <form action="{% if adminTruckObj %} {% url 'gearBox:truckFormUpdate' truckId=adminTruckObj.id %} {% else %} {% url 'gearBox:truckFormSave' %} {% endif %}" method="post" class="" novalidate enctype="multipart/form-data" >
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
                         <h2 class="text-uppercase d-inline-block" style="font-weight:bold">Information tab</h2>
-                        {% if truckInformationObj %}
+                        {% comment %} {% if truckInformationObj %}
                                 <div class="text-danger float-right" >Path:- 
                                     {% if truckInformationObj.truckImg1 %}
                                     <a href="/{{truckInformationObj.truckImg1}}" target="_blank">File1 ,</a>
@@ -78,7 +78,7 @@
                             {% endif %}
                         {% if data.truckActive is True %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
 
                     </div>
                     
@@ -93,13 +93,14 @@
                                 <div class="col-md-6 col-sm-6">
                                     <label for="truckNo" style="margin-bottom: 0.8rem!important;">Fleet : <span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="{% if adminTruckObj %}{{ adminTruckObj.adminTruckNumber }}{% endif %}" {% if adminTruckObj %}readonly{% endif %} type="number" name="truckNo"  style="padding: 0.25rem 0.2rem;" id="truckNo" required>
+                                        <input class="form-control" value="{{ adminTruckObj.adminTruckNumber }}" {% if adminTruckObj %}readonly{% endif %} type="number" name="truckNo"  style="padding: 0.25rem 0.2rem;" id="truckNo" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
                                     <label for="groups" style="margin-bottom: 0.8rem!important;">Groups : <span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select name="groups" id="groups" class="form-control">
+                                            
                                         </select>
                                     </div>
                                 </div>
@@ -134,18 +135,31 @@
                             </div>
                             <div class="col-md-4 col-sm-4 fileUpload">
                                 <span id="add-file" class="text-success" style="cursor:pointer">Add more files + </span>
-                                    <!-- Initial file input -->
+                                <!-- Initial file input -->
                                 <div class="py-2 pt-3">
                                     <input type="file" name="truckImg1">
+                                    {% if truckInformationObj.truckImg1 %}
+                                    <a href="{{ truckInformationObj.truckImg1.url }}" target="_blank">View File</a>
+                                    {% endif %}
                                 </div>
-                                <div class="py-2 2 d-none">
-                                    <span class="float-right text-danger" onclick="removeFile('2')" style="cursor:pointer; font-size:0.7rem">Remove</span>
+                                {% if truckInformationObj.truckImg2 or not truckInformationObj.truckImg1 %}
+                                <div class="py-2">
+                                    <span class="float-right text-danger" onclick="removeFile(2)" style="cursor:pointer; font-size:0.7rem">Remove</span>
                                     <input type="file" name="truckImg2">
+                                    {% if truckInformationObj.truckImg2 %}
+                                    <a href="{{ truckInformationObj.truckImg2.url }}" target="_blank">View File</a>
+                                    {% endif %}
                                 </div>
-                                <div class="py-2 3 d-none">
-                                    <span class="float-right text-danger" onclick="removeFile('3')" style="cursor:pointer; font-size:0.7rem">Remove</span>
+                                {% endif %}
+                                {% if truckInformationObj.truckImg2 or not truckInformationObj.truckImg1 %}
+                                <div class="py-2">
+                                    <span class="float-right text-danger" onclick="removeFile(3)" style="cursor:pointer; font-size:0.7rem">Remove</span>
                                     <input type="file" name="truckImg3">
-                                </div> 
+                                    {% if truckInformationObj.truckImg3 %}
+                                    <a href="{{ truckInformationObj.truckImg3.url }}" target="_blank">View File</a>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -162,39 +176,39 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customFuelCard" style="margin-bottom: 0.3rem!important;">Fuel Card :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customFuelCard" style="padding: 0.25rem 0.2rem;" id="customFuelCard" >
+                                            <input class="form-control" value="{{ truckInformationObj.customFuelCard }}" type="text" name="customFuelCard" style="padding: 0.25rem 0.2rem;" id="customFuelCard" >
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customRegOwner" style="margin-bottom: 0.3rem!important;">Registered Owner :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="customRegOwner" style="padding: 0.25rem 0.2rem;" id="customRegOwner" required>
+                                            <input class="form-control" value="{{ truckInformationObj.customRegisteredOwner }}"  type="text" name="customRegOwner" style="padding: 0.25rem 0.2rem;" id="customRegOwner" required>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customOldRego" style="margin-bottom: 0.3rem!important;">Old Rego :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customOldRego" style="padding: 0.25rem 0.2rem;" id="customOldRego" data-validate-minmax="1000,9999">
+                                            <input class="form-control" value="{{ truckInformationObj.customOldRego }}" type="number" name="customOldRego" style="padding: 0.25rem 0.2rem;" id="customOldRego" data-validate-minmax="1000,9999">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customOldFeetNumber" style="margin-bottom: 0.3rem!important;">Old Fleet Number :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customOldFeetNumber" style="padding: 0.25rem 0.2rem;" id="customOldFeetNumber" data-validate-minmax="1000,9999" >
+                                            <input class="form-control" value="{{ truckInformationObj.customFuelOldFleetNumber }}" type="number" name="customOldFeetNumber" style="padding: 0.25rem 0.2rem;" id="customOldFeetNumber" data-validate-minmax="1000,9999" >
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customRoadsideAssistance" style="margin-bottom: 0.3rem!important;">Roadside Assistance :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customRoadsideAssistance" style="padding: 0.25rem 0.2rem;" id="customRoadsideAssistance" data-validate-minmax="1000,9999">
+                                            <input class="form-control" value="{{ truckInformationObj.customRoadsideAssistance }}" type="number" name="customRoadsideAssistance" style="padding: 0.25rem 0.2rem;" id="customRoadsideAssistance" data-validate-minmax="1000,9999">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="customPdd" style="margin-bottom: 0.3rem!important;">PDD number :</label>
                                         {% comment %} concrite truck: Mandatory | tippers truck: not Mandatory {% endcomment %}
                                         <div class="field item form-group"> 
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999"  disabled required>
+                                            <input class="form-control" value="{{ truckInformationObj.customPDDNumber }}" type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999"  disabled required>
                                         </div>
                                     </div>
                                 </div>
@@ -215,47 +229,48 @@
                                         <label for="informationMake" style="margin-bottom: 0.3rem!important;">Make : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="informationMake" id="informationMake"  class="form-control">
-                                                <option value="Freightliner">Freightliner</option>
+                                                <option {% if truckInformationObj.informationMake == 'Freightliner' %}selected{% endif %}  value="Freightliner">Freightliner</option>
+                                                <option {% if truckInformationObj.informationMake == 'ABC' %}selected{% endif %}  value="ABC">ABC</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationModel" style="margin-bottom: 0.3rem!important;">Model : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="informationModel"  style="padding: 0.25rem 0.2rem;" id="informationModel">
+                                            <input class="form-control" value="{{ truckInformationObj.informationModel }}" type="text" name="informationModel"  style="padding: 0.25rem 0.2rem;" id="informationModel">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationConfiguration" style="margin-bottom: 0.3rem!important;">Configuration : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="informationConfiguration" id="informationConfiguration"  class="form-control">
-                                                <option value="Tipper">Tipper</option>
+                                                <option {% if truckInformationObj.informationMake == 'Tipper' %}selected{% endif %} value="Tipper">Tipper</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationChassis" style="margin-bottom: 0.3rem!important;">VIN / Chassis # : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="informationChassis"  style="padding: 0.25rem 0.2rem;" id="informationChassis">
+                                            <input class="form-control" value="{{ truckInformationObj.informationChassis }}" type="text" name="informationChassis"  style="padding: 0.25rem 0.2rem;" id="informationChassis">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationBuildYear" style="margin-bottom: 0.3rem!important;">Build year : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="informationBuildYear"  style="padding: 0.25rem 0.2rem;" id="informationBuildYear" data-validate-minmax="1000,9999">
+                                            <input class="form-control" value="{{ truckInformationObj.informationBuildYear }}" type="number" name="informationBuildYear"  style="padding: 0.25rem 0.2rem;" id="informationBuildYear" data-validate-minmax="1000,9999">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationIcon" style="margin-bottom: 0.3rem!important;">Icon : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select id="informationIcon" name="informationIcon">
-                                                <option value="Truck_1" 
+                                                <option {% if truckInformationObj.informationIcon == 'Truck_1' %}selected{% endif %} value="Truck_1" 
                                                     data-imagesrc="{% static 'img/truckIcons/truck01.gif' %}"></option>
-                                                <option value="Truck_2" 
+                                                <option {% if truckInformationObj.informationIcon == 'Truck_2' %}selected{% endif %} value="Truck_2" 
                                                     data-imagesrc="{% static 'img/truckIcons/truck02.gif' %}"></option>
-                                                <option value="Truck_3" class="bg-danger"  
+                                                <option {% if truckInformationObj.informationIcon == 'Truck_3' %}selected{% endif %} value="Truck_3" class="bg-danger"  
                                                     data-imagesrc="{% static 'img/truckIcons/truck03.gif' %}"></option>
-                                                <option value="Truck_4" class="bg-danger"  
+                                                <option {% if truckInformationObj.informationIcon == 'Truck_4' %}selected{% endif %} value="Truck_4" class="bg-danger"  
                                                     data-imagesrc="{% static 'img/truckIcons/truck04.gif' %}"></option>
                                             </select>
                                             <input type="hidden" name="informationIcon">
@@ -282,36 +297,35 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
+                                            <input class="form-control" value="{{ truckInformationObj.registration }}" type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registrationCode" style="margin-bottom: 0.3rem!important;">Code :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
+                                            <input class="form-control" value="{{ truckInformationObj.registrationCode }}" type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="registrationState" required id="registrationState"  class="form-control">
-                                                <option value="NY">New York</option>
-                                                <option value="CA">California</option>
+                                                <option {% if truckInformationObj.registrationSate == 'California' %}selected{% endif %} value="CA">California</option>
+                                                <option {% if truckInformationObj.registrationSate == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationDueDate" style="margin-bottom: 0.3rem!important;">Registration Due Date :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
+                                            <input class="form-control" value="{{ truckInformationObj.registrationDueDate|date:'Y-m-d' }}" type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="registrationInterval" id="registrationInterval"  class="form-control">
-                                                <option value="NY">New York</option>
-
+                                                <option {% if truckInformationObj.registrationInterval == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
                                         </div>
                                     </div>
@@ -336,31 +350,31 @@
                                 <div class="col-md-6 col-sm-6">
                                     <label for="engine" style="margin-bottom: 0.3rem!important;">Engine # :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engine"  style="padding: 0.25rem 0.2rem;" id="engine" required>
+                                        <input class="form-control" value="{{ truckInformationObj.engine }}" type="text" name="engine"  style="padding: 0.25rem 0.2rem;" id="engine" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
                                     <label for="engineMake" style="margin-bottom: 0.3rem!important;">Make :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineMake" style="padding: 0.25rem 0.2rem;" id="engineMake" required>
+                                        <input class="form-control" value="{{ truckInformationObj.engineMake }}" type="text" name="engineMake" style="padding: 0.25rem 0.2rem;" id="engineMake" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="engineModel" style="margin-bottom: 0.3rem!important;">Model :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineModel" style="padding: 0.25rem 0.2rem;" id="engineModel" required>
+                                        <input class="form-control" value="{{ truckInformationObj.engineModel }}" type="text" name="engineModel" style="padding: 0.25rem 0.2rem;" id="engineModel" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="engineCapacity" style="margin-bottom: 0.3rem!important;">Capacity :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineCapacity" style="padding: 0.25rem 0.2rem;" id="engineCapacity" required>
+                                        <input class="form-control" value="{{ truckInformationObj.engineCapacity }}" type="text" name="engineCapacity" style="padding: 0.25rem 0.2rem;" id="engineCapacity" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
                                     <label for="engineGearbox" style="margin-bottom: 0.3rem!important;">Gearbox :</label>
                                     <div class="field item form-group">
-                                        <input class="form-control" value="" {% if data %}readonly{% endif %} type="text" name="engineGearbox" style="padding: 0.25rem 0.2rem;" id="engineGearbox">
+                                        <input class="form-control" value="{{ truckInformationObj.engineGearBox }}" type="text" name="engineGearbox" style="padding: 0.25rem 0.2rem;" id="engineGearbox">
                                     </div>
                                 </div>
                             </div>

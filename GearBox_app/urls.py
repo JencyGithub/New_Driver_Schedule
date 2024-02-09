@@ -76,6 +76,7 @@ urlpatterns = [
     path('truckTable', views.truckTable, name='truckTable'),
     path('truckForm', views.truckForm, name='truckForm'),
     path('truckForm/add/', views.truckFormSave, name='truckFormSave'),
+    path('truckForm/update/<int:truckId>', views.truckFormSave, name='truckFormUpdate'),
     
     path('truckForm/Axles/View/<int:truckId>', views.truckAxlesFormView, name='truckAxlesFormView'),
     path('truckForm/Axles/Save/<int:truckId>', views.truckAxlesFormSave, name='truckAxlesFormSave'),
