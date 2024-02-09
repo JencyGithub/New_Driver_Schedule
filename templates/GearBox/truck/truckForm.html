@@ -56,13 +56,13 @@
 <div class="right_col" role="main">
     <div class="custom-container">
         <div class="clearfix"></div>
-        <form action="{% url 'gearBox:truckFormAdd' %}" method="post" class="" novalidate>
+        <form action="{% url 'gearBox:truckFormSave' %}" method="post" class="" novalidate enctype="multipart/form-data" >
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
                         <h2 class="text-uppercase d-inline-block" style="font-weight:bold">Information tab</h2>
-                        {% if data %}
+                        {% if data.truckActive is True %}
                         <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
                         {% endif %}
 
@@ -99,8 +99,10 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="vehicleType" style="margin-bottom: 0.8rem!important;">Vehicle type : <span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="vehicleType" required id="vehicleType" class="form-control">
-                                            <option value="Tipper">None</option>
+                                        <select name="vehicleType" required required onchange=(vehicleTypeFun()) id="vehicleType" class="form-control">
+                                            <option disabled selected>Select vehicle Type</option>
+                                            <option value="Tipper">Tipper</option>
+                                            <option value="Concrite">Concrite</option>
                                         </select>
                                     </div>
                                 </div>
@@ -117,15 +119,15 @@
                                 <span id="add-file" class="text-success" style="cursor:pointer">Add more files + </span>
                                     <!-- Initial file input -->
                                 <div class="py-2 pt-3">
-                                    <input type="file" name="file1">
+                                    <input type="file" name="truckImg1">
                                 </div>
                                 <div class="py-2 2 d-none">
                                     <span class="float-right text-danger" onclick="removeFile('2')" style="cursor:pointer; font-size:0.7rem">Remove</span>
-                                    <input type="file" name="file[]">
+                                    <input type="file" name="truckImg2">
                                 </div>
                                 <div class="py-2 3 d-none">
                                     <span class="float-right text-danger" onclick="removeFile('3')" style="cursor:pointer; font-size:0.7rem">Remove</span>
-                                    <input type="file" name="file[]">
+                                    <input type="file" name="truckImg3">
                                 </div> 
                             </div>
                         </div>
@@ -175,7 +177,7 @@
                                         <label for="customPdd" style="margin-bottom: 0.3rem!important;">PDD number :</label>
                                         {% comment %} concrite truck: Mandatory | tippers truck: not Mandatory {% endcomment %}
                                         <div class="field item form-group"> 
-                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999" required>
+                                            <input class="form-control" value="" {% if data %}readonly{% endif %} type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999"  disabled required>
                                         </div>
                                     </div>
                                 </div>
@@ -433,7 +435,21 @@
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script>
-
+    function vehicleTypeFun() {
+        var selectedValue = $('#vehicleType').val(); // Get the selected value using jQuery
+        
+        var arr_ = ['Concrite'];
+    
+        // Check if the selected value is present in the list
+        if ($.inArray(selectedValue, arr_) !== -1) {
+            // If the selected value is present in the list, remove the 'disabled' attribute
+            $('#customPdd').removeAttr('disabled');
+        } else {
+            // If the selected value is not present in the list, add the 'disabled' attribute
+            $('#customPdd').attr('disabled', 'disabled');
+        }
+    }
+    
     var validator = new FormValidator({
         "events": ['blur', 'input', 'change']
     }, document.forms[0]);
@@ -517,6 +533,8 @@
     });
     function removeFile(givenclass){
         $(`.${givenclass}`).addClass('d-none')
+        
+        
     }
 </script>
 

@@ -318,7 +318,7 @@
                                                                     {% elif   'BasePlant does not exist.' in error.errorFromPastTrip %}
                                                                     <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" style="font-size:0.6rem;" class="btn btn-sm btn-primary">  Add depot  </a>
 
-                                                                    {% elif   not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                    {% elif   error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
                                                                     <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}"style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
                                                                     {% comment %} HOLCIM  {% endcomment %}
                                                                     

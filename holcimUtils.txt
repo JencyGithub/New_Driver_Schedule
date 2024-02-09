@@ -1,252 +1,220 @@
-pattern not match['Holcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['Holcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 1 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 1 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                           Page 2 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                           Page 2 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                         GROSS CARTAGE INCOME STATEMENT             10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                         GROSS CARTAGE INCOME STATEMENT             10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description            Amount (AUD)   Delivery Address             Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description            Amount (AUD)   Delivery Address             Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:          33,875.26']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:          33,875.26']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:        3,387.53']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:        3,387.53']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                            Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                            Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['51            1,974.740      1,974.74   TO    5,264                              37,262.79']01-Jan-2023_Tipper.csv
-pattern not match['51            1,974.740      1,974.74   TO    5,264                              37,262.79']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 3 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 3 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 4 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 4 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             36,546.12']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             36,546.12']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           3,654.61']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           3,654.61']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['57            2,192.740      2,192.74   TO    5,360                                 40,200.73']01-Jan-2023_Tipper.csv
-pattern not match['57            2,192.740      2,192.74   TO    5,360                                 40,200.73']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 5 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 5 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             26,180.58']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             26,180.58']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           2,618.06']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           2,618.06']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['42            1,608.600      1,608.60   TO    3,712                                 28,798.64']01-Jan-2023_Tipper.csv
-pattern not match['42            1,608.600      1,608.60   TO    3,712                                 28,798.64']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 6 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 6 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                           10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                           10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                            Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                            Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                             Page 7 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                             Page 7 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                            10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                            10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                            Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                            Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             19,364.10']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             19,364.10']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           1,936.41']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           1,936.41']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['60            2,319.800      2,319.80   TO    2,531                                 21,300.51']01-Jan-2023_Tipper.csv
-pattern not match['60            2,319.800      2,319.80   TO    2,531                                 21,300.51']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 8 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 8 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                           Page 9 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                           Page 9 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                         GROSS CARTAGE INCOME STATEMENT             10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                         GROSS CARTAGE INCOME STATEMENT             10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description            Amount (AUD)   Delivery Address             Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description            Amount (AUD)   Delivery Address             Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:          31,111.69']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:          31,111.69']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:        3,111.17']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:        3,111.17']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                            Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                            Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['50            1,927.340      1,927.34   TO    4,296                              34,222.86']01-Jan-2023_Tipper.csv
-pattern not match['50            1,927.340      1,927.34   TO    4,296                              34,222.86']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                    Page 10 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                    Page 10 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                              GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                              GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:               23,019.10']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:               23,019.10']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:             2,301.91']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:             2,301.91']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                                 Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                                 Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['30            1,039.140      1,039.14   TO    2,256                                   25,321.01']01-Jan-2023_Tipper.csv
-pattern not match['30            1,039.140      1,039.14   TO    2,256                                   25,321.01']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 11 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                                  Page 11 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                       Page 12 of 12']01-Jan-2023_Tipper.csv
-pattern not match['ABN:      87099732297                                                                                                                                                       Page 12 of 12']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                      10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                      10.03.2023 12:36:54']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['Owner:     320941            PNR TRANSPORT PTY LTD']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['P.O.BOX 8017']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['TARNEIT']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Payment Cut-Off Date:        02.02.2023']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                      Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Date         Docket #      Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                      Adjustment Reason']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             31,510.79']01-Jan-2023_Tipper.csv
-pattern not match['Total Income:             31,510.79']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           3,151.08']01-Jan-2023_Tipper.csv
-pattern not match['Total GST Paid:           3,151.08']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['52            2,025.620      2,025.62   TO    4,338                                 34,661.87']01-Jan-2023_Tipper.csv
-pattern not match['52            2,025.620      2,025.62   TO    4,338                                 34,661.87']01-Jan-2023_Tipper.csv
-pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty Units Km/Zone                                 Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty Units Km/Zone                                 Amount (AUD)']01-Jan-2023_Tipper.csv
-pattern not match['342           13,087.980     13,087.98 TO   27757                                   221,768.41']01-Jan-2023_Tipper.csv
-pattern not match['342           13,087.980     13,087.98 TO   27757                                   221,768.41']01-Jan-2023_Tipper.csv
+pattern not match['Holcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['Holcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 1 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 1 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 2 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 2 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             43,449.49']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             43,449.49']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,344.95']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,344.95']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['68            2,646.520      2,646.52   TO    7,360                                 47,794.44']Holcim-Tippers-April-2023.csv
+pattern not match['68            2,646.520      2,646.52   TO    7,360                                 47,794.44']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 3 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 3 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             25,616.49']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             25,616.49']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,561.65']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,561.65']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['41            1,577.280      1,577.28   TO    4,309                                 28,178.14']Holcim-Tippers-April-2023.csv
+pattern not match['41            1,577.280      1,577.28   TO    4,309                                 28,178.14']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 4 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 4 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             22,014.11']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             22,014.11']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,201.41']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,201.41']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['36            1,380.680      1,380.68   TO    3,658                                 24,215.52']Holcim-Tippers-April-2023.csv
+pattern not match['36            1,380.680      1,380.68   TO    3,658                                 24,215.52']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                               Page 5 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                               Page 5 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                              08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                              08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                              Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                              Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             14,710.03']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             14,710.03']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           1,471.00']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           1,471.00']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['39            1,496.900      1,496.90   TO    2,216                                 16,181.03']Holcim-Tippers-April-2023.csv
+pattern not match['39            1,496.900      1,496.90   TO    2,216                                 16,181.03']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 6 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 6 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 7 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 7 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             44,648.73']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             44,648.73']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,464.87']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,464.87']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['71            2,727.260      2,727.26   TO    7,625                                 49,113.60']Holcim-Tippers-April-2023.csv
+pattern not match['71            2,727.260      2,727.26   TO    7,625                                 49,113.60']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 8 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 8 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             26,382.62']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             26,382.62']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,638.26']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           2,638.26']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['43            1,639.980      1,639.98   TO    4,481                                 29,020.88']Holcim-Tippers-April-2023.csv
+pattern not match['43            1,639.980      1,639.98   TO    4,481                                 29,020.88']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 9 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 9 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 10 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['ABN:      87099732297                                                                                                                                                                  Page 10 of 10']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Area:     81                                                                            GROSS CARTAGE INCOME STATEMENT                                                                 08.05.2023 17:16:50']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['Owner:       320941          PNR TRANSPORT PTY LTD']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['P.O.BOX 8017']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['TARNEIT']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Payment Cut-Off Date:        02.05.2023']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description               Amount (AUD)   Delivery Address                                                                 Adjustment Reason']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             41,881.89']Holcim-Tippers-April-2023.csv
+pattern not match['Total Income:             41,881.89']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,188.19']Holcim-Tippers-April-2023.csv
+pattern not match['Total GST Paid:           4,188.19']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units Km/Zone                               Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['68            2,655.280      2,655.28   TO    6,768                                 46,070.08']Holcim-Tippers-April-2023.csv
+pattern not match['68            2,655.280      2,655.28   TO    6,768                                 46,070.08']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty Units Km/Zone                                 Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['Total for Vendor: Trips    Load Qty       Paid Qty Units Km/Zone                                 Amount (AUD)']Holcim-Tippers-April-2023.csv
+pattern not match['366           14,123.900     14,123.90 TO   36417                                   240,573.69']Holcim-Tippers-April-2023.csv
+pattern not match['366           14,123.900     14,123.90 TO   36417                                   240,573.69']Holcim-Tippers-April-2023.csv

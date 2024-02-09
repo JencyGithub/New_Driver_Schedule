@@ -23,7 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
 from django.db.models import F, ExpressionWrapper, fields
 from django.db.models.functions import Cast
-import datetime
+from datetime import datetime
 from collections import defaultdict
 
 
@@ -1372,16 +1372,17 @@ def rctiSave(request):
     try:
         folderName = None
         newFileName = time + "@_!" + (str(invoiceFile.name)).replace(' ','')
-        if clientName == 'boral':
+        # if boral in clientName.lower() 
+        if 'boral' in clientName.lower():
             folderName = 'tempRCTIInvoice'
-        elif clientName == 'holcim':
+        elif 'holcim' in clientName.lower():
             folderName = 'RCTIInvoice'
             
         location = f'static/Account/RCTI/{folderName}'
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
-        if clientName == 'boral' and save_data == '1':
+        if 'boral' in clientName.lower() and save_data == '1':
             cmd = ["python", "Account_app/utils.py", newFileName]
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
         fileDetails = [] 
@@ -1389,7 +1390,7 @@ def rctiSave(request):
         total = 0
         clientNameID  = Client.objects.filter(name = clientName).first()
         if save_data == '1':
-            if clientName == 'boral':
+            if 'boral' in clientName.lower():
                 with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
                     fileData = csv.reader(f)
                     for data in fileData:
@@ -1407,11 +1408,12 @@ def rctiSave(request):
                         elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
                             fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
                             date_ = 0
+                            
                 date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
-                shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
-                print('shiftObj',shiftObj)
-                pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
-                print('pastTripErrorObj',pastTripErrorObj)
+                # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
+                # # print('shiftObj',shiftObj)
+                # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
+                # # print('pastTripErrorObj',pastTripErrorObj)
                 # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
                 #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
                 #     return redirect(request.META.get('HTTP_REFERER'))
@@ -1432,12 +1434,14 @@ def rctiSave(request):
                     rctiReport.total = fileDetails[4]
                     rctiReport.save()
                     with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id))
+                        f.write(str(rctiReport.id) +','+ str(clientName))
+                    # return HttpResponse('work')
+                        
                     colorama.AnsiToWin32.stream = None
                     os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                     cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                     subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            elif clientName == 'holcim':
+            elif 'holcim' in clientName.lower():
                 with open( f'static/Account/RCTI/RCTIInvoice/{newFileName}' , 'r') as f:
                     fileData = csv.reader(f)
                     for row in fileData:
@@ -1451,7 +1455,8 @@ def rctiSave(request):
                         elif total == 1:
                             fileDetails.insert(2,float(splitRow[-1].replace(',','')))
                             total = 0
-                date_object = datetime.strptime(fileDetails[1], '%d.%m.%Y').date()
+                date_object = datetime.strptime(fileDetails[1], '%d.%m.%Y')
+                # return HttpResponse(date_object)
                 rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
                 if rctiReport:
                     messages.error(request, "This file entry already exists!")
@@ -1464,7 +1469,7 @@ def rctiSave(request):
                     rctiReport.total = fileDetails[-1]
                     rctiReport.save()
                     with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id))
+                        f.write(str(rctiReport.id) +','+ str(clientName))
                 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
                     file_name = f.write(newFileName)
                 colorama.AnsiToWin32.stream = None

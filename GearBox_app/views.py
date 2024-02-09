@@ -331,17 +331,35 @@ def truckForm(request, id=None):
 
 @csrf_protect
 def truckFormSave(request):
-    return redirect('gearBox:truckAxlesFormView')
-    
-    # return HttpResponse(request.POST.get('truckNo'))
-    # dataList = {
-    #     'adminTruckNumber' : request.POST.get('truckNo'),
-    # }
-    # insertIntoTable(tableName='AdminTruck',dataSet=dataList)
-
-    # messages.success(request,'Adding successfully')
-    # return redirect('gearBox:truckTable')
-    return redirect('gearBox:truckAxlesFormView')
+    truckNo = request.POST.get('truckNo')
+    truckObj = AdminTruck.objects.filter(adminTruckNumber = truckNo).first()
+    if truckObj:
+        messages.error(request,'Truck number already exist')
+        return redirect(request.META.get('HTTP_REFERER'))
+    else:
+        adminTruckObj = AdminTruck()
+        adminTruckObj.adminTruckNo = truckNo
+        adminTruckObj.createdBy = request.user
+        # adminTruckObj.save()
+        
+        adminTruckObj = AdminTruck.objects.filter(pk = adminTruckObj.id).first()
+        
+        truckInformationObj = TruckInformation()
+        truckInformationObj.truckNo = request.POST.get('truckNo')
+        truckInformationObj.groups = request.POST.get('groups')
+        truckInformationObj.subGroups = request.POST.get('subGroups')
+        truckInformationObj.vehicleType = request.POST.get('vehicleType')
+        truckInformationObj.serviceGroup = request.POST.get('serviceGroup')
+        truckImg1 = request.FILES.get('truckImg1')
+        truckImg2 = request.FILES.get('truckImg2')
+        truckImg3 = request.FILES.get('truckImg3')
+        print(truckImg1)
+        if truckImg1:
+            print('Inside ', truckImg1)
+            truckInformationObj.loadSheet = truckFileSave(truckImg1)
+        return HttpResponse('here')
+        messages.success(request,'Adding successfully')
+        return redirect('gearBox:truckAxlesFormView')
 
 def truckAxlesFormView(request):
     return render(request,'GearBox/truck/truckAxlesForm.html')

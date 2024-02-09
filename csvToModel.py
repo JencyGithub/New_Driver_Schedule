@@ -28,8 +28,10 @@ def dateConvert(date_):
 docket_pattern = r'^\d{8}$|^\d{6}$'
 
 
-def insertIntoModel(dataList,file_name , rctiReportId):
+def insertIntoModel(dataList,file_name , data):
     RCTIobj = None
+    rctiReportId = data[0]
+    clientNames = data[1]
     rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
     try:
         data_str = ','.join(dataList)
@@ -38,7 +40,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         
         # minimum Payment for top up 
         if len(dataList) == 1 and 'topup' in data_str:
-            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.clientName = clientNames
             rctiErrorObj.docketNumber = None
             rctiErrorObj.docketDate = None
             rctiErrorObj.errorDescription = "Manually Manage."
@@ -48,7 +50,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             rctiErrorObj.save()
             return
         if len(dataList) == 1:
-            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.clientName = clientNames
             rctiErrorObj.docketNumber = None
             rctiErrorObj.docketDate = None
             rctiErrorObj.errorDescription = "Manually Manage."
@@ -62,7 +64,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         if not RCTIobj:
             RCTIobj = RCTI()
         RCTIobj.truckNo = convertIntoFloat(dataList[0])
-        clientObj = Client.objects.filter(name = 'boral').first()
+        clientObj = Client.objects.filter(name = clientNames).first()
         RCTIobj.clientName = clientObj
         
         
@@ -98,7 +100,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
                             break
                         i = i + 1
                     else :
-                        rctiErrorObj.clientName = 'boral'
+                        rctiErrorObj.clientName = clientNames
                         rctiErrorObj.docketNumber = RCTIobj.docketNumber
                         rctiErrorObj.docketDate = RCTIobj.docketDate
                         rctiErrorObj.errorDescription = "Earning Depot/Location does not exist."
@@ -188,8 +190,8 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         RCTIobj.rctiReport = rctiReportObj
         RCTIobj.save()
         # print('Rcti Obj - ', RCTIobj)
-        # print('CLIENT---',Client.objects.filter(name = 'boral').first())
-        # clientObj = Client.objects.filter(name = 'boral').first()
+        # print('CLIENT---',Client.objects.filter(name = clientNames).first())
+        # clientObj = Client.objects.filter(name = clientNames).first()
         # print('Client Obj',clientObj.clientId)
         try:
             reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
@@ -201,7 +203,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
             reconciliationDocketObj.docketDate =  RCTIobj.docketDate
             reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-            # reconciliationDocketObj.clientName =  'boral'
+            # reconciliationDocketObj.clientName =  clientNames
             reconciliationDocketObj.clientId =  clientObj.clientId
             # print('reconciliationDocketObj client Obj',reconciliationDocketObj.clientId)
             
@@ -223,7 +225,7 @@ def insertIntoModel(dataList,file_name , rctiReportId):
             pass
             # print('Exception' , e)
     except Exception as e:
-        rctiErrorObj.clientName = 'boral'
+        rctiErrorObj.clientName = clientNames
         rctiErrorObj.docketNumber = dataList[0]
         rctiErrorObj.docketDate =  dataList[1]
         rctiErrorObj.errorDescription = e
@@ -232,13 +234,14 @@ def insertIntoModel(dataList,file_name , rctiReportId):
         rctiErrorObj.save() 
         pass
 
-def insertIntoExpenseModel(dataList , file_name):
+def insertIntoExpenseModel(dataList , file_name,data):
     errorSolve = dataList
+    clientNames = data[1]
     if dataList:
         try:
             rctiExpenseObj = RctiExpense()
             if checkDate(dataList[2]):
-                clientNameObj = Client.objects.filter(name = 'boral').first()
+                clientNameObj = Client.objects.filter(name = clientNames).first()
                 rctiExpenseObj.clientName  = clientNameObj
                 rctiExpenseObj.truckNo = str(dataList[0])
                 rctiExpenseObj.docketNumber = str(dataList[1])
@@ -256,7 +259,7 @@ def insertIntoExpenseModel(dataList , file_name):
                 return
         except Exception as e:
             rctiErrorObj = RctiErrors() 
-            rctiErrorObj.clientName = 'boral'
+            rctiErrorObj.clientName = clientNames
             rctiErrorObj.docketNumber = dataList[1]
             rctiErrorObj.docketDate =  dataList[2]
             rctiErrorObj.errorDescription = 'expense' + e
@@ -274,7 +277,8 @@ with open("File_name_file.txt", 'r') as f:
     file_names = f.read().split('<>')   
             
 with open("rctiReportId.txt", 'r') as f:
-    rctiReportId = f.read()  
+    data = f.read().split(',')
+ 
     
 earningFileName = file_names[0].strip()
 expenseFileName = file_names[1].strip()
@@ -283,7 +287,7 @@ try:
     earningFile = open(f'static/Account/RCTI/RCTIInvoice/{earningFileName}', 'r')
     earningReader = csv.reader(earningFile)
     for earningData in earningReader:
-        insertIntoModel(earningData,earningFileName,rctiReportId)      
+        insertIntoModel(earningData,earningFileName,data)      
 
 except Exception as e:
     with open ('Earning_error.txt','a') as f:
@@ -293,7 +297,7 @@ try:
     expenseFile = open(f'static/Account/RCTI/RCTIInvoice/{expenseFileName}', 'r')
     expenseReader = csv.reader(expenseFile)
     for expenseData in expenseReader:
-        insertIntoExpenseModel(expenseData,expenseFileName)
+        insertIntoExpenseModel(expenseData,expenseFileName,data)
 except Exception as e:
     with open ('Expense_error.txt','a') as f:
         f.write(str(e))

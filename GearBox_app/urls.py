@@ -75,7 +75,7 @@ urlpatterns = [
     
     path('truckTable', views.truckTable, name='truckTable'),
     path('truckForm', views.truckForm, name='truckForm'),
-    path('truckForm/add/', views.truckFormSave, name='truckFormAdd'),
+    path('truckForm/add/', views.truckFormSave, name='truckFormSave'),
     
     path('truckForm/Axles/View', views.truckAxlesFormView, name='truckAxlesFormView'),
     path('truckForm/Axles/Save', views.truckAxlesFormSave, name='truckAxlesFormSave'),
@@ -102,6 +102,7 @@ urlpatterns = [
     path('truckForm/Documents/Save', views.truckDocumentsFormSave, name='truckDocumentsFormSave'),
     
     path('truck/view/<int:id>/', views.truckForm, name='truckView'),
+    
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
