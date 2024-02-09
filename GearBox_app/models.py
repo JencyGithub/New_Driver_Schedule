@@ -199,10 +199,14 @@ class Driver(models.Model):
         RegexValidator(
             regex=r'^\d{10}$',  # Match a 10-digit number
             message='Phone number must be a 10-digit number without any special characters or spaces.',
-        ),
+        ),null=True
     ])
     email = models.CharField(max_length=200)
     password = models.CharField(max_length=50)
+    
+    firstName = models.CharField(max_length=100, default='', null=True)
+    middleName = models.CharField(max_length=100, default='', null=True)
+    lastName = models.CharField(max_length=100, default='', null=True)
     
     def __str__(self) -> str:
         return str(self.driverId) + str(self.name)

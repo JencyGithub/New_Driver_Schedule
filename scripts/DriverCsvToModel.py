@@ -23,11 +23,14 @@ def run():
             data = row.strip().split(',')
             # with open("Expense_error.txt", 'a')as f:
             #     f.write(str(data)+'\n')
-            dump = data[:5]  
+            dump = data[:5]
+
             if len(str(dump[2])) == 10:
                 M_pattern =  dump[2]  
+            elif len(str(dump[2])) == 9:
+                M_pattern = '0' + dump[2]
             else:
-                M_pattern =  dump[2]  
+                M_pattern = '' 
 
             users = User.objects.all()
 
@@ -36,28 +39,33 @@ def run():
             # print(usernames,email_addresses)
             try:
                 driverName = dump[1].lower().strip().replace(' ','').replace('-','').replace('(','').replace(')','')
-                if  driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
+                if driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
                     DriverObj = Driver()
                     DriverObj.driverId = dump[0]
                     DriverObj.name = driverName.lower()
                     DriverObj.phone = dump[2] 
                     DriverObj.email = dump[3].strip().replace(' ','')
                     DriverObj.password = dump[4].strip()
-                    
+
+                    DriverObj.firstname = dump[5].strip()
+                    DriverObj.middleName = dump[6].strip() if dump[6].strip() else ''
+                    DriverObj.lastName = dump[7].strip()
+
                     user_ = User.objects.create(
                         username=DriverObj.name,
                         email=DriverObj.email,
                         password=DriverObj.password,
+                        first_name = DriverObj.firstname,
+                        last_name = DriverObj.lastname,
                         is_staff=True,
-                    )  
+                    )
                     group = Group.objects.get(name='Driver')
                     user_.groups.add(group)
                     
                     user_.set_password(DriverObj.password)
                     user_.save()
                     DriverObj.save()
-                else:
-                    
+                else:                    
                     with open("Driver_skip.txt", 'a')as f:
                         f.write(str(dump)+ str(file_name) + '\n')
             except Exception as e:
