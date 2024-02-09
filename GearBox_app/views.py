@@ -171,6 +171,10 @@ def driverFormSave(request, id= None):
     email_addresses = [user.email for user in users]
     driver_Id = [driver.driverId for driver in drivers]
     driverName = request.POST.get('name').strip().replace(' ','').lower()
+    firstName = request.POST.get('firstName').strip().replace(' ','').lower()
+    middleName = request.POST.get('middleName').strip().replace(' ','').lower()
+    lastName = request.POST.get('lastName').strip().replace(' ','').lower()
+
     # Update 
     if id :
         driverObj = Driver.objects.get(pk=id)
@@ -181,7 +185,12 @@ def driverFormSave(request, id= None):
                 return redirect(request.META.get('HTTP_REFERER'))
             else:
                 driverObj.name = driverName
+                driverObj.firstName = firstName
+                driverObj.middleName = middleName
+                driverObj.lastName = lastName
                 user.username = driverObj.name
+                user.first_name = driverObj.firstName
+                user.last_name = driverObj.LastName
             
         if driverObj.email != request.POST.get('email'):
             if request.POST.get('email') in email_addresses:
@@ -217,12 +226,17 @@ def driverFormSave(request, id= None):
             DriverObj.phone = request.POST.get('phone') 
             DriverObj.email = request.POST.get('email')
             DriverObj.password = request.POST.get('password')
+            DriverObj.firstName = firstName
+            DriverObj.middleName = middleName
+            DriverObj.lastName = lastName
             
             user_ = User.objects.create(
                 username=DriverObj.name,
                 email=DriverObj.email,
                 password=DriverObj.password,
                 is_staff=True,
+                first_name = DriverObj.firstName,
+                last_name = DriverObj.lastName,
             )  
             group = Group.objects.get(name='Driver')
             user_.groups.add(group)
