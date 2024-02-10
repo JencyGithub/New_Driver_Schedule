@@ -112,7 +112,7 @@ urlpatterns = [
     # dockument 
     # path('document/', views.documentView, name="do
 
-    # setting form 
+    # truck setting form 
     path("settingsForm/", views.settingsForm, name="settingsForm"),
 
     # Compliance form 
@@ -135,5 +135,8 @@ urlpatterns = [
 
     # Sub groups 
     path('subgroups/add/', views.addSubGroups, name='addSubGroups'),
-    
+
+    # Fleet Settings 
+    path('fleet/Settings/', views.fleetSettings, name='fleetSettings'),    
+    path('fleet/customInformation/save', views.fleetCustomInformationSave, name='fleetCustomInformationSave'),    
 ]

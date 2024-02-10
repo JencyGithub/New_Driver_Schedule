@@ -88,7 +88,7 @@
               {% endif %}           
               <li><a href="{% url "Appointment:preStartTableView" %}">Pre start</a>
               {% if request.session.user_type == "SuperUser" %}
-                <li><a href="#">Settings</a>
+                <li><a href="{% url 'gearBox:fleetSettings' %}">Settings</a>
               {% endif %}
             </ul>
           </li>
