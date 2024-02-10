@@ -20,8 +20,9 @@ class BasePlant(models.Model):
     lat = models.CharField(max_length=20, default='')
     long = models.CharField(max_length=20, default='')
     
-    # True = BasePlant, False = Location
-    basePlantType = models.BooleanField(default=True) 
+    #if not any select that means plant name is location
+    clientDepot = models.BooleanField(default=False) 
+    clientBasePlant = models.BooleanField(default=False) 
     
     class Meta:
         unique_together = (('lat', 'long'),)
