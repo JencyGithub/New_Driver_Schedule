@@ -268,6 +268,7 @@ admin.site.register(Axles)
 admin.site.register(ThresholdNightShift)
 admin.site.register(Grace)
 admin.site.register(OnLease)
+admin.site.register(TruckInformationCustom)
 class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]
