@@ -27,6 +27,9 @@
         .brick-wrapper {
             margin-bottom: 10px; 
         }
+        .bg-dark{
+            background-color: #000;
+        }
     }
 </style>
 {% endblock %}
@@ -52,75 +55,79 @@
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle1" name="vehicle_axle1" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle1 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle1 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle1 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle1 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 1 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 2 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 3 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle1 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle1 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 3 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 2 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 1 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
                                         
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle2" name="vehicle_axle2" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle2 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle2 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle2 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle2 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 1 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 2 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 3 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle2 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle2 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 3 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 2 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 1 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                             
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle3" name="vehicle_axle3" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle3 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle3 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle3 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle3 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 1 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 2 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 3 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle3 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle3 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 3 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 2 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 1 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle4" name="vehicle_axle4" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle4 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle4 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle4 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle4 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 1 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 2 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 3 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle4 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle4 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 3 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 2 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 1 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
                                         
@@ -129,73 +136,77 @@
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle5" name="vehicle_axle5" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle5 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle5 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle5 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle5 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 1 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 2 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 3 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle5 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle5 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 3 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 2 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 1 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle6" name="vehicle_axle6" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle6 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle6 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle6 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle6 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 1 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 2 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 3 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle6 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle6 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 3 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 2 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 1 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                               
                                             
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle7" name="vehicle_axle7" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle7 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle7 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle7 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle7 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 1 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 2 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 3 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle7 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle7 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 3 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 2 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 1 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle8" name="vehicle_axle8" >
                                                 <option selected="selected" value="0">None</option>
-                                                <option  value="1" data-select2-id="3187">Single</option>
-                                                <option value="2">Dual</option>
-                                                <option value="3">Triple</option>
-                                                <option value="4">Quad</option>
+                                                <option {% if truckAxlesObj.vehicle_axle8 == 1 %}selected{% endif %}  value="1" data-select2-id="3187">Single</option>
+                                                <option  {% if truckAxlesObj.vehicle_axle8 == 2 %}selected{% endif %} value="2">Dual</option>
+                                                <option {% if truckAxlesObj.vehicle_axle8 == 3 %}selected{% endif %} value="3">Triple</option>
+                                                <option {% if truckAxlesObj.vehicle_axle8 == 4 %}selected{% endif %} value="4">Quad</option>
                                             </select>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 1 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 2 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 3 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-1" {% if truckAxlesObj.vehicle_axle8 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick mt-5" {% if truckAxlesObj.vehicle_axle8 == 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 3 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 2 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 1 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
+                                            
                                             
                                         </div>
 
@@ -241,7 +252,7 @@
     
             $selectBox.change(function() {
                 var selectedValue = $(this).val();
-    
+                
                 // Reset all bricks to default color before applying new selection
                 $bricks.css('background-color', '');
     
@@ -260,6 +271,7 @@
             // based on how you want to interact with the bricks directly.
         });
     });
+    
     
 
     // initialize a validator instance from the "FormValidator" constructor.
