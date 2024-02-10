@@ -41,7 +41,7 @@
                 <div class="x_panel">
                     <h2 class="text-uppercase" style="font-weight:bold">Axles tab</h2>
                 </div>
-                <form action="{% url 'gearBox:truckAxlesFormSave' %}" method="post">
+                <form action="{% url 'gearBox:truckAxlesFormSave' truckId=adminTruckObj.id %}" method="post">
                     {% csrf_token %}
                     {% comment %} <h2>Axles Form </h2> {% endcomment %}
                     <div class="x_panel">
@@ -50,14 +50,6 @@
                                 <div class="col-md-12">
                                     <div class="col-md-6">
                                         <div class="col-md-3">
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick mt-5"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
-                                            <div class="col brick my-1"></div>
                                             <select class="form-control"  id="vehicle_axle1" name="vehicle_axle1" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -65,9 +57,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -76,6 +65,10 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle2" name="vehicle_axle2" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -83,9 +76,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                            
-                                        </div>
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -94,6 +84,10 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                            
+                                        </div>
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle3" name="vehicle_axle3" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -101,8 +95,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -111,6 +103,9 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle4" name="vehicle_axle4" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -118,11 +113,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -131,6 +121,12 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle5" name="vehicle_axle5" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -138,8 +134,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -148,6 +142,9 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle6" name="vehicle_axle6" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -155,8 +152,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -165,6 +160,9 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle7" name="vehicle_axle7" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -172,8 +170,6 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
-                                        </div>
-                                        <div class="col-md-3">
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
@@ -182,6 +178,9 @@
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
                                             <div class="col brick my-1"></div>
+                                            
+                                        </div>
+                                        <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle8" name="vehicle_axle8" >
                                                 <option selected="selected" value="0">None</option>
                                                 <option  value="1" data-select2-id="3187">Single</option>
@@ -189,6 +188,15 @@
                                                 <option value="3">Triple</option>
                                                 <option value="4">Quad</option>
                                             </select>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick mt-5"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            <div class="col brick my-1"></div>
+                                            
                                         </div>
 
                                     </div>
@@ -230,32 +238,29 @@
         $('.col-md-3').each(function() {
             var $bricks = $(this).find('.brick');
             var $selectBox = $(this).find('select');
-
-            $bricks.click(function() {
-                // Reset background color of all bricks within this column
-                {% comment %} $bricks.css('background-color', ''); {% endcomment %}
-
-                // Set background color of clicked brick
-                // $(this).css('background-color', 'black');
-
-                // Get the index of the clicked brick within its column
-                var index = $(this).index();
-
-                
-                if(index <= 3) {
-                    // Change the color of the first n bricks where n is the index + 1
-                    $bricks.slice(0, index + 1).css('background-color', 'black');
-
-                    // Change the color of the last n bricks where n is the total bricks count - index
-                    $bricks.slice(-index - 1).css('background-color', 'black');
-
-                    // Update select box value based on the number of bricks selected
-                    var numBricks = index + 1;
-                    $selectBox.val(numBricks); // Set the value of the select dropdown
+    
+            $selectBox.change(function() {
+                var selectedValue = $(this).val();
+    
+                // Reset all bricks to default color before applying new selection
+                $bricks.css('background-color', '');
+    
+                // Based on the selected value, change the color of bricks
+                if(selectedValue > 0) {
+                    // Change the color of the first 'selectedValue' bricks to black
+                    $bricks.slice(0, selectedValue).css('background-color', 'black');
+                    
+                    // If you want to color the bricks below based on the selection,
+                    // you might need to adjust this logic depending on your exact needs
+                    $bricks.slice(-selectedValue).css('background-color', 'black');
                 }
             });
+    
+            // The previous click event on bricks can be adjusted or removed
+            // based on how you want to interact with the bricks directly.
         });
     });
+    
 
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
