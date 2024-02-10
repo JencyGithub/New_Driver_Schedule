@@ -182,10 +182,16 @@ def download_csv(modeladmin, request, queryset):
 
     return response
 
+class clientOfficeInline(admin.StackedInline):
+    model = clientOffice
+    extra = 0
+
+
 class ClientAdmin(admin.ModelAdmin):
     list_display = ["clientId", "name", 'docketGiven']
     search_fields = ["clientId", "name"]
     actions = [download_csv]
+    inlines = [clientOfficeInline]
 
 admin.site.register(Client, ClientAdmin)
 
@@ -283,8 +289,6 @@ class ClientTruckConnection_(admin.ModelAdmin):
 
 admin.site.register(ClientTruckConnection,ClientTruckConnection_)
     
-
-
 
 def driver_download_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
