@@ -317,6 +317,7 @@ def truckForm(request, id=None):
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
     adminTruckObj=truckInformationObj=connections = None
+    truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True).first()
     count_ = 1
     if id:
         adminTruckObj = AdminTruck.objects.filter(pk=id).first()
@@ -336,6 +337,7 @@ def truckForm(request, id=None):
                 
         # return HttpResponse(connections)
     params = {
+        'truckInformationCustomObj' : truckInformationCustomObj,
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'adminTruckObj' : adminTruckObj,
@@ -362,7 +364,7 @@ def truckFormSave(request,truckId=None):
 
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
-        adminTruckObj.status        
+        # adminTruckObj.status        
         
         truckInformationObj.fleet = truckNo
         truckInformationObj.groups = request.POST.get('groups')
@@ -678,3 +680,20 @@ def addGroupsSave(request):
 
 def addSubGroups(request):
     return render(request, 'GearBox/subgroupsForm.html')
+
+def fleetSettings(request):
+    truckInformationCustomObj = TruckInformationCustom.objects.all()
+    params = {
+        'truckInformationCustomObj':truckInformationCustomObj,
+    }
+    return render(request, 'GearBox/fleetSettings.html', params)
+
+@csrf_protect
+def fleetCustomInformationSave(request):
+    truckInformationCustomObj = TruckInformationCustom()
+    truckInformationCustomObj.customFieldLabel = request.POST.get('customFieldLabel')
+    truckInformationCustomObj.active = True if  request.POST.get('active') else False 
+    truckInformationCustomObj.save()
+    messages.success(request,'Custom Information added Successfully')
+    return redirect('gearBox:fleetSettings')
+

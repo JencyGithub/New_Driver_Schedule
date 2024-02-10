@@ -257,6 +257,7 @@ class TruckInformationCustom(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
 # AXLES TAB
 class Axles(models.Model):
     AXLES_CHOICES = (
