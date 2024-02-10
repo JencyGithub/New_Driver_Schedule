@@ -115,7 +115,7 @@
                         </ul>
                     </div>  {% endcomment %}
                 </div>
-                <!-- {% url 'gearBox:truckFormAdd' %} -->
+                {% comment %} <!-- {% url 'gearBox:truckFormAdd' %} --> {% endcomment %}
                 <form action="{% url 'gearBox:truckComplianceFormSave' %}" method="post">
                     {% csrf_token %}
                     {% comment %} <h2>Compliance Form </h2> {% endcomment %}

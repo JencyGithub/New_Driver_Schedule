@@ -356,15 +356,13 @@ def truckFormSave(request,truckId=None):
         if truckId:
             adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
             truckInformationObj = adminTruckObj.truckInformation
-            # truckInformationObj = TruckInformation.objects.filter(pk=adminTruckObj.truckInformation).first()
         else:
             adminTruckObj = AdminTruck()
             truckInformationObj = TruckInformation()
 
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
-        # return HttpResponse(truckNo)
-        
+        adminTruckObj.status        
         
         truckInformationObj.fleet = truckNo
         truckInformationObj.groups = request.POST.get('groups')
@@ -398,7 +396,7 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.registered = True if request.POST.get('unRegistration') =='on' else False
         truckInformationObj.registration = request.POST.get('registration')
         truckInformationObj.registrationCode = request.POST.get('registrationCode')
-        truckInformationObj.registrationSate = request.POST.get('registrationState')
+        truckInformationObj.registrationState = request.POST.get('registrationState')
         truckInformationObj.registrationDueDate = request.POST.get('registrationDueDate')
         truckInformationObj.registrationInterval = request.POST.get('registrationInterval')
         
@@ -426,14 +424,23 @@ def truckFormSave(request,truckId=None):
 
 
 def truckAxlesFormView(request,truckId):
+    truckAxlesObj = None
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    if adminTruckObj.truckAxles:
+        truckAxlesObj = adminTruckObj.truckAxles
+        
     params={
-        'adminTruckObj':adminTruckObj
+    'adminTruckObj':adminTruckObj,
+    'truckAxlesObj':truckAxlesObj
     }
     return render(request,'GearBox/truck/truckAxlesForm.html',params)
 
 def truckAxlesFormSave(request,truckId):
-    truckAxlesObj = Axles()
+    adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    if adminTruckObj.truckAxles:
+        truckAxlesObj = adminTruckObj.truckAxles 
+    else:
+        truckAxlesObj = Axles()
     truckAxlesObj.vehicle_axle1 = request.POST.get('vehicle_axle1')
     truckAxlesObj.vehicle_axle2 = request.POST.get('vehicle_axle2')
     truckAxlesObj.vehicle_axle3 = request.POST.get('vehicle_axle3')
@@ -446,7 +453,8 @@ def truckAxlesFormSave(request,truckId):
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
     adminTruckObj.truckAxles = truckAxlesObj
     adminTruckObj.save()
-    messages.success(request,'Adding successfully')
+    messages.success(request, 'Update successfully' if adminTruckObj.truckAxles else 'Adding successfully')
+
     return redirect('gearBox:truckSettingFormView',truckId=adminTruckObj.id)
 
 def  truckSettingFormView(request,truckId):
@@ -457,6 +465,37 @@ def  truckSettingFormView(request,truckId):
     return render(request,'GearBox/truck/truckSettingForm.html',params)
 
 def truckSettingFormSave(request):
+    # truckSettingObj.fuelType = request.POST.get('fuelType')
+    # truckSettingObj.FuelCreditCategory = request.POST.get('FuelCreditCategory')
+    # truckSettingObj.adbluePercent = request.POST.get('adbluePercent')
+    # truckSettingObj.kilometresOffset = request.POST.get('kilometresOffset')
+    # truckSettingObj.hoursOffset = request.POST.get('hoursOffset')
+    # truckSettingObj.prestartChecklist = request.POST.get('prestartChecklist')
+    # truckSettingObj.trailers = request.POST.get('trailers')
+    # truckSettingObj.GCM = request.POST.get('GCM')
+    # truckSettingObj.GVM = request.POST.get('GVM')
+    # truckSettingObj.TARE = request.POST.get('TARE')
+    # truckSettingObj.ATM = request.POST.get('ATM')
+    # truckSettingObj.Length = request.POST.get('Length')
+    # truckSettingObj.Height = request.POST.get('Height')
+    # truckSettingObj.Width = request.POST.get('Width')
+    # truckSettingObj.Volume = request.POST.get('Volume')
+    # truckSettingObj.Pallets = request.POST.get('Pallets')
+    # truckSettingObj.spareField7 = request.POST.get('spareField7')
+    # truckSettingObj.spareField8 = request.POST.get('spareField8')
+    # truckSettingObj.spareField9 = request.POST.get('spareField9')
+    # truckSettingObj.spareField10 = request.POST.get('spareField10')
+    # truckSettingObj.spareField11 = request.POST.get('spareField11')
+    # truckSettingObj.spareField12 = request.POST.get('spareField12')
+    # truckSettingObj.spareField13 = request.POST.get('spareField13')
+    # truckSettingObj.spareField14 = request.POST.get('spareField14')
+    # truckSettingObj.spareField15 = request.POST.get('spareField15')
+    # truckSettingObj.spareField16 = request.POST.get('spareField16')
+    # truckSettingObj.spareField17 = request.POST.get('spareField17')
+    # truckSettingObj.spareField18 = request.POST.get('spareField18')
+    # truckSettingObj.spareField19 = request.POST.get('spareField19')
+    # truckSettingObj.spareField20 = request.POST.get('spareField20')
+    # truckSettingObj.description = request.POST.get('description')
     return redirect('gearBox:truckRemindersFormView')
 
 def  truckRemindersFormView(request):
