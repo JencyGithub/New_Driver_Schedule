@@ -1947,7 +1947,9 @@ def basePlantSave(request, id=None):
         'managerName': request.POST.get('managerName'),
         'lat': request.POST.get('lat'),
         'long': request.POST.get('long'),
-        'basePlantType' : False if  request.POST.get('basePlantType') == "typeLocation" else True
+        # if not any select that means plant name is location 
+        'clientDepot' :  True if  request.POST.get('clientDepot') else False , 
+        'clientBasePlant' :  True if  request.POST.get('clientBasePlant') else False
     }
 
     

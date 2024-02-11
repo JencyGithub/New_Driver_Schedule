@@ -311,12 +311,15 @@ def truckTable(request):
     return render(request , 'GearBox/truck/table/truckTable.html',params)
 
 def truckForm(request, id=None):
-    
+    truckInformationCustomObj = None
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
     adminTruckObj=truckInformationObj=connections = None
-    truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True).first()
+    basePlantObj = BasePlant.objects.all()
+    if not id:
+        truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True)
+    # return HttpResponse(truckInformationCustomObj)
     count_ = 1
     if id:
         adminTruckObj = AdminTruck.objects.filter(pk=id).first()
@@ -325,6 +328,8 @@ def truckForm(request, id=None):
         
         for i in connections:
             i['count'] = count_
+            if i['startDate'] <= getCurrentDateTimeObj().date() and i['endDate'] > getCurrentDateTimeObj().date():
+                i['status'] = True
             count_ += 1
             i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
             preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
@@ -336,13 +341,14 @@ def truckForm(request, id=None):
                 
         # return HttpResponse(connections)
     params = {
-        'truckInformationCustomObj' : truckInformationCustomObj,
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'adminTruckObj' : adminTruckObj,
         'truckInformationObj':truckInformationObj,
         'connections' : connections,
-        'preStarts':preStarts
+        'preStarts':preStarts,
+        'basePlantObj':basePlantObj,
+        'truckInformationCustomObj':truckInformationCustomObj,
     }
     return render(request,'GearBox/truck/truckForm.html',params)
 
@@ -363,7 +369,7 @@ def truckFormSave(request,truckId=None):
 
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
-        # adminTruckObj.status        
+        adminTruckObj.truckActive = True    
         
         truckInformationObj.fleet = truckNo
         truckInformationObj.groups = request.POST.get('groups')
@@ -380,12 +386,45 @@ def truckFormSave(request,truckId=None):
             truckInformationObj.truckImg2 = truckFileSave(truckImg2)
         if truckImg3:
             truckInformationObj.truckImg3 = truckFileSave(truckImg3)
-        truckInformationObj.customFuelCard = request.POST.get('customFuelCard')
-        truckInformationObj.customFuelOldFleetNumber = request.POST.get('customOldFeetNumber')
-        truckInformationObj.customOldRego = request.POST.get('customOldRego')
-        truckInformationObj.customRegisteredOwner = request.POST.get('customRegOwner')
-        truckInformationObj.customRoadsideAssistance = request.POST.get('customRoadsideAssistance')
-        truckInformationObj.customPDDNumber = request.POST.get('customPdd')
+        
+        if request.POST.get('customFieldLabel1') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel1')).first()
+            truckInformationObj.customFieldLabel1 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue1 = request.POST.get('customFieldValue1')
+            
+        if request.POST.get('customFieldLabel2') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel2')).first()
+            truckInformationObj.customFieldLabel2 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue2 = request.POST.get('customFieldValue2')
+            
+        if request.POST.get('customFieldLabel3') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel3')).first()
+            truckInformationObj.customFieldLabel3 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue3 = request.POST.get('customFieldValue3')
+            
+        if request.POST.get('customFieldLabel4') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel4')).first()
+            truckInformationObj.customFieldLabel4 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue4 = request.POST.get('customFieldValue4')
+            
+        if request.POST.get('customFieldLabel5') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel5')).first()
+            truckInformationObj.customFieldLabel5 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue5 = request.POST.get('customFieldValue5')
+            
+        if request.POST.get('customFieldLabel6') != None:
+            truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel6')).first()
+            truckInformationObj.customFieldLabel6 = truckInformationCustomObj.customFieldLabel
+            truckInformationObj.customFieldValue6 = request.POST.get('customFieldValue6')
+            
+            
+        # for i in 
+        # truckInformationObj.customFuelCard = request.POST.get('customFuelCard')
+        # truckInformationObj.customFuelOldFleetNumber = request.POST.get('customOldFeetNumber')
+        # truckInformationObj.customOldRego = request.POST.get('customOldRego')
+        # truckInformationObj.customRegisteredOwner = request.POST.get('customRegOwner')
+        # truckInformationObj.customRoadsideAssistance = request.POST.get('customRoadsideAssistance')
+        # truckInformationObj.customPDDNumber = request.POST.get('customPdd')
         
         truckInformationObj.informationMake = request.POST.get('informationMake')
         truckInformationObj.informationModel = request.POST.get('informationModel')
@@ -394,12 +433,13 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.informationBuildYear = request.POST.get('informationBuildYear')
         truckInformationObj.informationIcon = request.POST.get('informationIcon')
         
-        truckInformationObj.registered = True if request.POST.get('unRegistration') =='on' else False
-        truckInformationObj.registration = request.POST.get('registration')
-        truckInformationObj.registrationCode = request.POST.get('registrationCode')
-        truckInformationObj.registrationState = request.POST.get('registrationState')
-        truckInformationObj.registrationDueDate = request.POST.get('registrationDueDate')
-        truckInformationObj.registrationInterval = request.POST.get('registrationInterval')
+        truckInformationObj.registered = False if request.POST.get('unRegistration') =='on' else True
+        if truckInformationObj.registered is False:
+            truckInformationObj.registration = request.POST.get('registration')
+            truckInformationObj.registrationCode = request.POST.get('registrationCode')
+            truckInformationObj.registrationState = request.POST.get('registrationState')
+            truckInformationObj.registrationDueDate = request.POST.get('registrationDueDate')
+            truckInformationObj.registrationInterval = request.POST.get('registrationInterval')
         
         truckInformationObj.powered = True if request.POST.get('powered') =='on' else False
         truckInformationObj.engine = request.POST.get('engine')
@@ -541,14 +581,16 @@ def truckConnectionForm(request, id):
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
-    
+    basePlantObj = BasePlant.objects.filter(clientDepot = True)
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'truckType' : request.POST.get('truckType'),
         'id' : id,
+        'basePlantObj' : basePlantObj,
         'preStarts':preStarts
     }
+    # return HttpResponse(basePlantObj)
     return render(request,'GearBox/clientTruckConnectionForm.html',params)
 
 @csrf_protect
@@ -565,6 +607,7 @@ def truckConnectionSave(request,id):
         'truckType' : request.POST.get('truckType'),
         'startDate' : request.POST.get('startDate'),
         'endDate' : request.POST.get('endDate'),
+        'basePlantId':request.POST.get('basePlantId'),
         'createdBy' : request.user
     }
 
@@ -590,7 +633,26 @@ def truckConnectionSave(request,id):
     messages.success(request,'Truck Connection Add Successfully')
     return redirect('gearBox:truckTable')
 
-    # Document 
+    # Document
+@csrf_protect
+def truckConnectionDeactivate(request):
+    print('here')
+    status = False
+    current_date = getCurrentDateTimeObj().date()
+    truckConnectionId = request.POST.get('connectionId_')
+    adminTruckObj = AdminTruck.objects.filter(pk=truckConnectionId).first()
+    existing_appointments = AppointmentTruck.objects.filter(
+        truckNo=adminTruckObj,
+        appointmentId__startDate__lte=current_date,
+        appointmentId__endDate__gte=current_date
+    )
+    if not existing_appointments:
+        status = True
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=truckConnectionId).first()
+        clientTruckConnectionObj.endDate = current_date
+        clientTruckConnectionObj.save()
+        print(existing_appointments)
+    return JsonResponse({'status': status})
 @csrf_protect
 def getRateCard(request):
     clientId = request.POST.get('clientName')
@@ -717,17 +779,26 @@ def addSubGroups(request):
 
 def fleetSettings(request):
     truckInformationCustomObj = TruckInformationCustom.objects.all()
+    addStatus = False
+    if TruckInformationCustom.objects.all().count() >= 6:
+        print(TruckInformationCustom.objects.all().count())
+        addStatus = True
+        
     params = {
+        'addStatus':addStatus,
         'truckInformationCustomObj':truckInformationCustomObj,
     }
     return render(request, 'GearBox/fleetSettings.html', params)
 
 @csrf_protect
-def fleetCustomInformationSave(request):
-    truckInformationCustomObj = TruckInformationCustom()
+def fleetCustomInformationSave(request, id = None):
+    if not id:
+        truckInformationCustomObj = TruckInformationCustom()
+    else:
+        truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=id).first()
     truckInformationCustomObj.customFieldLabel = request.POST.get('customFieldLabel')
     truckInformationCustomObj.active = True if  request.POST.get('active') else False 
     truckInformationCustomObj.save()
-    messages.success(request,'Custom Information added Successfully')
+    messages.success(request, 'Custom Information update Successfully' if id else 'Custom Information added Successfully' )
     return redirect('gearBox:fleetSettings')
 

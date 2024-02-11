@@ -37,9 +37,11 @@
                     <div class="col-sm-9">
                         <h2 class="text-uppercase" style="font-weight:bold">Custom Information</h2>
                     </div>
+                    {% if addStatus is False %}
                     <div class="col-sm-3">
                         <button type='button' class="btn btn-sm btn-default px-3 float-right" data-toggle="modal" data-target="#addFieldsetModal">Add Fieldset</button>
                     </div>
+                    {% endif %}
                     
                     <!-- Modal -->
                     <form action="{% url 'gearBox:fleetCustomInformationSave' %}" method="POST">
@@ -76,92 +78,29 @@
   
                 </div>
                 {% comment %} <!-- {% url 'gearBox:truckFormAdd' %} --> {% endcomment %}
-                <form action="" method="post">
-                    {% csrf_token %}
                     <div class="x_panel">
                         <div class="x_content">
                             <div class="col-md-12 col-sm-12">
                                 <div class="row">
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>
-                                            {% for truckInformationCustom in truckInformationCustomObj%}
-                                            {{ truckInformationCustom.customFieldLabel1 }}
-                                                <div class="input-group-section pink">
-                                                    <label for="customFieldLabel{{ forloop.counter }}">Custom Field1 :</label>
+                                    {% for truckInformationCustom in truckInformationCustomObj%}
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <form action="{% url 'gearBox:fleetCustomInformationUpdate' id=truckInformationCustom.id %}" method="POST">
+                                            {% csrf_token %}
+                                                <div class="input-group-section {% if truckInformationCustom.active %}green {% else %}pink{% endif %}">
+                                                    <label for="customFieldLabel{{ forloop.counter }}">Custom Field1 : </label>
                                                     <input type="checkbox" {% if truckInformationCustom.active %}checked{% endif %} id="active" name="active" class="mx-2">
                                                     <div class="d-flex align-items-center justify-content-between">
-                                                        <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel1 }}" name="customFieldLabel" class="form-control mr-2">
+                                                        <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel }}" name="customFieldLabel" class="form-control mr-2">
                                                         <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
                                                     </div>
                                                 </div>
-                                            {% endfor %}
-                                        </form>
-                                    </div>
-                                    {% comment %} <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>
-                                            <div class="input-group-section pink">
-                                                <label for="customFieldLabel2">Custom Field2 :</label>
-                                                <input type="checkbox" id="cbCustomFieldLabel2" name="cbCustomFieldLabel2" class="mx-2">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <input type="text" id="customFieldLabel2" name="customFieldLabel2" class="form-control mr-2">
-                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>
-                                            <div class="input-group-section pink">
-                                                <label for="customFieldLabel3">Custom Field3 :</label>
-                                                <input type="checkbox" id="cbCustomFieldLabel3" name="cbCustomFieldLabel3" class="mx-2">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <input type="text" id="customFieldLabel3" name="customFieldLabel3" class="form-control mr-2">
-                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>                                        
-                                            <div class="input-group-section pink">
-                                                <label for="customFieldLabel4">Custom Field4 :</label>
-                                                <input type="checkbox" id="cbCustomFieldLabel4" name="cbCustomFieldLabel4" class="mx-2">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <input type="text" id="customFieldLabel4" name="customFieldLabel4" class="form-control mr-2">
-                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>
-                                            <div class="input-group-section green">
-                                                <label for="customFieldLabel5">Custom Field5 :</label>
-                                                <input type="checkbox" id="cbCustomFieldLabel5" name="cbCustomFieldLabel5" class="mx-2">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <input type="text" id="customFieldLabel5" name="customFieldLabel5" class="form-control mr-2">
-                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mb-4">
-                                        <form>
-                                            <div class="input-group-section pink">
-                                                <label for="customFieldLabel6">Custom Field6 :</label>
-                                                <input type="checkbox" id="cbCustomFieldLabel6" name="cbCustomFieldLabel6" class="mx-2">
-                                                <div class="d-flex align-items-center justify-content-between">
-                                                    <input type="text" id="customFieldLabel6" name="customFieldLabel6" class="form-control mr-2">
-                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div> {% endcomment %}
+                                            </form> 
+                                        </div>
+                                    {% endfor %}
                                 </div>
                             </div>    
                         </div>
                     </div>
-                </form>
 
             </div>
         </div>

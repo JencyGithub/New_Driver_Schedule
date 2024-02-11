@@ -223,6 +223,7 @@ class TruckInformation(models.Model):
     informationConfiguration = models.CharField(max_length=100, default='', null=True, blank=True)
     informationChassis = models.CharField(max_length=100, default='', null=True, blank=True)
     informationBuildYear = models.PositiveIntegerField(default=0)
+    
     informationIcon = models.CharField(max_length=100, default='', null=True, blank=True)
     customFieldLabel1 = models.CharField(max_length=100, default='', null=True, blank=True)
     customFieldLabel2 = models.CharField(max_length=100, default='', null=True, blank=True)

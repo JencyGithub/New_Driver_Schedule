@@ -54,10 +54,10 @@
                 <div class="x_title">
                     <h2>{% if basePlant %}Edit{% else %}Add{% endif %} Depot / Location</h2>
                     <div class="float-right">
-                        <input type="radio" checked id="typeDepot"value="typeDepot" name="basePlantType" style="margin-top: .8rem;">
-                        <label for="typeDepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
-                        <input type="radio" id="typeLocation" value="typeLocation" name="basePlantType"style="margin-top: .8rem;" {% if basePlant %} {% if basePlant.basePlantType is False %} checked {% endif %}{% endif %}>
-                        <label for="typeLocation" class="ml-2"style="margin-right: 1rem;">Location</label>
+                        <input type="checkbox" checked id="clientDeepot"value="clientDeepot" name="clientDepot" style="margin-top: .8rem;" {% if basePlant.clientDepot is True %} checked {% endif %}>
+                        <label for="clientDeepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
+                        <input type="checkbox" id="clientBasePlant" value="clientBasePlant" name="clientBasePlant"style="margin-top: .8rem;" {% if basePlant.clientBasePlant is True %} checked {% endif %}>
+                        <label for="clientBasePlant" class="ml-2"style="margin-right: 1rem;">BasePlant</label>
                     </div>
                     <div class="clearfix"></div>
                 </div>

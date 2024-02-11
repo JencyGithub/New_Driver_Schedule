@@ -47,6 +47,20 @@ request {% endblock %} {% block headStyle %}
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
+                                        <label for="basePlantId" class="col-form-label col-md-3 col-sm-3 label-align">Plant name:<span class="required">*</span></label>
+
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <select name="basePlantId" onchange="rateCard(this)" class="form-control" required="required">
+                                                <option disabled selected >Select Plant Name</option>
+                                                {% for basePlant in basePlantObj %}
+                                                <option value="{{ basePlant.id }}">{{ basePlant.basePlant }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
                                         <label for="rate_card_name"
                                             class="col-form-label col-md-3 col-sm-3 label-align">Rate card :<span
                                                 class="required">*</span></label>

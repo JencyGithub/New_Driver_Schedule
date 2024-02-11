@@ -107,6 +107,7 @@ urlpatterns = [
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
+    path('truck/connection/deactivate>/', views.truckConnectionDeactivate, name='truckConnectionDeactivate'),
     path('getRateCard/', views.getRateCard, name='getRateCard'),
     
     # dockument 
@@ -146,4 +147,5 @@ urlpatterns = [
     # Fleet Settings 
     path('fleet/Settings/', views.fleetSettings, name='fleetSettings'),    
     path('fleet/customInformation/save', views.fleetCustomInformationSave, name='fleetCustomInformationSave'),    
+    path('fleet/customInformation/update/<int:id>', views.fleetCustomInformationSave, name='fleetCustomInformationUpdate'),    
 ]

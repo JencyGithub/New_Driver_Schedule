@@ -76,9 +76,10 @@
                                 </div>
                             <div class="clearfix"></div>
                             {% endif %}
-                        {% if data.truckActive is True %}
-                        <a href="{% url 'gearBox:truckConnectionAddView' id=data.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
-                        {% endif %} {% endcomment %}
+                        {% endcomment %}
+                        {% if adminTruckObj.truckActive is True %}
+                        <a href="{% url 'gearBox:truckConnectionAddView' id=adminTruckObj.id %}" class="btn btn-sm btn-default float-right">Add connection</a>
+                        {% endif %} 
 
                     </div>
                     
@@ -234,8 +235,8 @@
                         <div class="x_title">
                             <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
                             <span class="float-right">
-                                <input type="checkbox"  name="unRegistration" id="unRegistration" onchange="registered(this)">
-                                <label for="unRegistration">Un-Registered</label>
+                                <input type="checkbox"   name="registered" id="registered" onchange="registeredFun(this)">
+                                <label for="registered">Un-Registered</label>
                             </span>
                             <div class="clearfix"></div>
                         </div>
@@ -245,7 +246,7 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.registration }}" type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
+                                            <input class="form-control" value="{{ truckInformationObj.registration }}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
@@ -338,44 +339,68 @@
                         <div class="x_content">
                             <div class="col-md-12 col-sm-12">
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customFuelCard" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel1}} :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.customFuelCard }}" type="text" name="customFuelCard" style="padding: 0.25rem 0.2rem;" id="customFuelCard" >
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customRegOwner" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel2}} :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.customRegisteredOwner }}"  type="text" name="customRegOwner" style="padding: 0.25rem 0.2rem;" id="customRegOwner" required>
-                                        </div>
-                                    </div>
+                                    {% for truckInformationCustom in truckInformationCustomObj %}
                                     
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customOldRego" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel3}} :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.customOldRego }}" type="number" name="customOldRego" style="padding: 0.25rem 0.2rem;" id="customOldRego" data-validate-minmax="1000,9999">
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldValue{{forloop.counter}}" style="margin-bottom: 0.3rem!important;">{{truckInformationCustom.customFieldLabel}} :</label>
+                                            <input  type="text" hidden value="{{truckInformationCustom.id}}" name ="customFieldLabel{{forloop.counter}}" />
+                                            <div class="field item form-group">
+                                                <input class="form-control"  type="text" name="customFieldValue{{forloop.counter}}" style="padding: 0.25rem 0.2rem;" id="customFieldValue{{forloop.counter}}" >
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customOldFeetNumber" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel4}} :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.customFuelOldFleetNumber }}" type="number" name="customOldFeetNumber" style="padding: 0.25rem 0.2rem;" id="customOldFeetNumber" data-validate-minmax="1000,9999" >
+                                    {% endfor %}
+                                    {% if truckInformationCustomObj is None  %}
+                                        {% if truckInformationObj.customFieldLabel1 != ''   %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel1" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel1}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue1 }}"  type="text" name="customFieldValue1" style="padding: 0.25rem 0.2rem;" id="customFieldLabel1" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customRoadsideAssistance" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel5}} :</label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.customRoadsideAssistance }}" type="number" name="customRoadsideAssistance" style="padding: 0.25rem 0.2rem;" id="customRoadsideAssistance" data-validate-minmax="1000,9999">
+                                        {% endif %}
+                                        {% if truckInformationObj.customFieldLabel2 != ''  %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel2" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel2}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue2 }}"  type="text" name="customFieldValue2" style="padding: 0.25rem 0.2rem;" id="customFieldLabel2" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="customPdd" style="margin-bottom: 0.3rem!important;">{{truckInformationCustomObj.customFieldLabel6}} :</label>
-                                        {% comment %} concrite truck: Mandatory | tippers truck: not Mandatory {% endcomment %}
-                                        <div class="field item form-group"> 
-                                            <input class="form-control" value="{{ truckInformationObj.customPDDNumber }}" type="number" name="customPdd" style="padding: 0.25rem 0.2rem;" id="customPdd" data-validate-minmax="1000,9999"  disabled required>
+                                        {% endif %}
+                                        {% if truckInformationObj.customFieldLabel3 != ''  %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel3" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel3}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue3 }}"  type="text" name="customFieldValue3" style="padding: 0.25rem 0.2rem;" id="customFieldLabel3" required>
+                                            </div>
                                         </div>
-                                    </div>
+                                        {% endif %}
+                                        {% if truckInformationObj.customFieldLabel4 != ''  %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel4" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel4}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue4 }}"  type="text" name="customFieldValue4" style="padding: 0.25rem 0.2rem;" id="customFieldLabel4" required>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if truckInformationObj.customFieldLabel5 != None %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel5" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel5}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue5 }}"  type="text" name="customFieldValue5" style="padding: 0.25rem 0.2rem;" id="customFieldLabel5" required>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% if truckInformationObj.customFieldLabel6 != None  %}
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="customFieldLabel6" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel6}} :</label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue6 }}"  type="text" name="customFieldValue6" style="padding: 0.25rem 0.2rem;" id="customFieldLabel6" required>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    
                                 </div>
                             </div>
                         </div>
@@ -391,6 +416,11 @@
                             <div class="x_panel">
                                 <div class="x_title">
                                     <h2>Connections</h2>
+                                    <div class="float-right">
+                                        {% if connection.status is True %}
+                                        <button class="btn btn-danger btn-sm" type="button" onclick="confirmDeactivation('{{ connection.id }}')">Deactivate</button>
+                                        {% endif %}
+                                    </div>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
@@ -435,18 +465,24 @@
                                             <label for="startDate{{connection.count}}"> Start date<span class="required">*</span></label>
                                             <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.startDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="startDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="startDate{{connection.count}}">
                                         </div>
-                                        
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
-                                            <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="createdBy{{connection.count}}"> Created By<span class="required">*</span></label>
-                                            <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.createdBy}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="createdBy{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="createdBy{{connection.count}}">
+                                        <div class="row mt-3">
+                                            <div class="col-md-4 col-sm-4">
+                                                <label for="endDate{{connection.count}}"> Plant<span class="required">*</span></label>
+                                                <select name="plantName{{connection.count}}" class="form-control" id="plantName{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
+                                                    {% for basePlant in basePlantObj%}
+                                                    <option value="{{basePlant.id}}" {% if basePlant.id == connection.basePlantId %} selected {% endif %} >{{basePlant.basePlant}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 col-sm-4">
+                                                <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
+                                                <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
+                                            </div>
+                                            <div class="col-md-4 col-sm-4">
+                                                <label for="createdBy{{connection.count}}"> Created By<span class="required">*</span></label>
+                                                <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.createdBy}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="createdBy{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="createdBy{{connection.count}}">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -466,6 +502,7 @@
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     function vehicleTypeFun() {
         var selectedValue = $('#vehicleType').val(); // Get the selected value using jQuery
         
@@ -480,7 +517,32 @@
             $('#customPdd').attr('disabled', 'disabled');
         }
     }
-    
+
+    function confirmDeactivation(connectionId) {
+    // Display confirmation alert
+    if (confirm("Are you sure you want to deactivate this truck?")) {
+        $.ajax({
+            url: "/gearBox/truck/connection/deactivate>/",
+            method: "POST",
+            data: {
+                connectionId_: connectionId // Use colon ':' for assignment
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(data) {
+                if(data.status){
+                    alert("Truck connection deactivated successfully!");
+                    location.reload();
+                }
+                else{
+                    alert("Appointment exists for this truck. Deactivation failed.");
+                }
+            }
+        });
+        }
+    }
+
     var validator = new FormValidator({
         "events": ['blur', 'input', 'change']
     }, document.forms[0]);
@@ -518,7 +580,7 @@
             $('input[name="informationIcon"]').val(data.selectedData.value);
         }
     })
-    function registered(data) {
+    function registeredFun(data) {
         var isChecked = $(data).prop("checked");
         if(isChecked){
             $("#registrationSection input").prop("disabled", true);
