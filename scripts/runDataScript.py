@@ -106,7 +106,8 @@ trucks = [
 
 for truck in trucks:
     try:
-        obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckStatus = truck['truckStatus'])
+        
+        obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckStatus = truck['truckStatus'], createdBy=User.objects.filter().first())
         # obj = AdminTruck(adminTruckNumber = truck)
         obj.save()
     except Exception as e:
@@ -133,7 +134,8 @@ def truckConnectionInsert(data):
             clientId =  clientObj,
             clientTruckId =  data['clientTruckId'],
             startDate =  data['startDate'],
-            endDate =  data['endDate']
+            endDate =  data['endDate'],
+            createdBy=User.objects.filter().first()
         )
         clientTruckConnectionObj.save()
         return

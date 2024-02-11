@@ -3,8 +3,6 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 $(document).ready(function(){
     checkRecurring()
     console.log('reload')
-
-    
 });
 
 $('#repeats').on('change', function(){
@@ -42,6 +40,7 @@ var validator = new FormValidator({
 // on form "submit" event
 document.forms[0].onsubmit = function (e) {
     var submit = true, validatorResult = validator.checkAll(this);
+    
     $('select[required]').each(function() {
         if (!$(this).val()) {
             validatorResult.valid = false
@@ -114,7 +113,7 @@ function setTruckAndDriver(dataRow){
     }
 }
 
-$('#origin, #appStop').on('change', function(){
+$("#origin, #appStop, select[name^='appStop']").on('change', function(){
     let originName = $(this).val()
     console.log(originName); 
     if(originName){
@@ -201,10 +200,11 @@ function openBox(checked, id) {
 
 $('#addTruck').on('change', function(){
     const isChecked = $(this).prop('checked');
-    $('#truckNo, #origin, #appStop').prop('disabled', !isChecked);
+    // $('#truckNo, #origin, #appStop').prop('disabled', !isChecked);
+    $('#truckNo, #origin').prop('disabled', !isChecked);
     $('#truckNo, #origin').prop('required', isChecked);
-    $('#originAddress, #originPhone, #originPersonOnName, #originLatitude, #originLongitude').prop('required', isChecked);
-    $('.stopDiv').toggleClass('d-none', !isChecked);
+    // $('#originAddress, #originPhone, #originPersonOnName, #originLatitude, #originLongitude').prop('required', isChecked);
+    // $('.stopDiv').toggleClass('d-none', !isChecked);
 });
 
 
@@ -224,3 +224,4 @@ function addOrigin(){
     $('#locationDiv').removeClass('d-none')
     $("#originAddVal").val(1)
 }
+

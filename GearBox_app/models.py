@@ -42,6 +42,8 @@ class clientOffice(models.Model):
         return str(self.clientId) + str(self.locationType)
 
     
+
+    
 # -----------------------------------
 # Rate Card
 # -----------------------------------   

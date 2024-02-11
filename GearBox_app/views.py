@@ -155,7 +155,9 @@ def adminStaffSave(request, id=None):
 def driverForm(request, id=None):
     data = None
     if id:
-        data = Driver.objects.get(pk = id)   
+        data = Driver.objects.filter(pk = id).first() 
+        data.countryCode = data.phone[:2]  
+        data.phone = data.phone[2:]
     params = {
         'data' : data
     }
@@ -181,7 +183,7 @@ def driverFormSave(request, id= None):
         user = User.objects.get(email = driverObj.email)
         if driverObj.name != driverName:
             if driverName in usernames:
-                messages.error( request, "Driver Name  already Exist")
+                messages.error( request, "Driver Name already Exist")
                 return redirect(request.META.get('HTTP_REFERER'))
             else:
                 driverObj.name = driverName
@@ -201,13 +203,10 @@ def driverFormSave(request, id= None):
                 user.email = driverObj.email        
         
         if driverObj.phone != request.POST.get('phone'):
-            driverObj.phone = request.POST.get('phone') 
+            driverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone'))  
             
         user.save()
         driverObj.save()
-        
-        
-        
         messages.success(request,'Updating successfully')
     else:
         if int(request.POST.get('driverId')) in driver_Id :
@@ -223,7 +222,7 @@ def driverFormSave(request, id= None):
             DriverObj = Driver()
             DriverObj.driverId = int(request.POST.get('driverId'))
             DriverObj.name = driverName
-            DriverObj.phone = request.POST.get('phone') 
+            DriverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone')) 
             DriverObj.email = request.POST.get('email')
             DriverObj.password = request.POST.get('password')
             DriverObj.firstName = firstName
@@ -623,48 +622,83 @@ def clientTable(request):
     return render(request,'GearBox/table/client.html',params)
 
 def clientForm(request, id=None):
-    data = None
+    data, ofcObjs = None, None
     if id:
-        data = Client.objects.get(pk=id)
+        data = Client.objects.filter(pk=id).first()
+        ofcObjs = clientOffice.objects.filter(clientId=data)
 
     params = {
-        'data' : data
+        'data' : data,
+        'ofcObjs' : ofcObjs
     }
     return render(request, 'GearBox/clientForm.html', params)
 
 @csrf_protect
 def clientChange(request, id=None):
-    clientObj = None
+    clientObj = Client()
+    
     if id:
         clientObj = Client.objects.filter(pk=id).first()
-    else:
-        clientObj = Client()
 
     clientObj.name = request.POST.get('name').lower().strip()  
     clientObj.email = request.POST.get('email')
     clientObj.docketGiven = True if request.POST.get('docketGiven') == 'on' else False  
     clientObj.createdBy = request.user 
     clientObj.save()
-
     
-    # dataList =  {
-    #     'name' : request.POST.get('name').lower().strip(),
-    #     'email' : request.POST.get('email'),
-    #     'docketGiven' : True if request.POST.get('docketGiven') == 'on' else False,
-    #     'createdBy' : request.user
-    # }
-    
-    # if id:
-    #     updateIntoTable(record_id=id,tableName='Client',dataSet=dataList)
-    #     messages.success(request,'Updated successfully')
-    # else:
-    #     insertIntoTable(tableName='Client',dataSet=dataList)
-    #     messages.success(request,'Added successfully')
+    clientOfcObj = clientOffice() 
+    clientOfcObj.clientId = clientObj
+    clientOfcObj.locationType = request.POST.get('addType')
+    clientOfcObj.description = request.POST.get('addDescription')
+    clientOfcObj.address1 = request.POST.get('address1')
+    clientOfcObj.address2 =request.POST.get('address2')
+    clientOfcObj.personName = request.POST.get('personName')   
+    clientOfcObj.city = request.POST.get('addCity')
+    clientOfcObj.state = request.POST.get('addState')
+    clientOfcObj.country = request.POST.get('addCountry') 
+    clientOfcObj.postalCode =  request.POST.get('addPostalCode')
+    clientOfcObj.primaryContact = str(request.POST.get('countryCode')) + str(request.POST.get('primaryContact')) 
+    clientOfcObj.alternativeContact = request.POST.get('alternateContact')
+    clientOfcObj.save()
 
     return redirect('gearBox:clientTable')
 
 # def addGroups(request):
 #     return render(request,'GearBox/groupsForm.html')
+
+@csrf_protect
+@api_view(['POST'])
+def clientOfcView(request): 
+    ofcId = request.POST.get('ofcId')
+    ofcObj = clientOffice.objects.filter(pk=ofcId).values().first()
+    ofcObj['countryCode'] = str(ofcObj['primaryContact'])[:-10]
+    ofcObj['primaryContact'] = str(ofcObj['primaryContact'])[-10:]
+    
+    return JsonResponse({ 'status': True, 'ofcObj' : ofcObj})
+    
+@csrf_protect
+def clientOfcEditSave(request, id=None, clientId=None):
+    clientOfcObj = clientOffice()
+    if id:
+        clientOfcObj = clientOffice.objects.filter(pk=id).first()
+        
+    if clientId:
+        clientOfcObj.clientId = Client.objects.filter(pk=clientId).first()
+
+    clientOfcObj.locationType = request.POST.get('modalAddType')
+    clientOfcObj.description = request.POST.get('modalAddDescription')
+    clientOfcObj.address1 = request.POST.get('modalAddress1')
+    clientOfcObj.address2 =request.POST.get('modalAddress2')
+    clientOfcObj.personName = request.POST.get('modalPersonName')   
+    clientOfcObj.city = request.POST.get('modalAddCity')
+    clientOfcObj.state = request.POST.get('modalAddState')
+    clientOfcObj.country = request.POST.get('modalAddCountry') 
+    clientOfcObj.postalCode =  request.POST.get('modalAddPostalCode')
+    clientOfcObj.primaryContact = str(request.POST.get('modalCountryCode')) + str(request.POST.get('modalPrimaryContact')) 
+    clientOfcObj.alternativeContact = request.POST.get('modalAlternateContact')
+    clientOfcObj.save()
+
+    return redirect(request.META.get('HTTP_REFERER'))
 
 def groupsView(request):
     return render(request,'GearBox/groupsForm.html')

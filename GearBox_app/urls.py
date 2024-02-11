@@ -124,9 +124,16 @@ urlpatterns = [
     
     path('client/add/', views.clientForm, name='clientAdd'),
     path('client/add/save/', views.clientChange, name='clientAddSave'),
+
+    path('client/ofc/view/', views.clientOfcView, name='clientOfcView'),
+    path('client/new/ofc/save/<int:clientId>/', views.clientOfcEditSave, name='clientOfcNewSave'),
+    path('client/ofc/edit/save/<int:id>/', views.clientOfcEditSave, name='clientOfcEditSave'),
+
     
     path('client/edit/<int:id>/', views.clientForm, name='clientEdit'),
     path('client/edit/save/<int:id>/', views.clientChange, name='clientEditSave'),
+
+
 
     # Groups
 
