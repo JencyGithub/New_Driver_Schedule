@@ -75,22 +75,16 @@
                         <th>driverName</th>
                         <th>shiftDate</th>
                         <th>Verified By</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% if shifts %}
                       {% for shift in shifts %}
                       <tr>
-                        <td>{{ shift.shiftType }}</td>
-                        <td>{{ shift.driverName }}</td>
-                        <td>{{ shift.shiftDate }}</td>
-                        <td>{{ shift.verifiedBy }}</td>
-                        <td>
-                            <a href="{% url 'Account:DriverTripEdit' id=shift.id%}" title="update">
-                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                            </a>
-                        </td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate }}</a></td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.verifiedBy }}</a></td>
                       </tr>
                       {% endfor %}
                       {% endif %}
