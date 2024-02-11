@@ -386,36 +386,37 @@ def truckFormSave(request,truckId=None):
             truckInformationObj.truckImg2 = truckFileSave(truckImg2)
         if truckImg3:
             truckInformationObj.truckImg3 = truckFileSave(truckImg3)
-        
+            
         if request.POST.get('customFieldLabel1') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel1')).first()
             truckInformationObj.customFieldLabel1 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue1 = request.POST.get('customFieldValue1')
+        truckInformationObj.customFieldValue1 = request.POST.get('customFieldValue1')
+        # return HttpResponse(request.POST.get('customFieldLabel1'))
             
         if request.POST.get('customFieldLabel2') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel2')).first()
             truckInformationObj.customFieldLabel2 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue2 = request.POST.get('customFieldValue2')
+        truckInformationObj.customFieldValue2 = request.POST.get('customFieldValue2')
             
         if request.POST.get('customFieldLabel3') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel3')).first()
             truckInformationObj.customFieldLabel3 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue3 = request.POST.get('customFieldValue3')
+        truckInformationObj.customFieldValue3 = request.POST.get('customFieldValue3')
             
         if request.POST.get('customFieldLabel4') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel4')).first()
             truckInformationObj.customFieldLabel4 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue4 = request.POST.get('customFieldValue4')
+        truckInformationObj.customFieldValue4 = request.POST.get('customFieldValue4')
             
         if request.POST.get('customFieldLabel5') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel5')).first()
             truckInformationObj.customFieldLabel5 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue5 = request.POST.get('customFieldValue5')
+        truckInformationObj.customFieldValue5 = request.POST.get('customFieldValue5')
             
         if request.POST.get('customFieldLabel6') != None:
             truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=request.POST.get('customFieldLabel6')).first()
             truckInformationObj.customFieldLabel6 = truckInformationCustomObj.customFieldLabel
-            truckInformationObj.customFieldValue6 = request.POST.get('customFieldValue6')
+        truckInformationObj.customFieldValue6 = request.POST.get('customFieldValue6')
             
             
         # for i in 
@@ -434,13 +435,12 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.informationIcon = request.POST.get('informationIcon')
         
         truckInformationObj.registered = False if request.POST.get('unRegistration') =='on' else True
-        if truckInformationObj.registered is False:
+        if truckInformationObj.registered:
             truckInformationObj.registration = request.POST.get('registration')
             truckInformationObj.registrationCode = request.POST.get('registrationCode')
             truckInformationObj.registrationState = request.POST.get('registrationState')
             truckInformationObj.registrationDueDate = request.POST.get('registrationDueDate')
             truckInformationObj.registrationInterval = request.POST.get('registrationInterval')
-        
         truckInformationObj.powered = True if request.POST.get('powered') =='on' else False
         truckInformationObj.engine = request.POST.get('engine')
         truckInformationObj.engineMake = request.POST.get('engineMake')
