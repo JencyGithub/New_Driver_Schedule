@@ -2769,12 +2769,19 @@ def publicHolidaySave(request, id=None):
 
 # ```````````````````````````````````
 
-def rateCardTable(request,clientId = None):
+def rateCardTable(request,clientId = None, clientOfcId=None):
     
-    RateCards = RateCard.objects.filter(clientName=clientId)
+    if not clientOfcId and not clientId :
+        return redirect(request.META.get('HTTP_REFERER'))
+    
+    rateCards = RateCard.objects.filter(clientName=clientId)
+    if clientOfcId:
+        rateCards = RateCard.objects.filter(clientOfc_id=clientOfcId)
+        
     params = {
-        'rateCard': RateCards,
+        'rateCard': rateCards,
         'clientId':clientId,
+        'clientOfcId' : clientOfcId
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 

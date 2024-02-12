@@ -318,8 +318,6 @@
                                 <input type="text" name="addCity" id="addCity"  class="form-control" required>
                             </div>
                             
-
-                            
                             <div class="col-sm-4 col-md-4 field">
                                 <label for="addState">State:<span class="required">*</span></label>
                                 <input type="text" name="addState" id="addState"  class="form-control" required>
@@ -369,6 +367,8 @@
                                             <p class="m-0">{{ ofc.address1 }}</p>
                                             <p class="mb-1"><span>{{ ofc.city }}</span>, <span>{{ ofc.state }}</span>, <span>{{ ofc.postalCode }}</span></p>
                                             <a href="#" class="text-dark text-decoration-none">+{{ ofc.primaryContact }}</a>
+                                            <br>
+                                            <a href="{% url 'Account:rateCardTableClientOfc' clientId=data.clientId clientOfcId=ofc.id %}" title="Rate cards"><i class="fa-solid fa-clipboard float-right" style="font-size: 1.2rem;"></i></a>
                                         </div>
                                     </div>
                                 </div>

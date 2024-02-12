@@ -39,7 +39,7 @@ class ClientOffice(models.Model):
     alternativeContact = models.IntegerField(null=True, default=0)
 
     def __str__(self) -> str:
-        return str(self.clientId) + str(self.locationType)
+        return str(self.description) + str(self.clientId) + str(self.locationType)
 
     
 
