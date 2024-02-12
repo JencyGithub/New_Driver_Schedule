@@ -83,7 +83,7 @@ class AppointmentStop(models.Model):
     stopType = models.CharField(max_length=100,choices=[('Stop','Stop'),('Pickup','Pickup'),('Dropoff','Dropoff')], default="Stop") 
     arrivalTime = models.TimeField(null=True, blank=True)
     duration = models.PositiveBigIntegerField(default=0)
-    noted = models.CharField(default='', null=True, max_length=2048)
+    notes = models.CharField(default='', null=True, max_length=2048)
     
     def __str__(self):
         return str(self.stopName.basePlant)
