@@ -24,7 +24,7 @@ class Client(models.Model):
     def __str__(self) -> str:
         return str(self.name) 
 
-class clientOffice(models.Model):
+class ClientOffice(models.Model):
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     locationType = models.CharField(max_length=10, choices=(('Home', 'Home'), ('Workplace', 'Workplace')))
     description = models.CharField(max_length=2048, default='', null=True)
@@ -65,8 +65,8 @@ standby_time_grace_options = (
 class RateCard(models.Model):
     rate_card_name = models.CharField(max_length=255 , unique=True)
     tds = models.FloatField(default=0)
-    clientName = models.ForeignKey(Client,on_delete=models.CASCADE , default=1)
-
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE , null=True)
+    clientOfc = models.ForeignKey(ClientOffice,on_delete=models.CASCADE , null=True)
 
     def __str__(self) -> str:
         return str(self.rate_card_name)

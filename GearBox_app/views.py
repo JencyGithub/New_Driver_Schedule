@@ -687,7 +687,7 @@ def clientForm(request, id=None):
     data, ofcObjs = None, None
     if id:
         data = Client.objects.filter(pk=id).first()
-        ofcObjs = clientOffice.objects.filter(clientId=data)
+        ofcObjs = ClientOffice.objects.filter(clientId=data)
 
     params = {
         'data' : data,
@@ -708,7 +708,7 @@ def clientChange(request, id=None):
     clientObj.createdBy = request.user 
     clientObj.save()
     
-    clientOfcObj = clientOffice() 
+    clientOfcObj = ClientOffice() 
     clientOfcObj.clientId = clientObj
     clientOfcObj.locationType = request.POST.get('addType')
     clientOfcObj.description = request.POST.get('addDescription')
@@ -732,7 +732,7 @@ def clientChange(request, id=None):
 @api_view(['POST'])
 def clientOfcView(request): 
     ofcId = request.POST.get('ofcId')
-    ofcObj = clientOffice.objects.filter(pk=ofcId).values().first()
+    ofcObj = ClientOffice.objects.filter(pk=ofcId).values().first()
     ofcObj['countryCode'] = str(ofcObj['primaryContact'])[:-10]
     ofcObj['primaryContact'] = str(ofcObj['primaryContact'])[-10:]
     
@@ -740,9 +740,9 @@ def clientOfcView(request):
     
 @csrf_protect
 def clientOfcEditSave(request, id=None, clientId=None):
-    clientOfcObj = clientOffice()
+    clientOfcObj = ClientOffice()
     if id:
-        clientOfcObj = clientOffice.objects.filter(pk=id).first()
+        clientOfcObj = ClientOffice.objects.filter(pk=id).first()
         
     if clientId:
         clientOfcObj.clientId = Client.objects.filter(pk=clientId).first()

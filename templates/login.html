@@ -151,15 +151,35 @@
   <script>
     $(document).ready(function(){
 
-      function success(position) {}
-      function error(err) {}
+      function success(position) {
+        // Handle successful retrieval of location
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+      }
+    
+      function error(err) {
+        // Handle errors when retrieving location
+        console.error("Error getting location:", err.message);
+      }
       
       if ("geolocation" in navigator) {
+        // Custom alert message to request location permission
+        var confirmation = confirm("This website would like to access your location. Allow access?");
+        if (confirmation) {
+          // Request location permission if the user confirms
           navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+          // Handle denial of location access
+          console.warn("User denied access to location.");
+        }
       } else {
-          console.warn("Geolocation is not supported by this browser.");
+        // Inform the user if geolocation is not supported
+        console.warn("Geolocation is not supported by this browser.");
       }
     });
+    
+    
     
   </script>
 </body>

@@ -182,8 +182,8 @@ def download_csv(modeladmin, request, queryset):
 
     return response
 
-class clientOfficeInline(admin.StackedInline):
-    model = clientOffice
+class ClientOfficeInline(admin.StackedInline):
+    model = ClientOffice
     extra = 0
 
 
@@ -191,7 +191,7 @@ class ClientAdmin(admin.ModelAdmin):
     list_display = ["clientId", "name", 'docketGiven']
     search_fields = ["clientId", "name"]
     actions = [download_csv]
-    inlines = [clientOfficeInline]
+    inlines = [ClientOfficeInline]
 
 admin.site.register(Client, ClientAdmin)
 
