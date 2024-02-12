@@ -720,7 +720,7 @@ def clientChange(request, id=None):
     clientOfcObj.country = request.POST.get('addCountry') 
     clientOfcObj.postalCode =  request.POST.get('addPostalCode')
     clientOfcObj.primaryContact = str(request.POST.get('countryCode')) + str(request.POST.get('primaryContact')) 
-    clientOfcObj.alternativeContact = request.POST.get('alternateContact')
+    clientOfcObj.alternativeContact = request.POST.get('alternateContact') if request.POST.get('alternateContact') else None
     clientOfcObj.save()
 
     return redirect('gearBox:clientTable')
@@ -757,7 +757,7 @@ def clientOfcEditSave(request, id=None, clientId=None):
     clientOfcObj.country = request.POST.get('modalAddCountry') 
     clientOfcObj.postalCode =  request.POST.get('modalAddPostalCode')
     clientOfcObj.primaryContact = str(request.POST.get('modalCountryCode')) + str(request.POST.get('modalPrimaryContact')) 
-    clientOfcObj.alternativeContact = request.POST.get('modalAlternateContact')
+    clientOfcObj.alternativeContact = request.POST.get('modalAlternateContact') if request.POST.get('modalAlternateContact') else None
     clientOfcObj.save()
 
     return redirect(request.META.get('HTTP_REFERER'))

@@ -287,95 +287,65 @@
                 <input type="hidden" name="stopCount" id="stopCount" value="0">
             </div>
             <div class="col-md-12 col-sm-12 stopSection">
-                <!-- <div class="stopDiv1">
-                    <div class="col-md-8 col-sm-8">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-12">
-                                <label for="appStop">Select Stop :</label>
-                                <div class="field item form-group">
-                                    <select name="appStop" class="form-select form-control text-capitalize" id="appStop">
-                                        <option selected disabled>Select Stop</option>
-                                        {% for origin in origins %}
-                                            <option class="text-capitalize text-lowercase" {% if appointmentStop.stopName.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-6">
-                                <div class="form-group">
-                                    <label class="file-upload-label" for="arrivalTime">Arrival time:</label>
-                                    <input type="time" class="form-control" id="arrivalTime">
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-6">
-                                <div class="form-group">
-                                    <label class="file-upload-label" for="duration">Duration:</label>
-                                    <input type="number" class="form-control" id="duration" min="0">
-                                </div>
-                            </div>
-                           
-                            <div class="col-sm-12 col-md-12">
-                                <label for="stopNotes">Notes :</label>
-                                <div class="field item form-group">
-                                    <textarea name="stopNotes" id="stopNotes" rows="2" class="form-control"></textarea>
-                                </div>
-                            </div>
+                <!-- <div class="stopDiv${stopCount + 1}">
+                    <div class="row">
+                        <div class="col-md-8 col-sm-8">
+                            <label for="appStop${stopCount + 1}">Select Stop :</label>
+                            <div class="field item form-group">
+                                <select name="appStop${stopCount + 1}" class="form-select form-control text-capitalize"
+                                    id="appStop${stopCount + 1}" required>
+                                    <option selected disabled>Select Stop</option>
+                                    {% for origin in origins %}
+                                    <option class="text-capitalize text-lowercase" {% if appointmentStop.stopName.basePlant == origin.basePlant %}selected{% endif %}
+                                        value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>            
                         </div>
-                    </div>
-                    <div class="col-md-4 col-sm-4">
-                        <div class="row py-3">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label for="stopType" class="font-weight-bold text-dark">Stop Type:</label><br>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="stopType" id="stop" value="stop" checked>
-                                        <label class="form-check-label" for="stop">Stop</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="stopType" id="pickup" value="pickup">
-                                        <label class="form-check-label" for="pickup">Pickup</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="stopType" id="dropoff" value="dropoff">
-                                        <label class="form-check-label" for="dropoff">Dropoff</label>
-                                    </div>
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <label for="stopType" class="font-weight-bold text-dark">Stop Type:</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="stopType${stopCount + 1}"
+                                        id="stop${stopCount + 1}" value="stop${stopCount + 1}" checked>
+                                    <label class="form-check-label" for="stop${stopCount + 1}">Stop</label>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="signature" class="font-weight-bold text-dark">Signature:</label><br>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="signature" id="yes" value="yes">
-                                        <label class="form-check-label" for="yes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="signature" id="no" value="no">
-                                        <label class="form-check-label" for="no">No</label>
-                                    </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="stopType${stopCount + 1}"
+                                        id="pickup${stopCount + 1}" value="pickup${stopCount + 1}">
+                                    <label class="form-check-label" for="pickup${stopCount + 1}">Pickup</label>
                                 </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="photo" class="font-weight-bold text-dark">Photo:</label><br>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="photo" id="photoYes" value="yes">
-                                        <label class="form-check-label" for="photoYes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="photo" id="photoNo" value="no">
-                                        <label class="form-check-label" for="photoNo">No</label>
-                                    </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="stopType${stopCount + 1}"
+                                        id="dropoff${stopCount + 1}" value="dropoff${stopCount + 1}">
+                                    <label class="form-check-label" for="dropoff${stopCount + 1}">Dropoff</label>
                                 </div>
-                            </div>
-                            <div class="col-12 mt-2">
-                                <div class="form-group">
-                                    <label class="file-upload-label" for="fileUpload">File Upload:</label>
-                                    <input type="file" class="form-control-file" id="fileUpload" >
-                                </div>
-                            </div>
+                            </div>                          
                         </div>
                         
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="file-upload-label" for="arrivalTime${stopCount + 1}">Arrival time:</label>
+                                <input type="time" class="form-control" id="arrivalTime${stopCount + 1}"
+                                    name="arrivalTime${stopCount + 1}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div class="form-group">
+                                <label class="file-upload-label" for="duration${stopCount + 1}">Duration:</label>
+                                <input type="number" class="form-control" id="duration${stopCount + 1}"
+                                    name="duration${stopCount + 1}" min="0">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                            <label for="stopNotes${stopCount + 1}">Notes :</label>
+                            <div class="field item form-group">
+                                <textarea name="stopNotes${stopCount + 1}" id="stopNotes${stopCount + 1}" rows="1"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
                     </div>
+
                 </div> -->
             </div>
         </div>
@@ -409,89 +379,60 @@
 
         let content = ''    
         content += `<div class="stopDiv${stopCount + 1}">`
-        content += `<div class="col-md-8 col-sm-8">`
         content += `<div class="row">`
-        content += `<div class="col-sm-12 col-md-12">`
+        content += `<div class="col-md-8 col-sm-8">`
         content += `<label for="appStop${stopCount + 1}">Select Stop :</label>`
         content += `<div class="field item form-group">`
-        content += `<select name="appStop${stopCount + 1}" class="form-select form-control text-capitalize" id="appStop${stopCount + 1}" required>`
+        content += `<select name="appStop${stopCount + 1}" class="form-select form-control text-capitalize"`
+        content += `id="appStop${stopCount + 1}" required>`
         content += `<option selected disabled>Select Stop</option>`
         content += `{% for origin in origins %}`
-        content += `<option class="text-capitalize text-lowercase" {% if appointmentStop.stopName.basePlant == origin.basePlant %}selected{% endif %} value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>`
+        content += `<option class="text-capitalize text-lowercase" {% if appointmentStop.stopName.basePlant == origin.basePlant %}selected{% endif %}`
+        content += `value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>`
         content += `{% endfor %}`
         content += `</select>`
-        content += `</div>`
-        content += `</div>`
-        content += `<div class="col-md-6 col-sm-6">`
-        content += `<div class="form-group">`
-        content += `<label class="file-upload-label" for="arrivalTime${stopCount + 1}">Arrival time:</label>`
-        content += `<input type="time" class="form-control" id="arrivalTime${stopCount + 1}" name="arrivalTime${stopCount + 1}">`
-        content += `</div>`
-        content += `</div>`
-        content += `<div class="col-md-6 col-sm-6">`
-        content += `<div class="form-group">`
-        content += `<label class="file-upload-label" for="duration${stopCount + 1}">Duration:</label>`
-        content += `<input type="number" class="form-control" id="duration${stopCount + 1}" name="duration${stopCount + 1}" min="0">`
-        content += `</div>`
-        content += `</div>`
-        content += `<div class="col-sm-12 col-md-12">`
-        content += `<label for="stopNotes${stopCount + 1}">Notes :</label>`
-        content += `<div class="field item form-group">`
-        content += `<textarea name="stopNotes${stopCount + 1}" id="stopNotes${stopCount + 1}" rows="2" class="form-control"></textarea>`
-        content += `</div>`
-        content += `</div>`
-        content += `</div>`
+        content += `</div>            `
         content += `</div>`
         content += `<div class="col-md-4 col-sm-4">`
-        content += `<div class="row py-3">`
-        content += `<div class="col-12">`
         content += `<div class="form-group">`
         content += `<label for="stopType" class="font-weight-bold text-dark">Stop Type:</label><br>`
         content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}" id="stop${stopCount + 1}" value="stop${stopCount + 1}" checked>`
+        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
+        content += `id="stop${stopCount + 1}" value="stop${stopCount + 1}" checked>`
         content += `<label class="form-check-label" for="stop${stopCount + 1}">Stop</label>`
         content += `</div>`
         content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}" id="pickup${stopCount + 1}" value="pickup${stopCount + 1}">`
+        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
+        content += `id="pickup${stopCount + 1}" value="pickup${stopCount + 1}">`
         content += `<label class="form-check-label" for="pickup${stopCount + 1}">Pickup</label>`
         content += `</div>`
         content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}" id="dropoff${stopCount + 1}" value="dropoff${stopCount + 1}">`
+        content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
+        content += `id="dropoff${stopCount + 1}" value="dropoff${stopCount + 1}">`
         content += `<label class="form-check-label" for="dropoff${stopCount + 1}">Dropoff</label>`
         content += `</div>`
+        content += `</div>                          `
         content += `</div>`
-        content += `</div>`
-        content += `<div class="col-6">`
+        content += ``
+        content += `<div class="col-md-3 col-sm-3">`
         content += `<div class="form-group">`
-        content += `<label for="signature" class="font-weight-bold text-dark">Signature:</label><br>`
-        content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="signature${stopCount + 1}" id="signatureYes${stopCount + 1}" value="signatureYes${stopCount + 1}">`
-        content += `<label class="form-check-label" for="signatureYes${stopCount + 1}">Yes</label>`
-        content += `</div>`
-        content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="signature${stopCount + 1}" id="signatureNo${stopCount + 1}" value="signatureNo${stopCount + 1}">`
-        content += `<label class="form-check-label" for="signatureNo${stopCount + 1}">No</label>`
+        content += `<label class="file-upload-label" for="arrivalTime${stopCount + 1}">Arrival time:</label>`
+        content += `<input type="time" class="form-control" id="arrivalTime${stopCount + 1}"`
+        content += `name="arrivalTime${stopCount + 1}">`
         content += `</div>`
         content += `</div>`
-        content += `</div>`
-        content += `<div class="col-6">`
+        content += `<div class="col-md-3 col-sm-3">`
         content += `<div class="form-group">`
-        content += `<label for="photo" class="font-weight-bold text-dark">Photo:</label><br>`
-        content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="photo${stopCount + 1}" id="photoYes${stopCount + 1}" value="yes">`
-        content += `<label class="form-check-label" for="photoYes${stopCount + 1}">Yes</label>`
-        content += `</div>`
-        content += `<div class="form-check form-check-inline">`
-        content += `<input class="form-check-input" type="radio" name="photo${stopCount + 1}" id="photoNo${stopCount + 1}" value="no">`
-        content += `<label class="form-check-label" for="photoNo${stopCount + 1}">No</label>`
+        content += `<label class="file-upload-label" for="duration${stopCount + 1}">Duration:</label>`
+        content += `<input type="number" class="form-control" id="duration${stopCount + 1}"`
+        content += `name="duration${stopCount + 1}" min="0">`
         content += `</div>`
         content += `</div>`
-        content += `</div>`
-        content += `<div class="col-12 mt-2">`
-        content += `<div class="form-group">`
-        content += `<label class="file-upload-label" for="fileUpload${stopCount + 1}">File Upload:</label>`
-        content += `<input type="file" class="form-control-file" id="fileUpload${stopCount + 1}" name="fileUpload${stopCount + 1}">`
-        content += `</div>`
+        content += `<div class="col-sm-6 col-md-6">`
+        content += `<label for="stopNotes${stopCount + 1}">Notes :</label>`
+        content += `<div class="field item form-group">`
+        content += `<textarea name="stopNotes${stopCount + 1}" id="stopNotes${stopCount + 1}" rows="1"`
+        content += `class="form-control"></textarea>`
         content += `</div>`
         content += `</div>`
         content += `</div>`
