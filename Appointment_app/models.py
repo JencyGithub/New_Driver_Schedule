@@ -156,7 +156,7 @@ class DriverPreStart(models.Model):
     comment = models.CharField(max_length=2048, default='', null=True)
 
     def __str__(self):
-        return str(self.driverId.name) + '-->' + str(self.curDateTime)
+        return str(self.curDateTime)
     
     
 class DriverPreStartQuestion(models.Model):
