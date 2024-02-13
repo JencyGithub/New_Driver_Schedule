@@ -372,11 +372,7 @@
 <script>
     $('#addStop').on('click', function(){
         let stopCount = parseInt($('#stopCount').val())
-
         $('#stopCount').val(stopCount+1)
-
-        console.log($('#stopCount').val())
-
         let content = ''    
         content += `<div class="stopDiv${stopCount + 1}">`
         content += `<div class="row">`
@@ -398,27 +394,25 @@
         content += `<label for="stopType" class="font-weight-bold text-dark">Stop Type:</label><br>`
         content += `<div class="form-check form-check-inline">`
         content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
-        content += `id="stop${stopCount + 1}" value="stop${stopCount + 1}" checked>`
+        content += `id="stop${stopCount + 1}" value="Stop" checked>`
         content += `<label class="form-check-label" for="stop${stopCount + 1}">Stop</label>`
         content += `</div>`
         content += `<div class="form-check form-check-inline">`
         content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
-        content += `id="pickup${stopCount + 1}" value="pickup${stopCount + 1}">`
+        content += `id="pickup${stopCount + 1}" value="Pickup">`
         content += `<label class="form-check-label" for="pickup${stopCount + 1}">Pickup</label>`
         content += `</div>`
         content += `<div class="form-check form-check-inline">`
         content += `<input class="form-check-input" type="radio" name="stopType${stopCount + 1}"`
-        content += `id="dropoff${stopCount + 1}" value="dropoff${stopCount + 1}">`
+        content += `id="dropoff${stopCount + 1}" value="Dropoff">`
         content += `<label class="form-check-label" for="dropoff${stopCount + 1}">Dropoff</label>`
         content += `</div>`
-        content += `</div>                          `
         content += `</div>`
-        content += ``
+        content += `</div>`
         content += `<div class="col-md-3 col-sm-3">`
         content += `<div class="form-group">`
         content += `<label class="file-upload-label" for="arrivalTime${stopCount + 1}">Arrival time:</label>`
-        content += `<input type="time" class="form-control" id="arrivalTime${stopCount + 1}"`
-        content += `name="arrivalTime${stopCount + 1}">`
+        content += `<input type="time" class="form-control" id="arrivalTime${stopCount + 1}" name="arrivalTime${stopCount + 1}">`
         content += `</div>`
         content += `</div>`
         content += `<div class="col-md-3 col-sm-3">`

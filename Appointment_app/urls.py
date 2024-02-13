@@ -28,6 +28,12 @@ urlpatterns = [
     
     path('appointmentForm/update/view/<int:id>/<int:update>/', views.appointmentForm,name="appointmentFormUpdateView"),
     path('appointmentForm/update/save/<int:id>/', views.appointmentSave,name="appointmentFormUpdateSave"),
+
+    path('add/stop/view/<int:jobId>/', views.stopView,name="addStopView"),
+    path('add/stop/save/<int:jobId>/', views.stopSave,name="addStopSave"),
+    
+    path('edit/stop/view/<int:stopId>/', views.stopView,name="editStopView"),
+    path('edit/stop/save/<int:stopId>/', views.stopSave,name="editStopSave"),
     
     path('findJob/', views.findJob,name="findJob"),
     path('cancelJob/', views.cancelJob,name="cancelJob"),
@@ -36,22 +42,14 @@ urlpatterns = [
     path('get/single/appointment/', views.getSingleAppointmentData,name="getSingleAppointment"),
     
     path('getTruckAndDriver/', views.getTruckAndDriver ,name="getTruckAndDriver"),
-    path('getOriginDetails/', views.getOriginDetails ,name="getOriginDetails"),
+    path('getOriginDetails/', views.getOriginDetails ,name="getOriginDetails"),    
     
-    
-    path('pre-start/table/view/', views.preStartTableView ,name="preStartTableView"),
-
-    
+    path('pre-start/table/view/', views.preStartTableView ,name="preStartTableView"),    
     path('pre-start/view/<int:id>/', views.preStartForm ,name="preStartView"),
-
-
     
     path('pre-start/form/view/', views.preStartForm ,name="preStartForm"),
     path('pre-start/form/save/', views.preStartSave ,name="preStartSave"),
 
     path('question/add/view/<int:id>/', views.questionAddView ,name="questionAddView"),
     path('question/add/save/<int:id>/', views.questionAddSave ,name="questionAddSave"),
-    
-    
-    
 ]

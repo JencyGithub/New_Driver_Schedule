@@ -95,6 +95,7 @@ def appointmentSave(request,id=None):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
     reportingTime = request.POST.get('reportingTime')
+    stopCount = int(request.POST.get('stopCount'))
     shiftType = None
     
     if 6 <= int(startTime.split(':')[0]) <= 17 :
@@ -107,21 +108,6 @@ def appointmentSave(request,id=None):
         messageStr = "Appointment Updated Successfully."
     else:
         client = Client.objects.filter(pk=request.POST.get('stopName').strip()).first()
-        # newOrigin = request.POST.get('originAddVal').strip()
-        # if newOrigin == 1:
-        #     originObj = BasePlant()
-        #     originObj.basePlant = request.POST.get('origin')
-        #     originObj.address = request.POST.get('originAddress')
-        #     originObj.phone = request.POST.get('originPhone')
-        #     originObj.personOnName = request.POST.get('originPersonOnName')
-        #     originObj.managerName = request.POST.get('originPersonOnName')
-        #     originObj.lat = request.POST.get('originLatitude')
-        #     originObj.long = request.POST.get('originLongitude')
-        #     originObj.save()
-        
-        
-
-
         appointmentObj.title = request.POST.get('title')
         appointmentObj.recurringType = recurringType
         appointmentObj.startTime = startTime
@@ -152,6 +138,22 @@ def appointmentSave(request,id=None):
         
         appointmentObj.save()
         messageStr = "Appointment added successfully."
+                
+        # Stops add
+        for count in range(1, stopCount + 1):
+            stopName = BasePlant.objects.filter(pk=request.POST.get(f'appStop{count}')).first()
+            if stopName:
+                appointmentStopObj = AppointmentStop()
+                appointmentStopObj.appointmentId = appointmentObj
+                appointmentStopObj.stopName =  stopName 
+                appointmentStopObj.stopType = request.POST.get(f'stopType{count}')
+                appointmentStopObj.arrivalTime = request.POST.get(f'arrivalTime{count}') if request.POST.get(f'arrivalTime{count}') else None
+
+                appointmentStopObj.duration = request.POST.get(f'duration{count}') if  request.POST.get(f'duration{count}') else 0
+                appointmentStopObj.notes = request.POST.get(f'stopNotes{count}') if request.POST.get(f'stopNotes{count}') else None
+                
+                appointmentStopObj.save()
+            
         
     # Add origin
     originId = request.POST.get('origin')
@@ -182,14 +184,6 @@ def appointmentSave(request,id=None):
         appointmentTruckObj.save()
     # Add stop
     
-    stopName = BasePlant.objects.filter(pk=request.POST.get('appStop')).first()
-    if stopName:
-        appointmentStopObj = AppointmentStop()
-        appointmentStopObj.stopName = stopName
-        appointmentStopObj.appointmentId = appointmentObj
-        appointmentStopObj.save()
-   
-        
     if driver and truck:
         appointmentObj.status = "Assigned"
         appointmentObj.save()
@@ -197,6 +191,35 @@ def appointmentSave(request,id=None):
     messages.success(request, messageStr)
 
     return redirect('Appointment:findJob')        
+
+
+def stopView(request, jobId=None, stopId=None):
+    params = {
+        'origins' : BasePlant.objects.all(),
+        'jobId' :jobId,
+        'stopId' : stopId
+    }
+    if stopId:
+        obj = AppointmentStop.objects.filter(pk=stopId).first()
+        params['obj'] = obj
+        
+    return render(request, 'Appointment/addStopForm.html', params)
+
+@csrf_protect
+def stopSave(request, jobId=None, stopId=None):
+    appointmentStopObj = AppointmentStop()
+    if stopId:
+        appointmentStopObj = AppointmentStop.objects.filter(pk=stopId).first()
+
+    appointmentStopObj.appointmentId = appointmentStopObj.appointmentId
+    appointmentStopObj.stopName =  BasePlant.objects.filter(pk=request.POST.get("appStop")).first()
+    appointmentStopObj.stopType = request.POST.get(f'stopType')
+    appointmentStopObj.arrivalTime = request.POST.get(f'arrivalTime') if request.POST.get(f'arrivalTime') else None
+    appointmentStopObj.duration = int(float(request.POST.get(f'duration'))) if  request.POST.get(f'duration') else 0
+    appointmentStopObj.notes = request.POST.get(f'stopNotes') if request.POST.get(f'stopNotes') else None
+    appointmentStopObj.save()
+    return redirect('Appointment:findJob')
+
 
 @csrf_protect
 def findJob(request):
@@ -237,9 +260,14 @@ def getSingleAppointmentData(request):
         
     appointmentObj['clientName'] = Client.objects.filter(pk = appointmentObj['stop_id']).first().name
 
-    stopObj = AppointmentStop.objects.filter(appointmentId=appointmentObj['id']).first()
-    if stopObj:
-        stopObj = BasePlant.objects.filter(pk=stopObj.stopName.id).values().first()
+    stopObjs = AppointmentStop.objects.filter(appointmentId__id=appointmentObj['id']).values()
+    if len(stopObjs) > 0:
+        for stop in stopObjs:
+            basePantObj = BasePlant.objects.filter(pk=stop['stopName_id']).first()
+            stop['stopName'] = basePantObj.basePlant
+            stop['stopAddress'] = basePantObj.address
+            stop['stopPhone'] = basePantObj.phone
+            
 
     driverObj = AppointmentDriver.objects.filter(appointmentId=appointmentObj['id']).values().first()
     if driverObj:
@@ -249,7 +277,7 @@ def getSingleAppointmentData(request):
     if truckObj:
         truckObj = AdminTruck.objects.filter(pk=truckObj['truckNo_id']).values().first()
 
-    return JsonResponse({'status': True, 'appointmentObj': appointmentObj, 'driverObj': driverObj, 'truckObj': truckObj, 'originObj': originObj, 'stopObj': stopObj})
+    return JsonResponse({'status': True, 'appointmentObj': appointmentObj, 'driverObj': driverObj, 'truckObj': truckObj, 'originObj': originObj, 'stopObjs': list(stopObjs)})
     
     
 @csrf_protect

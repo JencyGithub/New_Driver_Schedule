@@ -152,7 +152,7 @@ class DriverPreStart(models.Model):
     clientId =  models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True)
     preStartId =  models.ForeignKey(PreStart, on_delete=models.CASCADE, default=None, null=True)
     driverId =  models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
-    curDateTime = models.DateTimeField(default=None, null=True)
+    curDateTime = models.DateTimeField(null=True)
     comment = models.CharField(max_length=2048, default='', null=True)
 
     def __str__(self):
