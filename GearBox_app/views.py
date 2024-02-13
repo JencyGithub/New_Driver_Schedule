@@ -14,7 +14,7 @@ from django.contrib.auth.models import User , Group
 import os, colorama, subprocess
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
-
+from django.core.serializers import serialize
 
 # Create your views here.
 def leaveReq(request):
@@ -310,7 +310,8 @@ def truckTable(request):
     }
     return render(request , 'GearBox/truck/table/truckTable.html',params)
 
-def truckForm(request, id=None):
+def truckForm(request, id=None , viewOnly= None):
+    
     truckInformationCustomObj = None
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
@@ -349,23 +350,25 @@ def truckForm(request, id=None):
         'preStarts':preStarts,
         'basePlantObj':basePlantObj,
         'truckInformationCustomObj':truckInformationCustomObj,
+        'viewOnly':viewOnly,
     }
     return render(request,'GearBox/truck/truckForm.html',params)
 
 @csrf_protect
 def truckFormSave(request,truckId=None):
+    adminTruckObj = AdminTruck()
+    truckInformationObj = TruckInformation()
+    viewOnly = 1 if request.POST.get('viewOnly') != 'None' else 0
     truckNo = request.POST.get('truckNo')
     truckObj = AdminTruck.objects.filter(adminTruckNumber = truckNo).first()
     if truckObj and truckId is None:
         messages.error(request,'Truck number already exist')
         return redirect(request.META.get('HTTP_REFERER'))
-    else:
+    elif not viewOnly:
         if truckId:
             adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
             truckInformationObj = adminTruckObj.truckInformation
-        else:
-            adminTruckObj = AdminTruck()
-            truckInformationObj = TruckInformation()
+            
 
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
@@ -434,7 +437,8 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.informationBuildYear = request.POST.get('informationBuildYear')
         truckInformationObj.informationIcon = request.POST.get('informationIcon')
         
-        truckInformationObj.registered = False if request.POST.get('unRegistration') =='on' else True
+        truckInformationObj.registered = False if request.POST.get('registered')  else True
+        # return HttpResponse(truckInformationObj.registered)
         if truckInformationObj.registered:
             truckInformationObj.registration = request.POST.get('registration')
             truckInformationObj.registrationCode = request.POST.get('registrationCode')
@@ -449,35 +453,41 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.engineGearBox = request.POST.get('engineGearbox')
             
         truckInformationObj.save()
-        adminTruckObj.save()
         
-        adminTruckObj = AdminTruck.objects.filter(pk = adminTruckObj.id).first()
         adminTruckObj.truckInformation = truckInformationObj
         adminTruckObj.save()
 
-        if truckId:
-            messages.success(request,'Updated successfully')
-        else:
-            messages.success(request,'Adding successfully')
-        return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id)
+        return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id,viewOnly=viewOnly)
+        
+    return redirect('gearBox:truckAxlesFormView',truckId=truckId,viewOnly=viewOnly)
 
 
 
 
-def truckAxlesFormView(request,truckId):
+def truckAxlesFormView(request,truckId,viewOnly):
     truckAxlesObj = None
+    truckAxlesObj_serialized = None
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
     if adminTruckObj.truckAxles:
         truckAxlesObj = adminTruckObj.truckAxles
+        truckAxlesObj_serialized = serialize('json', [truckAxlesObj])
         
     params={
     'adminTruckObj':adminTruckObj,
-    'truckAxlesObj':truckAxlesObj
+    'truckAxlesObj':truckAxlesObj,
+    'viewOnly':viewOnly,
+    'truckAxlesObj_serialized':truckAxlesObj_serialized
     }
+    
     return render(request,'GearBox/truck/truckAxlesForm.html',params)
 
 def truckAxlesFormSave(request,truckId):
+    viewOnly = request.POST.get('viewOnly') 
+    if viewOnly == '1':
+        return redirect('gearBox:truckSettingFormView',truckId=truckId ,viewOnly=viewOnly)
+
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
+    check = adminTruckObj.truckAxles
     if adminTruckObj.truckAxles:
         truckAxlesObj = adminTruckObj.truckAxles 
     else:
@@ -494,14 +504,32 @@ def truckAxlesFormSave(request,truckId):
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
     adminTruckObj.truckAxles = truckAxlesObj
     adminTruckObj.save()
-    messages.success(request, 'Update successfully' if adminTruckObj.truckAxles else 'Adding successfully')
+    # where first ime store axle value  and then update vehicle detail page with new data
+    if check is None:
+        return redirect(request.META.get('HTTP_REFERER'))
+    else:
+    # messages.success(request, 'Update successfully' if adminTruckObj.truckAxles else 'Adding successfully')
 
-    return redirect('gearBox:truckSettingFormView',truckId=adminTruckObj.id)
+        return redirect('gearBox:truckSettingFormView',truckId=truckId ,viewOnly=viewOnly)
 
-def  truckSettingFormView(request,truckId):
+def axleInformationSave(request,axleId,inputNumber):
+    truckAxleObj = Axles.objects.filter(pk=axleId).first()
+    setattr(truckAxleObj, 'axle_make' + str(inputNumber), request.POST.get('axle_make' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_rims' + str(inputNumber), request.POST.get('axle_rims' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_tyre_size' + str(inputNumber), request.POST.get('axle_tyre_size' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_suspensions' + str(inputNumber), request.POST.get('axle_suspensions' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_brakes' + str(inputNumber), request.POST.get('axle_brakes' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_slack_adjusters' + str(inputNumber), request.POST.get('axle_slack_adjusters' + str(inputNumber)))
+    setattr(truckAxleObj, 'axle_differential' + str(inputNumber), request.POST.get('axle_differential' + str(inputNumber)))
+    truckAxleObj.save()
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def  truckSettingFormView(request,truckId,viewOnly):
     adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
     params={
-        'adminTruckObj':adminTruckObj
+        'adminTruckObj':adminTruckObj,
+        'viewOnly':viewOnly,
     }
     return render(request,'GearBox/truck/truckSettingForm.html',params)
 
@@ -794,9 +822,9 @@ def fleetSettings(request):
 def fleetCustomInformationSave(request, id = None):
     if not id:
         truckInformationCustomObj = TruckInformationCustom()
+        truckInformationCustomObj.customFieldLabel = request.POST.get('customFieldLabel')
     else:
         truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=id).first()
-    truckInformationCustomObj.customFieldLabel = request.POST.get('customFieldLabel')
     truckInformationCustomObj.active = True if  request.POST.get('active') else False 
     truckInformationCustomObj.save()
     messages.success(request, 'Custom Information update Successfully' if id else 'Custom Information added Successfully' )

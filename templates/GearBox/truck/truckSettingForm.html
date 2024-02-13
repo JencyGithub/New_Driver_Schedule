@@ -60,8 +60,9 @@
                     <h2 class="text-uppercase" style="font-weight:bold">Settings tab</h2>
                 </div>
 
-                <form action="{% url 'gearBox:truckSettingFormSave' %}" method="post">
+                <form action="{% url 'gearBox:truckSettingFormSave' %}" method="POST">
                     {% csrf_token %}
+                    <input value="{{viewOnly}}" name ="viewOnly" hidden id="viewOnly">
 
                     <div class="x_panel">
                         <div class="x_title">
@@ -311,7 +312,12 @@
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-
+    if ($('#viewOnly').val() == 1){
+        $('input ,select,textarea').each(function(){
+            $(this).prop("disabled", true);
+        })
+        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+    }
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
     var validator = new FormValidator({

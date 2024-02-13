@@ -78,10 +78,11 @@ urlpatterns = [
     path('truckForm/add/', views.truckFormSave, name='truckFormSave'),
     path('truckForm/update/<int:truckId>', views.truckFormSave, name='truckFormUpdate'),
     
-    path('truckForm/Axles/View/<int:truckId>', views.truckAxlesFormView, name='truckAxlesFormView'),
+    path('truckForm/Axles/View/<int:truckId>/<int:viewOnly>/', views.truckAxlesFormView, name='truckAxlesFormView'),
     path('truckForm/Axles/Save/<int:truckId>', views.truckAxlesFormSave, name='truckAxlesFormSave'),
+    path('truckForm/Axles/Information/Save/<int:axleId>/<int:inputNumber>', views.axleInformationSave, name='axleInformationSave'),
     
-    path('truckForm/Setting/View/<int:truckId>', views.truckSettingFormView, name='truckSettingFormView'),
+    path('truckForm/Setting/View/<int:truckId>/<int:viewOnly>/', views.truckSettingFormView, name='truckSettingFormView'),
     path('truckForm/Setting/Save', views.truckSettingFormSave, name='truckSettingFormSave'),
     
     path('truckForm/Reminders/View', views.truckRemindersFormView, name='truckRemindersFormView'),
@@ -102,7 +103,8 @@ urlpatterns = [
     path('truckForm/Documents/View', views.truckDocumentsFormView, name='truckDocumentsFormView'),
     path('truckForm/Documents/Save', views.truckDocumentsFormSave, name='truckDocumentsFormSave'),
     
-    path('truck/view/<int:id>/', views.truckForm, name='truckView'),
+    path('truck/edit/view/<int:id>/', views.truckForm, name='truckEditView'),
+    path('truck/view/<int:id>/<int:viewOnly>/', views.truckForm, name='truckView'),
     
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),

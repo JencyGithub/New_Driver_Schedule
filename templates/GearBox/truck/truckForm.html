@@ -58,6 +58,8 @@
         <div class="clearfix"></div>
         <form action="{% if adminTruckObj %} {% url 'gearBox:truckFormUpdate' truckId=adminTruckObj.id %} {% else %} {% url 'gearBox:truckFormSave' %} {% endif %}" method="post" class="" novalidate enctype="multipart/form-data" >
             {% csrf_token %}
+            <input value="{{viewOnly}}" name ="viewOnly" hidden  id="viewOnly">
+
             <div class="row">
                 <div class="col-md-12 col-sm-12">
                     <div class="x_panel">
@@ -233,9 +235,10 @@
                     <!-- Registration -->
                     <div class="x_panel">
                         <div class="x_title">
-                            <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
+                            <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>{{truckInformationObj.registered}}
+                            
                             <span class="float-right">
-                                <input type="checkbox"   name="registered" id="registered" onchange="registeredFun(this)">
+                                <input type="checkbox" {%if not truckInformationObj.registered  %}checked{%endif%} value="registered"  name="registered" id="registered" onchange="registeredFun(this)">
                                 <label for="registered">Un-Registered</label>
                             </span>
                             <div class="clearfix"></div>
@@ -246,19 +249,19 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.registration }}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
+                                            <input class="form-control"   {%if not truckInformationObj.registered  %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registration }} {% endif %}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registrationCode" style="margin-bottom: 0.3rem!important;">Code :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.registrationCode }}" type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
+                                            <input class="form-control"  {%if not truckInformationObj.registered  %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registrationCode }} {% endif %}" type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select name="registrationState" required id="registrationState"  class="form-control">
+                                            <select name="registrationState" {%if not truckInformationObj.registered  %}disabled{%endif%} required id="registrationState"  class="form-control">
                                                 <option {% if truckInformationObj.registrationSate == 'California' %}selected{% endif %} value="CA">California</option>
                                                 <option {% if truckInformationObj.registrationSate == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
@@ -267,13 +270,13 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationDueDate" style="margin-bottom: 0.3rem!important;">Registration Due Date :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.registrationDueDate|date:'Y-m-d' }}" type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
+                                            <input class="form-control"  {%if not truckInformationObj.registered  %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registrationDueDate|date:'Y-m-d' }}{% endif %}" type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select name="registrationInterval" id="registrationInterval"  class="form-control">
+                                            <select name="registrationInterval" {%if not truckInformationObj.registered  %}disabled{%endif%} id="registrationInterval"  class="form-control">
                                                 <option {% if truckInformationObj.registrationInterval == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
                                         </div>
@@ -503,6 +506,25 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script>
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    {% comment %} $(document).ready(function() {
+        var value_ = $('#registered').val();
+        if(value_){
+            $("#registrationSection input").prop("disabled", true);
+            $("#registrationSection select").prop("disabled", true);
+            $("#registration ").val('');
+            $("#registrationCode ").val('');
+        }else{
+            $("#registrationSection input").prop("disabled", false);
+            $("#registrationSection select").prop("disabled", false);
+        }
+    }); {% endcomment %}
+
+    if ($('#viewOnly').val() == 1){
+        $('input ,select,textarea').each(function(){
+            $(this).prop("disabled", true);
+        })
+        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+    }
     function vehicleTypeFun() {
         var selectedValue = $('#vehicleType').val(); // Get the selected value using jQuery
         
@@ -582,6 +604,7 @@
     })
     function registeredFun(data) {
         var isChecked = $(data).prop("checked");
+        console.log(isChecked)
         if(isChecked){
             $("#registrationSection input").prop("disabled", true);
             $("#registrationSection select").prop("disabled", true);
@@ -589,7 +612,6 @@
             $("#registrationSection input").prop("disabled", false);
             $("#registrationSection select").prop("disabled", false);
         }
-        console.log(isChecked);
     }
 
     {% comment %} window.onload = function() {

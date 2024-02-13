@@ -52,14 +52,15 @@
                             <div class="modal-header">
                                 <h5 class="modal-title" id="modalLabel">Custom Information Fieldset</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                                    <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
                                 <!-- Input Field -->
                                 <div class="form-group">
-                                <label for="customFieldLabel">Custom Field</label>
-                                <input type="text" name="customFieldLabel" class="form-control" id="customFieldLabel">
+                                    <label for="customFieldLabel">Custom Field</label>
+                                    <input type="text" name="customFieldLabel" class="form-control" id="customFieldLabel">
+                                    <p class="text-danger">one time you save after you can not change column name </p>
                                 </div>
                                 <!-- Checkbox -->
                                 <div class="form-check">
@@ -90,7 +91,7 @@
                                                     <label for="customFieldLabel{{ forloop.counter }}">Custom Field1 : </label>
                                                     <input type="checkbox" {% if truckInformationCustom.active %}checked{% endif %} id="active" name="active" class="mx-2">
                                                     <div class="d-flex align-items-center justify-content-between">
-                                                        <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel }}" name="customFieldLabel" class="form-control mr-2">
+                                                        <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel }}" disabled class="form-control mr-2">
                                                         <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
                                                     </div>
                                                 </div>
