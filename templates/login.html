@@ -165,14 +165,14 @@
       
       if ("geolocation" in navigator) {
         // Custom alert message to request location permission
-        var confirmation = confirm("This website would like to access your location. Allow access?");
-        if (confirmation) {
-          // Request location permission if the user confirms
-          navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-          // Handle denial of location access
-          console.warn("User denied access to location.");
-        }
+        // var confirmation = confirm("This website would like to access your location. Allow access?");
+        navigator.geolocation.getCurrentPosition(success, error);
+        // if (confirmation) {
+        //   // Request location permission if the user confirms
+        // } else {
+        //   // Handle denial of location access
+        //   console.warn("User denied access to location.");
+        // }
       } else {
         // Inform the user if geolocation is not supported
         console.warn("Geolocation is not supported by this browser.");
