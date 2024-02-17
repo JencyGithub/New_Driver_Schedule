@@ -383,7 +383,7 @@
     document.forms[0].onsubmit = function (e) {
         var submit = true,
             validatorResult = validator.checkAll(this);
-        if($('#phone').val().length != 10 && $('#phone').val().length != 0){
+        if($('#phone').val().length != 9 && $('#phone').val().length != 0){
             validatorResult.valid = false
             $('#phone').css('border','1px solid #CE5454');
         }else{
