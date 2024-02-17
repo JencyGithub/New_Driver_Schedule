@@ -266,7 +266,6 @@ def admin_truck_download_csv(modeladmin, request, queryset):
     return response
 
 
-admin.site.register(RateCard)
 admin.site.register(CostParameters)
 admin.site.register(ThresholdDayShift)
 admin.site.register(TruckGroup)
@@ -288,6 +287,8 @@ class ClientTruckConnection_(admin.ModelAdmin):
     search_fields = ['clientTruckId']
 
 admin.site.register(ClientTruckConnection,ClientTruckConnection_)
+
+
     
 
 def driver_download_csv(modeladmin, request, queryset):
@@ -329,6 +330,12 @@ class LeaveRequestAdmin(admin.ModelAdmin):
     actions = [leave_download_csv]
 
 admin.site.register(LeaveRequest, LeaveRequestAdmin)
+
+class RateCardAdmin(admin.ModelAdmin):
+    list_display = ["rate_card_name","clientName","clientOfc"]
+    search_fields = ["rate_card_name","clientName","clientOfc"]
+
+admin.site.register(RateCard, RateCardAdmin)
 
 
 def nature_leave_download_csv(modeladmin, request, queryset):

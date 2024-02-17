@@ -259,7 +259,7 @@ class TruckInformationCustom(models.Model):
     active = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.customFieldLabel)
     
 # AXLES TAB
 class Axles(models.Model):
@@ -347,13 +347,96 @@ class Axles(models.Model):
             return str(self.id)
 
 #SETTINGS TAB
-# class Settings(models.Model):
+class TruckSetting(models.Model):
+    # Configuration
+    fuelType = models.CharField(max_length=100)
+    fuelCreditCategory = models.CharField(max_length=100)
+    adbluePercent = models.FloatField(null=True, blank=True)
+    kilometersOffset = models.FloatField(null=True, blank=True)
+    hoursOffset = models.FloatField(null=True, blank=True)
+    preStartChecklist = models.CharField(max_length=100)
+    trailers = models.CharField(max_length=100)
+    
+    # Dimensions
+    GCM = models.FloatField(null=True, blank=True)
+    GVM = models.FloatField(null=True, blank=True)
+    TARE = models.FloatField(null=True, blank=True)
+    ATM = models.FloatField(null=True, blank=True)
+    length = models.FloatField(null=True, blank=True)
+    height = models.FloatField(null=True, blank=True)
+    width = models.FloatField(null=True, blank=True)
+    volume = models.FloatField(null=True, blank=True)
+    pallets = models.FloatField(null=True, blank=True)
+
+    # 16 Custom Fields
+    customText1 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue1 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText2 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue2 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText3 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue3 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText4 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue4 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText5 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue5 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText6 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue6 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText7 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue7 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText8 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue8 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText9 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue9 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText10 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue10 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText11 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue11 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText12 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue12 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText13 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue13 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText14 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue14 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText15 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue15 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText16 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue16 = models.CharField(max_length=2048, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.fuelType)
+
+    
+class TruckSettingCustom(models.Model):
+    customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
+    active = models.BooleanField(default=True)
+    required = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return str(self.customFieldLabel) + str(self.active)
+    
+
 
 class AdminTruck(models.Model):
     # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     adminTruckNumber = models.PositiveIntegerField(unique=True)
     truckInformation = models.ForeignKey(TruckInformation, on_delete = models.CASCADE , null = True)
     truckAxles = models.ForeignKey(Axles, on_delete = models.CASCADE , null = True)
+    # truckSetting = models.ForeignKey(TruckSetting, on_delete = models.CASCADE , null = True)
     truckActive = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     

@@ -104,14 +104,14 @@ trucks = [
 
 ]
 
-# for truck in trucks:
-#     try:
+for truck in trucks:
+    try:
         
-#         obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckActive = truck['truckStatus'], createdBy=User.objects.filter().first())
-#         # obj = AdminTruck(adminTruckNumber = truck)
-#         obj.save()
-#     except Exception as e:
-#         print(f"Error : {e}")
+        obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckActive = truck['truckStatus'], createdBy=User.objects.filter().first())
+        # obj = AdminTruck(adminTruckNumber = truck)
+        obj.save()
+    except Exception as e:
+        print(f"Error : {e}")
 
 
 # # ------------------------------
@@ -120,7 +120,6 @@ trucks = [
 
 
 def truckConnectionInsert(data):
-    print(str(data))
     try:
         # print(data['id'])
         adminTruckObj = AdminTruck.objects.get(pk = data['truckNumber'])
@@ -141,7 +140,7 @@ def truckConnectionInsert(data):
         clientTruckConnectionObj.save()
         return
     except Exception as e :
-        print(f'Truck Number :, {e}')
+        print(f'Error Truck Number :, {e}')
         return
     
 
@@ -317,19 +316,19 @@ basePlant = [
     {'basePlant':'WOLLERT (B&F) TOLLING','address':'xyz' ,'phone':112345679 , 'personName':'abc','managerName':'dce','lat': 101.0120 , 'long': 242.1510}
 ]
 
-# for data in basePlant:
-#     try:
-#         obj = BasePlant()
-#         obj.basePlant = data['basePlant'] 
-#         obj.address = data['address']
-#         obj.phone = data['phone']
-#         obj.personName = data['personName']
-#         obj.managerName = data['managerName']
-#         obj.lat = data['lat']
-#         obj.long = data['long']
-#         obj.save()
-#     except Exception as e:
-#         print(str(data))
+for data in basePlant:
+    try:
+        obj = BasePlant()
+        obj.basePlant = data['basePlant'] 
+        obj.address = data['address']
+        obj.phone = data['phone']
+        obj.personName = data['personName']
+        obj.managerName = data['managerName']
+        obj.lat = data['lat']
+        obj.long = data['long']
+        obj.save()
+    except Exception as e:
+        print("Error:",str(data))
     
 # def run():
 #     data = ClientTruckConnection.objects.all().values()

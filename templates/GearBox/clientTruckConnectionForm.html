@@ -16,9 +16,6 @@ request {% endblock %} {% block headStyle %}
                         <h2>Add truck connection</h2>
                         <div class="clearfix"></div>
                     </div>
-
-
-
                     <div class="x_content">
                         <div class="cuatom-continer">
                             <form action="{% url 'gearBox:truckConnectionSaveView' id=id %}" method="POST" novalidate>
@@ -33,24 +30,9 @@ request {% endblock %} {% block headStyle %}
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label for="clientId" class="col-form-label col-md-3 col-sm-3 label-align">Client name:<span class="required">*</span></label>
-
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="clientId" onchange="rateCard(this)" class="form-control" required="required">
-                                                <option disabled selected >Select Client Name</option>
-                                                {% for client in clientIds%}
-                                                <option value="{{client.clientId}}">{{client.name}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
                                         <label for="basePlantId" class="col-form-label col-md-3 col-sm-3 label-align">Plant name:<span class="required">*</span></label>
-
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="basePlantId" onchange="rateCard(this)" class="form-control" required="required">
+                                            <select name="basePlantId" onchange="rateCard()" class="form-control" required="required" id="basePlantId">
                                                 <option disabled selected >Select Plant Name</option>
                                                 {% for basePlant in basePlantObj %}
                                                 <option value="{{ basePlant.id }}">{{ basePlant.basePlant }}</option>
@@ -61,27 +43,37 @@ request {% endblock %} {% block headStyle %}
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label for="rate_card_name"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Rate card :<span
-                                                class="required">*</span></label>
+                                        <label for="clientId" class="col-form-label col-md-3 col-sm-3 label-align">Client name:<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                                <select name="rate_card_name" disabled class="form-control" id="rate_card_name" required="required" >
-                                                    
-                                                </select>
+                                            <select name="clientId" onchange="rateCard()" class="form-control" required="required" id="clientId">
+                                                <option disabled selected >Select Client Name</option>
+                                                {% for client in clientIds%}
+                                                <option value="{{client.clientId}}">{{client.name}}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
-                                        <label for="pre_start_name"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Pre-start :<span
-                                                class="required">*</span></label>
+                                        <label for="rate_card_name" class="col-form-label col-md-3 col-sm-3 label-align">Rate card :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                                <select name="pre_start_name"  class="form-control" id="pre_start_name" required="required" >
+                                            <select name="rate_card_name" disabled class="form-control" id="rate_card_name" required="required" >
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12">
+                                        <label for="pre_start_name" class="col-form-label col-md-3 col-sm-3 label-align">Pre-start :<span class="required">*</span></label>
+                                        <div class="field item form-group col-md-6 col-sm-6">
+                                            <select name="pre_start_name"  class="form-control" id="pre_start_name" required="required" >
+                                                <option disabled selected >Select Pre-start</option>
                                                 {% for preStart in preStarts%}
                                                     <option value="{{preStart.id}}">{{preStart.preStartName}}</option>
                                                 {% endfor %}
-                                                </select>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -106,26 +98,22 @@ request {% endblock %} {% block headStyle %}
                                                 id="endDate" type="date"/>
                                         </div>
                                     </div>
-                                </div>
-                                
+                                </div>                                
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
                                         <label for="truckType" class="col-form-label col-md-3 col-sm-3 label-align">Truck type:<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="truckType" class="form-control" id="truckType" {% if data %}disabled{% endif %}>
+                                            <select name="truckType" class="form-control" id="truckType" {% if data %}disabled{% endif %}  required>
+                                                <option disabled selected >Select Truck Type</option>
                                                 <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
                                                 <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                              
+                                </div>                              
                                 <div class="row">
                                     <div class="col-md-9 col-sm-9 text-right">
-                                        <button type="reset" class="btn btn-success px-4">
-                                            Reset
-                                        </button>
-                                        <button type="submit" class="btn btn-primary px-4">
+                                        <button type="submit" class="btn btn-sm btn-default px-2">
                                             Submit
                                         </button>
                                     </div>
@@ -139,6 +127,7 @@ request {% endblock %} {% block headStyle %}
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -162,6 +151,16 @@ request {% endblock %} {% block headStyle %}
     document.forms[0].onsubmit = function (e) {
         var submit = true,
             validatorResult = validator.checkAll(this);
+
+        $('input[required], textarea[required], select[required]').each(function() {
+            if ($(this).val() == '' || $(this).val() == null) {
+                validatorResult.valid = false;
+                $(this).css('border','1px solid #CE5454');
+            }else{
+                $(this).css('border','1px solid #ced4da');
+
+            }
+        });
         console.log(validatorResult);
         return !!validatorResult.valid;
     };
@@ -179,11 +178,13 @@ request {% endblock %} {% block headStyle %}
     
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-    function rateCard(dataRow){
-        clientName = $(dataRow).val()
-        if (clientName)
-        {
-        
+    function rateCard(){
+
+        plantName = $('#basePlantId').val()
+        clientName = $('#clientId').val()
+
+        console.log(clientName, plantName)
+        if (clientName && plantName){
             $.ajax({
                 url: "/gearBox/getRateCard/",
                 method: "POST",
@@ -203,7 +204,7 @@ request {% endblock %} {% block headStyle %}
                     $('#rate_card_name').removeAttr('disabled');
                 },
             });
-    }
+        }
     }
 </script>
-{% endblock %} {% endblock %}
+{% endblock %} 

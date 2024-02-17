@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 from django.contrib import messages
 from django.http import Http404
 from django.contrib.auth.models import User , Group
-import os, colorama, subprocess
+import os, colorama, subprocess, json
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from django.core.serializers import serialize
@@ -310,17 +310,16 @@ def truckTable(request):
     }
     return render(request , 'GearBox/truck/table/truckTable.html',params)
 
-def truckForm(request, id=None , viewOnly= None):
-    
+def truckForm(request, id=None, viewOnly= None):
     truckInformationCustomObj = None
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
     adminTruckObj=truckInformationObj=connections = None
     basePlantObj = BasePlant.objects.all()
-    if not id:
-        truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True)
-    # return HttpResponse(truckInformationCustomObj)
+    curDate = getCurrentDateTimeObj().date()
+    truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True)
+
     count_ = 1
     if id:
         adminTruckObj = AdminTruck.objects.filter(pk=id).first()
@@ -329,18 +328,27 @@ def truckForm(request, id=None , viewOnly= None):
         
         for i in connections:
             i['count'] = count_
-            if i['startDate'] <= getCurrentDateTimeObj().date() and i['endDate'] > getCurrentDateTimeObj().date():
+            if i['startDate'] <= curDate and i['endDate'] > curDate:
                 i['status'] = True
             count_ += 1
             i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
             preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
-            i['pre_start_name'] = preStartObj.preStartName
-            # return HttpResponse(i['pre_start_name'])
+            
+            if preStartObj:
+                i['pre_start_name'] = preStartObj.preStartName
             i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
             if i['endDate']:
                 i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
+
+        for i in range(1, len(truckInformationCustomObj)+1):
+            field_str = 'customFieldValue' + str(i)
+            try:
+                value = getattr(truckInformationObj, field_str)
+                truckInformationCustomObj[i-1].customFieldValue = value
+                print(truckInformationCustomObj[i-1].customFieldValue)
+            except :
+                pass
                 
-        # return HttpResponse(connections)
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
@@ -351,6 +359,7 @@ def truckForm(request, id=None , viewOnly= None):
         'basePlantObj':basePlantObj,
         'truckInformationCustomObj':truckInformationCustomObj,
         'viewOnly':viewOnly,
+        'groups' : TruckGroup.objects.all()
     }
     return render(request,'GearBox/truck/truckForm.html',params)
 
@@ -451,17 +460,13 @@ def truckFormSave(request,truckId=None):
         truckInformationObj.engineModel = request.POST.get('engineModel')
         truckInformationObj.engineCapacity = request.POST.get('engineCapacity')
         truckInformationObj.engineGearBox = request.POST.get('engineGearbox')
-            
         truckInformationObj.save()
         
         adminTruckObj.truckInformation = truckInformationObj
         adminTruckObj.save()
-
-        return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id,viewOnly=viewOnly)
         
+        return redirect('gearBox:truckAxlesFormView',truckId=adminTruckObj.id,viewOnly=viewOnly)
     return redirect('gearBox:truckAxlesFormView',truckId=truckId,viewOnly=viewOnly)
-
-
 
 
 def truckAxlesFormView(request,truckId,viewOnly):
@@ -641,7 +646,7 @@ def truckConnectionSave(request,id):
 
     existingData = ClientTruckConnection.objects.filter(Q(truckNumber = adminTruck,clientId=dataList['clientId'],startDate__gte = dataList['startDate'],startDate__lte = dataList['endDate'])|Q(truckNumber = adminTruck,clientId=dataList['clientId'],endDate__gte = dataList['startDate'],endDate__lte = dataList['endDate'])).first()
     if existingData:
-        messages.error( request, "Connection already exist.")
+        messages.error(request, "Connection already exist.")
         return redirect(request.META.get('HTTP_REFERER'))
     try:
         oldData = ClientTruckConnection.objects.get(clientId=request.POST.get('clientId'),clientTruckId=request.POST.get('clientTruckNumber'),truckNumber=id)
@@ -650,7 +655,8 @@ def truckConnectionSave(request,id):
             oldData.save()
     except:
         pass
-    insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
+    
+    data = insertIntoTable(tableName='ClientTruckConnection',dataSet=dataList)
     with open("scripts/addPastTripForMissingTruckNo.txt", 'w') as f:
         f.write(str(dataList['truckNumber']))
 
@@ -681,12 +687,13 @@ def truckConnectionDeactivate(request):
         clientTruckConnectionObj.save()
         print(existing_appointments)
     return JsonResponse({'status': status})
+
 @csrf_protect
 def getRateCard(request):
     clientId = request.POST.get('clientName')
-    clientName = Client.objects.filter(pk = clientId).first()
-    rateCardList = RateCard.objects.filter(clientName = clientName).values()
-    print(rateCardList)
+    print(clientId)
+    rateCardList = RateCard.objects.filter(clientName__clientId = clientId).values()
+    
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
 
@@ -820,12 +827,36 @@ def fleetSettings(request):
 
 @csrf_protect
 def fleetCustomInformationSave(request, id = None):
+    requiredCheck = request.POST.get('requiredCheck')
+    requiredField = request.POST.get('requiredField')
+    requiredFieldValue = request.POST.getlist('requiredFieldValue')
+    
+    # Load the JSON data from a file
+    with open('static/Account/fleetInformation.json', 'r') as file:
+        data = json.load(file)
+
+    inputFields = data["CUSTOM-INFORMATION"]["input-fields"]
+    selectFields = data["CUSTOM-INFORMATION"]["select-fields"]    
+    fieldName = "customFieldValue" + str(TruckInformationCustom.objects.all().count() + 1)
+    
+    if requiredCheck == "required":
+        data["CUSTOM-INFORMATION"]["All"].append(fieldName)
+    else:        
+        if requiredField in inputFields:
+            data["CUSTOM-INFORMATION"]["input-fields"][requiredField].append(fieldName)
+        elif requiredField in selectFields:
+            for i in range(len(requiredFieldValue)):
+                data["CUSTOM-INFORMATION"]["select-fields"][requiredField][requiredFieldValue[i]].append(fieldName)
+            
+    with open('static/Account/fleetInformation.json', 'w') as file:
+        json.dump(data, file, indent=4)
+    
     if not id:
         truckInformationCustomObj = TruckInformationCustom()
         truckInformationCustomObj.customFieldLabel = request.POST.get('customFieldLabel')
     else:
         truckInformationCustomObj = TruckInformationCustom.objects.filter(pk=id).first()
-    truckInformationCustomObj.active = True if  request.POST.get('active') else False 
+    truckInformationCustomObj.active = True if request.POST.get('active') else False 
     truckInformationCustomObj.save()
     messages.success(request, 'Custom Information update Successfully' if id else 'Custom Information added Successfully' )
     return redirect('gearBox:fleetSettings')

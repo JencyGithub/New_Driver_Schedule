@@ -21,6 +21,10 @@
         margin-top: 0.3rem;
         list-style-type: none;
     }
+    button[type="submit"]{
+        background-color: transparent;
+        font-size: 3em;outline: none;
+    }
 
     .isInvalid {
         border: 1px solid rgb(255, 0, 0) !important;
@@ -29,7 +33,9 @@
     ul.wizard_steps{
         padding-left: 0;
     }
-  
+    label{
+        margin-bottom: 0.2em!important;
+    }
 
     @media (max-width: 576px) {
         .custom-continer {
@@ -56,9 +62,10 @@
 <div class="right_col" role="main">
     <div class="custom-container">
         <div class="clearfix"></div>
-        <form action="{% if adminTruckObj %} {% url 'gearBox:truckFormUpdate' truckId=adminTruckObj.id %} {% else %} {% url 'gearBox:truckFormSave' %} {% endif %}" method="post" class="" novalidate enctype="multipart/form-data" >
+        <!-- <form action="{% if adminTruckObj %} {% url 'gearBox:truckFormUpdate' truckId=adminTruckObj.id %} {% else %} {% url 'gearBox:truckFormSave' %} {% endif %}" method="post" class="" novalidate enctype="multipart/form-data" > -->
+        <form action="{% if viewOnly == 1 %} {% url 'gearBox:truckFormUpdate' truckId=adminTruckObj.id %} {% endif %}" method="post" enctype="multipart/form-data" novalidate id="truckForm">
             {% csrf_token %}
-            <input value="{{viewOnly}}" name ="viewOnly" hidden  id="viewOnly">
+            <input value="{{viewOnly}}" name="viewOnly" hidden  id="viewOnly">
 
             <div class="row">
                 <div class="col-md-12 col-sm-12">
@@ -86,7 +93,7 @@
                     </div>
                     
                     <!-- Mandatory fields -->
-                    <div class="x_panel">
+                    <div class="x_panel mandatoryFieldsSection">
                         <div class="x_title">
                             <h6 style="font-weight:bold">Mandatory Fields</h6>
                             
@@ -94,28 +101,30 @@
                         <div class="x_content">
                             <div class="col-md-8 col-sm-8">
                                 <div class="col-md-6 col-sm-6">
-                                    <label for="truckNo" style="margin-bottom: 0.8rem!important;">Fleet : <span class="required">*</span></label>
+                                    <label for="truckNo">Fleet : <span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{ adminTruckObj.adminTruckNumber }}" {% if adminTruckObj %}readonly{% endif %} type="number" name="truckNo"  style="padding: 0.25rem 0.2rem;" id="truckNo" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
-                                    <label for="groups" style="margin-bottom: 0.8rem!important;">Groups : <span class="required">*</span></label>
+                                    <label for="groups">Groups : </label>
                                     <div class="field item form-group">
-                                        <select name="groups" id="groups" class="form-control">
-                                            
+                                        <select name="groups" id="groups" class="form-control text-uppercase">
+                                            {% for group in groups %}
+                                            <option value="{{group.name}}" class="text-uppercase">{{group.name}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="subGroups" style="margin-bottom: 0.8rem!important;">Sub groups : <span class="required">*</span></label>
+                                    <label for="subGroups">Sub groups : </label>
                                     <div class="field item form-group">
                                         <select name="subGroups" id="subGroups" class="form-control">
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="vehicleType" style="margin-bottom: 0.8rem!important;">Vehicle type : <span class="required">*</span></label>
+                                    <label for="vehicleType">Vehicle type : </label>
                                     <div class="field item form-group">
                                         <select name="vehicleType" required required onchange=(vehicleTypeFun()) id="vehicleType" class="form-control">
                                             <option disabled selected>Select vehicle Type</option>
@@ -125,7 +134,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="serviceGroup" style="margin-bottom: 0.8rem!important;">Service group : <span class="required">*</span></label>
+                                    <label for="serviceGroup">Service group : </label>
                                     <div class="field item form-group">
                                         <select name="serviceGroup" id="serviceGroup"  class="form-control">
                                             <option disabled selected>Select vehicle Type</option>
@@ -139,7 +148,7 @@
                             <div class="col-md-4 col-sm-4 fileUpload">
                                 <span id="add-file" class="text-success" style="cursor:pointer">Add more files + </span>
                                 <!-- Initial file input -->
-                                <div class="py-2 pt-3">
+                                <div class="py-2">
                                     <input type="file" name="truckImg1">
                                     {% if truckInformationObj.truckImg1 %}
                                     <a href="{{ truckInformationObj.truckImg1.url }}" target="_blank">View File</a>
@@ -168,7 +177,7 @@
                     </div>
                     
                     <!-- Information -->
-                    <div class="x_panel">
+                    <div class="x_panel informationFieldsSection">
                         <div class="x_title">
                             <h6 style="font-weight:bold">Information</h6>
                             <div class="clearfix"></div>
@@ -177,22 +186,22 @@
                             <div class="col-md-12 col-sm-12">
                                 <div class="row">
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="informationMake" style="margin-bottom: 0.3rem!important;">Make : <span class="required">*</span></label>
+                                        <label for="informationMake" style="margin-bottom: 0.3rem!important;">Make : </label>
                                         <div class="field item form-group">
-                                            <select name="informationMake" id="informationMake"  class="form-control">
+                                            <select name="informationMake" id="informationMake" class="form-control">
                                                 <option {% if truckInformationObj.informationMake == 'Freightliner' %}selected{% endif %}  value="Freightliner">Freightliner</option>
                                                 <option {% if truckInformationObj.informationMake == 'ABC' %}selected{% endif %}  value="ABC">ABC</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="informationModel" style="margin-bottom: 0.3rem!important;">Model : <span class="required">*</span></label>
+                                        <label for="informationModel" style="margin-bottom: 0.3rem!important;">Model : </label>
                                         <div class="field item form-group">
                                             <input class="form-control" value="{{ truckInformationObj.informationModel }}" type="text" name="informationModel"  style="padding: 0.25rem 0.2rem;" id="informationModel">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="informationConfiguration" style="margin-bottom: 0.3rem!important;">Configuration : <span class="required">*</span></label>
+                                        <label for="informationConfiguration" style="margin-bottom: 0.3rem!important;">Configuration : </label>
                                         <div class="field item form-group">
                                             <select name="informationConfiguration" id="informationConfiguration"  class="form-control">
                                                 <option {% if truckInformationObj.informationMake == 'Tipper' %}selected{% endif %} value="Tipper">Tipper</option>
@@ -200,7 +209,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="informationChassis" style="margin-bottom: 0.3rem!important;">VIN / Chassis # : <span class="required">*</span></label>
+                                        <label for="informationChassis" style="margin-bottom: 0.3rem!important;">VIN / Chassis # : </label>
                                         <div class="field item form-group">
                                             <input class="form-control" value="{{ truckInformationObj.informationChassis }}" type="text" name="informationChassis"  style="padding: 0.25rem 0.2rem;" id="informationChassis">
                                         </div>
@@ -208,11 +217,11 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="informationBuildYear" style="margin-bottom: 0.3rem!important;">Build year : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{ truckInformationObj.informationBuildYear }}" type="number" name="informationBuildYear"  style="padding: 0.25rem 0.2rem;" id="informationBuildYear" data-validate-minmax="1000,9999">
+                                            <input class="form-control" value="{{ truckInformationObj.informationBuildYear }}" type="number" name="informationBuildYear"  style="padding: 0.25rem 0.2rem;" id="informationBuildYear" data-validate-minmax="1000,9999" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="informationIcon" style="margin-bottom: 0.3rem!important;">Icon : <span class="required">*</span></label>
+                                        <label for="informationIcon" style="margin-bottom: 0.3rem!important;">Icon : </label>
                                         <div class="field item form-group">
                                             <select id="informationIcon" name="informationIcon">
                                                 <option {% if truckInformationObj.informationIcon == 'Truck_1' %}selected{% endif %} value="Truck_1" 
@@ -233,7 +242,7 @@
                     </div>
 
                     <!-- Registration -->
-                    <div class="x_panel">
+                    <div class="x_panel registrationFieldsSection">
                         <div class="x_title">
                             <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>{{truckInformationObj.registered}}
                             
@@ -249,7 +258,7 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control"   {%if not truckInformationObj.registered  %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registration }} {% endif %}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
+                                            <input class="form-control" {%if not truckInformationObj.registered  %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registration }} {% endif %}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
@@ -261,7 +270,8 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select name="registrationState" {%if not truckInformationObj.registered  %}disabled{%endif%} required id="registrationState"  class="form-control">
+                                            <select name="registrationState" {% if not truckInformationObj.registered %}disabled{%endif%} required id="registrationState"  class="form-control">
+                                                <option selected disabled>Select State</option>
                                                 <option {% if truckInformationObj.registrationSate == 'California' %}selected{% endif %} value="CA">California</option>
                                                 <option {% if truckInformationObj.registrationSate == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
@@ -274,9 +284,10 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : <span class="required">*</span></label>
+                                        <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : </label>
                                         <div class="field item form-group">
                                             <select name="registrationInterval" {%if not truckInformationObj.registered  %}disabled{%endif%} id="registrationInterval"  class="form-control">
+                                                <option selected disabled>Select Interval</option>
                                                 <option {% if truckInformationObj.registrationInterval == 'NewYork' %}selected{% endif %} value="NY">New York</option>
                                             </select>
                                         </div>
@@ -288,7 +299,7 @@
                     </div>
 
                     <!-- Engine Information -->
-                    <div class="x_panel">
+                    <div class="x_panel engineFieldsSection">
                         <div class="x_title">
                             <h6 class="d-inline-block" style="font-weight:bold">Engine Information</h6>
                             <span class="float-right">
@@ -306,19 +317,19 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-sm-6">
-                                    <label for="engineMake" style="margin-bottom: 0.3rem!important;">Make :</label>
+                                    <label for="engineMake" style="margin-bottom: 0.3rem!important;">Make :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{ truckInformationObj.engineMake }}" type="text" name="engineMake" style="padding: 0.25rem 0.2rem;" id="engineMake" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="engineModel" style="margin-bottom: 0.3rem!important;">Model :</label>
+                                    <label for="engineModel" style="margin-bottom: 0.3rem!important;">Model :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{ truckInformationObj.engineModel }}" type="text" name="engineModel" style="padding: 0.25rem 0.2rem;" id="engineModel" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
-                                    <label for="engineCapacity" style="margin-bottom: 0.3rem!important;">Capacity :</label>
+                                    <label for="engineCapacity" style="margin-bottom: 0.3rem!important;">Capacity :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <input class="form-control" value="{{ truckInformationObj.engineCapacity }}" type="text" name="engineCapacity" style="padding: 0.25rem 0.2rem;" id="engineCapacity" required>
                                     </div>
@@ -334,94 +345,97 @@
                     </div>
 
                     <!-- Custom fields -->
-                    <div class="x_panel">
+                    <div class="x_panel customFieldsSection">
                         <div class="x_title">
                             <h6 style="font-weight:bold">Custom fields</h6>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <div class="col-md-12 col-sm-12">
-                                <div class="row">
-                                    {% for truckInformationCustom in truckInformationCustomObj %}
-                                    
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldValue{{forloop.counter}}" style="margin-bottom: 0.3rem!important;">{{truckInformationCustom.customFieldLabel}} :</label>
-                                            <input  type="text" hidden value="{{truckInformationCustom.id}}" name ="customFieldLabel{{forloop.counter}}" />
-                                            <div class="field item form-group">
-                                                <input class="form-control"  type="text" name="customFieldValue{{forloop.counter}}" style="padding: 0.25rem 0.2rem;" id="customFieldValue{{forloop.counter}}" >
-                                            </div>
+                            <div class="row">
+                                <!-- {% for truckInformationCustom in truckInformationCustomObj %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldValue{{forloop.counter}}" style="margin-bottom: 0.3rem!important;">{{truckInformationCustom.customFieldLabel}} :</label>
+                                        <input type="text" hidden value="{{truckInformationCustom.id}}" name ="customFieldLabel{{forloop.counter}}" />
+                                        <div class="field item form-group">
+                                            <input class="form-control" type="text" name="customFieldValue{{forloop.counter}}" value="{% if truckInformationObj %}{{ truckInformationObj.customFieldValue1 }}{% endif %}" style="padding: 0.25rem 0.2rem;" id="customFieldValue{{forloop.counter}}" readonly>
                                         </div>
-                                    {% endfor %}
-                                    {% if truckInformationCustomObj is None  %}
-                                        {% if truckInformationObj.customFieldLabel1 != ''   %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel1" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel1}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue1 }}"  type="text" name="customFieldValue1" style="padding: 0.25rem 0.2rem;" id="customFieldLabel1" required>
-                                            </div>
+                                    </div>
+                                {% endfor %} -->
+
+
+                                {% for truckInformationCustom in truckInformationCustomObj %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldValue{{forloop.counter}}" style="margin-bottom: 0.3rem!important;">{{ truckInformationCustom.customFieldLabel }} :</label>
+                                        <input type="text" hidden value="{{ truckInformationCustom.id }}" name="customFieldLabel{{ forloop.counter }}" />
+                                        <div class="field item form-group">
+                                            <input class="form-control" type="text" name="customFieldValue{{ forloop.counter }}" value="{% if truckInformationObj %}{{ truckInformationCustom.customFieldValue }}{% endif %}" style="padding: 0.25rem 0.2rem;" id="customFieldValue{{ forloop.counter }}" readonly>
                                         </div>
-                                        {% endif %}
-                                        {% if truckInformationObj.customFieldLabel2 != ''  %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel2" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel2}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue2 }}"  type="text" name="customFieldValue2" style="padding: 0.25rem 0.2rem;" id="customFieldLabel2" required>
-                                            </div>
+                                    </div>
+                                {% endfor %}
+
+                            
+                                <!-- {% if not truckInformationCustomObj %}
+                                    {% if truckInformationObj.customFieldLabel1 %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel1" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel1}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue1 }}"  type="text" name="customFieldValue1" style="padding: 0.25rem 0.2rem;" id="customFieldLabel1" required>
                                         </div>
-                                        {% endif %}
-                                        {% if truckInformationObj.customFieldLabel3 != ''  %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel3" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel3}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue3 }}"  type="text" name="customFieldValue3" style="padding: 0.25rem 0.2rem;" id="customFieldLabel3" required>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                        {% if truckInformationObj.customFieldLabel4 != ''  %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel4" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel4}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue4 }}"  type="text" name="customFieldValue4" style="padding: 0.25rem 0.2rem;" id="customFieldLabel4" required>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                        {% if truckInformationObj.customFieldLabel5 != '' %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel5" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel5}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue5 }}"  type="text" name="customFieldValue5" style="padding: 0.25rem 0.2rem;" id="customFieldLabel5" required>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                        {% if truckInformationObj.customFieldLabel6 != ''  %}
-                                        <div class="col-md-4 col-sm-4">
-                                            <label for="customFieldLabel6" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel6}} :</label>
-                                            <div class="field item form-group">
-                                                <input class="form-control" value="{{ truckInformationObj.customFieldValue6 }}"  type="text" name="customFieldValue6" style="padding: 0.25rem 0.2rem;" id="customFieldLabel6" required>
-                                            </div>
-                                        </div>
-                                        {% endif %}
+                                    </div>
                                     {% endif %}
-                                    
-                                    
-                                </div>
+                                    {% if truckInformationObj.customFieldLabel2 %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel2" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel2}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue2 }}" type="text" name="customFieldValue2" style="padding: 0.25rem 0.2rem;" id="customFieldLabel2" required>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if truckInformationObj.customFieldLabel3 %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel3" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel3}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue3 }}" type="text" name="customFieldValue3" style="padding: 0.25rem 0.2rem;" id="customFieldLabel3" required>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if truckInformationObj.customFieldLabel4 %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel4" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel4}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue4 }}" type="text" name="customFieldValue4" style="padding: 0.25rem 0.2rem;" id="customFieldLabel4" required>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if truckInformationObj.customFieldLabel %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel5" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel5}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue5 }}" type="text" name="customFieldValue5" style="padding: 0.25rem 0.2rem;" id="customFieldLabel5" required>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if truckInformationObj.customFieldLabel6 %}
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="customFieldLabel6" style="margin-bottom: 0.3rem!important;">{{truckInformationObj.customFieldLabel6}} :</label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ truckInformationObj.customFieldValue6 }}" type="text" name="customFieldValue6" style="padding: 0.25rem 0.2rem;" id="customFieldLabel6" required>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endif %} -->
                             </div>
                         </div>
                     </div>
-
-                    <!-- Submit  -->
-                        <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
-                            <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Next</button>
-                        </div>
-
                     {% if connections %}
                         {% for connection in connections %}
                             <div class="x_panel">
                                 <div class="x_title">
-                                    <h2>Connections</h2>
+                                    <h6 class="d-inline-block font-weight-bold">Connections</h6>
                                     <div class="float-right">
                                         {% if connection.status is True %}
-                                        <button class="btn btn-danger btn-sm" type="button" onclick="confirmDeactivation('{{ connection.id }}')">Deactivate</button>
+                                        {% comment %} <button class="btn btn-danger btn-sm" type="button" onclick="confirmDeactivation('{{ connection.id }}')">Deactivate</button> {% endcomment %}
+                                        <i class="fa-regular fa-calendar-xmark text-default" style="font-size:1.5rem;cursor:pointer" onclick="confirmDeactivation('{{ connection.id }}')" title="Disactive"></i>
                                         {% endif %}
                                     </div>
                                     <div class="clearfix"></div>
@@ -445,8 +459,7 @@
                                         <div class="col-md-4 col-sm-4">
                                             <label for="pre_start_name{{connection.count}}">Pre start <span class="required">*</span></label>
                                             <input class="form-control" value="{% if connection %}{{connection.pre_start_name}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="pre_start_name{{count}}"  style="padding: 0.25rem 0.2rem;" id="pre_start_name{{count}}">
-                                        </div>
-                                        
+                                        </div>                                        
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 col-sm-4">
@@ -465,33 +478,40 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
+                                            <label for="endDate{{connection.count}}"> Plant<span class="required">*</span></label>
+                                            <select name="plantName{{connection.count}}" class="form-control" id="plantName{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
+                                                {% for basePlant in basePlantObj%}
+                                                <option value="{{basePlant.id}}" {% if basePlant.id == connection.basePlantId %} selected {% endif %} >{{basePlant.basePlant}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">                                            
+                                        <div class="col-md-4 col-sm-4">
                                             <label for="startDate{{connection.count}}"> Start date<span class="required">*</span></label>
                                             <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.startDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="startDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="startDate{{connection.count}}">
                                         </div>
-                                    </div>
-                                        <div class="row mt-3">
-                                            <div class="col-md-4 col-sm-4">
-                                                <label for="endDate{{connection.count}}"> Plant<span class="required">*</span></label>
-                                                <select name="plantName{{connection.count}}" class="form-control" id="plantName{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
-                                                    {% for basePlant in basePlantObj%}
-                                                    <option value="{{basePlant.id}}" {% if basePlant.id == connection.basePlantId %} selected {% endif %} >{{basePlant.basePlant}}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 col-sm-4">
-                                                <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
-                                                <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
-                                            </div>
-                                            <div class="col-md-4 col-sm-4">
-                                                <label for="createdBy{{connection.count}}"> Created By<span class="required">*</span></label>
-                                                <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.createdBy}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="createdBy{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="createdBy{{connection.count}}">
-                                            </div>
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
+                                            <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
+                                        </div>
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="createdBy{{connection.count}}"> Created By<span class="required">*</span></label>
+                                            <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.createdBy}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="createdBy{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="createdBy{{connection.count}}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
                     {% endif %} 
+                    <!-- Submit  -->
+                    <div class="col-md-12 text-right pb-2 position-sticky px-0 submitSection" style ="bottom:3%;">
+                        {% if viewOnly %}
+                        <input type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3" value="Next" id="finalSubmit">
+                        {% else %}
+                        <button type="submit" class="border-0 text-default m-0" title="Activate Custom Fields"><i class="fa-solid fa-circle-check"></i></button>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </form>
@@ -504,107 +524,128 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/prashantchaudhary/ddslick/master/jquery.ddslick.min.js" ></script>
 <script>
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
-    {% comment %} $(document).ready(function() {
-        var value_ = $('#registered').val();
-        if(value_){
-            $("#registrationSection input").prop("disabled", true);
-            $("#registrationSection select").prop("disabled", true);
-            $("#registration ").val('');
-            $("#registrationCode ").val('');
-        }else{
-            $("#registrationSection input").prop("disabled", false);
-            $("#registrationSection select").prop("disabled", false);
-        }
-    }); {% endcomment %}
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,validatorResult = validator.checkAll(this);
 
-    if ($('#viewOnly').val() == 1){
-        $('input ,select,textarea').each(function(){
-            $(this).prop("disabled", true);
-        })
-        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
-    }
-    function vehicleTypeFun() {
-        var selectedValue = $('#vehicleType').val(); // Get the selected value using jQuery
-        
-        var arr_ = ['Concrite'];
+        $('select[required]:not(:disabled)').each(function(){
+            if(!$(this).val()){
+                validatorResult.valid = false;
+                $(this).css('border','1px solid #CE5454');
+            } else {
+                $(this).css('border','1px solid #ced4da');
+            }
+        });
+
+        if(validatorResult.valid && !document.getElementById('finalSubmit')){
+            validatorResult.valid = false
+            let requiredFields = {};
+
+            $.getJSON("/static/Account/fleetInformation.json", function(data) {
+                let customInformation = data["CUSTOM-INFORMATION"];
+
+                for (let i = 0; i < customInformation['All'].length; i++) {
+                    requiredFields[customInformation['All'][i]] = true;
+                }
+
+                // Input fields value 
+                if (Object.keys(requiredFields).length <= 6) {
+                    let inputFields = customInformation['input-fields']
+                    for (let key in inputFields) {
+                        let values = inputFields[key];
+                        if (Object.keys(requiredFields).length <= 6) {
+                            for (let value of values) {
+                                if (!(value in requiredFields)) {
+                                    requiredFields[value] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Select fields value 
+                if (Object.keys(requiredFields).length <= 6) {
+                    let selectFields = customInformation['select-fields']
+                    for (const key in selectFields) {
+                        const values = selectFields[key];
+                        for (const value of Object.values(values)) {
+                            if (Object.keys(requiredFields).length <= 6 ) {
+                                if(value == values[$(`#${key}`).val()] || value == values["All"]){
+                                    value.forEach(field => {
+                                        requiredFields[field] = true;
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (var key in requiredFields) {
+                    $(`#${key}`).attr('required', true)
+                }
+            });
+
+            let adminTruckId = "{{ adminTruckObj.id }}"
+            let url = adminTruckId ? `/gearBox/truckForm/update/${adminTruckId}` : "/gearBox/truckForm/add/" ;
+            $('#truckForm').attr('action', url);
+
+            $('input, select').attr('disabled', true)
+            $('.customFieldsSection input').removeAttr('readonly').removeAttr('disabled');
+            
+            $('button[type=submit]').remove();
+            $('.submitSection').append(`<input type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3" value="Next" id="finalSubmit">`);
+        }else if(validatorResult.valid){
+            $('input, select, textarea').removeAttr('disabled');
+        }
+
+        // console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
     
-        // Check if the selected value is present in the list
+    function vehicleTypeFun() {
+        var selectedValue = $('#vehicleType').val();        
+        var arr_ = ['Concrite'];    
         if ($.inArray(selectedValue, arr_) !== -1) {
-            // If the selected value is present in the list, remove the 'disabled' attribute
             $('#customPdd').removeAttr('disabled');
         } else {
-            // If the selected value is not present in the list, add the 'disabled' attribute
             $('#customPdd').attr('disabled', 'disabled');
         }
     }
 
     function confirmDeactivation(connectionId) {
-    // Display confirmation alert
-    if (confirm("Are you sure you want to deactivate this truck?")) {
-        $.ajax({
-            url: "/gearBox/truck/connection/deactivate>/",
-            method: "POST",
-            data: {
-                connectionId_: connectionId // Use colon ':' for assignment
-            },
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            },
-            success: function(data) {
-                if(data.status){
-                    alert("Truck connection deactivated successfully!");
-                    location.reload();
+        if (confirm("Are you sure you want to deactivate this truck?")) {
+            $.ajax({
+                url: "/gearBox/truck/connection/deactivate>/",
+                method: "POST",
+                data: {
+                    connectionId_: connectionId 
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function(data) {
+                    if(data.status){
+                        alert("Truck connection deactivated successfully!");
+                        location.reload();
+                    }
+                    else{
+                        alert("Appointment exists for this truck. Deactivation failed.");
+                    }
                 }
-                else{
-                    alert("Appointment exists for this truck. Deactivation failed.");
-                }
-            }
-        });
+            });
         }
     }
 
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
-
-   
-
-</script>
-{% endblock %}
-
-{% block footerStyleEnd %} 
-<script type="text/javascript" src="https://cdn.rawgit.com/prashantchaudhary/ddslick/master/jquery.ddslick.min.js" ></script>
-<script>
-    $("#informationIcon").ddslick({
-        width:"100%",
-        imagePosition: "left",
-        selectText: "select Your Social Network",
-        onSelected: function(data){
-            $('input[name="informationIcon"]').val(data.selectedData.value);
-        }
-    })
     function registeredFun(data) {
         var isChecked = $(data).prop("checked");
-        console.log(isChecked)
         if(isChecked){
             $("#registrationSection input").prop("disabled", true);
             $("#registrationSection select").prop("disabled", true);
@@ -614,41 +655,67 @@
         }
     }
 
-    {% comment %} window.onload = function() {
-        var fileInput = document.getElementById('file-input');
-        var imagePreview = document.getElementById('image-preview');
+    function removeFile(givenClass){
+        $(`.${givenClass} input[type="file"]`).val('')
+        $(`.${givenClass}`).addClass('d-none')
+    }
 
-        fileInput.addEventListener('change', function() {
-            var file = this.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(event) {
-                    imagePreview.src = event.target.result;
-                    imagePreview.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
+    function checkCustomFields(selectedFieldId,selectedFieldVal){
+        $.getJSON("/static/Account/fleetInformation.json", function(data) {
+            var customInformation = data["CUSTOM-INFORMATION"];
+            let requiredFields = null
+            let isInput = customInformation['input-fields'].hasOwnProperty(selectedFieldId)
+            let isSelect = customInformation['select-fields'].hasOwnProperty(selectedFieldId)
+
+            if(isInput){
+                requiredFields = customInformation['input-fields'][selectedFieldId]
+            } else if(isSelect){
+                requiredFields = customInformation['select-fields'][selectedFieldId][selectedFieldVal]
             }
+            // console.log('Required Fields: ', selectedFieldId, '-', requiredFields)     
         });
-    } {% endcomment %}
-   
-    {% comment %} $('#add-file').on('click',function(){
-        let content = ''
-        let exist = $('input[name^="file"]')
-        content+=`<div class="pt-2 ${exist.length + 1}">`
-        content+=`<span class="float-right text-danger" onclick="removeFile('${exist.length + 1}')" style="cursor:pointer">Remove</span>`
-        content+=`<input type="file" class="form-control" name="file${exist.length + 1}">`
-        content+=`</div>`
-        if (exist.length <= 2){
-            $('.fileUpload').append(content)
-        } 
-    }) {% endcomment %}
+    }
+
+    if ($('#viewOnly').val() == 1){
+        
+        $('input:not([type="submit"]), select, textarea').each(function(){
+            $(this).prop("disabled", true);
+        });
+        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+    }
+
+    $("#informationIcon").ddslick({
+        width:"100%",
+        imagePosition: "left",
+        selectText: "select Your Social Network",
+        onSelected: function(data){
+            $('input[name="informationIcon"]').val(data.selectedData.value);
+        }
+    })
+
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked){
+            $('form .alert').remove();
+        }
+    }).prop('checked', false);
+
+    /*
+    $('.customFieldsSection input').each(function(){
+        $(this).attr('readonly',true)
+    })
+    */
 
     $("#add-file").on("click", function() {
         $(".fileUpload .d-none:first").removeClass("d-none");
     });
-    function removeFile(givenclass){
-        $(`.${givenclass}`).addClass('d-none')
-    }
+    
+    /* 
+    $(`select, textarea, input[type="text"], input[type="number"], input[type="date"]`).on('change',function(){
+        let selectedFieldId = $(this).attr('id')
+        let selectedFieldVal = $(this).val()
+        checkCustomFields(selectedFieldId,selectedFieldVal)
+    })
+    */
 </script>
-
-{% endblock %} 
+{% endblock %}

@@ -4,7 +4,36 @@
 {% block headStyle %}
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+
 <style>
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #435f7b !important;
+    }
+
+    .select2-container .select2-selection--multiple{
+        min-height: 38px!important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice,
+    .select2-container .select2-search--inline .select2-search__field {
+        margin-top: 8px !important;
+        cursor: pointer;
+    }
+    
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #435f7b !important;
+        border: 1px solid #435f7b !important;
+        color: white;
+    }
+    
+    .select2-container--default .select2-selection--multiple {
+        cursor: pointer !important;
+    }
+
+
     .input-group-section {
         padding: 15px;
         border-radius: 5px;
@@ -15,6 +44,10 @@
       
     label {
     font-weight: bold;
+    }
+    .errorMsg{
+        color: #b5666e;
+        font-size: 0.7rem;
     }
       
     @media (min-width: 992px) {
@@ -30,81 +63,122 @@
 <div class="right_col" role="main">
     <div class="custom-container">
         <div class="clearfix"></div>
-
         <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="col-sm-9">
-                        <h2 class="text-uppercase" style="font-weight:bold">Custom Information</h2>
-                    </div>
-                    {% if addStatus is False %}
-                    <div class="col-sm-3">
-                        <button type='button' class="btn btn-sm btn-default px-3 float-right" data-toggle="modal" data-target="#addFieldsetModal">Add Fieldset</button>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Modal -->
-                    <form action="{% url 'gearBox:fleetCustomInformationSave' %}" method="POST">
-                        {% csrf_token %}
-                        <div class="modal fade" id="addFieldsetModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="modalLabel">Custom Information Fieldset</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <!-- Input Field -->
-                                <div class="form-group">
-                                    <label for="customFieldLabel">Custom Field</label>
-                                    <input type="text" name="customFieldLabel" class="form-control" id="customFieldLabel">
-                                    <p class="text-danger">Fields once created can not be altered later.</p>
-                                </div>
-                                <!-- Checkbox -->
-                                <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="active" id="active">
-                                <label class="form-check-label" for="active">Active</label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-default">Submit</button>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    </form>
-                    
-  
-                </div>
-                {% comment %} <!-- {% url 'gearBox:truckFormAdd' %} --> {% endcomment %}
+            <div class="col-12">
+                <div class="accordion" id="accordionExample">
                     <div class="x_panel">
-                        <div class="x_content">
-                            <div class="col-md-12 col-sm-12">
-                                <div class="row">
-                                    {% for truckInformationCustom in truckInformationCustomObj%}
-                                        <div class="col-md-6 col-lg-4 mb-4">
-                                            <form action="{% url 'gearBox:fleetCustomInformationUpdate' id=truckInformationCustom.id %}" method="POST">
-                                            {% csrf_token %}
-                                                <div class="input-group-section {% if truckInformationCustom.active %}green {% else %}pink{% endif %}">
-                                                    <label for="customFieldLabel{{ forloop.counter }}">Custom Field1 : </label>
-                                                    <input type="checkbox" {% if truckInformationCustom.active %}checked{% endif %} id="active" name="active" class="mx-2">
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel }}" disabled class="form-control mr-2">
-                                                        <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
-                                                    </div>
+                        <div data-toggle="collapse" data-target="#customInformationCollaps" aria-expanded="true" aria-controls="customInformationCollaps">
+                            <h2 class="text-uppercase font-weight-bold d-inline-block">Custom Information</h2>
+
+                            {% if truckInformationCustomObj|length <= 5 %}
+                            
+                            <span class="btn btn-sm btn-outline-dark float-right mt-1" id="addFieldsetBtn" style="font-size: 0.8rem;">Add Fieldset</span>
+                            {% endif %}
+                        </div>
+                        <div id="customInformationCollaps" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <hr class="my-1">
+                            <div class="x_content p-0">
+                                {% for truckInformationCustom in truckInformationCustomObj%}
+                                    <div class="col-md-4 col-lg-4 p-1">
+                                        <form action="{% url 'gearBox:fleetCustomInformationUpdate' id=truckInformationCustom.id %}" method="POST">
+                                        {% csrf_token %}
+                                            <div class="input-group-section {% if truckInformationCustom.active %}green {% else %}pink{% endif %}">
+                                                <label for="customFieldLabel{{ forloop.counter }}">Custom Field {{ forloop.counter }}: </label>
+                                                <input type="checkbox" {% if truckInformationCustom.active %}checked{% endif %} id="active{{ forloop.counter }}" name="active" class="mx-2 float-right">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <input type="text" id="customFieldLabel{{ forloop.counter }}" value="{{ truckInformationCustom.customFieldLabel }}" disabled class="form-control mr-2">
+                                                    <button type="submit" title="Save" class="btn btn-default btn-sm"><i class="fas fa-save"></i></button>
                                                 </div>
-                                            </form> 
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>    
+                                            </div>
+                                        </form> 
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
-
+                </div>
             </div>
         </div>
+        
+    </div>
+</div>
+ <!-- Modal -->
+ <div class="modal fade" id="addFieldsetModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <form action="{% url 'gearBox:fleetCustomInformationSave' %}" method="POST" id="truckInformationForm" novalidate>
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h6 class="modal-title" id="modalLabel">Custom Information Fieldset</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body pb-1">
+                    <div class="form-group">
+                        <label for="customFieldLabel">Custom Field</label>
+                        <div class="form-check float-right">
+                            <input type="checkbox" class="form-check-input" style="margin-top: 0.15rem;" name="active" id="active" checked>
+                            <label class="form-check-label" for="active">Active</label>
+                        </div>
+                        <input type="text" name="customFieldLabel" class="form-control" id="customFieldLabel" required autocomplete="off">
+                        <p class="errorMsg">Fields once created can not be altered later.</p>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" id="NotRequired" name="requiredCheck" class="form-check-input" checked value="NotRequired">
+                                <label class="form-check-label" for="NotRequired">Not Required</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" id="required" name="requiredCheck" class="form-check-input" value="required">
+                                <label class="form-check-label" for="required">Required</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" id="conditionallyRequired" name="requiredCheck" class="form-check-input" value="conditionallyRequired">
+                                <label class="form-check-label" for="conditionallyRequired">Conditionally Required</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row customRequiredSection d-none">
+                        <div class="col-md-6 col-sm-6">
+                            <select name="requiredField" id="requiredField" class="form-control">
+                                <option selected disabled>Select Field</option>
+                                <option value="truckNo">TruckNo</option>
+                                <option value="groups">Groups</option>
+                                <option value="subGroups">Sub-Groups</option>
+                                <option value="vehicleType">VehicleType</option>
+                                <option value="serviceGroup">ServiceGroup</option>
+                                <option value="informationModel">InformationModel</option>
+                                <option value="informationChassis">InformationChassis</option>
+                                <option value="informationBuildYear">InformationBuildYear</option>
+                                <option value="informationMake">InformationMake</option>
+                                <option value="informationConfiguration">InformationConfiguration</option>
+                                <option value="registration">Registration</option>
+                                <option value="registrationCode">RegistrationCode</option>
+                                <option value="registrationDueDate">RegistrationDueDate</option>
+                                <option value="registrationState">RegistrationState</option>
+                                <option value="registrationInterval">RegistrationInterval</option>
+                                <option value="engine">Engine</option>
+                                <option value="engineMake">EngineMake</option>
+                                <option value="engineModel">EngineModel</option>
+                                <option value="engineCapacity">EngineCapacity</option>
+                                <option value="engineGearbox">EngineGearbox</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6 requiredValueSection">
+                            <select name="requiredFieldValue" id="requiredFieldValue" multiple="multiple" disabled>
+                                <option value="truckNo">TruckNo</option>
+                                <option value="informationModel">InformationModel</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2 px-1">
+                    <button type="submit" class="btn btn-sm btn-default">Submit</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 <!-- /page content -->
@@ -114,61 +188,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-<script>
 
-    var validator = new FormValidator({
-        "events": ['blur', 'input', 'change']
-    }, document.forms[0]);
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true,
-            validatorResult = validator.checkAll(this);
-        console.log(validatorResult);
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-    $('.toggleValidationTooltips').change(function () {
-        validator.settings.alerts = !this.checked;
-        if (this.checked)
-            $('form .alert').remove();
-    }).prop('checked', false);
 
-    $(document).ready(function(){
-        $('input[type="checkbox"]').change(function() {
-            $(this).prev('input').prop('disabled', !this.checked);
-        });
-    });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
-</script>
+<script src="{% static 'js/fleetSettings.js' %}"></script>
 {% endblock %}
 
-{% block footerStyleEnd %} 
-<script type="text/javascript" src="https://cdn.rawgit.com/prashantchaudhary/ddslick/master/jquery.ddslick.min.js" ></script>
-<script>
-    $("#informationIcon").ddslick({
-        width:"100%",
-        imagePosition: "left",
-        selectText: "select Your Social Network",
-        onSelected: function(data){
-            $('input[name="informationIcon"]').val(data.selectedData.value);
-        }
-    })
-    function registered(data) {
-        var isChecked = $(data).prop("checked");
-        if(isChecked){
-            $("#registrationSection input").prop("disabled", true);
-            $("#registrationSection select").prop("disabled", true);
-        }else{
-            $("#registrationSection input").prop("disabled", false);
-            $("#registrationSection select").prop("disabled", false);
-        }
-        console.log(isChecked);
-    }
-
-</script>
-
-{% endblock %}
