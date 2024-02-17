@@ -32,9 +32,12 @@ for obj in reconciliationReportData:
 
                 
             obj.driverWaitingTimeCost = 0
-            if 'costParameters_waiting_cost_per_minute' in data or 'waiting_time_grace_in_minutes' in data or 'chargeable_waiting_time_starts_after' in data:
+            if 'costParameters_waiting_cost_per_minute' in data or 'waiting_time_grace_in_minutes' in data or 'chargeable_waiting_time_starts_after' in data or 'waiting_load_calculated_on_load_size ' in data or 'waiting_time_grace_per_cubic_meter ' in data or 'minimum_load_size_for_waiting_time_grace ' in data:
                 if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-                    obj.driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                    if graceObj.waiting_load_calculated_on_load_size:
+                        obj.driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                    else:
+                        obj.driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 
                 
             if 'costParameters_transfer_cost' in data or 'transfer_km_grace' in data:

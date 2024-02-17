@@ -172,6 +172,9 @@ class Grace(models.Model):
     chargeable_standby_time_starts_after = models.FloatField(default=0)
     waiting_time_grace_in_minutes = models.FloatField(default=0)
     chargeable_waiting_time_starts_after = models.FloatField(default=0)
+    waiting_load_calculated_on_load_size = models.BooleanField(default=False)
+    waiting_time_grace_per_cubic_meter = models.FloatField(default=0)
+    minimum_load_size_for_waiting_time_grace = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
