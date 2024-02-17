@@ -593,6 +593,11 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Grace Form :-</h2>
+                            <div class="float-right">
+                                <input   type="checkbox" name="grace_waiting_load_calculated_on_load_size"
+                                {% if grace.waiting_load_calculated_on_load_size  %}checked disabled {% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
+                                                <label for="waiting_load_calculated_on_load_size" >Waiting Load Calculated On Load Size</label>
+                            </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
@@ -654,7 +659,7 @@
                                     </div>
                                 </div>
                                 <!-- chargeable_waiting_time_starts_after,start_date,end_date -->
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-xl-4 col-md-6 chargeable_waiting_time_starts_after">
                                     <label for="chargeable_waiting_time_starts_after">Chargeable waiting time starts after :<span class="required">*</span> <i class="fa-solid fa-circle-info" data-toggle="tooltip" title="Number of minuites after which waiting time is considered for payment"></i></label>
                                     <div class="field item form-group">
                                         <input class="form-control" type="number"
@@ -663,29 +668,26 @@
                                             required='required' style="padding: 0.25rem 0.2rem;" id="chargeable_waiting_time_starts_after">
                                     </div>
                                 </div>
-                                <!-- <div class="col-xl-4 col-md-6">
-                                    <label for="grace_start_date">Start date :<span class="required">*</span></label>
+                                <div class="col-xl-4 col-md-6  {% if not grace.waiting_load_calculated_on_load_size %}d-none{% endif %}  waiting_time_grace_per_cubic_meter ">
+                                    <label for="waiting_time_grace_per_cubic_meter">Waiting Time Grace Per Cubic Meter :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="date" name="grace_start_date"
-                                        value="{% if grace %}{{grace.start_date}}{% endif %}" 
+                                        <input class="form-control" " type="number" name="grace_waiting_time_grace_per_cubic_meter"
+                                        value="{% if grace %}{{grace.waiting_time_grace_per_cubic_meter}}{% endif %}" 
                                         {% if grace %} readonly {% endif %}
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="grace_start_date">
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="waiting_time_grace_per_cubic_meter">
                                     </div>
                                 </div>
-                                <div class="col-xl-4 col-md-6">
-                                    <label for="grace_end_date">End date :<span class="required">*</span></label>
+                                <div class="col-xl-4 col-md-6 {% if not grace.waiting_load_calculated_on_load_size %}d-none{% endif %} minimum_load_size_for_waiting_time_grace ">
+                                    <label for="minimum_load_size_for_waiting_time_grace">Minimum Load Size For Waiting Time Grace :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control"  type="date" name="grace_end_date"
-                                        value="{% if grace %}{{grace.end_date}}{% endif %}" 
+                                        <input class="form-control"  type="number" name="grace_minimum_load_size_for_waiting_time_grace"
+                                        value="{% if grace %}{{grace.minimum_load_size_for_waiting_time_grace}}{% endif %}" 
                                         {% if grace %} readonly {% endif %}
-                                            required='required' style="padding: 0.25rem 0.2rem;" id="grace_end_date">
+                                            required='required' style="padding: 0.25rem 0.2rem;" id="minimum_load_size_for_waiting_time_grace">
                                     </div>
-                                </div> -->
-
-
+                                </div>
                             </div>
                         </div>
-
                     </div>
                     <!-- End Grace  -->
 
@@ -899,7 +901,20 @@
         });
     });
 
-
+    function waiting_load_calculated_on_load_sizeFun() {
+        var checked = $('#waiting_load_calculated_on_load_size').prop('checked'); // Use prop() to get the checked state
+        console.log(checked);
+        
+        if (checked) {
+            $('#chargeable_waiting_time_starts_after').prop('readonly', true).val(0);
+            $('.waiting_time_grace_per_cubic_meter, .minimum_load_size_for_waiting_time_grace').removeClass('d-none');
+        } else {
+            console.log('Else');
+            $('#chargeable_waiting_time_starts_after').prop('readonly', false);
+            $('.waiting_time_grace_per_cubic_meter, .minimum_load_size_for_waiting_time_grace').addClass('d-none');
+        }
+    }
+    
     function rateRevision(id,value=null){
         rateRevisionVal = $("#rateRevisionVal").val()
         console.log(rateRevisionVal)

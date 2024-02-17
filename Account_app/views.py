@@ -1654,10 +1654,11 @@ def driverDocketEntry(request, tripId , errorId = None):
 @csrf_protect
 def countDocketWaitingTime(request):
     tripId = request.POST.get('tripId')
-    print(tripId)
+    docketId = request.POST.get('docketId')
     waitingTimeStart = request.POST.get('waitingTimeStart')
     waitingTimeEnd = request.POST.get('waitingTimeEnd')
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    docketObj = DriverShiftDocket.objects.filter(pk=docketId).first()
     totalWaitingTime =0
     if tripObj:
         clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
@@ -1665,15 +1666,23 @@ def countDocketWaitingTime(request):
         clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
         rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
-
+        
         totalWaitingTime = getTimeDifference(waitingTimeStart,waitingTimeEnd)
-        if totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
+        if graceObj.waiting_load_calculated_on_load_size:
+            loadSize = graceObj.minimum_load_size_for_waiting_time_grace
+        
+            if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
+                loadSize = float(docketObj.cubicMl)
+            loadWaitingMinuteCount = float(loadSize) * float(graceObj.waiting_time_grace_per_cubic_meter) + float(graceObj.waiting_time_grace_in_minutes)
+            totalWaitingTime = float(totalWaitingTime) - math.ceil(loadWaitingMinuteCount)
+        elif totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
             totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
             if totalWaitingTime < 0:
                 totalWaitingTime = 0
         else:
             totalWaitingTime = 0
-                    
+    if totalWaitingTime < 0:
+        totalWaitingTime = 0
     return JsonResponse({'status': True,'totalWaitingTime':totalWaitingTime})
 
 
@@ -1824,7 +1833,10 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             driverStandByCost = 0
 
             if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                if graceObj.waiting_load_calculated_on_load_size:
+                    driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                else:  
+                    driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
             if docketObj.standByStartTime and docketObj.standByEndTime:
                 slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
@@ -2147,6 +2159,7 @@ def driverEntryUpdate(request, shiftId):
             if request.POST.get(f'waitingCheck{docket.id}'):
                 docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
                 docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
+                # return HttpResponse(docket.waitingTimeEnd)
             else:
                 docket.waitingTimeStart = None
                 docket.waitingTimeEnd = None
@@ -2176,7 +2189,6 @@ def driverEntryUpdate(request, shiftId):
 
                 # tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj)
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
-                        
                 if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
                     
@@ -2194,8 +2206,12 @@ def driverEntryUpdate(request, shiftId):
                 driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 
                 driverSurchargeCost = checkSurcharge(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-
-                driverWaitingTimeCost = checkWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                if docket.waitingTimeStart and docket.waitingTimeEnd:
+                    if graceObj.waiting_load_calculated_on_load_size:
+                        driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                    else:  
+                        driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                            
                 slotSize = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                 driverTransferKmCost = checkTransferCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
@@ -2977,6 +2993,9 @@ def rateCardSave(request, id=None, edit=0):
         updatedValues.append('chargeable_standby_time_starts_after') if grace.chargeable_standby_time_starts_after != float(request.POST.get('grace_chargeable_standby_time_starts_after')) else None
         updatedValues.append('waiting_time_grace_in_minutes') if grace.waiting_time_grace_in_minutes != float(request.POST.get('grace_waiting_time_grace_in_minutes')) else None
         updatedValues.append('chargeable_waiting_time_starts_after') if grace.chargeable_waiting_time_starts_after != float(request.POST.get('grace_chargeable_waiting_time_starts_after')) else None
+        updatedValues.append('waiting_load_calculated_on_load_size') if grace.waiting_load_calculated_on_load_size != checkOnOff(request.POST.get('grace_waiting_load_calculated_on_load_size')) else None
+        updatedValues.append('waiting_time_grace_per_cubic_meter') if grace.waiting_time_grace_per_cubic_meter != float(request.POST.get('grace_waiting_time_grace_per_cubic_meter')) else None
+        updatedValues.append('minimum_load_size_for_waiting_time_grace') if grace.minimum_load_size_for_waiting_time_grace != float(request.POST.get('grace_minimum_load_size_for_waiting_time_grace')) else None
         
         # return HttpResponse(updatedValues) 
 
@@ -3046,6 +3065,11 @@ def rateCardSave(request, id=None, edit=0):
     grace.chargeable_standby_time_starts_after=float(request.POST.get('grace_chargeable_standby_time_starts_after'))
     grace.waiting_time_grace_in_minutes=float(request.POST.get('grace_waiting_time_grace_in_minutes'))
     grace.chargeable_waiting_time_starts_after=float(request.POST.get('grace_chargeable_waiting_time_starts_after'))
+    if request.POST.get('grace_waiting_load_calculated_on_load_size') == 'on':
+        grace.waiting_load_calculated_on_load_size= True
+        grace.waiting_time_grace_per_cubic_meter=float(request.POST.get('grace_waiting_time_grace_per_cubic_meter'))
+        grace.minimum_load_size_for_waiting_time_grace=float(request.POST.get('grace_minimum_load_size_for_waiting_time_grace'))
+        grace.chargeable_waiting_time_starts_after= 0
     grace.start_date=startDate
     grace.end_date=endDate
     grace.save()

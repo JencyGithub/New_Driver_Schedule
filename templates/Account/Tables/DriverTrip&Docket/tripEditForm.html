@@ -293,6 +293,8 @@
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
+                                        <input type="checkbox" class="float-right" id="waitingCheck{{docket.id}}" name="waitingCheck{{docket.id}}" value="waitingCheck{{docket.id}}"
+                                            onclick="waitingCheck({{docket.id}},this)" {% if docket.waitingTimeStart %} checked {% endif %}>
                                         <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">

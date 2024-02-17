@@ -173,6 +173,7 @@ function docketUpdate(docketId) {
 }
 function countTotalWaitingTime(lineData, count_, tripId) {
   let waitingTimeStart = $(`#waitingTimeStart${count_}`).val();
+  let docketNumber = $(`#docketNumber${count_}`).val();
   let waitingTimeEnd = lineData.value;
   if (waitingTimeStart && waitingTimeEnd) {
     $.ajax({
@@ -182,6 +183,7 @@ function countTotalWaitingTime(lineData, count_, tripId) {
         tripId: tripId,
         waitingTimeEnd: waitingTimeEnd,
         waitingTimeStart: waitingTimeStart,
+        docketId:count_,
       },
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
