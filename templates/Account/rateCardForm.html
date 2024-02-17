@@ -595,7 +595,7 @@
                             <h2> Grace Form :-</h2>
                             <div class="float-right">
                                 <input   type="checkbox" name="grace_waiting_load_calculated_on_load_size"
-                                {% if grace.waiting_load_calculated_on_load_size  %}checked disabled {% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
+                                {% if grace.waiting_load_calculated_on_load_size   %}checked{% endif %} {% if grace %}disabled{% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
                                                 <label for="waiting_load_calculated_on_load_size" >Waiting Load Calculated On Load Size</label>
                             </div>
                             <div class="clearfix"></div>
