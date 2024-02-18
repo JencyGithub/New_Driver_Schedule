@@ -595,7 +595,7 @@
                             <h2> Grace Form :-</h2>
                             <div class="float-right">
                                 <input   type="checkbox" name="grace_waiting_load_calculated_on_load_size"
-                                {% if grace.waiting_load_calculated_on_load_size   %}checked{% endif %} {% if grace %}disabled{% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
+                                {% if grace.waiting_load_calculated_on_load_size  %}checked disabled {% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
                                                 <label for="waiting_load_calculated_on_load_size" >Waiting Load Calculated On Load Size</label>
                             </div>
                             <div class="clearfix"></div>
@@ -671,7 +671,7 @@
                                 <div class="col-xl-4 col-md-6  {% if not grace.waiting_load_calculated_on_load_size %}d-none{% endif %}  waiting_time_grace_per_cubic_meter ">
                                     <label for="waiting_time_grace_per_cubic_meter">Waiting Time Grace Per Cubic Meter :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" " type="number" name="grace_waiting_time_grace_per_cubic_meter"
+                                        <input class="form-control" type="number" name="grace_waiting_time_grace_per_cubic_meter"
                                         value="{% if grace %}{{grace.waiting_time_grace_per_cubic_meter}}{% endif %}" 
                                         {% if grace %} readonly {% endif %}
                                             required='required' style="padding: 0.25rem 0.2rem;" id="waiting_time_grace_per_cubic_meter">
