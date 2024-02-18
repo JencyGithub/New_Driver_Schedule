@@ -44,6 +44,9 @@ urlpatterns = [
 
     # Appointment routes 
     path('appointment/',include('Appointment_app.urls')),
+
+    # Progressive Web
+    path('', include('pwa.urls'))
     
     
     
