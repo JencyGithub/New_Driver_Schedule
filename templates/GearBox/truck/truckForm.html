@@ -478,10 +478,10 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="endDate{{connection.count}}"> Plant<span class="required">*</span></label>
-                                            <select name="plantName{{connection.count}}" class="form-control" id="plantName{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
-                                                {% for basePlant in basePlantObj%}
-                                                <option value="{{basePlant.id}}" {% if basePlant.id == connection.basePlantId %} selected {% endif %} >{{basePlant.basePlant}}</option>
+                                            <label for="clientOfc{{connection.count}}"> ClientOffice <span class="required">*</span></label>
+                                            <select name="clientOfc{{connection.count}}" class="form-control" id="clientOfc{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
+                                                {% for clientOfcs in clientOfcObj%}
+                                                <option value="{{clientOfcs.id}}" {% if clientOfcs.id == connection.clientOfc_id %} selected {% endif %} >{{clientOfcs.description}}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -493,6 +493,10 @@
                                         </div>
                                         <div class="col-md-4 col-sm-4">
                                             <label for="endDate{{connection.count}}"> End date<span class="required">*</span></label>
+                                            <div class="float-right  {% if not connection.neverEnding  %}d-none{% endif %} neverEnding">
+                                                <input type="checkbox" {% if connection.neverEnding  %}checked disabled{% endif %} name="neverEnding" onchange="neverEndingFun()" id="neverEnding" class="">
+                                                <label for="neverEnding">Never Ending</label>
+                                            </div>
                                             <input class="form-control" data-validate-length-range="6,6" value="{% if connection %}{{connection.endDate}}{% endif %}" {% if connection %}readonly{% endif %} type="date" name="endDate{{connection.count}}"  style="padding: 0.25rem 0.2rem;" id="endDate{{connection.count}}">
                                         </div>
                                         <div class="col-md-4 col-sm-4">

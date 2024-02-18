@@ -313,10 +313,10 @@ def truckTable(request):
 def truckForm(request, id=None, viewOnly= None):
     truckInformationCustomObj = None
     clientIds = Client.objects.all()
+    clientOfcObj = ClientOffice.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
     adminTruckObj=truckInformationObj=connections = None
-    basePlantObj = BasePlant.objects.all()
     curDate = getCurrentDateTimeObj().date()
     truckInformationCustomObj = TruckInformationCustom.objects.filter(active=True)
 
@@ -356,7 +356,7 @@ def truckForm(request, id=None, viewOnly= None):
         'truckInformationObj':truckInformationObj,
         'connections' : connections,
         'preStarts':preStarts,
-        'basePlantObj':basePlantObj,
+        'clientOfcObj':clientOfcObj,
         'truckInformationCustomObj':truckInformationCustomObj,
         'viewOnly':viewOnly,
         'groups' : TruckGroup.objects.all()
@@ -631,6 +631,7 @@ def truckConnectionSave(request,id):
     adminTruck = AdminTruck.objects.get(id=id)
     rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
     client = Client.objects.get(pk=request.POST.get('clientId'))
+    clientOfcObj = ClientOffice.objects.filter(pk=request.POST.get('clientOfc')).first()
     dataList = {
         'truckNumber' : adminTruck,
         'rate_card_name' : rateCard,
@@ -640,7 +641,8 @@ def truckConnectionSave(request,id):
         'truckType' : request.POST.get('truckType'),
         'startDate' : request.POST.get('startDate'),
         'endDate' : request.POST.get('endDate'),
-        'basePlantId':request.POST.get('basePlantId'),
+        'clientOfc': clientOfcObj,
+        'neverEnding':True if request.POST.get('neverEnding') == 'on' else False,
         'createdBy' : request.user
     }
 
@@ -690,13 +692,20 @@ def truckConnectionDeactivate(request):
 
 @csrf_protect
 def getRateCard(request):
-    clientId = request.POST.get('clientName')
-    print(clientId)
-    rateCardList = RateCard.objects.filter(clientName__clientId = clientId).values()
-    
+    clientOfficeId = request.POST.get('clientOffice')
+    clientOfficeObj = ClientOffice.objects.filter(pk = clientOfficeId).first()
+    rateCardList = RateCard.objects.filter(clientOfc = clientOfficeObj).values()
+    print(rateCardList)
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
 
 
+@csrf_protect
+def getClientOffice(request):
+    clientId = request.POST.get('clientName')
+    clientObj = Client.objects.filter(pk = clientId).first()
+    clientOfficeObj = ClientOffice.objects.filter(clientId = clientObj).values()
+    return JsonResponse({'status': True, 'clientOfficeObj': list(clientOfficeObj)})
+    
 # Settings Form 
 
 def settingsForm(request):

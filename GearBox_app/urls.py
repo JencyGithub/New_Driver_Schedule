@@ -111,6 +111,7 @@ urlpatterns = [
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
     path('truck/connection/deactivate>/', views.truckConnectionDeactivate, name='truckConnectionDeactivate'),
     path('getRateCard/', views.getRateCard, name='getRateCard'),
+    path('getClientOffice/', views.getClientOffice, name='getClientOffice'),
     
     # dockument 
     # path('document/', views.documentView, name="do

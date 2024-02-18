@@ -14,120 +14,105 @@ request {% endblock %} {% block headStyle %}
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Add truck connection</h2>
+                        
                         <div class="clearfix"></div>
                     </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
+
+
+                    <div class="x_content ">
+                        <div class="custom-continer">
                             <form action="{% url 'gearBox:truckConnectionSaveView' id=id %}" method="POST" novalidate>
                                 {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="clientTruckNumber" class="col-form-label col-md-3 col-sm-3 label-align">Client truck number :<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" type="number" name="clientTruckNumber" required style="padding: 0.25rem 0.2rem;" id="clientTruckNumber">
-                                        </div>
+
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientTruckNumber" class="required">Client truck number :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" type="number" name="clientTruckNumber" required style="padding: 0.25rem 0.2rem;" id="clientTruckNumber">
+
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="basePlantId" class="col-form-label col-md-3 col-sm-3 label-align">Plant name:<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="basePlantId" onchange="rateCard()" class="form-control" required="required" id="basePlantId">
-                                                <option disabled selected >Select Plant Name</option>
-                                                {% for basePlant in basePlantObj %}
-                                                <option value="{{ basePlant.id }}">{{ basePlant.basePlant }}</option>
-                                                {% endfor %}
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientId" class="required">Client name:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        {% comment %} <select name="clientId" onchange="rateCard(this)" class="form-control" required="required"> {% endcomment %}
+                                        <select name="clientId" onchange="clientOfficeFun(this)" class="form-control" required="required">
+                                            <option disabled selected >Select Client Name</option>
+                                            {% for client in clientIds%}
+                                            <option value="{{client.clientId}}">{{client.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="clientId" class="required">Client office:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select name="clientOfc" disabled class="form-control" id="clientOfc" required="required" >
+                                    
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="rate_card_name"class="required">Rate card :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select name="rate_card_name" disabled class="form-control" id="rate_card_name" required="required" >
+                                    
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label  for="pre_start_name" class="required">Pre-start :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select name="pre_start_name"  class="form-control" id="pre_start_name" required="required" >
+                                            {% for preStart in preStarts%}
+                                                <option value="">Select Pre Start</option>
+                                                <option value="{{preStart.id}}">{{preStart.preStartName}}</option>
+                                            {% endfor %}
                                             </select>
-                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="clientId" class="col-form-label col-md-3 col-sm-3 label-align">Client name:<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="clientId" onchange="rateCard()" class="form-control" required="required" id="clientId">
-                                                <option disabled selected >Select Client Name</option>
-                                                {% for client in clientIds%}
-                                                <option value="{{client.clientId}}">{{client.name}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="truckType" class="required">Truck type:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select name="truckType" class="form-control" id="truckType" onchange="truckTypeFun()" {% if data %}disabled{% endif %}>
+                                            <option value=""  >Select Truck Type</option>
+                                            <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
+                                            <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="rate_card_name" class="col-form-label col-md-3 col-sm-3 label-align">Rate card :<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="rate_card_name" disabled class="form-control" id="rate_card_name" required="required" >
-                                                
-                                            </select>
-                                        </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="startDate" class="required ">Start Date :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control" name="startDate" required="required"
+                                        id="startDate" type="date"/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="pre_start_name" class="col-form-label col-md-3 col-sm-3 label-align">Pre-start :<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="pre_start_name"  class="form-control" id="pre_start_name" required="required" >
-                                                <option disabled selected >Select Pre-start</option>
-                                                {% for preStart in preStarts%}
-                                                    <option value="{{preStart.id}}">{{preStart.preStartName}}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <label for="endDate" class="required ">End Date :<span class="required">*</span></label>
+                                    <div class="float-right d-none neverEnding">
+                                        <input type="checkbox" name="neverEnding" onchange="neverEndingFun()" id="neverEnding" class="">
+                                        <label for="neverEnding">Never Ending</label>
+                                    </div>
+                                    <div class="field item form-group">
+                                        <input class="form-control" name="endDate" required="required"
+                                        id="endDate" type="date"/>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="startDate"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">Start Date :<span
-                                                class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="startDate" required="required"
-                                                id="startDate" type="date"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="endDate"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">End Date :<span
-                                                class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="endDate" required="required"
-                                                id="endDate" type="date"/>
-                                        </div>
-                                    </div>
-                                </div>                                
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="truckType" class="col-form-label col-md-3 col-sm-3 label-align">Truck type:<span class="required">*</span></label>
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <select name="truckType" class="form-control" id="truckType" {% if data %}disabled{% endif %}  required>
-                                                <option disabled selected >Select Truck Type</option>
-                                                <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
-                                                <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>                              
-                                <div class="row">
-                                    <div class="col-md-9 col-sm-9 text-right">
-                                        <button type="submit" class="btn btn-sm btn-default px-2">
-                                            Submit
-                                        </button>
-                                    </div>
+                                
+                                <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
+                                    <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
                                 </div>
                             </form>
                         </div>
+                        
                     </div>
+                    
                 </div>
             </div>
         </div>
     </div>
 </div>
 <!-- /page content -->
-{% endblock %}
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -151,16 +136,6 @@ request {% endblock %} {% block headStyle %}
     document.forms[0].onsubmit = function (e) {
         var submit = true,
             validatorResult = validator.checkAll(this);
-
-        $('input[required], textarea[required], select[required]').each(function() {
-            if ($(this).val() == '' || $(this).val() == null) {
-                validatorResult.valid = false;
-                $(this).css('border','1px solid #CE5454');
-            }else{
-                $(this).css('border','1px solid #ced4da');
-
-            }
-        });
         console.log(validatorResult);
         return !!validatorResult.valid;
     };
@@ -178,15 +153,36 @@ request {% endblock %} {% block headStyle %}
     
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-    function rateCard(){
-
-        plantName = $('#basePlantId').val()
-        clientName = $('#clientId').val()
-
-        console.log(clientName, plantName)
-        if (clientName && plantName){
+    function rateCard(dataRow) {
+        $.ajax({
+            url: "/gearBox/getRateCard/",
+            method: "POST",
+            data: {
+                'clientOffice': dataRow, // Pass the value instead of the DOM element
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(data) {
+                $("#rate_card_name").empty();
+                $("#rate_card_name").append('<option value="" disabled selected>Select Rate Card</option>');
+                data.rateCard.forEach(function(item) {
+                    $("#rate_card_name").append(
+                        '<option value="' + item['id'] + '">' + item['rate_card_name'] + "</option>"
+                    );
+                });
+                $('#rate_card_name').removeAttr('disabled');
+            },
+        });
+    }
+    
+    function clientOfficeFun(dataRow){
+        clientName = $(dataRow).val()
+        if (clientName)
+        {
+        
             $.ajax({
-                url: "/gearBox/getRateCard/",
+                url: "/gearBox/getClientOffice/",
                 method: "POST",
                 data: {
                     'clientName' : clientName,
@@ -195,16 +191,49 @@ request {% endblock %} {% block headStyle %}
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
                 success: function (data) {
-                    $("#rate_card_name").empty()
-                    data.rateCard.forEach(function (item) {
-                        $("#rate_card_name").append(
-                        '<option value="' + item['id'] + '">' + item['rate_card_name'] + "</option>"
+                    $("#clientOfc").empty()
+                    $("#clientOfc").append('<option value="" disabled selected>Select Office</option>');
+
+                    data.clientOfficeObj.forEach(function (item) {
+                        $("#clientOfc").append(
+                        '<option value="' + item['id'] + '">' + item['address1'] + "</option>"
                         );
                     });
-                    $('#rate_card_name').removeAttr('disabled');
+                    $('#clientOfc').removeAttr('disabled');
+                    $('#rate_card_name').prop('disabled',true);
+                    $("#clientOfc").on("change", function() {
+                        // Your logic when an option is changed
+                        // You can access the selected option using $(this).val()
+                        var selectedOptionValue = $(this).val();
+                        rateCard(selectedOptionValue)
+                        // You can perform additional actions here based on the selected option
+                    });
                 },
             });
         }
     }
+    function truckTypeFun(){
+        truckTypeVal = $('#truckType').val()
+        if (truckTypeVal == 'Embedded'){
+            $('.neverEnding').removeClass('d-none')
+        }
+        else{
+            $('.neverEnding').addClass('d-none')
+        }
+    }
+
+    function neverEndingFun(){
+        checkedVal =  $('#neverEnding').is(':checked');
+        console.log(checkedVal)
+        if(checkedVal){
+            $('#endDate').val('2035-01-01')
+            $('#endDate').prop( "readonly", true )
+        }
+        else{
+            $('#endDate').val('');
+            $('#endDate').prop("readonly", false);
+
+        }
+    }
 </script>
-{% endblock %} 
+{% endblock %} {% endblock %}
