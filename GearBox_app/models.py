@@ -438,7 +438,7 @@ class AdminTruck(models.Model):
     adminTruckNumber = models.PositiveIntegerField(unique=True)
     truckInformation = models.ForeignKey(TruckInformation, on_delete = models.CASCADE , null = True)
     truckAxles = models.ForeignKey(Axles, on_delete = models.CASCADE , null = True)
-    # truckSetting = models.ForeignKey(TruckSetting, on_delete = models.CASCADE , null = True)
+    truckSetting = models.ForeignKey(TruckSetting, on_delete = models.CASCADE , null = True)
     truckActive = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     
