@@ -422,6 +422,7 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
+admin.site.register(TruckEntryError)
 
 # admin.site.register(AppointmentTruck)
 # admin.site.register(AppointmentDriver)

@@ -530,3 +530,15 @@ class TruckDocument(models.Model):
     def __str__(self):
         return str(self.tags)
     
+    
+class TruckEntryError(models.Model):
+    truckNo = models.IntegerField(default=0,null=True) 
+    errorDescription = models.CharField(max_length=255, default=None, null=True, blank=True)
+    exceptionText = models.CharField(max_length=255, default=None, null=True, blank=True)
+    fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
+    status = models.BooleanField(default=False)
+    errorType = models.FloatField(default=0) 
+    data = models.CharField(max_length=2048, default=' ')
+
+    def __str__(self):
+        return str(self.truckNo)
