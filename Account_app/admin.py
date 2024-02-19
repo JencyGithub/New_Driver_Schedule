@@ -269,11 +269,15 @@ def admin_truck_download_csv(modeladmin, request, queryset):
 admin.site.register(CostParameters)
 admin.site.register(ThresholdDayShift)
 admin.site.register(TruckGroup)
+admin.site.register(TruckSubGroup)
 admin.site.register(Axles)
 admin.site.register(ThresholdNightShift)
 admin.site.register(Grace)
 admin.site.register(OnLease)
 admin.site.register(TruckInformationCustom)
+admin.site.register(TruckSettingCustom)
+admin.site.register(TruckSetting)
+
 class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]

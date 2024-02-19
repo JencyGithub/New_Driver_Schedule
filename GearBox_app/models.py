@@ -427,7 +427,6 @@ class TruckSetting(models.Model):
 class TruckSettingCustom(models.Model):
     customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
     active = models.BooleanField(default=True)
-    required = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.customFieldLabel) + str(self.active)
@@ -515,7 +514,12 @@ class TruckGroup(models.Model):
     def __str__(self):
         return self.name
 
+class TruckSubGroup(models.Model):
+    truckGroup = models.ForeignKey(TruckGroup, on_delete=models.CASCADE , null=True)
+    name = models.CharField(max_length=100, default=None)
 
+    def __str__(self):
+        return self.name
 
 # DOCUMENTS TAB
 class TruckDocument(models.Model):
