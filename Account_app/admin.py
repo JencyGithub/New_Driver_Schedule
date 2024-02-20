@@ -422,7 +422,11 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
-admin.site.register(TruckEntryError)
+class TruckEntryErrorAdmin(admin.ModelAdmin):
+    list_display = ["truckNo","exceptionText"]
+    search_fields = ["truckNo"]
+
+admin.site.register(TruckEntryError , TruckEntryErrorAdmin)
 
 # admin.site.register(AppointmentTruck)
 # admin.site.register(AppointmentDriver)

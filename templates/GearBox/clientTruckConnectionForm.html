@@ -90,11 +90,11 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="endDate" class="required ">End Date :<span class="required">*</span></label>
                                     <div class="float-right d-none neverEnding">
-                                        <input type="checkbox" name="neverEnding" onchange="neverEndingFun()" id="neverEnding" class="">
+                                        <input type="checkbox" name="neverEnding"  onchange="neverEndingFun()" id="neverEnding" class="">
                                         <label for="neverEnding">Never Ending</label>
                                     </div>
                                     <div class="field item form-group">
-                                        <input class="form-control" name="endDate" required="required"
+                                        <input class="form-control" readonly name="endDate" required="required"
                                         id="endDate" type="date"/>
                                     </div>
                                 </div>
@@ -118,6 +118,7 @@ request {% endblock %} {% block headStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+<script src="{% static 'js/reconciliation_analysis.js' %}"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"

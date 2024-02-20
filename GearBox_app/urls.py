@@ -143,12 +143,21 @@ urlpatterns = [
 
     path('truck/groups/view', views.groupsView, name='groupsView'),
     path('truck/groups/add/save/', views.addGroupsSave, name='addGroupsSave'),
+    path('truck/groups/edit/<int:id>', views.addGroupsSave, name='addGroupsEdit'),
 
     # Sub groups 
-    path('subgroups/add/', views.addSubGroups, name='addSubGroups'),
+    path('subgroups/form/', views.subGroupForm, name='subGroupForm'),
+    path('subgroups/save/', views.subGroupSave, name='subGroupSave'),
+    path('subgroups/edit/<int:id>', views.subGroupSave, name='subGroupEdit'),
 
     # Fleet Settings 
     path('fleet/Settings/', views.fleetSettings, name='fleetSettings'),    
     path('fleet/customInformation/save', views.fleetCustomInformationSave, name='fleetCustomInformationSave'),    
     path('fleet/customInformation/update/<int:id>', views.fleetCustomInformationSave, name='fleetCustomInformationUpdate'),    
+    
+    
+    path('truckSampleCsv/', views.truckSampleCsv, name='truckSampleCsv'),
+    path('Bulk/Truck/Entry/', views.bulkTruckEntryForm, name='bulkTruckEntryForm'), 
+    path('Bulk/Truck/Entry/Save', views.uploadBulkData, name='uploadBulkData'), 
+    
 ]

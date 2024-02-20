@@ -15,6 +15,8 @@ import os, colorama, subprocess, json
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password
 from django.core.serializers import serialize
+from django.http import FileResponse
+import pandas as pd
 
 # Create your views here.
 def leaveReq(request):
@@ -807,19 +809,58 @@ def clientOfcEditSave(request, id=None, clientId=None):
     return redirect(request.META.get('HTTP_REFERER'))
 
 def groupsView(request):
-    return render(request,'GearBox/groupsForm.html')
+    truckGroupObj = TruckGroup.objects.all()
+    params = {
+        'truckGroupObj':truckGroupObj
+    }
+    return render(request,'GearBox/groupsForm.html',params)
 
 
 @csrf_protect
-def addGroupsSave(request):
+def addGroupsSave(request , id= None):
     groupName = request.POST.get('groupName')
-    truckGroupObj = TruckGroup(name=groupName)
+    truckGroupObj = TruckGroup.objects.filter(pk=id).first()
+    existingTruckGroup = TruckGroup.objects.filter(name=groupName).first()
+    if existingTruckGroup:
+        messages.error(request, 'This Group  Already Exists ')
+        return redirect(request.META.get('HTTP_REFERER'))
+    if not truckGroupObj:
+        truckGroupObj = TruckGroup()
+    truckGroupObj.name=groupName
     truckGroupObj.save()
-    messages.success(request,'Group added Successfully')
-    return redirect('gearBox:groupsView')
+    messages.success(request, 'Add Successfully' if not truckGroupObj else 'Update Successfully')
+    return redirect(request.META.get('HTTP_REFERER'))
 
-def addSubGroups(request):
-    return render(request, 'GearBox/subgroupsForm.html')
+def subGroupForm(request):
+    truckGroupObj = TruckGroup.objects.all()
+    truckSubGroupObj = TruckSubGroup.objects.all()
+    params = {
+        'truckGroupObj':truckGroupObj,
+        'truckSubGroupObj':truckSubGroupObj,
+    }
+    return render(request, 'GearBox/subgroupsForm.html',params)
+
+@csrf_protect
+def subGroupSave(request , id=None):
+    truckGroupObj = TruckGroup.objects.all()
+    truckSubGroupObj = TruckSubGroup.objects.filter(pk=id).first()
+    truckGroupObj = TruckGroup.objects.filter(pk=request.POST.get('groups')).first()
+    existingTruckSubGroup = TruckSubGroup.objects.filter(name = request.POST.get('subGroups')  , truckGroup =truckGroupObj).first()
+    if existingTruckSubGroup:
+        messages.error(request, 'This Group  Sub Group Already Exists ')
+        return redirect(request.META.get('HTTP_REFERER'))
+    if not truckSubGroupObj:
+        truckSubGroupObj = TruckSubGroup()
+    truckSubGroupObj.truckGroup  =  truckGroupObj
+    truckSubGroupObj.name  = request.POST.get('subGroups') 
+    truckSubGroupObj.save()
+    
+    params = {
+        'truckGroupObj':truckGroupObj
+    }
+    messages.success(request, 'Add Successfully' if not truckSubGroupObj else 'Update Successfully')
+    return redirect(request.META.get('HTTP_REFERER'))
+
 
 def fleetSettings(request):
     truckInformationCustomObj = TruckInformationCustom.objects.all()
@@ -870,3 +911,61 @@ def fleetCustomInformationSave(request, id = None):
     messages.success(request, 'Custom Information update Successfully' if id else 'Custom Information added Successfully' )
     return redirect('gearBox:fleetSettings')
 
+def truckSampleCsv(request):
+    existing_custom_field = []
+    truck_information_custom_list = []
+    custom_column_name = []
+    data = pd.read_excel('static/Account/sampleTruckEntry.xlsx')
+    build_date_index = data.columns.get_loc('Build Date')
+    existing_custom_field = data.columns[build_date_index + 1: build_date_index + 7].tolist()
+
+    truck_information_custom_objects = TruckInformationCustom.objects.all()
+
+    for obj in truck_information_custom_objects:    
+        truck_information_custom_list.append(obj.customFieldLabel)
+        
+    custom_column_name = truck_information_custom_list[0:]
+    length_ = len(custom_column_name)
+    custom_column_name +=existing_custom_field[length_:]
+    
+    for i in range(len(custom_column_name)):
+        data.rename(columns={'Custom_Field_'+str(i+1): custom_column_name[i]}, inplace=True)
+
+    data.to_excel('static/Account/sampleTruckEntry - Copy.xlsx', index=False)
+
+    return FileResponse(open(f'static/Account/sampleTruckEntry - Copy.xlsx', 'rb'), as_attachment=True)
+
+def bulkTruckEntryForm(request):
+    truckEntryErrorObj = TruckEntryError.objects.all()
+    params = {
+        'truckEntryErrorObj':truckEntryErrorObj
+    }
+    return render(request, 'GearBox/truck/bulkTruckEntryForm.html',params)
+
+@csrf_protect
+def uploadBulkData(request):
+    truck_csv_file = request.FILES.get('truckEntryFile')
+    if not truck_csv_file:
+        messages.warning(request,'Invalid Request')
+        return redirect(request.META.get('HTTP_REFERER'))
+    try:
+        time = (str(timezone.now())).replace(':', '').replace(
+            '-', '').replace(' ', '').split('.')
+        time = time[0]
+        newFileName = time + "@_!" + str(truck_csv_file.name)
+
+        location = 'static/Account/TruckEntry'
+        lfs = FileSystemStorage(location=location)
+        lfs.save(newFileName, truck_csv_file)
+        with open("Truck_entry_file.txt", 'w') as f:
+            f.write(newFileName+','+str(request.user))
+            f.close()
+        colorama.AnsiToWin32.stream = None
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'TruckCsvToModel','--continue-on-error']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        messages.success(
+            request, "Please wait 5 minutes. The data conversion process continues")
+        return redirect(request.META.get('HTTP_REFERER'))
+    except Exception as e:
+        return HttpResponse(f"Error: {str(e)}")
