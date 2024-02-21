@@ -468,7 +468,7 @@ class ClientTruckConnection(models.Model):
     pre_start_name = models.PositiveIntegerField(default=0)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE)
     clientTruckId = models.PositiveIntegerField(default=0)
-    neverEnding = models.BoolenField(default=False)
+    neverEnding = models.BooleanField(default=False)
     # basePlantId = models.PositiveIntegerField(default=0)  
     # clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  
     startDate = models.DateField(default=timezone.now())  
