@@ -11,6 +11,7 @@ from django.contrib.auth.models import User , Group
 from GearBox_app.models import *
 from django.core.mail import send_mail
 from django.contrib.auth.hashers import check_password
+from CRUD import *
 
 register = template.Library()
 
@@ -59,7 +60,37 @@ def loginCheck(request):
             else:
                 messages.error(request, "Login failed!")
                 return redirect(request.META.get('HTTP_REFERER'))
-                return redirect('login')
+            
+    # if len(request.POST.get('username').split('@')) > 1:
+    #     db_name = request.POST.get('username').split('@')[-1]+'_db'
+    #     username = request.POST.get('username')
+    #     password = request.POST.get('password')
+    #     user = authenticate(username=username,password=password,db_name = db_name)
+
+    #     if user:
+    #         login(request, user)
+    #         print('User Name 1',request.user)
+            
+    #         CurrentUser_ = request.user
+    #         request.session['db_name'] = db_name
+    #         # return HttpResponse(getDatabase(request))
+    #         if CurrentUser_.groups.filter(name='Driver').exists():
+    #             request.session['user_type'] = 'Driver'
+    #             return redirect('index')
+                
+    #         elif CurrentUser_.groups.filter(name='Accounts').exists():
+    #             request.session['user_type'] = 'Accounts'
+    #         elif CurrentUser_.groups.filter(name='HR').exists():
+    #             request.session['user_type'] = 'HR'
+    #         else:
+    #             request.session['user_type'] = 'SuperUser'
+    #         return redirect('Account:index')
+    #     else:
+    #         messages.error(request, "Login failed!")
+    #         return redirect(request.META.get('HTTP_REFERER'))
+    # else:
+    #     messages.error(request,'Invalid username')
+    #     return redirect(request.META.get('HTTP_REFERER'))
     
 
 def CustomLogOut(request):

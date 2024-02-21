@@ -326,21 +326,21 @@ def truckForm(request, id=None, viewOnly= None):
     if id:
         adminTruckObj = AdminTruck.objects.filter(pk=id).first()
         truckInformationObj = adminTruckObj.truckInformation
-        connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
-        
-        for i in connections:
-            i['count'] = count_
-            if i['startDate'] <= curDate and i['endDate'] > curDate:
-                i['status'] = True
-            count_ += 1
-            i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
-            preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
+        # connections = ClientTruckConnection.objects.filter(truckNumber=id).values()
+        # return HttpResponse(connections)
+        # for i in connections:
+        #     i['count'] = count_
+        #     if i['startDate'] <= curDate and i['endDate'] > curDate:
+        #         i['status'] = True
+        #     count_ += 1
+        #     i['createdBy'] = User.objects.filter(pk=i['createdBy_id']).first().username
+        #     preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
             
-            if preStartObj:
-                i['pre_start_name'] = preStartObj.preStartName
-            i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
-            if i['endDate']:
-                i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
+        #     if preStartObj:
+        #         i['pre_start_name'] = preStartObj.preStartName
+        #     i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
+        #     if i['endDate']:
+        #         i['endDate'] = dateConverterFromTableToPageFormate(i['endDate'])
 
         for i in range(1, len(truckInformationCustomObj)+1):
             field_str = 'customFieldValue' + str(i)
@@ -695,7 +695,9 @@ def truckConnectionDeactivate(request):
 @csrf_protect
 def getRateCard(request):
     clientOfficeId = request.POST.get('clientOffice')
+    print(clientOfficeId)
     clientOfficeObj = ClientOffice.objects.filter(pk = clientOfficeId).first()
+    print('ClientOffice Id' ,clientOfficeObj )
     rateCardList = RateCard.objects.filter(clientOfc = clientOfficeObj).values()
     print(rateCardList)
     return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
