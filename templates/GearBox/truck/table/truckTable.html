@@ -59,8 +59,8 @@
                                         <tbody>
                                             {% for truck in adminTrucks %}
                                             <tr>
-                                                <td> <a href="#"> {{ truck.adminTruckNumber}} </a></td>
-                                                <td> <a href="#"> {{ truck.createdBy.username}} </a></td>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.id viewOnly=1 %}"> {{ truck.adminTruckNumber}} </a></td>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.id viewOnly=1 %}"> {{ truck.createdBy.username}} </a></td>
                                                 <td class = "text-center">
                                                     <a href="{% url 'gearBox:truckEditView' id=truck.id %}">
                                                         <i class="fa-solid fa-pen-to-square" style="font-size:1.3rem"></i>

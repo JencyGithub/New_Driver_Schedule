@@ -616,13 +616,13 @@ def truckConnectionForm(request, id):
     clientIds = Client.objects.all()
     rateCards = RateCard.objects.all()
     preStarts = PreStart.objects.all()
-    basePlantObj = BasePlant.objects.filter(clientDepot = True)
+    # basePlantObj = BasePlant.objects.filter(clientDepot = True)
     params = {
         'clientIds' : clientIds,
         'rateCards' : rateCards,
         'truckType' : request.POST.get('truckType'),
         'id' : id,
-        'basePlantObj' : basePlantObj,
+        # 'basePlantObj' : basePlantObj,
         'preStarts':preStarts
     }
     # return HttpResponse(basePlantObj)

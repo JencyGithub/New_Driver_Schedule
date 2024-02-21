@@ -152,7 +152,6 @@ request {% endblock %} {% block headStyle %}
         })
         .prop("checked", false);
     
-    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     function rateCard(dataRow) {
         $.ajax({
