@@ -462,7 +462,8 @@ class Driver(models.Model):
         
 
 class ClientTruckConnection(models.Model):
-    truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
+    truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE , null=True)
+    clientOfc = models.ForeignKey(ClientOffice, on_delete=models.CASCADE,null=True)
     truckType = models.CharField(max_length=254 , choices=TRUCK_TYPE_CHOICES, default='Embedded')
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     pre_start_name = models.PositiveIntegerField(default=0)
