@@ -40,7 +40,7 @@
           <div class="x_title">
             <h2>Rate Card Table : </h2>
             {% if clientOfcId %}
-            <a href="{% url 'Account:rateCardForm' clientId=clientId %}" class="btn btn-sm btn-dark float-right">Add</a>
+            <a href="{% url 'Account:rateCardForm' clientId=clientId clientOfcId=clientOfcId %}" class="btn btn-sm btn-dark float-right">Add</a>
             {% endif %}
 
             <div class="clearfix"></div>

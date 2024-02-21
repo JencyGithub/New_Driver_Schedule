@@ -84,7 +84,7 @@
             {% endif %}
            
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="{% if rateCard %}{% else %}{% url 'Account:rateCardSave' %}{% endif %}" novalidate enctype="multipart/form-data" id="myForm">
+                <form class="" method="POST" action="{% if rateCard %}{% else %}{% url 'Account:rateCardSave' clientOfcId=clientOfcId %}{% endif %}" novalidate enctype="multipart/form-data" id="myForm">
                     {% csrf_token %}
                     <!--Start Rate Care Name  -->
                     <div class="x_panel">

@@ -2802,7 +2802,7 @@ def rateCardTable(request,clientId = None, clientOfcId=None):
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
 
-def rateCardForm(request, id=None , clientId=None):
+def rateCardForm(request, id=None , clientId=None , clientOfcId=None):
     rateCard = rateCardSurcharges = surchargesEntry = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = tds = startDate = endDate = None
     surchargesEntry =Surcharge.objects.all()
     rateCardDates = []
@@ -2853,6 +2853,7 @@ def rateCardForm(request, id=None , clientId=None):
         'endDate' : endDate,
         'rateCardDates' : rateCardDates,
         'clientId':clientId,
+        'clientOfcId':clientOfcId,
         # 'onLease' : onLease,
     }
     return render(request, 'Account/rateCardForm.html', params)
@@ -2875,7 +2876,7 @@ def checkOnOff(val_):
 
 
 @csrf_protect
-def rateCardSave(request, id=None, edit=0):
+def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
     # Rate Card
     rateCardID = None
     startDate = request.POST.get('startDate')
@@ -2887,6 +2888,7 @@ def rateCardSave(request, id=None, edit=0):
         rateCard.rate_card_name=request.POST.get('rate_card_name')
         clientId =request.POST.get('clientName')
         rateCard.clientName = Client.objects.filter(pk = clientId).first()
+        rateCard.clientOfc = ClientOffice.objects.filter(pk = clientOfcId).first()
         rateCard.save()
         rateCardID = RateCard.objects.filter(rate_card_name=request.POST.get('rate_card_name')).first()
 
