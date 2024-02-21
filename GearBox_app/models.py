@@ -255,7 +255,7 @@ class TruckInformation(models.Model):
     engineGearBox = models.CharField(max_length=100, default='', null=True, blank=True)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.fleet)
     
 class TruckInformationCustom(models.Model):
     customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)

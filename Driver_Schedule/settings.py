@@ -83,11 +83,11 @@ TEMPLATES = [
         },
     },
 ]
-AUTHENTICATION_BACKENDS = [
-    'Driver_Schedule.auth_backends.CustomAuthBackend',
-    # Add other authentication backends if needed
-    'django.contrib.auth.backends.ModelBackend',  # Default authentication backend
-]
+# AUTHENTICATION_BACKENDS = [
+#     'Driver_Schedule.auth_backends.CustomAuthBackend',
+#     # Add other authentication backends if needed
+#     'django.contrib.auth.backends.ModelBackend',  # Default authentication backend
+# ]
 
 WSGI_APPLICATION = 'Driver_Schedule.wsgi.application'
 
@@ -99,11 +99,12 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'gss_db': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'gss_db.sqlite3',
     }
+    # },
+    # 'gss_db': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'gss_db.sqlite3',
+    # }
 }
 
 
