@@ -352,24 +352,24 @@ class Axles(models.Model):
 #SETTINGS TAB
 class TruckSetting(models.Model):
     # Configuration
-    fuelType = models.CharField(max_length=100)
-    fuelCreditCategory = models.CharField(max_length=100)
-    adbluePercent = models.FloatField(null=True, blank=True)
-    kilometersOffset = models.FloatField(null=True, blank=True)
-    hoursOffset = models.FloatField(null=True, blank=True)
-    preStartChecklist = models.CharField(max_length=100)
-    trailers = models.CharField(max_length=100)
+    fuelType = models.CharField(max_length=1024, null=True, blank=True)
+    fuelCreditCategory = models.CharField(max_length=1024, null=True, blank=True)
+    adbluePercent = models.CharField(max_length=1024, null=True, blank=True)
+    kilometersOffset = models.CharField(max_length=1024, null=True, blank=True)
+    hoursOffset = models.CharField(max_length=1024, null=True, blank=True)
+    preStartChecklist = models.CharField(max_length=1024, null=True, blank=True)
+    trailers = models.CharField(max_length=1024, null=True, blank=True)
     
     # Dimensions
-    GCM = models.FloatField(null=True, blank=True)
-    GVM = models.FloatField(null=True, blank=True)
-    TARE = models.FloatField(null=True, blank=True)
-    ATM = models.FloatField(null=True, blank=True)
-    length = models.FloatField(null=True, blank=True)
-    height = models.FloatField(null=True, blank=True)
-    width = models.FloatField(null=True, blank=True)
-    volume = models.FloatField(null=True, blank=True)
-    pallets = models.FloatField(null=True, blank=True)
+    GCM = models.CharField(max_length=1024, null=True, blank=True)
+    GVM = models.CharField(max_length=1024, null=True, blank=True)
+    TARE = models.CharField(max_length=1024, null=True, blank=True)
+    ATM = models.CharField(max_length=1024, null=True, blank=True)
+    length = models.CharField(max_length=1024, null=True, blank=True)
+    height = models.CharField(max_length=1024, null=True, blank=True)
+    width = models.CharField(max_length=1024, null=True, blank=True)
+    volume = models.CharField(max_length=1024, null=True, blank=True)
+    pallets = models.CharField(max_length=1024, null=True, blank=True)
 
     # 16 Custom Fields
     customText1 = models.CharField(max_length=1024, null=True, blank=True)
