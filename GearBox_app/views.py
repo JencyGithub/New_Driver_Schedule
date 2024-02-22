@@ -360,7 +360,8 @@ def truckForm(request, id=None, viewOnly= None):
         'clientOfcObj':clientOfcObj,
         'truckInformationCustomObj':truckInformationCustomObj,
         'viewOnly':viewOnly,
-        'groups' : TruckGroup.objects.all()
+        'groups' : TruckGroup.objects.all(),
+        'subGroups' : TruckSubGroup.objects.all(),
     }
     return render(request,'GearBox/truck/truckForm.html',params)
 
@@ -829,6 +830,28 @@ def addGroupsSave(request , id= None):
         truckGroupObj = TruckGroup()
     truckGroupObj.name=groupName
     truckGroupObj.save()
+    
+    # Load the JSON data from the file
+    json_file_path = 'static/Account/fleetInformation.json'
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+    # Update the JSON data by adding the new group entry
+    group_name = groupName.strip()  # Strip whitespace from group name
+    if 'select-fields' in data['CUSTOM-INFORMATION']:
+        select_fields = data['CUSTOM-INFORMATION']['select-fields']
+        if 'groups' in select_fields:
+            # Check if the group name already exists
+            if group_name not in select_fields['groups']:
+                # Add the new group dynamically
+                select_fields['groups'][group_name] = []
+
+    # Write the updated JSON data back to the file
+    with open(json_file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+    with open('static/Account/fleetInformation.json', 'r') as file:
+        data = json.load(file)
+
     messages.success(request, 'Add Successfully' if not truckGroupObj else 'Update Successfully')
     return redirect(request.META.get('HTTP_REFERER'))
 
@@ -842,23 +865,46 @@ def subGroupForm(request):
     return render(request, 'GearBox/subgroupsForm.html',params)
 
 @csrf_protect
+def getSubGroup(request):
+    groupId = request.POST.get('groupId')
+    subGroupObj = TruckSubGroup.objects.filter(truckGroup=groupId).values()
+    return  JsonResponse({'status': True,"subGroupObj":list(subGroupObj)})
+
+@csrf_protect
 def subGroupSave(request , id=None):
+    subGroupName = request.POST.get('subGroups')
     truckGroupObj = TruckGroup.objects.all()
     truckSubGroupObj = TruckSubGroup.objects.filter(pk=id).first()
     truckGroupObj = TruckGroup.objects.filter(pk=request.POST.get('groups')).first()
-    existingTruckSubGroup = TruckSubGroup.objects.filter(name = request.POST.get('subGroups')  , truckGroup =truckGroupObj).first()
+    existingTruckSubGroup = TruckSubGroup.objects.filter(name = subGroupName  , truckGroup =truckGroupObj).first()
     if existingTruckSubGroup:
         messages.error(request, 'This Group  Sub Group Already Exists ')
         return redirect(request.META.get('HTTP_REFERER'))
     if not truckSubGroupObj:
         truckSubGroupObj = TruckSubGroup()
     truckSubGroupObj.truckGroup  =  truckGroupObj
-    truckSubGroupObj.name  = request.POST.get('subGroups') 
+    truckSubGroupObj.name  = subGroupName 
     truckSubGroupObj.save()
-    
-    params = {
-        'truckGroupObj':truckGroupObj
-    }
+        # Load the JSON data from the file
+    json_file_path = 'static/Account/fleetInformation.json'
+    with open(json_file_path, 'r') as file:
+        data = json.load(file)
+
+    # Update the JSON data by adding the new group entry
+    subGroupName = subGroupName.strip()  # Strip whitespace from group name
+    if 'select-fields' in data['CUSTOM-INFORMATION']:
+        select_fields = data['CUSTOM-INFORMATION']['select-fields']
+        if 'subGroups' in select_fields:
+            # Check if the group name already exists
+            if subGroupName not in select_fields['subGroups']:
+                # Add the new group dynamically
+                select_fields['subGroups'][subGroupName] = []
+
+    # Write the updated JSON data back to the file
+    with open(json_file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+    with open('static/Account/fleetInformation.json', 'r') as file:
+        data = json.load(file)
     messages.success(request, 'Add Successfully' if not truckSubGroupObj else 'Update Successfully')
     return redirect(request.META.get('HTTP_REFERER'))
 

@@ -109,9 +109,10 @@
                                 <div class="col-md-6 col-sm-6">
                                     <label for="groups">Groups : </label>
                                     <div class="field item form-group">
-                                        <select name="groups" id="groups" class="form-control text-uppercase">
+                                        <select name="groups" id="groups" onchange="subGroupFun(this)" class="form-control text-uppercase">
+                                            <option value="" disabled selected class="text-uppercase"> Select Group</option>
                                             {% for group in groups %}
-                                            <option value="{{group.name}}" class="text-uppercase">{{group.name}}</option>
+                                            <option {% if truckInformationObj.group == group.id %}selected{% endif %} value="{{group.id}}" class="text-uppercase">{{group.name}}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -119,7 +120,12 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="subGroups">Sub groups : </label>
                                     <div class="field item form-group">
-                                        <select name="subGroups" id="subGroups" class="form-control">
+                                        <select name="subGroups" id="subGroups" disabled class="form-control">
+                                            <option value="" disabled selected class="text-uppercase"> Select SubGroup</option>
+                                            {% for subGroup in subGroups %}
+                                            <option {% if truckInformationObj.group == subGroup.id %}selected{% endif %} value="{{group.id}}" class="text-uppercase">{{subGroup.name}}</option>
+                                            {% endfor %}
+
                                         </select>
                                     </div>
                                 </div>
@@ -129,7 +135,13 @@
                                         <select name="vehicleType" required required onchange=(vehicleTypeFun()) id="vehicleType" class="form-control">
                                             <option disabled selected>Select vehicle Type</option>
                                             <option  {% if truckInformationObj.vehicleType == 'Tipper' %}selected{% endif %}  value="Tipper">Tipper</option>
-                                            <option {% if truckInformationObj.vehicleType == 'Concrite' %}selected{% endif %} value="Concrite">Concrite</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Agitator' %}selected{% endif %} value="Agitator">Agitator</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Dog Trailer' %}selected{% endif %} value="Dog Trailer">Dog Trailer</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Trailer B' %}selected{% endif %} value="Trailer B">Trailer B</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Trailer' %}selected{% endif %} value="Trailer">Trailer</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Ute' %}selected{% endif %} value="Ute">Ute</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Car' %}selected{% endif %} value="Car">Car</option>
+                                            <option {% if truckInformationObj.vehicleType == 'Prime Mover' %}selected{% endif %} value="Prime Mover">Prime Mover</option>
                                         </select>
                                     </div>
                                 </div>
@@ -137,9 +149,13 @@
                                     <label for="serviceGroup">Service group : </label>
                                     <div class="field item form-group">
                                         <select name="serviceGroup" id="serviceGroup"  class="form-control">
-                                            <option disabled selected>Select vehicle Type</option>
+                                            <option disabled selected>Select service group</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Agitator' %}selected{% endif %} value="Agitator">Agitator</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Dog Trailer' %}selected{% endif %} value="Dog Trailer">Dog Trailer</option>
                                             <option {% if truckInformationObj.serviceGroup == 'Tipper' %}selected{% endif %} value="Tipper">Tipper</option>
-                                            <option {% if truckInformationObj.serviceGroup == 'Concrite' %}selected{% endif %} value="Concrite">Concrite</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Tralier' %}selected{% endif %} value="Tralier">Tralier</option>
+                                            <option {% if truckInformationObj.serviceGroup == 'Non-Serviceable' %}selected{% endif %} value="Non-Serviceable">Non-Serviceable</option>
+
 
                                         </select>
                                     </div>
@@ -189,8 +205,17 @@
                                         <label for="informationMake" style="margin-bottom: 0.3rem!important;">Make : </label>
                                         <div class="field item form-group">
                                             <select name="informationMake" id="informationMake" class="form-control">
+                                                <option {% if truckInformationObj.informationMake == 'ISUZU' %}selected{% endif %}  value="ISUZU">ISUZU</option>
                                                 <option {% if truckInformationObj.informationMake == 'Freightliner' %}selected{% endif %}  value="Freightliner">Freightliner</option>
-                                                <option {% if truckInformationObj.informationMake == 'ABC' %}selected{% endif %}  value="ABC">ABC</option>
+                                                <option {% if truckInformationObj.informationMake == 'Kenworth' %}selected{% endif %}  value="Kenworth">Kenworth</option>
+                                                <option {% if truckInformationObj.informationMake == 'Mack' %}selected{% endif %}  value="Mack">Mack</option>
+                                                <option {% if truckInformationObj.informationMake == 'Sloanbuilt' %}selected{% endif %}  value="Sloanbuilt">Sloanbuilt</option>
+                                                <option {% if truckInformationObj.informationMake == 'Volkswagen' %}selected{% endif %}  value="Volkswagen">Volkswagen</option>
+                                                <option {% if truckInformationObj.informationMake == 'Renault' %}selected{% endif %}  value="Renault">Renault</option>
+                                                <option {% if truckInformationObj.informationMake == 'Iveco' %}selected{% endif %}  value="Iveco">Iveco</option>
+                                                <option {% if truckInformationObj.informationMake == 'BTE' %}selected{% endif %}  value="BTE">BTE</option>
+                                                <option {% if truckInformationObj.informationMake == 'International' %}selected{% endif %}  value="International">International</option>
+                                                <option {% if truckInformationObj.informationMake == 'Nissan' %}selected{% endif %}  value="Nissan">Nissan</option>
                                             </select>
                                         </div>
                                     </div>
@@ -204,7 +229,16 @@
                                         <label for="informationConfiguration" style="margin-bottom: 0.3rem!important;">Configuration : </label>
                                         <div class="field item form-group">
                                             <select name="informationConfiguration" id="informationConfiguration"  class="form-control">
-                                                <option {% if truckInformationObj.informationMake == 'Tipper' %}selected{% endif %} value="Tipper">Tipper</option>
+                                                <option {% if truckInformationObj.informationMake == '8x4 Agi' %}selected{% endif %} value="8x4 Agi">8x4 Agi</option>
+                                                <option {% if truckInformationObj.informationMake == 'Agitator' %}selected{% endif %} value="Agitator">Agitator</option>
+                                                <option {% if truckInformationObj.informationMake == 'Rigid' %}selected{% endif %} value="Rigid">Rigid</option>
+                                                <option {% if truckInformationObj.informationMake == '10x4 Agi' %}selected{% endif %} value="10x4 Agi">10x4 Agi</option>
+                                                <option {% if truckInformationObj.informationMake == 'Trailer' %}selected{% endif %} value="Trailer">Trailer</option>
+                                                <option {% if truckInformationObj.informationMake == 'Dog Trailer' %}selected{% endif %} value="Dog Trailer">Dog Trailer</option>
+                                                <option {% if truckInformationObj.informationMake == 'Ute' %}selected{% endif %} value="Ute">Ute</option>
+                                                <option {% if truckInformationObj.informationMake == 'Prime Mover' %}selected{% endif %} value="Prime Mover">Prime Mover</option>
+                                                <option {% if truckInformationObj.informationMake == 'Car' %}selected{% endif %} value="Car">Car</option>
+                                                <option {% if truckInformationObj.informationMake == '4 Wheel Drive' %}selected{% endif %} value="4 Wheel Drive">4 Wheel Drive</option>
                                             </select>
                                         </div>
                                     </div>
@@ -244,7 +278,7 @@
                     <!-- Registration -->
                     <div class="x_panel registrationFieldsSection">
                         <div class="x_title">
-                            <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>{{truckInformationObj.registered}}
+                            <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
                             
                             <span class="float-right">
                                 <input type="checkbox" {%if  truckInformationObj.registered  %}checked{%endif%} value="registered"  name="registered" id="registered" onchange="registeredFun(this)">
@@ -272,9 +306,10 @@
                                         <div class="field item form-group">
                                             <select name="registrationState" {% if  truckInformationObj.registered %}disabled{%endif%} required id="registrationState"  class="form-control">
                                                 <option selected disabled>Select State</option>
-                                                <option {% if  truckInformationObj.registrationSate == 'California' %}selected{% endif %} value="CA">California</option>
-                                                <option {% if  truckInformationObj.registrationSate == 'NewYork' %}selected{% endif %} value="NY">New York</option>
-                                            </select>
+                                                <option {% if  truckInformationObj.registrationState == 'VIC' %}selected{% endif %} value="VIC" >VIC</option>
+                                                <option {% if  truckInformationObj.registrationState == 'NSW' %}selected{% endif %} value="NSW" >NSW</option>
+                                                <option {% if  truckInformationObj.registrationState == 'QLD' %}selected{% endif %} value="QLD" >QLD</option>
+                                                </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -288,7 +323,8 @@
                                         <div class="field item form-group">
                                             <select name="registrationInterval" {%if  truckInformationObj.registered  %}disabled{%endif%} id="registrationInterval"  class="form-control">
                                                 <option selected disabled>Select Interval</option>
-                                                <option {% if  truckInformationObj.registrationInterval == 'NewYork' %}selected{% endif %} value="NY">New York</option>
+                                                <option {% if  truckInformationObj.registrationInterval == 'Annual' %}selected{% endif %} value="Annual">Annual</option>
+
                                             </select>
                                         </div>
                                     </div>
@@ -623,7 +659,35 @@
             $('#customPdd').attr('disabled', 'disabled');
         }
     }
-
+    function subGroupFun(selectElement){
+        var selectedValue = selectElement.value;
+        $("#subGroups").empty();
+        $.ajax({
+            url: "/gearBox/subGroup/get/", 
+            method: "POST", // Ensure the method is POST
+            data: {
+                groupId: selectedValue 
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(data) {
+                if(data.status){
+                    $("#subGroups").prop('disabled',false)
+                    data.subGroupObj.forEach(function (item) {
+                        $("#subGroups").append(
+                        '<option value="' + item['id'] + '">' + item['name'] + "</option>"
+                        );
+                    });
+                }
+                else{
+                    alert("Something Went Wrong..");
+                }
+            }
+        });
+    }
+    
+    
     function confirmDeactivation(connectionId) {
         if (confirm("Are you sure you want to deactivate this truck?")) {
             $.ajax({

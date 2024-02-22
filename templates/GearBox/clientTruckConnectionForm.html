@@ -83,16 +83,16 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="startDate" class="required ">Start Date :<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <input class="form-control" name="startDate" required="required"
+                                        <input class="form-control" onchange="endDateFun()" name="startDate" required="required"
                                         id="startDate" type="date"/>
                                     </div>
                                 </div>
-                                <div class="col-md-4 col-sm-4">
+                                <div class="float-right d-none neverEnding">
+                                    <input type="checkbox" name="neverEnding"   onchange="neverEndingFun()" id="neverEnding" class="">
+                                    <label for="neverEnding">Never Ending</label>
+                                </div>
+                                <div class="col-md-4 col-sm-4 EndDate">
                                     <label for="endDate" class="required ">End Date :<span class="required">*</span></label>
-                                    <div class="float-right d-none neverEnding">
-                                        <input type="checkbox" name="neverEnding"  onchange="neverEndingFun()" id="neverEnding" class="">
-                                        <label for="neverEnding">Never Ending</label>
-                                    </div>
                                     <div class="field item form-group">
                                         <input class="form-control" readonly name="endDate" required="required"
                                         id="endDate" type="date"/>
@@ -118,7 +118,7 @@ request {% endblock %} {% block headStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
-<script src="{% static 'js/reconciliation_analysis.js' %}"></script>
+{% comment %} <script src="{% static 'js/reconciliation_analysis.js' %}"></script> {% endcomment %}
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
@@ -127,12 +127,21 @@ request {% endblock %} {% block headStyle %}
 <script>
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    
     var validator = new FormValidator(
         {
             events: ["blur", "input", "change"],
         },
         document.forms[0]
     );
+    function endDateFun(){
+        startDateVal = $('#startDate').val()
+        if (startDate){
+            $('#endDate').prop('readonly',false)
+            
+        }
+    }
     // on form "submit" event
     document.forms[0].onsubmit = function (e) {
         var submit = true,
@@ -224,14 +233,14 @@ request {% endblock %} {% block headStyle %}
 
     function neverEndingFun(){
         checkedVal =  $('#neverEnding').is(':checked');
-        console.log(checkedVal)
         if(checkedVal){
             $('#endDate').val('2035-01-01')
-            $('#endDate').prop( "readonly", true )
+            $('.EndDate').addClass( "d-none" )
         }
         else{
             $('#endDate').val('');
-            $('#endDate').prop("readonly", false);
+            $('.EndDate').removeClass( "d-none" )
+
 
         }
     }

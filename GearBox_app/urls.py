@@ -144,6 +144,7 @@ urlpatterns = [
     path('truck/groups/view', views.groupsView, name='groupsView'),
     path('truck/groups/add/save/', views.addGroupsSave, name='addGroupsSave'),
     path('truck/groups/edit/<int:id>', views.addGroupsSave, name='addGroupsEdit'),
+    path('subGroup/get/', views.getSubGroup, name='getSubGroup'),
 
     # Sub groups 
     path('subgroups/form/', views.subGroupForm, name='subGroupForm'),
