@@ -1,5 +1,3 @@
-
-
 let map, infoWindow;
 
 function initMap() {
@@ -10,8 +8,10 @@ function initMap() {
   infoWindow = new google.maps.InfoWindow();
 
   // Call the geolocation function immediately after initializing the map
-  getLocation();
 }
+$('#getLocation').on('click', function(){
+  getLocation();
+})
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -27,18 +27,21 @@ function getLocation() {
         $("#latitude").val(pos["lat"]);
         // const posString = JSON.stringify(pos);
         // alert(posString);
-        infoWindow.setPosition(pos);
-        infoWindow.setContent("You are here.");
-        infoWindow.open(map);
-        map.setCenter(pos);
+
+        // Set in map
+        // infoWindow.setPosition(pos);
+        // infoWindow.setContent("You are here.");
+        // infoWindow.open(map);
+        // map.setCenter(pos);
       },
-      () => {
-        handleLocationError(true, infoWindow, map.getCenter());
-      }
+      // () => {
+      //   handleLocationError(true, infoWindow, map.getCenter());
+      // }
     );
-  } else {
-    handleLocationError(false, infoWindow, map.getCenter());
-  }
+  } 
+  // else {
+  //   handleLocationError(false, infoWindow, map.getCenter());
+  // }
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -51,4 +54,4 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.open(map);
 }
 
-window.initMap = initMap;
+// window.initMap = initMap;
