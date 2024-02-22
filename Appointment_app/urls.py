@@ -47,9 +47,14 @@ urlpatterns = [
     path('pre-start/table/view/', views.preStartTableView ,name="preStartTableView"),    
     path('pre-start/view/<int:id>/', views.preStartForm ,name="preStartView"),
     
+    path('pre-start/edit/view/<int:id>/<int:edit>/', views.preStartForm, name="preStartEditView"),
+    path('pre-start/edit/save/<int:id>/', views.preStartSave, name="preStartEditSave"),
+    
     path('pre-start/form/view/', views.preStartForm ,name="preStartForm"),
     path('pre-start/form/save/', views.preStartSave ,name="preStartSave"),
 
+
+    
     path('question/add/view/<int:id>/', views.questionAddView ,name="questionAddView"),
     path('question/add/save/<int:id>/', views.questionAddSave ,name="questionAddSave"),
 ]

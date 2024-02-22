@@ -39,7 +39,7 @@
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Clients</h2>
-                        <a href="{% url 'Appointment:preStartForm' %}" class="btn btn-dark float-right">Add</a>
+                        <a href="{% url 'Appointment:preStartForm' %}" class="btn btn-sm btn-dark float-right">Add</a>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -50,17 +50,17 @@
                                         style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th>Pre start</th>
-                                                <th class="w-25 text-center">View Pre-start</th>
-                                                <th class="w-25 text-center">Add Question</th>
+                                                <th class="w-75">Pre start</th>
+                                                <th class="text-center">Add Question</th>
+                                                <th class="text-center">Edit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for preStart in preStarts %}
                                                 <tr>
-                                                    <td>{{preStart.preStartName}}</td>
-                                                    <td class="text-center"><a href="{% url 'Appointment:preStartView' id=preStart.id %}"><i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i></a></td>
+                                                    <td><a href="{% url 'Appointment:preStartView' id=preStart.id %}">{{preStart.preStartName}}</a></td>
                                                     <td class="text-center"><a href="{% url 'Appointment:questionAddView' id=preStart.id %}"><i class="fa-solid fa-plus" style="font-size:1.3rem"></i></a></td>
+                                                    <td class="text-center"><a href="{% url 'Appointment:preStartEditView' id=preStart.id edit=1 %}"><i class="fa-solid fa-pen-to-square" style="font-size:1.3rem"></i></a></td>
                                                 </tr>
                                             {% endfor %}
                                             

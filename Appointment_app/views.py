@@ -340,64 +340,77 @@ def preStartTableView(request):
     params = {'preStarts':preStarts}
     return render(request, 'Appointment/preStartTable.html', params)
 
-def preStartForm(request, id=None):
+def preStartForm(request, id=None, edit=None):
     if id:
         data = PreStart.objects.filter(pk=id).first()
         questions = PreStartQuestion.objects.filter(preStartId=data.id)
         params = {
             'data' : data,
             'questions' : questions,
-            'queLen' : len(questions)    
+            'queLen' : len(questions),
+            'edit' : edit if edit == 1 else None
         }
     else:
         params = {}
     return render(request, 'Appointment/preStartForm.html', params)
 
 @csrf_protect
-def preStartSave(request):
+def preStartSave(request, id=None):
     currentTimezone = pytz.timezone('Asia/Kolkata')
     currentDateTime = datetime.now(tz=currentTimezone)
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
-    
-    preStartObj = PreStart()
+
+    preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
+    msg = "Pre-start updated successfully."
+   
     preStartObj.preStartName = preStartName
     preStartObj.createdDate = currentDateTime
     preStartObj.createdBy = request.user
     preStartObj.save()
-    for question in range(1,int(questionCount)):
-        questionObj = PreStartQuestion()
-        questionObj.preStartId = preStartObj
-        questionObj.questionText = request.POST.get(f'q{question}txt')
-        questionObj.questionType = request.POST.get(f'q{question}type')
+    for question in range(0,int(questionCount)):
+        count = question
+        questionObj = PreStartQuestion() 
+        if id:
+            questionObj = PreStartQuestion.objects.filter(preStartId=preStartObj).first()
+            questionObj.wantFile1 = questionObj.wantFile2 = questionObj.wantFile3 =questionObj.wantFile4 = False
+            questionObj.save()
+            count = questionObj.id
+        else:
+            questionObj.preStartId = preStartObj
+            msg = "Pre-start added successfully."
+            
+        questionObj.questionText = request.POST.get(f'q{count}txt')
+        questionObj.questionType = request.POST.get(f'q{count}type')
+        print(count,request.POST.get(f'q{count}type'))
         
-        queTxt1 = request.POST.get(f'q{question}o1')
-        queTxt2 = request.POST.get(f'q{question}o2')
-        queTxt3 = request.POST.get(f'q{question}o3')
-        queTxt4 = request.POST.get(f'q{question}o4')
-        wantFile = request.POST.get(f'wantFile{question}')
+        queTxt1 = request.POST.get(f'q{count}o1')
+        queTxt2 = request.POST.get(f'q{count}o2')
+        queTxt3 = request.POST.get(f'q{count}o3')
+        queTxt4 = request.POST.get(f'q{count}o4')
+        wantFile = request.POST.get(f'wantFile{count}')
         
         questionObj.optionTxt1 = queTxt1
         
         if queTxt2:
-            questionObj.optionTxt2 = request.POST.get(f'q{question}o2')
+            questionObj.optionTxt2 = request.POST.get(f'q{count}o2')
         if queTxt3:
-            questionObj.optionTxt3 = request.POST.get(f'q{question}o3')
+            questionObj.optionTxt3 = request.POST.get(f'q{count}o3')
         if queTxt4:
-            questionObj.optionTxt4 = request.POST.get(f'q{question}o4')
+            questionObj.optionTxt4 = request.POST.get(f'q{count}o4')
 
-        if wantFile == f'q{question}o1wantFile':
+        if wantFile == f'q{count}o1wantFile':
             questionObj.wantFile1 = True
-        elif wantFile == f'q{question}o2wantFile':
+        elif wantFile == f'q{count}o2wantFile':
             questionObj.wantFile2 = True
-        elif wantFile == f'q{question}o3wantFile':
+        elif wantFile == f'q{count}o3wantFile':
             questionObj.wantFile3 = True
-        elif wantFile == f'q{question}o4wantFile':
+        elif wantFile == f'q{count}o4wantFile':
             questionObj.wantFile4 = True
             
         questionObj.save()
 
-    messages.success(request, "Pre-start added.")
+    messages.success(request, msg)
     return redirect('Appointment:preStartTableView')
     
 
