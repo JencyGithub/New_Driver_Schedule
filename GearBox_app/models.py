@@ -198,7 +198,12 @@ class OnLease(models.Model):
 
 
 
+class ClientOfcWithRateCardConnection(models.Model):
+    clientOfc = models.ForeignKey(ClientOffice, on_delete=models.CASCADE , null=True)
+    rateCard = models.ForeignKey(RateCard, on_delete=models.CASCADE , null=True)
 
+    def __str__(self):
+        return str(self.clientOfc)
 
     
 # -----------------------------------
