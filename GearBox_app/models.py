@@ -66,7 +66,7 @@ class RateCard(models.Model):
     rate_card_name = models.CharField(max_length=255 , unique=True)
     tds = models.FloatField(default=0)
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE , null=True)
-    clientOfc = models.ForeignKey(ClientOffice,on_delete=models.CASCADE , null=True)
+    # clientOfc = models.ForeignKey(ClientOffice,on_delete=models.CASCADE , null=True)
 
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -203,9 +203,11 @@ class ClientOfcWithRateCardConnection(models.Model):
     rateCard = models.ForeignKey(RateCard, on_delete=models.CASCADE , null=True)
 
     def __str__(self):
-        return str(self.clientOfc)
-
+        return str(self.clientOfc ) +'-'+ str(self.rateCard)
     
+    class Meta:
+        unique_together = (('clientOfc', 'rateCard'),)
+
 # -----------------------------------
 # Trucks section
 # -----------------------------------

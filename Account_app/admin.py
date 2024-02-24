@@ -336,8 +336,8 @@ class LeaveRequestAdmin(admin.ModelAdmin):
 admin.site.register(LeaveRequest, LeaveRequestAdmin)
 
 class RateCardAdmin(admin.ModelAdmin):
-    list_display = ["rate_card_name","clientName","clientOfc"]
-    search_fields = ["rate_card_name","clientName","clientOfc"]
+    list_display = ["rate_card_name","clientName"]
+    search_fields = ["rate_card_name","clientName"]
 
 admin.site.register(RateCard, RateCardAdmin)
 
@@ -420,6 +420,7 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 
 # admin.site.register(Location)
 
+admin.site.register(ClientOfcWithRateCardConnection)
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
 class TruckEntryErrorAdmin(admin.ModelAdmin):
