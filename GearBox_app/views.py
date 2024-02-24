@@ -732,14 +732,16 @@ def clientTable(request):
     return render(request,'GearBox/table/client.html',params)
 
 def clientForm(request, id=None):
-    data, ofcObjs = None, None
+    data, ofcObjs , rateCards = None, None , None
     if id:
         data = Client.objects.filter(pk=id).first()
         ofcObjs = ClientOffice.objects.filter(clientId=data)
+        rateCards = RateCard.objects.filter(clientName = data)
 
     params = {
         'data' : data,
-        'ofcObjs' : ofcObjs
+        'ofcObjs' : ofcObjs,
+        "rateCards" :rateCards
     }
     return render(request, 'GearBox/clientForm.html', params)
 
@@ -771,6 +773,7 @@ def clientChange(request, id=None):
     clientOfcObj.alternativeContact = request.POST.get('alternateContact') if request.POST.get('alternateContact') else None
     clientOfcObj.save()
 
+    
     return redirect('gearBox:clientTable')
 
 # def addGroups(request):
@@ -783,15 +786,17 @@ def clientOfcView(request):
     ofcObj = ClientOffice.objects.filter(pk=ofcId).values().first()
     ofcObj['countryCode'] = str(ofcObj['primaryContact'])[:-10]
     ofcObj['primaryContact'] = str(ofcObj['primaryContact'])[-10:]
-    
+    ofcObj['allRateCards'] = list(RateCard.objects.filter(clientName__clientId = ofcObj['clientId_id']).values())
+    ofcObj['rateCards'] = list(ClientOfcWithRateCardConnection.objects.filter(clientOfc__id = ofcId).values())
     return JsonResponse({ 'status': True, 'ofcObj' : ofcObj})
     
 @csrf_protect
 def clientOfcEditSave(request, id=None, clientId=None):
     clientOfcObj = ClientOffice()
+    selectedRateCards = request.POST.getlist('rateCards')
     if id:
         clientOfcObj = ClientOffice.objects.filter(pk=id).first()
-        
+        ClientOfcWithRateCardConnection.objects.filter(clientOfc=clientOfcObj).delete()
     if clientId:
         clientOfcObj.clientId = Client.objects.filter(pk=clientId).first()
 
@@ -807,7 +812,13 @@ def clientOfcEditSave(request, id=None, clientId=None):
     clientOfcObj.primaryContact = str(request.POST.get('modalCountryCode')) + str(request.POST.get('modalPrimaryContact')) 
     clientOfcObj.alternativeContact = request.POST.get('modalAlternateContact') if request.POST.get('modalAlternateContact') else None
     clientOfcObj.save()
-
+    # return HttpResponse(selectedRateCards)
+    for i in selectedRateCards:
+        clientOfcWithRateCardConnectionObj = ClientOfcWithRateCardConnection()
+        clientOfcWithRateCardConnectionObj.clientOfc = clientOfcObj
+        clientOfcWithRateCardConnectionObj.rateCard = RateCard.objects.filter(pk=i).first()
+        clientOfcWithRateCardConnectionObj.save()
+        
     return redirect(request.META.get('HTTP_REFERER'))
 
 def groupsView(request):
@@ -913,7 +924,6 @@ def fleetSettings(request):
     truckInformationCustomObj = TruckInformationCustom.objects.all()
     addStatus = False
     if TruckInformationCustom.objects.all().count() >= 6:
-        print(TruckInformationCustom.objects.all().count())
         addStatus = True
         
     params = {

@@ -2791,13 +2791,14 @@ def rateCardTable(request,clientId = None, clientOfcId=None):
         return redirect(request.META.get('HTTP_REFERER'))
     
     rateCards = RateCard.objects.filter(clientName=clientId)
+    
     if clientOfcId:
-        rateCards = RateCard.objects.filter(clientOfc_id=clientOfcId)
-        
+        # rateCards = ClientOfcWithRateCardConnection.objects.filter(clientOfc_id=clientOfcId)
+        rateCards = RateCard.objects.filter(clientofcwithratecardconnection__clientOfc_id=clientOfcId)
     params = {
         'rateCard': rateCards,
         'clientId':clientId,
-        'clientOfcId' : clientOfcId
+        # 'clientOfcId' : clientOfcId
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 

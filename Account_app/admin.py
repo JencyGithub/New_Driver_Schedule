@@ -420,7 +420,12 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 
 # admin.site.register(Location)
 
-admin.site.register(ClientOfcWithRateCardConnection)
+class ClientOfcWithRateCardConnectionAdmin(admin.ModelAdmin):
+    list_display = ["clientOfc","rateCard"]
+    search_fields = ["clientOfc","rateCard"]
+
+admin.site.register(ClientOfcWithRateCardConnection , ClientOfcWithRateCardConnectionAdmin)
+
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
 class TruckEntryErrorAdmin(admin.ModelAdmin):

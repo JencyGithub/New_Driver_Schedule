@@ -1,7 +1,31 @@
 {% extends "main/main.html" %} {% load static %} {% block title %} | Client change{% endblock %} {% block headStyle %}
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
 <style>
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #435f7b !important;
+    }
+
+    .select2-container .select2-selection--multiple{
+        min-height: 38px!important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice,
+    .select2-container .select2-search--inline .select2-search__field {
+        margin-top: 8px !important;
+        cursor: pointer;
+    }
+    
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #435f7b !important;
+        border: 1px solid #435f7b !important;
+        color: white;
+    }
+    
+    .select2-container--default .select2-selection--multiple {
+        cursor: pointer !important;
+    }
     label{
         margin-top: 0.5rem;
         margin-bottom: 0;
@@ -338,6 +362,7 @@
                                 <label for="address2">Address 2:</label>
                                 <textarea name="address2" id="address2" rows="1" class="form-control"></textarea>
                             </div>
+                            
                         </div>
                     </div>
                     {% else %}
@@ -676,10 +701,19 @@
                         <label for="modalAddress2">Address 2:</label>
                         <textarea name="modalAddress2" id="modalAddress2" rows="1" class="form-control"></textarea>
                     </div>
+                    <div class="col-md-12 col-sm-12 requiredValueSection">
+                        <label for="rateCards">RateCards :<span class="required">*</span></label>
+                        <select name="rateCards" id="rateCards" multiple="multiple">
+                            {% for rateCard in rateCards %}
+                            <option value="{{rateCard.id}}">{{rateCard.rate_card_name}} </option>
+                            
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer px-2">
-                <button type="submit" class="btn btn-sm btn-outline-dark" style="font-size:0.95em;">Submit</button>
+                <button type="submit"  class="btn btn-sm btn-outline-dark" style="font-size:0.95em;">Submit</button>
             </div>
         </form>
       </div>
@@ -696,7 +730,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
+    $('#rateCards').select2({
+        placeholder: 'Select options',
+        width: '100%'
+    });
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     var validator = new FormValidator(
@@ -732,7 +772,6 @@
             validator.settings.alerts = !this.checked;
             if (this.checked) $("form .alert").remove();
     }).prop("checked", false);
-
     function setModalWithData(ofcId, readonlyVal) {
         $.ajax({
             url: "/gearBox/client/ofc/view/",
@@ -757,6 +796,23 @@
                 $('#modalPrimaryContact').val(dataObj['primaryContact']).attr('readonly', readonlyVal);
                 $('#modalCountryCode, #modalAddType').attr('disabled', readonlyVal);
                 console.log(readonlyVal)
+                $('#rateCards').empty();
+                $.each(dataObj.allRateCards, function(index, rateCard) {
+                    let option = $('<option>', {
+                        value: rateCard.id,
+                        text: rateCard.rate_card_name
+                    });
+                    
+                    // Check if the rate card is associated with the client office and select it
+                    let isSelected = dataObj.rateCards.some(rc => rc.rateCard_id === rateCard.id);
+                    if (isSelected) {
+                        option.prop('selected', true);
+                    }
+    
+                    $('#rateCards').append(option);
+                });
+
+                
                 if(readonlyVal == true){
                     $('.modal-footer').addClass('d-none')
                     $('#clientOfc form').removeAttr('action')
@@ -779,6 +835,9 @@
         });
         $('#clientOfc').modal('show');
     }
+
+
+    
     
     $('.modalView').on('click', function() {
         let id = $(this).attr('id').replace('view', '');
@@ -791,7 +850,8 @@
 
     $('.addOffice').on('click', function(){
         let clientId = $('#clientId').val()
-        $('#clientOfc .modal-body input, #clientOfc .modal-body select').each(function () {
+
+        $('#clientOfc .modal-body input,#clientOfc .modal-body textarea,  #clientOfc .modal-body select').each(function () {
             $(this).val("");
         });
         $('#clientOfc form').attr('action',`/gearBox/client/new/ofc/save/${clientId}/`)
@@ -805,11 +865,10 @@
         
             // Flag to track if any required fields are empty
             var hasEmptyField = false;          
-    
+            
             // Check each input/select with the required attribute
             $('input[required], textarea[required], select[required]').each(function() {
                 // If the field is empty, set hasEmptyField to true and add red border
-                console.log($(this), '-' ,$(this).val())
                 if ($(this).val() == '' || $(this).val() == null) {
                     hasEmptyField = true;
                     $(this).css('border','1px solid #CE5454');
@@ -818,7 +877,7 @@
 
                 }
             });
-    
+
             // If any required fields are empty, prevent form submission
             if (hasEmptyField || !checkPhone($('#modalPrimaryContact'))) {
                 return false;
