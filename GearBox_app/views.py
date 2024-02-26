@@ -692,15 +692,20 @@ def truckConnectionDeactivate(request):
         print(existing_appointments)
     return JsonResponse({'status': status})
 
+
 @csrf_protect
 def getRateCard(request):
+    clientOfcWithRateCardConnectionObjList = []    
     clientOfficeId = request.POST.get('clientOffice')
-    print(clientOfficeId)
     clientOfficeObj = ClientOffice.objects.filter(pk = clientOfficeId).first()
-    print('ClientOffice Id' ,clientOfficeObj )
-    rateCardList = RateCard.objects.filter(clientOfc = clientOfficeObj).values()
-    print(rateCardList)
-    return JsonResponse({'status': True, 'rateCard': list(rateCardList)})
+    clientOfcWithRateCardConnectionObj = ClientOfcWithRateCardConnection.objects.filter(clientOfc=clientOfficeObj)
+    for i in clientOfcWithRateCardConnectionObj:
+        dict_ =  {
+            'key' : i.rateCard.id,
+            'name' : i.rateCard.rate_card_name
+        }
+        clientOfcWithRateCardConnectionObjList.append(dict_)
+    return JsonResponse({'status': True, 'clientOfcWithRateCardConnectionObjList': clientOfcWithRateCardConnectionObjList})
 
 
 @csrf_protect

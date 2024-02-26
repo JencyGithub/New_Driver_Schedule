@@ -2798,7 +2798,7 @@ def rateCardTable(request,clientId = None, clientOfcId=None):
     params = {
         'rateCard': rateCards,
         'clientId':clientId,
-        # 'clientOfcId' : clientOfcId
+        'clientOfcId' : clientOfcId
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
@@ -3077,7 +3077,6 @@ def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
     grace.end_date=endDate
     grace.save()
     
-
     
     updatedValues.insert(0,rateCardID.id)
     updatedValues.insert(1,startDate)
@@ -3088,7 +3087,6 @@ def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
             f.write(str(val) + ',')
 
     if edit != 0:
-
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
         cmd = ["python", "manage.py", "runscript", 'updateTripsAndReconciliationData','--continue-on-error']
@@ -3115,6 +3113,11 @@ def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
     # )
     # onLease.save()
 
+    clientOfcObj = ClientOffice.objects.filter(pk=clientOfcId).first()
+    clientOfcWithRateCardConnectionObj = ClientOfcWithRateCardConnection()
+    clientOfcWithRateCardConnectionObj.clientOfc = clientOfcObj
+    clientOfcWithRateCardConnectionObj.rateCard = rateCardID
+    clientOfcWithRateCardConnectionObj.save()
     messages.success(request, 'Data successfully add.')
     return redirect('gearBox:clientTable')
 

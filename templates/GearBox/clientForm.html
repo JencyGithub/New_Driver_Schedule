@@ -438,7 +438,8 @@
                     </div>
                     <div class="col-sm-6 col-md-6 field">
                         <label for="modalAddDescription">Client Office:</label>
-                        <textarea name="modalAddDescription" id="modalAddDescription" rows="1" class="form-control" required></textarea>
+                        <!-- <textarea name="modalAddDescription" id="modalAddDescription" rows="1" class="form-control" required></textarea> -->
+                        <input name="modalAddDescription" id="modalAddDescription" class="form-control" required>
                     </div>
                     <div class="col-md-4 col-sm-4 field">
                         <label for="modalPersonName">Person name :</label>
@@ -854,6 +855,14 @@
         $('#clientOfc .modal-body input,#clientOfc .modal-body textarea,  #clientOfc .modal-body select').each(function () {
             $(this).val("");
         });
+        
+        // Select blank
+        var select = $('#rateCards');
+
+        // Clearing all selected options
+        select.val(null).trigger('change');
+        // Select blank
+
         $('#clientOfc form').attr('action',`/gearBox/client/new/ofc/save/${clientId}/`)
         $('#clientOfc').modal('show');
 
