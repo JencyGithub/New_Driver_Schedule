@@ -306,9 +306,22 @@ def reminderTable(request):
 # ````````````````````````````````````````````````
 
 def truckTable(request):
+    adminTruckList = []
     adminTruck = AdminTruck.objects.all()
+    admin_truck_data = {}
+    for admin_truck in adminTruck:
+        latest_connection = ClientTruckConnection.objects.filter(truckNumber=admin_truck).order_by('-startDate').first()
+        admin_truck_data = {
+            'clientTruckNumber' : latest_connection.clientTruckId if latest_connection else '-',
+            'clientName' : latest_connection.clientId.name if latest_connection else '-',
+            'createdBy' : admin_truck.createdBy.username,
+            'adminTruckId' : admin_truck.id,
+            'adminTruckNumber' : admin_truck.adminTruckNumber
+        }
+        adminTruckList.append(admin_truck_data)
+
     params = {
-        'adminTrucks' : adminTruck
+        'adminTrucks' : adminTruckList
     }
     return render(request , 'GearBox/truck/table/truckTable.html',params)
 

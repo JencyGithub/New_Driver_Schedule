@@ -13,6 +13,7 @@ def run():
     data = f.read().split(',')
     file_name = data[0]
     clientName_ = data[1]
+    res_ =
     
     monthFileName = open(r"pastTrip_entry_month.txt",'r')
     monthAndYear = monthFileName.read()
@@ -27,6 +28,14 @@ def run():
     with open(fileName, 'r') as pastData:
         count = 0
         for line in pastData:
+            res_ = ''
+            if ' ' in str(data[0]):
+                res_ = str(data[0]).split()[0]
+            elif '/' in str(data[0]):
+                str_ = str(data[0]).split('/')
+                res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
+            else:
+                res_ = str(data[0])
             try:
                 if '"' in line:
                    line = str(line).replace('"','')

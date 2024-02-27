@@ -162,6 +162,7 @@ request {% endblock %} {% block headStyle %}
         .prop("checked", false);
     
 
+    
     function rateCard(dataRow) {
         $.ajax({
             url: "/gearBox/getRateCard/",
@@ -175,9 +176,9 @@ request {% endblock %} {% block headStyle %}
             success: function(data) {
                 $("#rate_card_name").empty();
                 $("#rate_card_name").append('<option value="" disabled selected>Select Rate Card</option>');
-                data.rateCard.forEach(function(item) {
+                data.clientOfcWithRateCardConnectionObjList.forEach(function(item) {
                     $("#rate_card_name").append(
-                        '<option value="' + item['id'] + '">' + item['rate_card_name'] + "</option>"
+                        '<option value="' + item['key'] + '">' + item['name'] + "</option>"
                     );
                 });
                 $('#rate_card_name').removeAttr('disabled');
