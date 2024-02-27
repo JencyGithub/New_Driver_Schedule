@@ -25,6 +25,7 @@ from django.db.models import F, ExpressionWrapper, fields
 from django.db.models.functions import Cast
 from datetime import datetime
 from collections import defaultdict
+from variables import *
 
 
 def index(request):
@@ -239,7 +240,7 @@ def formsSave(request):
                     docketFile='static/img/docketFiles/' + Docket_file[i],
                     basePlant=BasePlantVal
                 )
-                docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
+                docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = noSurcharge)[0]
                 docket_.save()
 
     else:
@@ -430,7 +431,7 @@ def uploadDocketSave(request, id):
         docketObj.tripId = tripObj
         docketObj.shiftDate = startDateObj.date()
 
-        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = "No Surcharge").first()
+        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
 
         tripObj.numberOfLoads += 1
         tripObj.save()

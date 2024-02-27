@@ -6,6 +6,7 @@ from datetime import datetime
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
+from variables import *
 
 def run():
     warnings.filterwarnings('ignore')
@@ -13,7 +14,7 @@ def run():
     data = f.read().split(',')
     file_name = data[0]
     clientName_ = data[1]
-    res_ =
+    # res_ = None
     
     monthFileName = open(r"pastTrip_entry_month.txt",'r')
     monthAndYear = monthFileName.read()
@@ -251,7 +252,7 @@ def run():
                         # print('startDateTime Set' , tripObj.startDateTime)
                         # print('EndDateTime Set' , tripObj.endDateTime)
 
-                        surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
+                        surCharge = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
                         docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                         if docketObj :
                             pastTripErrorObj = PastTripError(

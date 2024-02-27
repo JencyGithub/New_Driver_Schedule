@@ -6,6 +6,7 @@ import pandas as pd
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import sys
+from variables import *
 
 
 f = open(r"scripts/addPastTripForMissingTruckNo.txt", 'r')
@@ -172,7 +173,7 @@ for i in boralMatchingData:
                 shiftObj.save()
                 tripObj.save()
 
-                surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
+                surCharge = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
                 docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                 if docketObj :
                     pastTripErrorObj = PastTripError(

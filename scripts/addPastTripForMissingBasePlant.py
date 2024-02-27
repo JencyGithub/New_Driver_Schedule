@@ -5,7 +5,7 @@ from datetime import datetime
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import csv , re
-
+from variables import *
 
 f = open(r"scripts/addPastTripForMissingBasePlant.txt", 'r')
 basePlantName = f.read()
@@ -166,7 +166,7 @@ for i in matchingData:
                 shiftObj.save()
                 tripObj.save()
 
-                surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
+                surCharge = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
                 docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                 if docketObj :
                     pastTripErrorObj = PastTripError(
