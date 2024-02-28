@@ -31,6 +31,22 @@
         margin-bottom: 0;
 
     }
+    .fa-solid.fa-circle-plus{
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #151f2a;
+    }
+
+    .fa-solid.fa-minus{
+        cursor: pointer;
+        font-size: 1.3rem;
+        color: #c83333;
+        padding: 0.15rem 0.5rem;
+    }
+    .modal-body {
+        max-height: calc(102vh - 202px); /* Adjust height as needed */
+        overflow-y: auto;
+    }
 </style>
 
 {% endblock %} 
@@ -388,10 +404,8 @@
 
                                             <i class="fa-regular fa-eye float-right modalView mx-1" style="font-size: 1rem;cursor: pointer;" id="view{{ofc.id}}"></i>
                                             <hr class="my-1" />
-                                            <b>{{ ofc.personName }}</b>
                                             <p class="m-0">{{ ofc.address1 }}</p>
                                             <p class="mb-1"><span>{{ ofc.city }}</span>, <span>{{ ofc.state }}</span>, <span>{{ ofc.postalCode }}</span></p>
-                                            <a href="#" class="text-dark text-decoration-none">+{{ ofc.primaryContact }}</a>
                                             <br>
                                             <a href="{% url 'Account:rateCardTableClientOfc' clientId=data.clientId clientOfcId=ofc.id %}" title="Rate cards"><i class="fa-solid fa-clipboard float-right" style="font-size: 1.2rem;"></i></a>
                                         </div>
@@ -416,311 +430,110 @@
     </div>
 </div>
 
-<div class="modal fade bd-example-modal-lg" id="clientOfc" tabindex="-1" role="dialog" aria-labelledby="clientOfcLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header py-2">
-          <h5 class="modal-title" id="clientOfcLabel">Client Office</h5>
-          <span type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </span>
-        </div>
-        <form action="#" method="POST" novalidate id="modalForm">
-            {% csrf_token %}
-            <div class="modal-body pb-4">
-                <div class="row">
-                    <div class="col-sm-2 col-md-2 field">
-                        <label for="modalAddType">Type :<span class="required">*</span></label>
-                        <select name="modalAddType" id="modalAddType" class="form-control px-1" required>
-                            <option value="Workplace" selected>Workplace</option>
-                            <option value="Home">Home</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-6 col-md-6 field">
-                        <label for="modalAddDescription">Client Office:</label>
-                        <!-- <textarea name="modalAddDescription" id="modalAddDescription" rows="1" class="form-control" required></textarea> -->
-                        <input name="modalAddDescription" id="modalAddDescription" class="form-control" required>
-                    </div>
-                    <div class="col-md-4 col-sm-4 field">
-                        <label for="modalPersonName">Person name :</label>
-                        <input class="form-control" name="modalPersonName" id="modalPersonName" type="text" />
-                    </div>
+<div class="modal fade bd-example-modal-xl" id="clientOfc" tabindex="-1" role="dialog" aria-labelledby="clientOfcLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header py-3">
+                <h5 class="modal-title" id="clientOfcLabel">Client Office</h5>
+                <span type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </span>
+            </div>
+            <form action="#" method="POST" novalidate id="modalForm">
+                {% csrf_token %}
+                <input type="number" value="1" name="additionalContactCount" id="additionalContactCount" class="d-none">
 
-                    <div class="col-md-6 col-sm-6 field">
-                        <label for="modalPrimaryContact">Primary Contact :<span class="required">*</span></label>
-                        <div class="field d-flex">
-                            <div class="w-25">
-                                <select name="modalCountryCode" id="modalCountryCode" class="form-control px-1" required>
-                                    <option {% if data.countryCode == '213' %}selected{% endif %} value="213">Algeria (+213)</option>
-                                    <option {% if data.countryCode == '376' %}selected{% endif %} value="376">Andorra (+376)</option>
-                                    <option {% if data.countryCode == '244' %}selected{% endif %} value="244">Angola (+244)</option>
-                                    <option {% if data.countryCode == '1264' %}selected{% endif %} value="1264">Anguilla (+1264)</option>
-                                    <option {% if data.countryCode == '1268' %}selected{% endif %} value="1268">Antigua &amp; Barbuda (+1268)</option>
-                                    <option {% if data.countryCode == '54' %}selected{% endif %} value="54">Argentina (+54)</option>
-                                    <option {% if data.countryCode == '374' %}selected{% endif %} value="374">Armenia (+374)</option>
-                                    <option {% if data.countryCode == '297' %}selected{% endif %} value="297">Aruba (+297)</option>
-                                    <option {% if data.countryCode == '61' %}selected{% endif %} value="61" selected>Australia (+61)</option>
-                                    <option {% if data.countryCode == '43' %}selected{% endif %} value="43">Austria (+43)</option>
-                                    <option {% if data.countryCode == '994' %}selected{% endif %} value="994">Azerbaijan (+994)</option>
-                                    <option {% if data.countryCode == '1242' %}selected{% endif %} value="1242">Bahamas (+1242)</option>
-                                    <option {% if data.countryCode == '973' %}selected{% endif %} value="973">Bahrain (+973)</option>
-                                    <option {% if data.countryCode == '880' %}selected{% endif %} value="880">Bangladesh (+880)</option>
-                                    <option {% if data.countryCode == '1246' %}selected{% endif %} value="1246">Barbados (+1246)</option>
-                                    <option {% if data.countryCode == '375' %}selected{% endif %} value="375">Belarus (+375)</option>
-                                    <option {% if data.countryCode == '32' %}selected{% endif %} value="32">Belgium (+32)</option>
-                                    <option {% if data.countryCode == '501' %}selected{% endif %} value="501">Belize (+501)</option>
-                                    <option {% if data.countryCode == '229' %}selected{% endif %} value="229">Benin (+229)</option>
-                                    <option {% if data.countryCode == '1441' %}selected{% endif %} value="1441">Bermuda (+1441)</option>
-                                    <option {% if data.countryCode == '975' %}selected{% endif %} value="975">Bhutan (+975)</option>
-                                    <option {% if data.countryCode == '591' %}selected{% endif %} value="591">Bolivia (+591)</option>
-                                    <option {% if data.countryCode == '387' %}selected{% endif %} value="387">Bosnia Herzegovina (+387)</option>
-                                    <option {% if data.countryCode == '267' %}selected{% endif %} value="267">Botswana (+267)</option>
-                                    <option {% if data.countryCode == '55' %}selected{% endif %} value="55">Brazil (+55)</option>
-                                    <option {% if data.countryCode == '673' %}selected{% endif %} value="673">Brunei (+673)</option>
-                                    <option {% if data.countryCode == '359' %}selected{% endif %} value="359">Bulgaria (+359)</option>
-                                    <option {% if data.countryCode == '226' %}selected{% endif %} value="226">Burkina Faso (+226)</option>
-                                    <option {% if data.countryCode == '257' %}selected{% endif %} value="257">Burundi (+257)</option>
-                                    <option {% if data.countryCode == '855' %}selected{% endif %} value="855">Cambodia (+855)</option>
-                                    <option {% if data.countryCode == '237' %}selected{% endif %} value="237">Cameroon (+237)</option>
-                                    <option {% if data.countryCode == '1' %}selected{% endif %} value="1">Canada (+1)</option>
-                                    <option {% if data.countryCode == '238' %}selected{% endif %} value="238">Cape Verde Islands (+238)</option>
-                                    <option {% if data.countryCode == '1345' %}selected{% endif %} value="1345">Cayman Islands (+1345)</option>
-                                    <option {% if data.countryCode == '236' %}selected{% endif %} value="236">Central African Republic (+236)</option>
-                                    <option {% if data.countryCode == '56' %}selected{% endif %} value="56">Chile (+56)</option>
-                                    <option {% if data.countryCode == '86' %}selected{% endif %} value="86">China (+86)</option>
-                                    <option {% if data.countryCode == '57' %}selected{% endif %} value="57">Colombia (+57)</option>
-                                    <option {% if data.countryCode == '269' %}selected{% endif %} value="269">Comoros (+269)</option>
-                                    <option {% if data.countryCode == '242' %}selected{% endif %} value="242">Congo (+242)</option>
-                                    <option {% if data.countryCode == '682' %}selected{% endif %} value="682">Cook Islands (+682)</option>
-                                    <option {% if data.countryCode == '506' %}selected{% endif %} value="506">Costa Rica (+506)</option>
-                                    <option {% if data.countryCode == '385' %}selected{% endif %} value="385">Croatia (+385)</option>
-                                    <option {% if data.countryCode == '53' %}selected{% endif %} value="53">Cuba (+53)</option>
-                                    <option {% if data.countryCode == '90392' %}selected{% endif %} value="90392">Cyprus North (+90392)</option>
-                                    <option {% if data.countryCode == '357' %}selected{% endif %} value="357">Cyprus South (+357)</option>
-                                    <option {% if data.countryCode == '42' %}selected{% endif %} value="42">Czech Republic (+42)</option>
-                                    <option {% if data.countryCode == '45' %}selected{% endif %} value="45">Denmark (+45)</option>
-                                    <option {% if data.countryCode == '253' %}selected{% endif %} value="253">Djibouti (+253)</option>
-                                    <option {% if data.countryCode == '1809' %}selected{% endif %} value="1809">Dominica (+1809)</option>
-                                    <option {% if data.countryCode == '1809' %}selected{% endif %} value="1809">Dominican Republic (+1809)</option>
-                                    <option {% if data.countryCode == '593' %}selected{% endif %} value="593">Ecuador (+593)</option>
-                                    <option {% if data.countryCode == '20' %}selected{% endif %} value="20">Egypt (+20)</option>
-                                    <option {% if data.countryCode == '503' %}selected{% endif %} value="503">El Salvador (+503)</option>
-                                    <option {% if data.countryCode == '240' %}selected{% endif %} value="240">Equatorial Guinea (+240)</option>
-                                    <option {% if data.countryCode == '291' %}selected{% endif %} value="291">Eritrea (+291)</option>
-                                    <option {% if data.countryCode == '372' %}selected{% endif %} value="372">Estonia (+372)</option>
-                                    <option {% if data.countryCode == '251' %}selected{% endif %} value="251">Ethiopia (+251)</option>
-                                    <option {% if data.countryCode == '500' %}selected{% endif %} value="500">Falkland Islands (+500)</option>
-                                    <option {% if data.countryCode == '298' %}selected{% endif %} value="298">Faroe Islands (+298)</option>
-                                    <option {% if data.countryCode == '679' %}selected{% endif %} value="679">Fiji (+679)</option>
-                                    <option {% if data.countryCode == '358' %}selected{% endif %} value="358">Finland (+358)</option>
-                                    <option {% if data.countryCode == '33' %}selected{% endif %} value="33">France (+33)</option>
-                                    <option {% if data.countryCode == '594' %}selected{% endif %} value="594">French Guiana (+594)</option>
-                                    <option {% if data.countryCode == '689' %}selected{% endif %} value="689">French Polynesia (+689)</option>
-                                    <option {% if data.countryCode == '241' %}selected{% endif %} value="241">Gabon (+241)</option>
-                                    <option {% if data.countryCode == '220' %}selected{% endif %} value="220">Gambia (+220)</option>
-                                    <option {% if data.countryCode == '7880' %}selected{% endif %} value="7880">Georgia (+7880)</option>
-                                    <option {% if data.countryCode == '49' %}selected{% endif %} value="49">Germany (+49)</option>
-                                    <option {% if data.countryCode == '233' %}selected{% endif %} value="233">Ghana (+233)</option>
-                                    <option {% if data.countryCode == '350' %}selected{% endif %} value="350">Gibraltar (+350)</option>
-                                    <option {% if data.countryCode == '30' %}selected{% endif %} value="30">Greece (+30)</option>
-                                    <option {% if data.countryCode == '299' %}selected{% endif %} value="299">Greenland (+299)</option>
-                                    <option {% if data.countryCode == '1473' %}selected{% endif %} value="1473">Grenada (+1473)</option>
-                                    <option {% if data.countryCode == '590' %}selected{% endif %} value="590">Guadeloupe (+590)</option>
-                                    <option {% if data.countryCode == '671' %}selected{% endif %} value="671">Guam (+671)</option>
-                                    <option {% if data.countryCode == '502' %}selected{% endif %} value="502">Guatemala (+502)</option>
-                                    <option {% if data.countryCode == '224' %}selected{% endif %} value="224">Guinea (+224)</option>
-                                    <option {% if data.countryCode == '245' %}selected{% endif %} value="245">Guinea - Bissau (+245)</option>
-                                    <option {% if data.countryCode == '592' %}selected{% endif %} value="592">Guyana (+592)</option>
-                                    <option {% if data.countryCode == '509' %}selected{% endif %} value="509">Haiti (+509)</option>
-                                    <option {% if data.countryCode == '504' %}selected{% endif %} value="504">Honduras (+504)</option>
-                                    <option {% if data.countryCode == '852' %}selected{% endif %} value="852">Hong Kong (+852)</option>
-                                    <option {% if data.countryCode == '36' %}selected{% endif %} value="36">Hungary (+36)</option>
-                                    <option {% if data.countryCode == '354' %}selected{% endif %} value="354">Iceland (+354)</option>
-                                    <option {% if data.countryCode == '91' %}selected{% endif %} value="91">India (+91)</option>
-                                    <option {% if data.countryCode == '62' %}selected{% endif %} value="62">Indonesia (+62)</option>
-                                    <option {% if data.countryCode == '98' %}selected{% endif %} value="98">Iran (+98)</option>
-                                    <option {% if data.countryCode == '964' %}selected{% endif %} value="964">Iraq (+964)</option>
-                                    <option {% if data.countryCode == '353' %}selected{% endif %} value="353">Ireland (+353)</option>
-                                    <option {% if data.countryCode == '972' %}selected{% endif %} value="972">Israel (+972)</option>
-                                    <option {% if data.countryCode == '39' %}selected{% endif %} value="39">Italy (+39)</option>
-                                    <option {% if data.countryCode == '1876' %}selected{% endif %} value="1876">Jamaica (+1876)</option>
-                                    <option {% if data.countryCode == '81' %}selected{% endif %} value="81">Japan (+81)</option>
-                                    <option {% if data.countryCode == '962' %}selected{% endif %} value="962">Jordan (+962)</option>
-                                    <option {% if data.countryCode == '7' %}selected{% endif %} value="7">Kazakhstan (+7)</option>
-                                    <option {% if data.countryCode == '254' %}selected{% endif %} value="254">Kenya (+254)</option>
-                                    <option {% if data.countryCode == '686' %}selected{% endif %} value="686">Kiribati (+686)</option>
-                                    <option {% if data.countryCode == '850' %}selected{% endif %} value="850">Korea North (+850)</option>
-                                    <option {% if data.countryCode == '82' %}selected{% endif %} value="82">Korea South (+82)</option>
-                                    <option {% if data.countryCode == '965' %}selected{% endif %} value="965">Kuwait (+965)</option>
-                                    <option {% if data.countryCode == '996' %}selected{% endif %} value="996">Kyrgyzstan (+996)</option>
-                                    <option {% if data.countryCode == '856' %}selected{% endif %} value="856">Laos (+856)</option>
-                                    <option {% if data.countryCode == '371' %}selected{% endif %} value="371">Latvia (+371)</option>
-                                    <option {% if data.countryCode == '961' %}selected{% endif %} value="961">Lebanon (+961)</option>
-                                    <option {% if data.countryCode == '266' %}selected{% endif %} value="266">Lesotho (+266)</option>
-                                    <option {% if data.countryCode == '231' %}selected{% endif %} value="231">Liberia (+231)</option>
-                                    <option {% if data.countryCode == '218' %}selected{% endif %} value="218">Libya (+218)</option>
-                                    <option {% if data.countryCode == '417' %}selected{% endif %} value="417">Liechtenstein (+417)</option>
-                                    <option {% if data.countryCode == '370' %}selected{% endif %} value="370">Lithuania (+370)</option>
-                                    <option {% if data.countryCode == '352' %}selected{% endif %} value="352">Luxembourg (+352)</option>
-                                    <option {% if data.countryCode == '853' %}selected{% endif %} value="853">Macao (+853)</option>
-                                    <option {% if data.countryCode == '389' %}selected{% endif %} value="389">Macedonia (+389)</option>
-                                    <option {% if data.countryCode == '261' %}selected{% endif %} value="261">Madagascar (+261)</option>
-                                    <option {% if data.countryCode == '265' %}selected{% endif %} value="265">Malawi (+265)</option>
-                                    <option {% if data.countryCode == '60' %}selected{% endif %} value="60">Malaysia (+60)</option>
-                                    <option {% if data.countryCode == '960' %}selected{% endif %} value="960">Maldives (+960)</option>
-                                    <option {% if data.countryCode == '223' %}selected{% endif %} value="223">Mali (+223)</option>
-                                    <option {% if data.countryCode == '356' %}selected{% endif %} value="356">Malta (+356)</option>
-                                    <option {% if data.countryCode == '692' %}selected{% endif %} value="692">Marshall Islands (+692)</option>
-                                    <option {% if data.countryCode == '596' %}selected{% endif %} value="596">Martinique (+596)</option>
-                                    <option {% if data.countryCode == '222' %}selected{% endif %} value="222">Mauritania (+222)</option>
-                                    <option {% if data.countryCode == '269' %}selected{% endif %} value="269">Mayotte (+269)</option>
-                                    <option {% if data.countryCode == '52' %}selected{% endif %} value="52">Mexico (+52)</option>
-                                    <option {% if data.countryCode == '691' %}selected{% endif %} value="691">Micronesia (+691)</option>
-                                    <option {% if data.countryCode == '373' %}selected{% endif %} value="373">Moldova (+373)</option>
-                                    <option {% if data.countryCode == '377' %}selected{% endif %} value="377">Monaco (+377)</option>
-                                    <option {% if data.countryCode == '976' %}selected{% endif %} value="976">Mongolia (+976)</option>
-                                    <option {% if data.countryCode == '1664' %}selected{% endif %} value="1664">Montserrat (+1664)</option>
-                                    <option {% if data.countryCode == '212' %}selected{% endif %} value="212">Morocco (+212)</option>
-                                    <option {% if data.countryCode == '258' %}selected{% endif %} value="258">Mozambique (+258)</option>
-                                    <option {% if data.countryCode == '95' %}selected{% endif %} value="95">Myanmar (+95)</option>
-                                    <option {% if data.countryCode == '264' %}selected{% endif %} value="264">Namibia (+264)</option>
-                                    <option {% if data.countryCode == '674' %}selected{% endif %} value="674">Nauru (+674)</option>
-                                    <option {% if data.countryCode == '977' %}selected{% endif %} value="977">Nepal (+977)</option>
-                                    <option {% if data.countryCode == '31' %}selected{% endif %} value="31">Netherlands (+31)</option>
-                                    <option {% if data.countryCode == '687' %}selected{% endif %} value="687">New Caledonia (+687)</option>
-                                    <option {% if data.countryCode == '64' %}selected{% endif %} value="64">New Zealand (+64)</option>
-                                    <option {% if data.countryCode == '505' %}selected{% endif %} value="505">Nicaragua (+505)</option>
-                                    <option {% if data.countryCode == '227' %}selected{% endif %} value="227">Niger (+227)</option>
-                                    <option {% if data.countryCode == '234' %}selected{% endif %} value="234">Nigeria (+234)</option>
-                                    <option {% if data.countryCode == '683' %}selected{% endif %} value="683">Niue (+683)</option>
-                                    <option {% if data.countryCode == '672' %}selected{% endif %} value="672">Norfolk Islands (+672)</option>
-                                    <option {% if data.countryCode == '670' %}selected{% endif %} value="670">Northern Marianas (+670)</option>
-                                    <option {% if data.countryCode == '47' %}selected{% endif %} value="47">Norway (+47)</option>
-                                    <option {% if data.countryCode == '968' %}selected{% endif %} value="968">Oman (+968)</option>
-                                    <option {% if data.countryCode == '680' %}selected{% endif %} value="680">Palau (+680)</option>
-                                    <option {% if data.countryCode == '507' %}selected{% endif %} value="507">Panama (+507)</option>
-                                    <option {% if data.countryCode == '675' %}selected{% endif %} value="675">Papua New Guinea (+675)</option>
-                                    <option {% if data.countryCode == '595' %}selected{% endif %} value="595">Paraguay (+595)</option>
-                                    <option {% if data.countryCode == '51' %}selected{% endif %} value="51">Peru (+51)</option>
-                                    <option {% if data.countryCode == '63' %}selected{% endif %} value="63">Philippines (+63)</option>
-                                    <option {% if data.countryCode == '48' %}selected{% endif %} value="48">Poland (+48)</option>
-                                    <option {% if data.countryCode == '351' %}selected{% endif %} value="351">Portugal (+351)</option>
-                                    <option {% if data.countryCode == '1787' %}selected{% endif %} value="1787">Puerto Rico (+1787)</option>
-                                    <option {% if data.countryCode == '974' %}selected{% endif %} value="974">Qatar (+974)</option>
-                                    <option {% if data.countryCode == '262' %}selected{% endif %} value="262">Reunion (+262)</option>
-                                    <option {% if data.countryCode == '40' %}selected{% endif %} value="40">Romania (+40)</option>
-                                    <option {% if data.countryCode == '7' %}selected{% endif %} value="7">Russia (+7)</option>
-                                    <option {% if data.countryCode == '250' %}selected{% endif %} value="250">Rwanda (+250)</option>
-                                    <option {% if data.countryCode == '378' %}selected{% endif %} value="378">San Marino (+378)</option>
-                                    <option {% if data.countryCode == '239' %}selected{% endif %} value="239">Sao Tome &amp; Principe (+239)</option>
-                                    <option {% if data.countryCode == '966' %}selected{% endif %} value="966">Saudi Arabia (+966)</option>
-                                    <option {% if data.countryCode == '221' %}selected{% endif %} value="221">Senegal (+221)</option>
-                                    <option {% if data.countryCode == '381' %}selected{% endif %} value="381">Serbia (+381)</option>
-                                    <option {% if data.countryCode == '248' %}selected{% endif %} value="248">Seychelles (+248)</option>
-                                    <option {% if data.countryCode == '232' %}selected{% endif %} value="232">Sierra Leone (+232)</option>
-                                    <option {% if data.countryCode == '65' %}selected{% endif %} value="65">Singapore (+65)</option>
-                                    <option {% if data.countryCode == '421' %}selected{% endif %} value="421">Slovak Republic (+421)</option>
-                                    <option {% if data.countryCode == '386' %}selected{% endif %} value="386">Slovenia (+386)</option>
-                                    <option {% if data.countryCode == '677' %}selected{% endif %} value="677">Solomon Islands (+677)</option>
-                                    <option {% if data.countryCode == '252' %}selected{% endif %} value="252">Somalia (+252)</option>
-                                    <option {% if data.countryCode == '27' %}selected{% endif %} value="27">South Africa (+27)</option>
-                                    <option {% if data.countryCode == '34' %}selected{% endif %} value="34">Spain (+34)</option>
-                                    <option {% if data.countryCode == '94' %}selected{% endif %} value="94">Sri Lanka (+94)</option>
-                                    <option {% if data.countryCode == '290' %}selected{% endif %} value="290">St. Helena (+290)</option>
-                                    <option {% if data.countryCode == '1869' %}selected{% endif %} value="1869">St. Kitts (+1869)</option>
-                                    <option {% if data.countryCode == '1758' %}selected{% endif %} value="1758">St. Lucia (+1758)</option>
-                                    <option {% if data.countryCode == '249' %}selected{% endif %} value="249">Sudan (+249)</option>
-                                    <option {% if data.countryCode == '597' %}selected{% endif %} value="597">Suriname (+597)</option>
-                                    <option {% if data.countryCode == '268' %}selected{% endif %} value="268">Swaziland (+268)</option>
-                                    <option {% if data.countryCode == '46' %}selected{% endif %} value="46">Sweden (+46)</option>
-                                    <option {% if data.countryCode == '41' %}selected{% endif %} value="41">Switzerland (+41)</option>
-                                    <option {% if data.countryCode == '963' %}selected{% endif %} value="963">Syria (+963)</option>
-                                    <option {% if data.countryCode == '886' %}selected{% endif %} value="886">Taiwan (+886)</option>
-                                    <option {% if data.countryCode == '7' %}selected{% endif %} value="7">Tajikstan (+7)</option>
-                                    <option {% if data.countryCode == '66' %}selected{% endif %} value="66">Thailand (+66)</option>
-                                    <option {% if data.countryCode == '228' %}selected{% endif %} value="228">Togo (+228)</option>
-                                    <option {% if data.countryCode == '676' %}selected{% endif %} value="676">Tonga (+676)</option>
-                                    <option {% if data.countryCode == '1868' %}selected{% endif %} value="1868">Trinidad &amp; Tobago (+1868)</option>
-                                    <option {% if data.countryCode == '216' %}selected{% endif %} value="216">Tunisia (+216)</option>
-                                    <option {% if data.countryCode == '90' %}selected{% endif %} value="90">Turkey (+90)</option>
-                                    <option {% if data.countryCode == '7' %}selected{% endif %} value="7">Turkmenistan (+7)</option>
-                                    <option {% if data.countryCode == '993' %}selected{% endif %} value="993">Turkmenistan (+993)</option>
-                                    <option {% if data.countryCode == '1649' %}selected{% endif %} value="1649">Turks &amp; Caicos Islands (+1649)</option>
-                                    <option {% if data.countryCode == '688' %}selected{% endif %} value="688">Tuvalu (+688)</option>
-                                    <option {% if data.countryCode == '44' %}selected{% endif %} value="44">UK (+44)</option>
-                                    <option {% if data.countryCode == '1' %}selected{% endif %} value="1">USA (+1)</option>
-                                    <option {% if data.countryCode == '256' %}selected{% endif %} value="256">Uganda (+256)</option>
-                                    <option {% if data.countryCode == '380' %}selected{% endif %} value="380">Ukraine (+380)</option>
-                                    <option {% if data.countryCode == '971' %}selected{% endif %} value="971">United Arab Emirates (+971)</option>
-                                    <option {% if data.countryCode == '598' %}selected{% endif %} value="598">Uruguay (+598)</option>
-                                    <option {% if data.countryCode == '7' %}selected{% endif %} value="7">Uzbekistan (+7)</option>
-                                    <option {% if data.countryCode == '678' %}selected{% endif %} value="678">Vanuatu (+678)</option>
-                                    <option {% if data.countryCode == '379' %}selected{% endif %} value="379">Vatican City (+379)</option>
-                                    <option {% if data.countryCode == '58' %}selected{% endif %} value="58">Venezuela (+58)</option>
-                                    <option {% if data.countryCode == '84' %}selected{% endif %} value="84">Vietnam (+84)</option>
-                                    <option {% if data.countryCode == '84' %}selected{% endif %} value="84">Virgin Islands - British (+1284)</option>
-                                    <option {% if data.countryCode == '84' %}selected{% endif %} value="84">Virgin Islands - US (+1340)</option>
-                                    <option {% if data.countryCode == '681' %}selected{% endif %} value="681">Wallis &amp; Futuna (+681)</option>
-                                    <option {% if data.countryCode == '969' %}selected{% endif %} value="969">Yemen (North)(+969)</option>
-                                    <option {% if data.countryCode == '967' %}selected{% endif %} value="967">Yemen (South)(+967)</option>
-                                    <option {% if data.countryCode == '260' %}selected{% endif %} value="260">Zambia (+260)</option>
-                                    <option {% if data.countryCode == '263' %}selected{% endif %} value="263">Zimbabwe (+263)</option>
-                                </select>
-                            </div>
-                            <div class="w-75 field">
-                                <input class="form-control" name="modalPrimaryContact" id="modalPrimaryContact" type="number" required/>
-                            </div>
+                <div class="modal-body pb-4">
+                    <div class="row pb-3 border-bottom border-secondary">
+                        <div class="col-sm-4 col-md-4 field">
+                            <label for="modalAddType">Type :<span class="required">*</span></label>
+                            <select name="modalAddType" id="modalAddType" class="form-control px-1" required>
+                                <option value="Workplace" selected>Workplace</option>
+                                <option value="Home">Home</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 field">
-                        <label for="modalAlternateContact">Alternate Contact :</label>
-                        <div class="field">
-                            <input class="form-control" name="modalAlternateContact" id="modalAlternateContact" type="number"/>
+                        <div class="col-sm-8 col-md-8 field">
+                            <label for="modalAddDescription">Client Office:</label>
+                            <input name="modalAddDescription" id="modalAddDescription" class="form-control" required>
                         </div>
-                    </div>
-                    <div class="col-sm-3 col-md-3 field">
-                        <label for="modalAddCity">City:<span class="required">*</span></label>
-                        <input type="text" name="modalAddCity" id="modalAddCity"  class="form-control" required>
-                    </div>
-                    <div class="col-sm-3 col-md-3 field">
-                        <label for="modalAddState">State:<span class="required">*</span></label>
-                        <input type="text" name="modalAddState" id="modalAddState"  class="form-control" required>
-                    </div>
-                    <div class="col-sm-3 col-md-3 field">
-                        <label for="modalAddPostalCode">Postal Code:<span class="required">*</span></label>
-                        <input type="number" name="modalAddPostalCode" id="modalAddPostalCode"  class="form-control" required>
-                    </div>
-                    <div class="col-sm-3 col-md-3 field">
-                        <label for="modalAddCountry">Country:<span class="required">*</span></label>
-                        <input type="text" name="modalAddCountry" id="modalAddCountry"  class="form-control" required>
-                    </div>
-                    <div class="col-sm-6 col-md-6 field">
-                        <label for="modalAddress1">Address 1:<span class="required">*</span></label>
-                        <textarea name="modalAddress1" id="modalAddress1" rows="1" class="form-control" required></textarea>
-                    </div>
-                    <div class="col-sm-6 col-md-6 field">
-                        <label for="modalAddress2">Address 2:</label>
-                        <textarea name="modalAddress2" id="modalAddress2" rows="1" class="form-control"></textarea>
-                    </div>
-                    <div class="col-md-12 col-sm-12 requiredValueSection">
-                        <label for="rateCards">RateCards :<span class="required">*</span></label>
-                        <select name="rateCards" id="rateCards" multiple="multiple">
-                            {% for rateCard in rateCards %}
-                            <option value="{{rateCard.id}}">{{rateCard.rate_card_name}} </option>
-                            
-                            {% endfor %}
-                        </select>
+                        <div class="col-sm-3 col-md-3 field">
+                            <label for="modalAddCity">City:<span class="required">*</span></label>
+                            <input type="text" name="modalAddCity" id="modalAddCity"  class="form-control" required>
+                        </div>
+                        <div class="col-sm-3 col-md-3 field">
+                            <label for="modalAddState">State:<span class="required">*</span></label>
+                            <input type="text" name="modalAddState" id="modalAddState"  class="form-control" required>
+                        </div>
+                        <div class="col-sm-3 col-md-3 field">
+                            <label for="modalAddPostalCode">Postal Code:<span class="required">*</span></label>
+                            <input type="number" name="modalAddPostalCode" id="modalAddPostalCode"  class="form-control" required>
+                        </div>
+                        <div class="col-sm-3 col-md-3 field">
+                            <label for="modalAddCountry">Country:<span class="required">*</span></label>
+                            <select name="modalAddCountry" id="modalAddCountry" class="form-control px-1" required>
+                            </select> 
+                        </div>
+                        <div class="col-sm-6 col-md-6 field">
+                            <label for="modalAddress1">Address 1:<span class="required">*</span></label>
+                            <textarea name="modalAddress1" id="modalAddress1" rows="1" class="form-control" required></textarea>
+                        </div>
+                        <div class="col-sm-6 col-md-6 field">
+                            <label for="modalAddress2">Address 2:</label>
+                            <textarea name="modalAddress2" id="modalAddress2" rows="1" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-12 col-sm-12 requiredValueSection">
+                            <label for="rateCards">RateCards :<span class="required">*</span></label>
+                            <select name="rateCards" id="rateCards" multiple="multiple">
+                                {% for rateCard in rateCards %}
+                                <option value="{{rateCard.id}}">{{rateCard.rate_card_name}} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>                    
+                    <div class="row" id="additionalContactSection">                            
+                        <!-- <div class="col-12 text-right my-1">
+                            <i class="fa-solid fa-circle-plus addContact"></i>
+                        </div>
+                        <div class="col-12 my-1 firstAdditionalFieldSet">
+                            <div class="row bg-light pb-3 border rounded">
+                                <div class="col-md-4 col-sm-4 field">
+                                    <label for="modalPersonName1">Person name :<span class="required">*</span></label>
+                                    <input class="form-control" name="modalPersonName1" id="modalPersonName1" type="text" required/>
+                                </div>
+                                <div class="col-md-8 col-sm-8 field">
+                                    <label for="modalEmail1">Person Email :<span class="required">*</span></label>
+                                    <input class="form-control" name="modalEmail1" id="modalEmail1" type="email" required/>
+                                </div>
+                                <div class="col-md-7 col-sm-7 field">
+                                    <label for="modalPrimaryContact1">Primary Contact :<span class="required">*</span></label>
+                                    <div class="flex">
+                                        <div class="w-25">
+                                            <select name="modalCountryCode1" id="modalCountryCode1" class="form-control px-1" required>
+                                            </select>
+                                        </div>
+                                        <div class="w-75">
+                                            <input class="form-control" name="modalPrimaryContact1" id="modalPrimaryContact1" type="number" required/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-sm-5 field">
+                                    <label for="modalAlternateContact1">Alternate Contact :</label>
+                                    <div class="field">
+                                        <input class="form-control" name="modalAlternateContact1" id="modalAlternateContact1" type="number"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer px-2">
-                <button type="submit"  class="btn btn-sm btn-outline-dark" style="font-size:0.95em;">Submit</button>
-            </div>
-        </form>
-      </div>
+                <div class="modal-footer px-2">
+                    <button type="submit" class="btn btn-sm btn-outline-dark" style="font-size:0.95em;">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
-<!-- /page content -->
+</div>
+{% endblock %}
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -733,169 +546,5 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script>
-    $('#rateCards').select2({
-        placeholder: 'Select options',
-        width: '100%'
-    });
-    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
-
-    var validator = new FormValidator(
-        {
-            events: ["blur", "input", "change"],
-        },
-        document.forms[0]
-    );
-    function checkPhone(value){
-        if(value.val().length != 10){
-            value.css('border','1px solid #CE5454');
-            return false
-        }else{
-            value.css('border','1px solid #ced4da');
-            return true
-        }
-    } 
-    // on form "submit" event
-    document.forms[0].onsubmit = function (e) {
-        var submit = true, validatorResult = validator.checkAll(this);
-
-        validatorResult.valid = checkPhone($('#primaryContact'))        
-               
-        return !!validatorResult.valid;
-    };
-    // on form "reset" event
-    document.forms[0].onreset = function (e) {
-        validator.reset();
-    };
-    // stuff related ONLY for this demo page:
-   
-    $(".toggleValidationTooltips").change(function () {
-            validator.settings.alerts = !this.checked;
-            if (this.checked) $("form .alert").remove();
-    }).prop("checked", false);
-    function setModalWithData(ofcId, readonlyVal) {
-        $.ajax({
-            url: "/gearBox/client/ofc/view/",
-            method: "POST",
-            data: {
-                'ofcId': ofcId
-            },
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            },
-            success: function(items) {
-                let dataObj = items.ofcObj
-                $('#modalAddDescription').val(dataObj['description']).attr('readonly', readonlyVal);
-                $('#modalPersonName').val(dataObj['personName']).attr('readonly', readonlyVal);
-                $('#modalAlternateContact').val(dataObj['alternativeContact']).attr('readonly', readonlyVal);
-                $('#modalAddCity').val(dataObj['city']).attr('readonly', readonlyVal);
-                $('#modalAddState').val(dataObj['state']).attr('readonly', readonlyVal);
-                $('#modalAddPostalCode').val(dataObj['postalCode']).attr('readonly', readonlyVal);
-                $('#modalAddCountry').val(dataObj['country']).attr('readonly', readonlyVal);
-                $('#modalAddress1').val(dataObj['address1']).attr('readonly', readonlyVal);
-                $('#modalAddress2').val(dataObj['address2']).attr('readonly', readonlyVal);
-                $('#modalPrimaryContact').val(dataObj['primaryContact']).attr('readonly', readonlyVal);
-                $('#modalCountryCode, #modalAddType').attr('disabled', readonlyVal);
-                console.log(readonlyVal)
-                $('#rateCards').empty();
-                $.each(dataObj.allRateCards, function(index, rateCard) {
-                    let option = $('<option>', {
-                        value: rateCard.id,
-                        text: rateCard.rate_card_name
-                    });
-                    
-                    // Check if the rate card is associated with the client office and select it
-                    let isSelected = dataObj.rateCards.some(rc => rc.rateCard_id === rateCard.id);
-                    if (isSelected) {
-                        option.prop('selected', true);
-                    }
-    
-                    $('#rateCards').append(option);
-                });
-
-                
-                if(readonlyVal == true){
-                    $('.modal-footer').addClass('d-none')
-                    $('#clientOfc form').removeAttr('action')
-                }else{
-                    $('.modal-footer').removeClass('d-none')
-                    $('#clientOfc form').attr('action',`/gearBox/client/ofc/edit/save/${ofcId}/`)
-                }
-
-                $('#modalCountryCode option').each(function() {
-                    if ($(this).val() == dataObj['countryCode']) {
-                        $(this).prop('selected', true);
-                    }
-                });
-                $('#modalAddType option').each(function() {
-                    if ($(this).val() == dataObj['locationType']) {
-                        $(this).prop('selected', true);
-                    }
-                });
-            }
-        });
-        $('#clientOfc').modal('show');
-    }
-
-
-    
-    
-    $('.modalView').on('click', function() {
-        let id = $(this).attr('id').replace('view', '');
-        setModalWithData(id,readonlyVal=true)
-    });
-    $('.modalEdit').on('click', function() {
-        let id = $(this).attr('id').replace('edit', '');
-        setModalWithData(id,readonlyVal=false)
-    });
-
-    $('.addOffice').on('click', function(){
-        let clientId = $('#clientId').val()
-
-        $('#clientOfc .modal-body input,#clientOfc .modal-body textarea,  #clientOfc .modal-body select').each(function () {
-            $(this).val("");
-        });
-        
-        // Select blank
-        var select = $('#rateCards');
-
-        // Clearing all selected options
-        select.val(null).trigger('change');
-        // Select blank
-
-        $('#clientOfc form').attr('action',`/gearBox/client/new/ofc/save/${clientId}/`)
-        $('#clientOfc').modal('show');
-
-    });
-    $(document).ready(function() {
-        $('#modalForm').submit(function(e) {
-            // Prevent the default form submission behavior
-            e.preventDefault();
-        
-            // Flag to track if any required fields are empty
-            var hasEmptyField = false;          
-            
-            // Check each input/select with the required attribute
-            $('input[required], textarea[required], select[required]').each(function() {
-                // If the field is empty, set hasEmptyField to true and add red border
-                if ($(this).val() == '' || $(this).val() == null) {
-                    hasEmptyField = true;
-                    $(this).css('border','1px solid #CE5454');
-                }else{
-                    $(this).css('border','1px solid #ced4da');
-
-                }
-            });
-
-            // If any required fields are empty, prevent form submission
-            if (hasEmptyField || !checkPhone($('#modalPrimaryContact'))) {
-                return false;
-            }
-    
-            // If all required fields are filled, submit the form
-            this.submit();
-        });
-    });
-    
-</script>
-{% endblock %} {% endblock %}
+<script src="{% static 'js/clientForm.js' %}"></script>
+{% endblock %} 
