@@ -1921,17 +1921,19 @@ def HolcimDocketView(request,id):
     return render(request, 'Account/Holcim/docketView.html',params)
 def basePlantTable(request):
     basePlants = BasePlant.objects.all()
+
     # locations = Location.objects.all()
     return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants})
 
 def basePlantForm(request, id=None):
     
     basePlant = None
+    clientOfficeObj = ClientOffice.objects.all()
     if id:
         basePlant = BasePlant.objects.get(pk=id)
-        
     params = {
         'basePlant': basePlant,
+        'clientOfficeObj':clientOfficeObj
     }
     return render(request, "Account/basePlantForm.html", params)
 
@@ -1952,6 +1954,8 @@ def basePlantForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
+    clientBasePlant = request.POST.get('clientBasePlant')
+    clientDepot = request.POST.get('clientDepot')
     dataList = {
         'basePlant': request.POST.get('basePlant').upper(),
         'address': request.POST.get('address'),
@@ -1961,11 +1965,13 @@ def basePlantSave(request, id=None):
         'lat': request.POST.get('lat'),
         'long': request.POST.get('long'),
         # if not any select that means plant name is location 
-        'clientDepot' :  True if  request.POST.get('clientDepot') else False , 
-        'clientBasePlant' :  True if  request.POST.get('clientBasePlant') else False
+        'clientDepot' :  True if  clientDepot else False , 
+        'clientBasePlant' :  True if  clientBasePlant else False,
+        'depotCode' :  request.POST.get('depotCode'),
+        'email' :  request.POST.get('email'),
+        'clientOfficeId' : ClientOffice.objects.filter(id=request.POST.get('clientOfficeId')).first() if clientDepot and  clientBasePlant else None 
     }
 
-    
     result = None
     if id:
         result = updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
