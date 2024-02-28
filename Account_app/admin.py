@@ -393,6 +393,7 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 
 admin.site.register(Surcharge)
 admin.site.register(PublicHoliday)
+admin.site.register(ClientOfficeAdditionalInformation)
 
 
 class RctiErrors_(admin.ModelAdmin):

@@ -902,6 +902,8 @@ def getSubGroup(request):
 @csrf_protect
 def subGroupSave(request , id=None):
     subGroupName = request.POST.get('subGroups')
+    if not subGroupName:
+        return redirect(request.META.get('HTTP_REFERER'))
     truckGroupObj = TruckGroup.objects.all()
     truckSubGroupObj = TruckSubGroup.objects.filter(pk=id).first()
     truckGroupObj = TruckGroup.objects.filter(pk=request.POST.get('groups')).first()

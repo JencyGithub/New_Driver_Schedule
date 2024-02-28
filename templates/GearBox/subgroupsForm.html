@@ -1,6 +1,6 @@
 {% extends "main/main.html" %}
 {% load static %}
-{% block title %} | Truck Table {% endblock %}
+{% block title %} | Sub Group Table {% endblock %}
 {% block headStyle %}
 
 <!-- Datatables -->
@@ -119,26 +119,7 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
-<script>
-    const redirectButton = document.getElementById('redirectButton');
 
-    redirectButton.addEventListener('click', function () {
-        const djangoURL = redirectButton.getAttribute('data-url');
-
-        window.location.href = djangoURL;
-    });
-    function getSubGroupData(groupId, subGroupName , subGroupId) {
-        $('#subGroupModel').modal('show');
-        $('#groups').val(groupId);
-        $('#subGroups').val(subGroupName)
-        $('#subGroupForm').attr('action', '/gearBox/subgroups/edit/'+subGroupId);
-    }
-</script>
-<script>
-    $(document).ready(function () {
-        $('#datatable-buttons').DataTable();
-    });
-</script>
 <!-- Datatables -->
 <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
@@ -155,5 +136,32 @@
 <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('#datatable-buttons').DataTable();
+    });
+    $('#subGroupForm').submit(function (e) {
+        $('input[required], select[required]').each(function () {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid');
+                e.preventDefault();
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+    });
+    const redirectButton = document.getElementById('redirectButton');
 
+    redirectButton.addEventListener('click', function () {
+        const djangoURL = redirectButton.getAttribute('data-url');
+
+        window.location.href = djangoURL;
+    });
+    function getGroupData(groupName, groupId) {
+        $('#groupModel').modal('show');
+        $('#groupName').val(groupName);
+        $('#groupForm').attr('action', '/gearBox/truck/groups/edit/'+groupId);
+    }
+    
+</script>
 {% endblock %}

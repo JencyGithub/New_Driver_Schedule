@@ -30,16 +30,25 @@ class ClientOffice(models.Model):
     description = models.CharField(max_length=2048, default='', null=True)
     address1 = models.CharField(max_length=1024, null=True, default='')
     address2 = models.CharField(max_length=1024, null=True, default='')
-    personName = models.CharField(max_length=100, null=True, default='')
     city = models.CharField(max_length=100, null=True, default='')
     state = models.CharField(max_length=100, null=True, default='')
     country = models.CharField(max_length=100, null=True, default='')
     postalCode = models.IntegerField(null=True, default=0)
-    primaryContact = models.IntegerField(null=True, default=0)
-    alternativeContact = models.IntegerField(null=True, default=0)
+
 
     def __str__(self) -> str:
         return str(self.description) + str(self.clientId) + str(self.locationType)
+
+    
+class ClientOfficeAdditionalInformation(models.Model):
+    clientOfficeId = models.ForeignKey(ClientOffice, on_delete=models.CASCADE, null=True)
+    personName = models.CharField(max_length=100, null=True, default='')
+    primaryContact = models.IntegerField(null=True, default=0)
+    alternativeContact = models.IntegerField(null=True, default=0)
+    email = models.CharField(max_length = 255 , null = True , default='')
+    
+    def __str__(self) -> str:
+        return str(self.personName) + str(self.email)
 
     
 

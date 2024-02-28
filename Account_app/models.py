@@ -23,6 +23,9 @@ class BasePlant(models.Model):
     #if not any select that means plant name is location
     clientDepot = models.BooleanField(default=False) 
     clientBasePlant = models.BooleanField(default=False) 
+    depotCode = models.CharField(max_length=100, null=True , default='')
+    email = models.CharField(max_length=100, null=True , default='')
+    clientOfficeId = models.ForeignKey(ClientOffice, null=True, on_delete=models.CASCADE)
     
     class Meta:
         unique_together = (('lat', 'long'),)
