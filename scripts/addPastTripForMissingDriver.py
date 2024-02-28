@@ -239,12 +239,50 @@ for i in matchingData:
                         docketObj.returnQty = 0 if str(data[14].strip()).lower() == '' else data[14].strip()
                         docketObj.returnKm = 0 if str(data[15].strip()).lower() == '' else data[15].strip()
                         docketObj.cubicMl = 0 if str(data[8].strip()).lower() == '' else data[8].strip()
-                        docketObj.waitingTimeStart = None if str(data[11]).strip().lower() == '' else datetime.strptime(data[11].strip(), '%H:%M:%S').time()
-                        docketObj.waitingTimeEnd = None if str(data[12]).strip().lower() == '' else datetime.strptime(data[12].strip(), '%H:%M:%S').time()
-                        docketObj.standByStartTime = None if str(data[20].strip()).lower() == '' else datetime.strptime(data[20].strip(), '%H:%M:%S').time()
-                        docketObj.standByEndTime = None if str(data[21].strip()).lower() == '' else datetime.strptime(data[21].strip(), '%H:%M:%S').time()
-                        
-                        # docketObj.standBySlot = standBySlot
+                        waitingTimeStart = None if str(data[11]).strip().lower() == '' else str(data[11]).strip().lower()
+                        waitingTimeEnd = None if str(data[12]).strip().lower() == '' else str(data[12]).strip().lower()
+
+                        waitingTimeStartCount = 0 
+                        waitingTimeEndCount = 0
+                        if waitingTimeStart != None:
+                            waitingTimeStartCount = waitingTimeStart.count(':')
+                        if waitingTimeEnd != None:
+                            waitingTimeEndCount = waitingTimeEnd.count(':')
+
+                        if waitingTimeStart is not None and waitingTimeStartCount == 1:
+                            waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M').time())
+                        elif waitingTimeStartCount == 2:
+                            waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M:%S').time())
+                        if waitingTimeEnd is not None and waitingTimeEndCount == 1:
+                            waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M').time())
+                        elif waitingTimeEndCount == 2:
+                            waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
+                        docketObj.waitingTimeStart = waitingTimeStart
+                        docketObj.waitingTimeEnd = waitingTimeEnd
+                        # docketObj.totalWaitingInMinute = totalWaitingTime
+                        standByStartTime = None if str(data[20]).strip().lower() == '' else str(data[20]).strip().lower()
+                        standByEndTime = None if str(data[21]).strip().lower() == '' else str(data[21]).strip().lower()
+
+                        # Initialize counts to 0
+                        standByStartCount = 0 
+                        standByEndCount = 0
+                        if standByStartTime != None:
+                            standByStartCount = standByStartTime.count(':')
+                        if standByEndTime != None:
+                            standByEndCount = standByEndTime.count(':')
+
+                        if standByStartCount == 1 and standByStartTime is not None:
+                            standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M').time())
+                        elif standByStartCount == 2:
+                            standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
+                            
+                        if standByEndCount == 1 and standByEndTime is not None:
+                            standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M').time())
+                        elif standByEndCount == 2:
+                            standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
+
+                        docketObj.standByStartTime = standByStartTime
+                        docketObj.standByEndTime = standByEndTime  # docketObj.standBySlot = standBySlot
                         docketObj.comment = data[17].strip()
                         # modification for adding blow back and replacement.
                         if data[19].strip().replace(' ','') != None:
