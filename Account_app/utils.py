@@ -39,8 +39,10 @@ def setEarningLine(dataList:list, dateGiven=None, docketNumber=None , basePlant 
             tempList.extend(dataList[:3] + [' '.join(dataList[3:-7])] + dataList[-7:])
         else:  
             tempList.extend(dataList[:3] + [' '.join(dataList[3:-7])] + dataList[-7:])
-        
+    removeComma = tempList[3].replace(',', '')
+    tempList[3] = removeComma
     return tempList
+
    
 def setExpenseLine(dataList:list, docketNumber=None, expenseDate=None):
     tempList = []
@@ -61,7 +63,7 @@ def setTopUp(dataList:list):
     return dataList[:2] + [''] + [' '.join(dataList[2:-6])] + [''] + dataList[-6:]
 
 args = sys.argv[-1]
-# args = '20240105051933@_!Boral-30-Jun-2023.csv'
+# args = '01-01-2024.csv'
 
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 # file_path = args

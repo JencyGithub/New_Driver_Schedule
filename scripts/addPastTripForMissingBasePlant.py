@@ -439,6 +439,7 @@ def dateConvert(date_):
 docket_pattern = r'^\d{8}$|^\d{6}$'
 # For RCTI 
 rctiMatchingData = RctiErrors.objects.filter(errorDescription="Earning Depot/Location does not exist.", status=False)
+# rctiMatchingData = RctiErrors.objects.filter(docketNumber = '26032270' , errorDescription="list index out of range", status=False)
 # dataList = "['10652', '20527042', '01/08/23', 'BEGA', '151  AUCKLAND ST BEGA CARTAGE OTHERPER KM PER CU M', '4.0000', '3.0000', 'CUBIC ME', '37.1900', '111.57', '11.16', '122.73']"
 
 
@@ -447,6 +448,11 @@ for i in rctiMatchingData:
     dataList = i.data
     dataList = dataList.replace('[','').replace(']','').replace("'",'')
     dataList = dataList.split(',')
+    getReportIdAndLastValue = dataList[-1].split('@_!')
+    rctiReportObj = RctiReport.objects.filter(pk=getReportIdAndLastValue[-1]).first()
+    dataList[-1] = getReportIdAndLastValue[0]
+    clientName = i.clientName
+    
     for j in range(len(dataList)):
         dataList[j] = dataList[j].strip()
         # if j ==2:
@@ -463,7 +469,6 @@ for i in rctiMatchingData:
                     RCTIobj = existingDocket
             except:
                 RCTIobj = RCTI()
-
             RCTIobj.truckNo = convertIntoFloat(dataList[0])
             RCTIobj.clientName = Client.objects.filter(name = i.clientName).first()
             if re.match(docket_pattern ,str(dataList[1])):
@@ -472,6 +477,7 @@ for i in rctiMatchingData:
                 while dataList:
 
                     dump = dataList[:10]
+                    
                     description = dump[2].lower().strip()
                     if 'top up' in description:
                         # insertTopUpRecord(dump, RCTIobj.truckNo, RCTIobj.docketNumber)
@@ -558,13 +564,25 @@ for i in rctiMatchingData:
                     RCTIobj.GSTPayable = convertIntoFloat(dump[8])
                     RCTIobj.TotalExGST = convertIntoFloat(dump[7])
                     RCTIobj.Total = convertIntoFloat(dump[9])
-
-                    dataList = dataList[10:]
-                    
+                    # try:
+                        # print('DataList',dataList)
+                    if len(dataList) <=11:
+                        break
+                    else:
+                        dataList = dataList[11:]
+                    # except :
+                    #     pass
+                        # print('Before Error  Solving ',len(dataList))
+                        # exit()
+                RCTIobj.rctiReport = rctiReportObj
                 RCTIobj.save()
                 i.status = True
                 i.save()
                 
+
+                # print('save')
+                # print('DataList1',dataList)
+                # exit()
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
                 rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
                 
@@ -591,24 +609,25 @@ for i in rctiMatchingData:
                 
             else:
                 rctiErrorObj = RctiErrors( 
-                                clientName = 'boral',
+                                clientName = clientName,
                                 docketNumber = dataList[1],
                                 docketDate = RCTIobj.docketDate,
                                 errorDescription = 'To be adjusted manually by admin team',
                                 fileName = fileName,
-                                data = str(errorSolve)
+                                data = i.data
             )
                 rctiErrorObj.save()
 
         except Exception as e:
-            print(f"Error : {e}")
+            # print(f"Error : {e}")
+            # exit()
             rctiErrorObj = RctiErrors( 
-                                clientName = 'boral',
+                                clientName = clientName,
                                 docketNumber = RCTIobj.docketNumber,
                                 docketDate = RCTIobj.docketDate,
                                 errorDescription = e,
                                 fileName = fileName,
-                                data = str(errorSolve)
+                                data = i.data
             )
             rctiErrorObj.save()
             pass
