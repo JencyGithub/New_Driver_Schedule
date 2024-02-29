@@ -1435,7 +1435,7 @@ def rctiSave(request):
                     rctiReport.total = fileDetails[4]
                     rctiReport.save()
                     with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id) +','+ str(clientName))
+                        f.write(str(rctiReport.id) +','+ str(clientNameID.name))
                     # return HttpResponse('work')
                         
                     colorama.AnsiToWin32.stream = None
@@ -3181,10 +3181,9 @@ def archiveReset(request ,errorId):
     
 
 
+# @api_view(['POST'])
 @csrf_protect
-@api_view(['POST'])
 def pastTripSave(request):
-
     monthAndYear = str(request.POST.get('monthAndYear'))
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')

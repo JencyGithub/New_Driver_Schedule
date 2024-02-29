@@ -117,6 +117,8 @@ def run():
                 
                 # driverObj = Driver.objects.filter(name = driverName).first()
                 driverObj = Driver.objects.filter(driverId=driverID).first()
+                # driverObj = Driver.objects.filter(name = driverName).first()
+                driverObj = Driver.objects.filter(driverId=driverID).first()
                 
                 if driverObj:
                     
