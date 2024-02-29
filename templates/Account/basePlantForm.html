@@ -118,7 +118,8 @@
                                     <input class="form-control" type="email" name="email" required  value="{% if basePlant %}{{ basePlant.email }}{% endif %}" id="email">
                                 </div>
                             </div>
-                            <div class="col-sm-12 clientOfficeId {% if  basePlant.clientDepot is False  and basePlant.clientBasePlant is False %}d-none{% endif %} ">
+                            <!-- <div class="col-sm-12 clientOfficeId {% if  basePlant.clientDepot is False  and basePlant.clientBasePlant is False %}d-none{% endif %} "> -->
+                            <div class="col-sm-12 clientOfficeId {% if  basePlant is None or basePlant.clientBasePlant is False %}d-none{% endif %} ">
                                 <div class="form-group">
                                     <label for="clientOfficeId">Client Office  :<span class="required">*</span></label> 
                                     <select class="form-control" {% if  basePlant.clientDepot and  basePlant.clientBasePlant or  basePlant %}required{% endif %} name="clientOfficeId" id="clientOfficeId">
