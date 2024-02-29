@@ -802,16 +802,24 @@ def clientChange(request, id=None):
 def clientOfcView(request): 
     ofcId = request.POST.get('ofcId')
     ofcObj = ClientOffice.objects.filter(pk=ofcId).values().first()
-    ofcObj['countryCode'] = str(ofcObj['primaryContact'])[:-10]
-    ofcObj['primaryContact'] = str(ofcObj['primaryContact'])[-10:]
+    # ofcObj['countryCode'] = str(ofcObj['primaryContact'])[:-10]
+    # ofcObj['primaryContact'] = str(ofcObj['primaryContact'])[-10:]
     ofcObj['allRateCards'] = list(RateCard.objects.filter(clientName__clientId = ofcObj['clientId_id']).values())
     ofcObj['rateCards'] = list(ClientOfcWithRateCardConnection.objects.filter(clientOfc__id = ofcId).values())
-    return JsonResponse({ 'status': True, 'ofcObj' : ofcObj})
+
+    additionalInfoObjs = ClientOfficeAdditionalInformation.objects.filter(clientOfficeId__id=ofcObj['id']).values()
+    for obj in additionalInfoObjs:
+        obj['countryCode'] = str(obj['primaryContact'])[:-10]
+        obj['primaryContact'] = str(obj['primaryContact'])[-10:]
+
+    return JsonResponse({ 'status': True, 'ofcObj' : ofcObj, 'additionalInfoObjs' : list(additionalInfoObjs)})
     
 @csrf_protect
 def clientOfcEditSave(request, id=None, clientId=None):
     clientOfcObj = ClientOffice()
     selectedRateCards = request.POST.getlist('rateCards')
+    additionalFieldsCount = request.POST.get('additionalContactCount')
+
     if id:
         clientOfcObj = ClientOffice.objects.filter(pk=id).first()
         ClientOfcWithRateCardConnection.objects.filter(clientOfc=clientOfcObj).delete()
@@ -822,15 +830,34 @@ def clientOfcEditSave(request, id=None, clientId=None):
     clientOfcObj.description = request.POST.get('modalAddDescription')
     clientOfcObj.address1 = request.POST.get('modalAddress1')
     clientOfcObj.address2 =request.POST.get('modalAddress2')
-    clientOfcObj.personName = request.POST.get('modalPersonName')   
     clientOfcObj.city = request.POST.get('modalAddCity')
     clientOfcObj.state = request.POST.get('modalAddState')
     clientOfcObj.country = request.POST.get('modalAddCountry') 
     clientOfcObj.postalCode =  request.POST.get('modalAddPostalCode')
-    clientOfcObj.primaryContact = str(request.POST.get('modalCountryCode')) + str(request.POST.get('modalPrimaryContact')) 
-    clientOfcObj.alternativeContact = request.POST.get('modalAlternateContact') if request.POST.get('modalAlternateContact') else None
     clientOfcObj.save()
-    # return HttpResponse(selectedRateCards)
+    
+    if not id:
+        for i in range(1, int(additionalFieldsCount) + 1):
+            if f'modalPersonName{i}':
+                additionalInfoObj = ClientOfficeAdditionalInformation()    
+                additionalInfoObj.clientOfficeId = clientOfcObj
+                additionalInfoObj.personName = request.POST.get(f'modalPersonName{i}')
+                additionalInfoObj.email = request.POST.get(f'modalEmail{i}')
+                additionalInfoObj.primaryContact = str(request.POST.get(f'modalCountryCode{i}')) + str(request.POST.get(f'modalPrimaryContact{i}'))
+                additionalInfoObj.alternativeContact = request.POST.get(f'modalAlternateContact{i}') if request.POST.get(f'modalAlternateContact{i}') else 0
+                additionalInfoObj.save()
+    else:
+        objs = ClientOfficeAdditionalInformation.objects.filter(clientOfficeId=clientOfcObj)
+        for obj in objs:
+            if f'modalPersonName{obj.id}':
+                # additionalInfoObj = ClientOfficeAdditionalInformation()    
+                # additionalInfoObj.clientOfficeId = clientOfcObj
+                obj.personName = request.POST.get(f'modalPersonName{obj.id}')
+                obj.email = request.POST.get(f'modalEmail{obj.id}')
+                obj.primaryContact = str(request.POST.get(f'modalCountryCode{obj.id}')) + str(request.POST.get(f'modalPrimaryContact{obj.id}'))
+                obj.alternativeContact = request.POST.get(f'modalAlternateContact{obj.id}') if request.POST.get(f'modalAlternateContact{obj.id}') else 0
+                obj.save()
+
     for i in selectedRateCards:
         clientOfcWithRateCardConnectionObj = ClientOfcWithRateCardConnection()
         clientOfcWithRateCardConnectionObj.clientOfc = clientOfcObj
