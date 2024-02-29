@@ -33,7 +33,7 @@ for i in boralMatchingData:
 
         shiftDate = datetime.strptime(res_, '%Y-%m-%d')
         pastBasePlant = data[-1].strip().upper()
-        pastDriver = data[4].strip().replace(' ','').lower()
+        # pastDriver = data[4].strip().replace(' ','').lower()
 
         startTime = datetime.strptime(str(data[6].strip()), '%H:%M:%S').time()
         startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
@@ -44,8 +44,10 @@ for i in boralMatchingData:
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
         clientObj = Client.objects.filter(name = i.clientName).first()
         
-        driverName = data[4].strip().replace(' ','').lower()
-        driverObj = Driver.objects.filter(name = driverName).first()
+        # driverName = data[4].strip().replace(' ','').lower()
+        # driverObj = Driver.objects.filter(name = driverName).first()
+        driverID = int(data[4].strip())
+        driverObj = Driver.objects.filter(driverId=driverID).first()
         pastTruckNo = data[1].strip().replace(' ','').lower()
         
         basePlantObj = BasePlant.objects.filter(basePlant = pastBasePlant).first()

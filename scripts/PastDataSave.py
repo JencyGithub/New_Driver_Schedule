@@ -109,10 +109,14 @@ def run():
                     continue
                     
 
-                driverName = data[4].strip().replace(' ','').lower()
+
+                
+                # driverName = data[4].strip().replace(' ','').lower()
+                driverID = int(data[4].strip())
                 clientObj = Client.objects.filter(name = clientName_).first()
                 
-                driverObj = Driver.objects.filter(name = driverName).first()
+                # driverObj = Driver.objects.filter(name = driverName).first()
+                driverObj = Driver.objects.filter(driverId=driverID).first()
                 
                 if driverObj:
                     

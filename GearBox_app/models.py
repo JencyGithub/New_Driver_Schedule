@@ -463,7 +463,7 @@ class AdminTruck(models.Model):
     
 class Driver(models.Model):
     # driverId = models.IntegerField(primary_key=True, unique=True, default=generate_4digit_unique_key, editable=False)
-    driverId = models.IntegerField(primary_key=True, unique=True)
+    driverId = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=200)
     phone = models.CharField(max_length=100,null=True)
     email = models.CharField(max_length=200)

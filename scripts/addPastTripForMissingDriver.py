@@ -9,7 +9,7 @@ from variables import *
 
 
 f = open(r"scripts/addPastTripForMissingDriver.txt", 'r')
-driverName = f.read()
+driverId = f.read()
 
 matchingData = PastTripError.objects.filter(errorFromPastTrip="Driver matching query does not exist.", status=False)
 
@@ -20,7 +20,7 @@ for i in matchingData:
         data = data.split(',')
         
 
-        pastDriver = data[4].strip().replace(' ','').lower()
+        pastDriverId = int(data[4].strip())
         if ' ' in str(data[0].strip()):
             res_ = str(data[0].strip()).split()[0]
         elif '/' in str(data[0].strip()):
@@ -41,9 +41,9 @@ for i in matchingData:
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
         clientObj = Client.objects.filter(name = i.clientName).first()
         
-        driverObj = Driver.objects.filter(name = driverName).first()
+        driverObj = Driver.objects.filter(driverId = driverId).first()
 
-        if pastDriver == driverName:
+        if pastDriverId == driverId:
             i.status = True
             i.save()
             try:

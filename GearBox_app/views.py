@@ -173,7 +173,7 @@ def driverFormSave(request, id= None):
 
     usernames = [user.username for user in users]
     email_addresses = [user.email for user in users]
-    driver_Id = [driver.driverId for driver in drivers]
+    # driver_Id = [driver.driverId for driver in drivers]
     driverName = request.POST.get('name').strip().replace(' ','').lower()
     firstName = request.POST.get('firstName').strip().replace(' ','').lower()
     middleName = request.POST.get('middleName').strip().replace(' ','').lower()
@@ -211,10 +211,10 @@ def driverFormSave(request, id= None):
         driverObj.save()
         messages.success(request,'Updating successfully')
     else:
-        if int(request.POST.get('driverId')) in driver_Id :
-            messages.error( request, "Driver ID already Exist")
-            return redirect(request.META.get('HTTP_REFERER'))
-        elif driverName in usernames:
+        # if int(request.POST.get('driverId')) in driver_Id :
+        #     messages.error( request, "Driver ID already Exist")
+        #     return redirect(request.META.get('HTTP_REFERER'))
+        if driverName in usernames:
             messages.error( request, "Driver Name  already Exist")
             return redirect(request.META.get('HTTP_REFERER'))
         elif request.POST.get('email') in email_addresses:
@@ -222,7 +222,7 @@ def driverFormSave(request, id= None):
             return redirect(request.META.get('HTTP_REFERER'))
         else:
             DriverObj = Driver()
-            DriverObj.driverId = int(request.POST.get('driverId'))
+            # DriverObj.driverId = int(request.POST.get('driverId'))
             DriverObj.name = driverName
             DriverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone')) 
             DriverObj.email = request.POST.get('email')
@@ -249,7 +249,7 @@ def driverFormSave(request, id= None):
             
             
             with open("scripts/addPastTripForMissingDriver.txt", 'w') as f:
-                f.write(driverName)
+                f.write(DriverObj.driverId)
             # colorama.AnsiToWin32.stream = None
             # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
             # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error']

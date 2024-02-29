@@ -21,8 +21,8 @@
                                 action="{% if data %}{% url 'gearBox:driverFormEditSave' id=data.driverId %} {% else %}{% url 'gearBox:driverFormSave' %}{% endif %}"
                                 method="POST" novalidate>
                                 {% csrf_token %}
-                                <div class="row">
-                                    <div class="col-md-12 col-sm-12">
+                                {% comment %} <div class="row"> {% endcomment %}
+                                    {% comment %} <div class="col-md-12 col-sm-12">
                                         <label for="driverId"
                                             class="col-form-label col-md-3 col-sm-3 label-align">DriverId :<span
                                                 class="required">*</span></label>
@@ -32,8 +32,8 @@
                                                 id="driverId" type="number"
                                                 value="{% if data %}{{data.driverId}}{% else %}{% endif %}" {% if data %}readonly{% else %}{% endif %}/>
                                         </div>
-                                    </div>
-                                </div>
+                                    </div> {% endcomment %}
+                                {% comment %} </div> {% endcomment %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
                                         <label for="name"

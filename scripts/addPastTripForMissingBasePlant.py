@@ -20,7 +20,6 @@ for i in matchingData:
         data = data.split(',')
         
 
-        pastDriver = data[4].strip().replace(' ','').lower()
         if ' ' in str(data[0].strip()):
             res_ = str(data[0].strip()).split()[0]
         elif '/' in str(data[0].strip()):
@@ -41,8 +40,10 @@ for i in matchingData:
         endTimeDateTime = datetime.combine(shiftDate.date(),endTime)
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
         clientObj = Client.objects.filter(name = i.clientName).first()
-        driverName = data[4].strip().replace(' ','').lower()
-        driverObj = Driver.objects.filter(name = driverName).first()
+        # driverName = data[4].strip().replace(' ','').lower()
+        driverID = int(data[4].strip())
+        driverObj = Driver.objects.filter(driverId=driverID).first()
+        # driverObj = Driver.objects.filter(name = driverName).first()
         basePlant = BasePlant.objects.filter(basePlant = basePlantName).first()
         if pastBasePlant == basePlant.basePlant:
             i.status = True

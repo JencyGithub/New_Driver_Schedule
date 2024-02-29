@@ -23,12 +23,12 @@ def run():
             data = row.strip().split(',')
             # with open("Expense_error.txt", 'a')as f:
             #     f.write(str(data)+'\n')
-            dump = data[:8]
+            dump = data[:7]
 
-            if len(str(dump[2])) == 10:
-                M_pattern =  dump[2]  
-            elif len(str(dump[2])) == 9:
-                M_pattern = '0' + dump[2]
+            if len(str(dump[1])) == 10:
+                M_pattern =  dump[1]  
+            elif len(str(dump[1])) == 9:
+                M_pattern = '0' + dump[1]
             else:
                 M_pattern = '' 
 
@@ -38,18 +38,18 @@ def run():
             email_addresses = [user.email for user in users]
             # print(usernames,email_addresses)
             try:
-                driverName = dump[1].lower().strip().replace(' ','').replace('-','').replace('(','').replace(')','')
-                if driverName not in usernames and dump[3].strip().replace(' ','') not in email_addresses:
+                driverName = dump[0].lower().strip().replace(' ','').replace('-','').replace('(','').replace(')','')
+                if driverName not in usernames and dump[2].strip().replace(' ','') not in email_addresses:
                     DriverObj = Driver()
-                    DriverObj.driverId = dump[0]
+                    # DriverObj.driverId = dump[0]
                     DriverObj.name = driverName.lower()
-                    DriverObj.phone = dump[2] 
-                    DriverObj.email = dump[3].strip().replace(' ','')
-                    DriverObj.password = dump[4].strip()
+                    DriverObj.phone = dump[1] 
+                    DriverObj.email = dump[2].strip().replace(' ','')
+                    DriverObj.password = dump[3].strip()
 
-                    DriverObj.firstName = dump[5].strip()
-                    DriverObj.middleName = dump[6].strip() if dump[6].strip() else ''
-                    DriverObj.lastName = dump[7].strip()
+                    DriverObj.firstName = dump[4].strip()
+                    DriverObj.middleName = dump[5].strip() if dump[5].strip() else ''
+                    DriverObj.lastName = dump[6].strip()
 
                     user_ = User.objects.create(
                         username=DriverObj.name,
