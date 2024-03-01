@@ -163,12 +163,12 @@ admin.site.register(DriverTrip,DriverTrip_)
 #     search_fields = ["docketNo","TotalInGST"]
 
 
-class clientTripAdmin(admin.ModelAdmin):
+class RCTI_(admin.ModelAdmin):
     # inlines = [WaitingTimeCost_ ,TransferKMSCost_]
-    list_display = ["docketNumber","truckNo","clientName"]
+    list_display = ["docketNumber","truckNo","clientName" , "docketDate"]
     search_fields = ["docketNumber","truckNo"]
     
-admin.site.register(RCTI, clientTripAdmin)
+admin.site.register(RCTI, RCTI_)
 
 
 
@@ -519,7 +519,12 @@ admin.site.register(HolcimTrip,HolcimTrip_)
 
 
 admin.site.register(RctiReport)
-admin.site.register(RctiAdjustment)
+class RctiAdjustment_(admin.ModelAdmin):
+    
+    list_display = ['docketNumber','docketDate']
+    search_fields = ["docketNumber"]
+admin.site.register(RctiAdjustment,RctiAdjustment_)
+
 class DriverShift_(admin.ModelAdmin):
     list_display = ['verified','shiftDate','driverId']
     search_fields = ["driverId"]

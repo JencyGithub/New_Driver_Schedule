@@ -1409,8 +1409,10 @@ def rctiSave(request):
                         elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
                             fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
                             date_ = 0
-                            
-                date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+                
+                # date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+                original_date = datetime.strptime(fileDetails[1], '%d/%m/%y')
+                date_object = original_date.strftime('%Y-%m-%d')
                 # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
                 # # print('shiftObj',shiftObj)
                 # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
