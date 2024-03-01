@@ -485,7 +485,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="rate_card_name{{connection.count}}">Rate card <span class="required">*</span></label>
+                                            <a href="{% url 'Account:rateCardView' id=connection.rate_card_name_id %}" target="_blank">Rate card <span class="required">*</span></a>
                                             <select name="rate_card_name{{connection.count}}" class="form-control" id="rate_card_name{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
                                                 {% for card in rateCards%}
                                                 <option value="{{card.id}}" {% if card.id == connection.rate_card_name_id %} selected {% endif %} >{{card.rate_card_name}}</option>
@@ -493,13 +493,13 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="pre_start_name{{connection.count}}">Pre start <span class="required">*</span></label>
+                                            <a href="{% url 'Appointment:preStartView' id=connection.pre_start_id %}" target="_blank">Pre start <span class="required">*</span></a>
                                             <input class="form-control" value="{% if connection %}{{connection.pre_start_name}}{% endif %}" {% if connection %}readonly{% endif %} type="text" name="pre_start_name{{count}}"  style="padding: 0.25rem 0.2rem;" id="pre_start_name{{count}}">
                                         </div>                                        
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="clientId{{connection.count}}"> Client name <span class="required">*</span></label>
+                                            <a href="{% url 'gearBox:clientEdit' id=connection.clientId_id %}" target="_blank"> Client name <span class="required">*</span></a>
                                             <select name="clientId{{connection.count}}" class="form-control" id="clientId{{connection.count}}" required="required" {% if connection %}disabled{% endif %}>
                                                 {% for client in clientIds%}
                                                 <option value="{{client.clientId}}" {% if client.clientId == connection.clientId_id %} selected {% endif %} >{{client.name}}</option>

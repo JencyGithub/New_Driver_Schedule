@@ -142,10 +142,10 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
         
         if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
             docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
-        
+            # print('Total Waiting Time' , docketObj.totalWaitingInMinute)
             totalWaitingTime = float(docketObj.totalWaitingInMinute) 
             if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
-                totalWaitingTime = float(totalWaitingTime) 
+                totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
                 if totalWaitingTime > 0: 
                     totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
                 else:

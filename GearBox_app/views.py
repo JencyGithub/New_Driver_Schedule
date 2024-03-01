@@ -349,6 +349,7 @@ def truckForm(request, id=None, viewOnly= None):
             preStartObj =PreStart.objects.filter(pk=i['pre_start_name']).first()
             
             if preStartObj:
+                i['pre_start_id'] = i['pre_start_name']
                 i['pre_start_name'] = preStartObj.preStartName
             i['startDate'] = dateConverterFromTableToPageFormate(i['startDate'])
             if i['endDate']:

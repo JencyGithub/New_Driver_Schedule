@@ -11,6 +11,8 @@ from variables import *
 reconciliationQuerySet = ReconciliationReport.objects.filter(fromDriver = True)
 
 for reconciliationDocketObj in reconciliationQuerySet:
+    # if reconciliationDocketObj.docketNumber != 27191835:
+    #     continue
     docketObj = DriverShiftDocket.objects.filter(docketNumber = reconciliationDocketObj.docketNumber ,shiftDate =  reconciliationDocketObj.docketDate , clientId = reconciliationDocketObj.clientId ,truckConnectionId =reconciliationDocketObj.truckConnectionId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=docketObj.tripId).first()
     shiftObj = DriverShift.objects.filter(pk=docketObj.shiftId).first()
@@ -58,4 +60,4 @@ for reconciliationDocketObj in reconciliationQuerySet:
     reconciliationDocketObj.fromDriver = True  
     reconciliationDocketObj.save()
     checkMissingComponents(reconciliationDocketObj)
-    # print('Save' , reconciliationDocketObj.docketNumber , reconciliationDocketObj.driverWaitingTimeCost , reconciliationDocketObj.missingComponent)
+    print('Save' , reconciliationDocketObj.docketNumber ,driverWaitingTimeCost)
