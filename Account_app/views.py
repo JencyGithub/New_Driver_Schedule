@@ -3190,6 +3190,10 @@ def pastTripSave(request):
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')
     pastTrip_csv_file = request.FILES.get('pastTripFile')
+    if '@_!' in pastTrip_csv_file.name:
+        messages.error(request, "File name shouldn't contain @.")
+        return redirect(request.META.get('HTTP_REFERER'))
+    return HttpResponse(pastTrip_csv_file.name)
     if not pastTrip_csv_file:
         return HttpResponse("No file uploaded")
     try:
@@ -3238,7 +3242,7 @@ def uplodedPastTrip(request):
     pastTripFile = os.listdir('static/Account/PastTripsEntry')
     pasrTripFileNameList = []
     for file in pastTripFile:
-        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[-1]])
         
     return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
 # --------------------------------------------
@@ -3293,8 +3297,7 @@ def DriverShiftForm(request,id):
     pasrTripFileNameList = []
     
     for pastFile in pastTripFile:
-        pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[1]])
-        
+        pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[-1]])
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()
     pastTripErrors = PastTripError.objects.filter(status = False , errorType = 0).values()

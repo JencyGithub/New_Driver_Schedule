@@ -252,60 +252,6 @@ def insertIntoModel(dataList,file_name , data):
             RCTIobj.rctiReport = rctiReportObj
             RCTIobj.save()
             reconciliationSave(RCTIobj.docketNumber , RCTIobj.docketDate ,clientObj , RCTIobj = RCTIobj)
-        # try:
-        #     reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
-        #     rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
-
-        #     if not reconciliationDocketObj :
-        #         reconciliationDocketObj = ReconciliationReport()
-            
-        #         reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
-        #         reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-        #         # reconciliationDocketObj.clientName =  clientNames
-        #         reconciliationDocketObj.clientId =  clientObj.clientId
-            
-        #     # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-        #     print(adjustmentFlag)
-        #     if adjustmentFlag:
-        #         print('Inside Adjustment')
-        #         if  'cartage' in description: 
-        #             print('cartage Inside Adjustment')
-        #             reconciliationDocketObj.rctiLoadAndKmCost += rctiAdjustmentObj.totalExGST
-        #         elif  'waitingtime' in description:
-        #             print('waitingtime Inside Adjustment')
-        #             reconciliationDocketObj.rctiWaitingTimeCost += rctiAdjustmentObj.totalExGST
-        #         elif "trucktransfer" in description:
-        #             print('trucktransfer Inside Adjustment')
-        #             reconciliationDocketObj.rctiTransferKmCost += rctiAdjustmentObj.totalExGST
-        #         elif "returnperkm" in description:
-        #             print('returnperkm Inside Adjustment')
-        #             reconciliationDocketObj.rctiReturnKmCost += rctiAdjustmentObj.totalExGST
-        #         elif "standbyper" in description:
-        #             print('standbyper Inside Adjustment')
-        #             reconciliationDocketObj.rctiStandByCost += rctiAdjustmentObj.totalExGST
-        #         elif "minimumload" in description:
-        #             print('minimumload Inside Adjustment')
-        #             reconciliationDocketObj.rctiLoadDeficit += rctiAdjustmentObj.totalExGST
-        #         rctiTotalCost = reconciliationDocketObj.rctiLoadAndKmCost + reconciliationDocketObj.rctiTransferKmCost + reconciliationDocketObj.rctiReturnKmCost + + reconciliationDocketObj.rctiWaitingTimeCost + reconciliationDocketObj.rctiStandByCost + reconciliationDocketObj.rctiLoadDeficit + reconciliationDocketObj.rctiSurchargeCost + reconciliationDocketObj.rctiOtherCost
-                
-        #     else:
-        #         reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-                
-        #         reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
-        #         reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
-        #         reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
-        #         # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-        #         reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
-        #         reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
-        #     reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
-        #     reconciliationDocketObj.fromRcti = True 
-            
-        #     reconciliationDocketObj.save()
-        #     checkMissingComponents(reconciliationDocketObj)
-        #     reconciliationTotalCheck(reconciliationDocketObj)
-        #     return
-        # except Exception as e: 
-        #     pass
     except Exception as e:
         
         rctiErrorObj.clientName = clientNames
