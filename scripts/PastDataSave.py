@@ -48,6 +48,7 @@ def run():
                 # if count == 10:
                 #     exit() 
                 data = line.split(',')
+                
 
                 if len(data) != 25:
                     pastTripErrorObj = PastTripError(
@@ -302,7 +303,6 @@ def run():
                                 continue
 
                             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard).first()
-
                             if not costParameterObj:
                                 pastTripErrorObj = PastTripError(
                                     clientName = clientName_,
@@ -408,6 +408,7 @@ def run():
                                 # print('Docket save Error:', e)
                                 continue
                             # print('Docket obj saved')
+                            # exit()
                             try:
                                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
                                 
@@ -437,7 +438,8 @@ def run():
                                         driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                     else:  
                                         driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                        
+                                        
+
                                 if docketObj.standByStartTime and docketObj.standByEndTime:
                                     slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                     driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
@@ -457,8 +459,9 @@ def run():
                                 reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
                                 reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
                                 reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
-                                reconciliationDocketObj.fromDriver = True 
+                                reconciliationDocketObj.fromDriver = True
                                 reconciliationDocketObj.save()
+                                checkMissingComponents(reconciliationDocketObj)
                                 # print("reconciliation done!!!!")
                             except Exception as e:
                                 pastTripErrorObj = PastTripError(

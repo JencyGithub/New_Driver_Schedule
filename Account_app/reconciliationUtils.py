@@ -143,9 +143,9 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
         if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
             docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
         
-            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
+            totalWaitingTime = float(docketObj.totalWaitingInMinute) 
             if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
-                totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
+                totalWaitingTime = float(totalWaitingTime) 
                 if totalWaitingTime > 0: 
                     totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
                 else:
@@ -343,6 +343,8 @@ def checkMissingComponents(reconciliationReportObj):
     if float(reconciliationReportObj.driverCallOut) > 0 and float(reconciliationReportObj.rctiCallOut) == 0:
         components += 'Call Out Cost' + ', '
     reconciliationReportObj.missingComponent = components
+    if reconciliationReportObj.driverTotalCost == round(reconciliationReportObj.rctiTotalCost,2):
+        reconciliationReportObj.reconciliationType = 7
     reconciliationReportObj.save()
 
 

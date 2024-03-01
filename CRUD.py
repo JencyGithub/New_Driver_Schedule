@@ -14,6 +14,14 @@ def dateConverterFromTableToPageFormate(date):
     return formated_data
 
 def timeDifference(startTime,endTime):
+    try:
+        startTime = startTime.strftime('%H:%M:%S')
+    except:
+        pass
+    try:
+        endTime = endTime.strftime('%H:%M:%S')
+    except:
+        pass
     start_datetime = datetime.strptime(startTime, '%H:%M:%S')
     end_datetime = datetime.strptime(endTime, '%H:%M:%S')
     time_difference_minutes = (end_datetime - start_datetime).total_seconds() / 60
