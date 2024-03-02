@@ -1083,14 +1083,15 @@ def getTrucks(request):
 
 def rcti(request):
 
-    rctiErrors = RctiErrors.objects.filter(status = False).values()
-    rctiSolve = RctiErrors.objects.filter(status = True).values()
+    rctiErrors = RctiErrors.objects.filter(status = False, errorType=0).values()
+    rctiSolve = RctiErrors.objects.filter(status = True, errorType=0).values()
+    archiveError = RctiErrors.objects.filter(errorType=2).values() 
     client = Client.objects.all()
     BasePlant_ = BasePlant.objects.all()
     params = {
         'rctiErrors' : rctiErrors,
         'rctiSolve' :rctiSolve,
-        # 'archiveError':archiveError,
+        'archiveError':archiveError,
         'client':client,
         'basePlants': BasePlant_
     }
@@ -3118,21 +3119,52 @@ def pastTripErrorSolve(request, id):
     else:
         return HttpResponse("Error: PastTripError not found")
 
-
-def archivePastTrip(request ,errorId):
-    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
-    pastTripErrorObj.errorType = 2
-    pastTripErrorObj.save()
-    messages.success(request,'Archive successfully..')
-    return redirect(request.META.get('HTTP_REFERER'))  
+@api_view(['POST'])
+def archivePastTrip(request ):
+    errorIds = request.POST.getlist('errorIds[]')
+    for errorId in errorIds:
+        pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+        pastTripErrorObj.errorType = 2
+        pastTripErrorObj.save()
+    return JsonResponse({'status': True})
+    # pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    # pastTripErrorObj.errorType = 2
+    # pastTripErrorObj.save()
+    # messages.success(request,'Archive successfully..')
+    # return redirect(request.META.get('HTTP_REFERER'))  
   
-def archiveReset(request ,errorId):
-    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
-    pastTripErrorObj.errorType = 0
-    pastTripErrorObj.save()
-    messages.success(request,'Archive Reset successfully..')
-    return redirect(request.META.get('HTTP_REFERER'))    
-    
+@api_view(['POST'])
+def archiveReset(request ):
+    errorIds = request.POST.getlist('errorIds[]')
+    for errorId in errorIds:
+        pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+        pastTripErrorObj.errorType = 0
+        pastTripErrorObj.save()
+    return JsonResponse({'status': True})
+
+    # pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    # pastTripErrorObj.errorType = 0
+    # pastTripErrorObj.save()
+    # messages.success(request,'Archive Reset successfully..')
+    # return redirect(request.META.get('HTTP_REFERER'))    
+
+@api_view(['POST'])
+def archiveRCTI(request):
+    errorIDs = request.POST.getlist('errorIDs[]')
+    for errorId in errorIDs:
+        RCTIErrorObj = RctiErrors.objects.filter(pk=errorId).first()
+        RCTIErrorObj.errorType = 2
+        RCTIErrorObj.save()
+    return JsonResponse({'status': True})
+
+@api_view(['POST'])
+def archiveResetRCTI(request):
+    errorIDs = request.POST.getlist('errorIDs[]')
+    for errorId in errorIDs:
+        RCTIErrorObj = RctiErrors.objects.filter(pk=errorId).first()
+        RCTIErrorObj.errorType = 0
+        RCTIErrorObj.save()
+    return JsonResponse({'status': True})
 
 
 @csrf_protect

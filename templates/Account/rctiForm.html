@@ -4,14 +4,19 @@
 {% block headStyle %}
 
 <!-- Datatables -->
-<link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% comment %} <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"
   rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"
   rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
-  rel="stylesheet">
+  rel="stylesheet"> {% endcomment %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link type="text/css"
+    href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" />
 
 <style>
   .dt-buttons.btn-group {
@@ -203,7 +208,7 @@
 
             <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
               <li class="nav-item">
-                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Error</a>
+                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Active</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Solved</a>
@@ -219,15 +224,17 @@
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>Error</h2>
+                    <button id="archiveButton" class="btn btn-sm btn-success float-right" >Archive</button>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
                     <div class="row">
                       <div class="col-sm-12">
                         <div class="card-box table-responsive">
-                          <table id="datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                          <table id="activeTable" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                               <tr>
+                                <th></th>
                                 <th>View</th>
                                 <th>Client</th>
                                 <th>DocketNumber</th>
@@ -240,6 +247,7 @@
                             <tbody>
                               {% for error in rctiErrors %}
                               <tr>
+                                <td>{{ error.id }}</td>
                                 <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                 <td>{{ error.clientName }}</td>
                                 <td> {{ error.docketNumber }}</td>
@@ -274,64 +282,23 @@
                 <!-- End Error Table  -->
               </div>
 
-              <div class="tab-pane fade" id="Archive" role="tabpanel" aria-labelledby="Archive-tab">
-                <!--Archive Table  -->
-          
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Archive</h2>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
-                    <div class="row">
-                      <div class="col-sm-12">
-                        <div class="card-box table-responsive">
-                          <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
-                              <tr>
-                                <th>View</th>
-                                <th>DocketNumber</th>
-                                <th>DocketDate</th>
-                                <th>Solved Description</th>
-                                <th>FileName</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {% for solve in archiveError %}
-                              <tr>
-                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                <td>{{ solve.docketNumber }}</td>
-                                <td>{{solve.docketDate}}</td>
-                                <td>{{solve.errorDescription}}</td>
-                                <td>{{solve.fileName}}</td>
-                              </tr>
-                              {% endfor %}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- End ArchiveTable  -->
-
-                
-              </div>
               <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <!-- Solve Table  -->
           
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>Solved</h2>
+                    <button id="solveButton" class="btn btn-sm btn-success float-right" >Archive</button>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
                     <div class="row">
                       <div class="col-sm-12">
                         <div class="card-box table-responsive">
-                          <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                          <table id="solveTable" class="table table-striped table-bordered" style="width:100%">
                             <thead>
                               <tr>
+                                <th></th>
                                 <th>View</th>
                                 <th>DocketNumber</th>
                                 <th>DocketDate</th>
@@ -344,6 +311,7 @@
                             <tbody>
                               {% for solve in rctiSolve %}
                               <tr>
+                                <td>{{ solve.id }}</td>
                                 <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                 <td>{{ solve.docketNumber }}</td>
                                 <td>{{solve.docketDate}}</td>
@@ -366,6 +334,54 @@
 
                 
               </div>
+
+              <div class="tab-pane fade" id="Archive" role="tabpanel" aria-labelledby="Archive-tab">
+                <!--Archive Table  -->
+          
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Archive</h2>
+                    <button id="restoreButton" class="btn btn-sm btn-default float-right" >Restore</button>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="card-box table-responsive">
+                          <table id="archiveTable" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                              <tr>
+                                <th></th>
+                                <th>View</th>
+                                <th>DocketNumber</th>
+                                <th>DocketDate</th>
+                                <th>Solved Description</th>
+                                <th>FileName</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for solve in archiveError %}
+                              <tr>
+                                <td>{{solve.id}}</td>
+                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                <td>{{ solve.docketNumber }}</td>
+                                <td>{{solve.docketDate}}</td>
+                                <td>{{solve.errorDescription}}</td>
+                                <td>{{solve.fileName}}</td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End ArchiveTable  -->
+
+                
+              </div>
+              
               
 
               {% comment %} View error Model start {% endcomment %}
@@ -428,13 +444,108 @@
 {% endblock %}
 {% block footerStyleEnd %}
 <script src="{% static 'js/reconciliation_analysis.js' %}"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
   // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
   $(document).ready(function () {
-    $('#datatable-buttons').DataTable();
-    $('#solved-datatable-buttons').DataTable();
+
+    var activeTable = $("#activeTable").DataTable({
+      'columnDefs': [{
+          'targets': 0,
+          'checkboxes': {
+              'selectRow': true
+          }
+      }]
+    });
+
+    var solveTable = $("#solveTable").DataTable({
+      'columnDefs': [{
+          'targets': 0,
+          'checkboxes': {
+              'selectRow': true
+          }
+      }]
+    });
+
+    var archiveTable = $("#archiveTable").DataTable({
+        'columnDefs': [{
+            'targets': 0,
+            'checkboxes': {
+                'selectRow': true
+            }
+        }]
+    });
+
+    function getSelectedDockets(table){
+      var selectedRows = table.column(0).checkboxes.selected();
+      var errorIDs = [];
+      $.each(selectedRows, function(key,docket){
+          errorIDs.push(docket)
+      })
+      console.log(errorIDs)
+      if(errorIDs.length > 0){
+          return errorIDs
+      }else{
+          alert("Please select at least one docket");
+          return false
+      }
+    }
+
+    function setArchive(errorIDs){
+      $.ajax({
+          type: "POST",
+          url: "/account/rcti/archive/",
+          data: {
+              errorIDs: errorIDs,
+          },
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          },
+          success: function (data) {
+              window.location.reload();
+              alert('Selected errors successfully archived.');
+          }
+      }); 
+    }
+
+    $('#archiveButton').on('click', function () {
+      let errorIDs = getSelectedDockets(activeTable)
+      if(errorIDs){ 
+          setArchive(errorIDs);
+      }
+    });
+
+    $('#solveButton').on('click', function () {
+      let errorIDs = getSelectedDockets(solveTable)
+      if(errorIDs){ 
+          setArchive(errorIDs);
+      }
+    });
+
+    $('#restoreButton').on('click', function () {
+        let errorIDs = getSelectedDockets(archiveTable)
+        if(errorIDs){ 
+            $.ajax({
+                type: "POST",
+                url: "/account/rcti/archive/reset/",
+                data: {
+                    errorIDs: errorIDs,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    window.location.reload();
+                    alert('Selected errors successfully Restored.');
+                }
+            }); 
+        }
+    });
+
+    /* $('#datatable-buttons').DataTable();
+    $('#solved-datatable-buttons').DataTable(); */
 
     $('#no').click(function(){
       $('#save_').prop('checked', false);
@@ -473,7 +584,7 @@
   }
 </script>
 <!-- Datatables -->
-<script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+{% comment %} <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
@@ -487,6 +598,8 @@
 <script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script> {% endcomment %}
+<script type="text/javascript"
+    src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
 
 {% endblock %}

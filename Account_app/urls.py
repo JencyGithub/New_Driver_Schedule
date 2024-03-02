@@ -99,6 +99,9 @@ urlpatterns = [
     path('rcti/Error/Form/<int:errorId>/', views.rctiErrorForm, name='rctiErrorForm'), 
     path('rcti/Error/Solve/View/<int:solveId>/', views.rctiErrorSolveView, name='rctiErrorSolveView'), 
     
+    path('rcti/archive/', views.archiveRCTI, name='archiveRCTI'),
+    path('rcti/archive/reset/', views.archiveResetRCTI, name='archiveResetRCTI'),
+    
     
     # Expanse entry manually
     path('expense/', views.expanseForm, name='expanseForm'), 
@@ -204,8 +207,8 @@ urlpatterns = [
     path('pastTrip/solve/error/get/', views.getSinglePastTripSolveError, name='getSinglePastTripSolveError'),
     
     path('uploded/pastTrip/', views.uplodedPastTrip, name='uplodedPastTrip'),
-    path('archive/pastTrip/<int:errorId>', views.archivePastTrip, name='archivePastTrip'),
-    path('archive/reset/pastTrip/<int:errorId>', views.archiveReset, name='archiveReset'),
+    path('archive/pastTrip/', views.archivePastTrip, name='archivePastTrip'),
+    path('archive/reset/pastTrip/', views.archiveReset, name='archiveReset'),
     
     
      
