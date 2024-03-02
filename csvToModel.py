@@ -75,7 +75,8 @@ def reconciliationSave(docketNumber , docketDate ,clientObj ,rctiAdjustmentObj =
         reconciliationTotalCheck(reconciliationDocketObj)
         return
     except Exception as e: 
-        print('Error' , e)
+        pass 
+        # print('Error' , e)
 def insertIntoModel(dataList,file_name , data):
     RCTIobj = None
     rctiReportId = data[0]
