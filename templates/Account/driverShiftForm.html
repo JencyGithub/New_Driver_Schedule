@@ -74,7 +74,7 @@
                             {% if id == 0 %}
                             <div class="float-right">
                                 <a class="btn btn-sm btn-default" href="{% url 'Account:uplodedPastTrip'%}">Existing Files</a>
-                            </div>
+                            </div>                        
                             {%endif%}
                             <div class="clearfix"></div>
                         </div>
@@ -164,6 +164,9 @@
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>Charged Jobs</h2>
+                        <div class="float-right">
+                            <a class="btn btn-sm btn-default" href=" {% static 'Account/samplePastTripFile.csv' %}" download>Get Sample File</a>
+                        </div>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">

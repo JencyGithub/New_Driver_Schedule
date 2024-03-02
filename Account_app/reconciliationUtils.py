@@ -52,7 +52,8 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
         standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
     return standBySlot
     
-def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj , minimumLoadIncluded = False):
+    
     try:
         date_= docketObj.shiftDate
         driverDocketLoadSize = docketObj.cubicMl 
@@ -67,7 +68,7 @@ def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , grac
         else:
             shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             
-        if  float(driverDocketLoadSize) < float(shiftType.min_load_in_cubic_meters) :
+        if  float(driverDocketLoadSize) < float(shiftType.min_load_in_cubic_meters) and minimumLoadIncluded == True :
             docketObj.minimumLoad = (float(shiftType.min_load_in_cubic_meters) - float(driverDocketLoadSize))*float(costParameterObj.loading_cost_per_cubic_meter)
             docketObj.minimumLoad = docketObj.minimumLoad +  (float(driverDocketKm) * float(costParameterObj.km_cost) * float(driverDocketLoadSize))
             docketObj.save()

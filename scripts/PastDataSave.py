@@ -75,13 +75,7 @@ def run():
                 else:
                     res_ = str(data[0])
 
-                # with open(r'pastDataRow.txt','a') as f:
-                #     f.write(str(data[0]) + '\n')
-                # print(count)
                 shiftDate = datetime.strptime(res_, '%Y-%m-%d')
-                # print('-----------------------------------------')
-                # print('shiftDate',shiftDate , type(shiftDate))
-                # print('-----------------------------------------')
                 startTime = datetime.strptime(str(data[6]), '%H:%M:%S').time()
                 startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
                 startTimeStr = startTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
@@ -161,7 +155,7 @@ def run():
                             shiftObj = DriverShift()
                             shiftObj.shiftDate =  shiftDate
                             shiftObj.driverId =  driverObj.driverId
-                            shiftObj.shiftType = 'Day'
+                            shiftObj.shiftType = 'Day' if data[25].strip().lower() == 'day' else  'Night'
                             shiftObj.verified = True
                             shiftObj.save()
                             
@@ -426,7 +420,8 @@ def run():
                                 costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 
-                                driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                minimumLoadIncludedFlag = True if data[28].strip().lower() == 'yes' else False
+                                driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj, minimumLoadIncluded = minimumLoadIncludedFlag)
                                 
                                 driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
 
@@ -446,9 +441,16 @@ def run():
                                 driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 # minLoad 
-                                driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                driverLoadDeficit = 0
+                                if minimumLoadIncludedFlag:
+                                    driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                
+                                callOutFees =  costParameterObj.call_out_fees if data[29].strip().lower() == 'yes' else 0
+                                cancellationFees =  costParameterObj.cancellation_fees if data[29].strip().lower() == 'yes' else 0
+                                demurrageFees =  costParameterObj.demurrage_fees if data[29].strip().lower() == 'yes' else 0
                                 # TotalCost 
-                                driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+                                driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit + callOutFees+cancellationFees + demurrageFees
+                                
                                 reconciliationDocketObj.docketNumber = docketObj.docketNumber  
                                 reconciliationDocketObj.docketDate = shiftObj.shiftDate 
                                 reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
@@ -460,6 +462,9 @@ def run():
                                 reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
                                 reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
                                 reconciliationDocketObj.fromDriver = True
+                                reconciliationDocketObj.driverCallOut = callOutFees
+                                reconciliationDocketObj.driverCancellationCost = cancellationFees
+                                reconciliationDocketObj.driverDemurageCost = demurrageFees
                                 reconciliationDocketObj.save()
                                 checkMissingComponents(reconciliationDocketObj)
                                 # print("reconciliation done!!!!")
