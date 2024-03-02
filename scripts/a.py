@@ -56,7 +56,6 @@ for trip in tripQuerySet:
             if totalRevenue <  thresholdDayShiftAmount:
                 trip.revenueDeficit = thresholdDayShiftAmount - totalRevenue
                 trip.save()
-                print(trip.revenueDeficit)
                 
         # exit()
     else:

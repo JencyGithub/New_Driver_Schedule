@@ -26,6 +26,7 @@ from django.db.models.functions import Cast
 from datetime import datetime
 from collections import defaultdict
 from variables import *
+from scripts.PastDataSave import *
 
 
 def index(request):
@@ -1357,6 +1358,8 @@ def rctiHolcimFormSave(request):
 def rctiSave(request):
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
+    startDate = request.POST.get('startDate')
+    
     time = getCurrentTimeInString()
     location = None
     if rctiPdf:
@@ -1390,61 +1393,60 @@ def rctiSave(request):
         date_ = 0
         total = 0
         clientNameID  = Client.objects.filter(name = clientName).first()
-        if save_data == '1':
-            if 'boral' in clientName.lower():
-                with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
-                    fileData = csv.reader(f)
-                    for data in fileData:
-                        data = data[0]
-                        dataList = data.split()
-                        if 'documentnumber' in data.lower().strip().replace(" ",""):
-                            date_ += 1
-                        elif 'date' in data.lower().strip().replace(" ","") and date_ == 1 :
-                            fileDetails.insert(0,str(invoiceFile))
-                            fileDetails.insert(1,dataList[-1])
-                        elif 'totalexcludinggst' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(2,float(dataList[-1].replace(",","").replace('$','')))
-                        elif 'gstpayable' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(3,float(dataList[-1].replace(",","").replace('$','')))
-                        elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
-                            date_ = 0
-                
-                # date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
-                original_date = datetime.strptime(fileDetails[1], '%d/%m/%y')
-                date_object = original_date.strftime('%Y-%m-%d')
-                # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
-                # # print('shiftObj',shiftObj)
-                # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
-                # # print('pastTripErrorObj',pastTripErrorObj)
-                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
-                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                #     return redirect(request.META.get('HTTP_REFERER'))
-                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
-                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                #     return redirect(request.META.get('HTTP_REFERER'))
-                rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
-                if rctiReport:
-                    messages.error(request, "This file already exists!")
-                    return redirect(request.META.get('HTTP_REFERER'))
-                else:
-                    rctiReport = RctiReport()
-                    rctiReport.fileName = fileDetails[0]
-                    rctiReport.clientName = clientNameID
-                    rctiReport.reportDate = date_object
-                    rctiReport.gstPayable = fileDetails[2]
-                    rctiReport.totalExGST = fileDetails[3]
-                    rctiReport.total = fileDetails[4]
-                    rctiReport.save()
-                    with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id) +','+ str(clientNameID.name))
-                    # return HttpResponse('work')
-                        
-                    colorama.AnsiToWin32.stream = None
-                    os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                    cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
-                    subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            elif 'holcim' in clientName.lower():
+        if 'boral' in clientName.lower():
+            with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
+                fileData = csv.reader(f)
+                for data in fileData:
+                    data = data[0]
+                    dataList = data.split()
+                    if 'documentnumber' in data.lower().strip().replace(" ",""):
+                        date_ += 1
+                    elif 'date' in data.lower().strip().replace(" ","") and date_ == 1 :
+                        fileDetails.insert(0,str(invoiceFile))
+                        fileDetails.insert(1,dataList[-1])
+                    elif 'totalexcludinggst' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(2,float(dataList[-1].replace(",","").replace('$','')))
+                    elif 'gstpayable' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(3,float(dataList[-1].replace(",","").replace('$','')))
+                    elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
+                        date_ = 0
+            
+            # date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+            original_date = datetime.strptime(fileDetails[1], '%d/%m/%y')
+            date_object = original_date.strftime('%Y-%m-%d')
+            # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
+            # # print('shiftObj',shiftObj)
+            # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
+            # # print('pastTripErrorObj',pastTripErrorObj)
+            # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+            #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+            #     return redirect(request.META.get('HTTP_REFERER'))
+            # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+            #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+            #     return redirect(request.META.get('HTTP_REFERER'))
+            rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
+            if rctiReport:
+                messages.error(request, "This file already exists!")
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                rctiReport = RctiReport()
+                rctiReport.fileName = fileDetails[0]
+                rctiReport.clientName = clientNameID
+                rctiReport.reportDate = date_object
+                rctiReport.gstPayable = fileDetails[2]
+                rctiReport.totalExGST = fileDetails[3]
+                rctiReport.total = fileDetails[4]
+                rctiReport.save()
+                with open('rctiReportId.txt','w')as f:
+                    f.write(str(rctiReport.id) +','+ str(clientNameID.name) + ',' + str(startDate))
+                # return HttpResponse('work')
+                    
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        elif 'holcim' in clientName.lower():
                 with open( f'static/Account/RCTI/RCTIInvoice/{newFileName}' , 'r') as f:
                     fileData = csv.reader(f)
                     for row in fileData:
@@ -1472,7 +1474,7 @@ def rctiSave(request):
                     rctiReport.total = fileDetails[-1]
                     rctiReport.save()
                     with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id) +','+ str(clientName))
+                        f.write(str(rctiReport.id) +','+ str(clientName) + ',' + str(startDate))
                 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
                     file_name = f.write(newFileName)
                 colorama.AnsiToWin32.stream = None
@@ -2287,6 +2289,26 @@ def getDriverBreak(request):
     
     return JsonResponse({'status': True, 'driverBreaks': list(driverBreaks)})
     
+@csrf_protect
+@api_view(['POST'])
+def checkTripDeficit(request):
+    shiftId = request.POST.get('shiftId')
+    tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftId)
+    checkShiftRevenueDifference(tripObjs)
+    dict_ = {}
+    getDeficit = []
+    getTrueOrFalse = []
+    count_ = 1
+    for trip in tripObjs:
+        if trip.revenueDeficit > 0:
+            dict_ ={
+                'get_deficit' : f'Trip{count_}',
+                'deficit_value': trip.revenueDeficit,
+            }
+            getDeficit.append(dict_)
+            getDeficit.append('True')
+            count_+=1
+    return JsonResponse({'status':True if 'True' in getDeficit else False,}) 
     
 # ````````````````````````````````````
 # Reconciliation
@@ -3193,7 +3215,6 @@ def pastTripSave(request):
     if '@_!' in pastTrip_csv_file.name:
         messages.error(request, "File name shouldn't contain @.")
         return redirect(request.META.get('HTTP_REFERER'))
-    return HttpResponse(pastTrip_csv_file.name)
     if not pastTrip_csv_file:
         return HttpResponse("No file uploaded")
     try:
@@ -3324,7 +3345,9 @@ def  ShiftDetails(request,id):
     id_ = id
     shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False )
     for shift in shifts:
-        shift.driverName = Driver.objects.filter(pk = shift.driverId).first().name
+        shift.driverName = Driver.objects.filter(pk = shift.driverId).first()
+        if shift.driverName:
+            shift.driverName = shift.driverName.name
     params = {
         'shifts': shifts,
         'startDate': startDate,

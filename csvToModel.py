@@ -80,6 +80,7 @@ def insertIntoModel(dataList,file_name , data):
     RCTIobj = None
     rctiReportId = data[0]
     clientNames = data[1]
+    rctiFirstDocketDate = data[2]
     rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
     try:
         data_str = ','.join(dataList)
@@ -162,11 +163,11 @@ def insertIntoModel(dataList,file_name , data):
                 else:
                     RCTIobj.docketYard = dataList[2] 
                 # if convertIntoFloat(dataList[10]) < 0:
-                adjustmentStartDate =  '16' if rctiReportObj.reportDate.day > 15 else '01'
-                month_ = '0'+str(rctiReportObj.reportDate.month) if rctiReportObj.reportDate.month  < 10 else  str(rctiReportObj.reportDate.month)
-                date_ = str(rctiReportObj.reportDate.year)+'-'+ month_+'-'+ adjustmentStartDate
+                # adjustmentStartDate =  '16' if rctiReportObj.reportDate.day > 15 else '01'
+                # month_ = '0'+str(rctiReportObj.reportDate.month) if rctiReportObj.reportDate.month  < 10 else  str(rctiReportObj.reportDate.month)
+                # date_ = str(rctiReportObj.reportDate.year)+'-'+ month_+'-'+ adjustmentStartDate
                 # print(dateConvert(dataList[1]) , date_ , dateConvert(dataList[1])  < date_ , dataList)
-                if dateConvert(dataList[1])  < date_:
+                if dateConvert(dataList[1])  < rctiFirstDocketDate:
                     adjustmentFlag = True
                     rctiAdjustmentObj = RctiAdjustment()
                     rctiAdjustmentObj.truckNo = RCTIobj.truckNo

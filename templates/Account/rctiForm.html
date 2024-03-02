@@ -146,9 +146,10 @@
                 </div>
                 <div class="col-md-3 col-sm-3">
                   <div class="checkbox">
-                    <label>
-                      <input type="checkbox" {% if rctiErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save"  required id="save_" style="margin-top: 2.5rem;" value="1"> Save Data In Database
-                    </label>
+                    <label for="startDate"> Start Date : <span class="required">*</span></label>
+                      <input  type="date" name="startDate"  required id="startDate" class="form-control">
+
+                      {% comment %} <input  type="checkbox" {% if rctiErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save"  required id="save_" style="margin-top: 2.5rem;" value="1"> Save Data In Database {% endcomment %}
                   </div>
                 </div>
                 <div class="col-md-12 text-right">

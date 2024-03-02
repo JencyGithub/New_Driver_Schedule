@@ -162,6 +162,7 @@ urlpatterns = [
     path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
     path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
+    path('check/trip/deficit', views.checkTripDeficit, name='checkTripDeficit'), 
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  

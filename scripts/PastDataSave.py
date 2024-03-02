@@ -7,7 +7,67 @@ from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
 from variables import *
+def getSelectedCostComponent(obj):
+    checked = []
+    
+    checked.append('loading_cost_per_cubic_meter_included') if obj.loading_cost_per_cubic_meter_included else None
+    checked.append('km_cost_included') if obj.km_cost_included else None
+    checked.append('surcharge_included') if obj.surcharge_included else None
+    checked.append('transfer_cost_included') if obj.transfer_cost_included else None
+    checked.append('return_cost_included') if obj.return_cost_included else None
+    checked.append('standby_cost_included') if obj.standby_cost_included else None
+    checked.append('waiting_cost_included') if obj.waiting_cost_included else None
+    checked.append('call_out_fees_included') if obj.call_out_fees_included else None
+        
+    return checked  
+    
+def calculateIncludedTripRevenue(tripObj,checkedList:list):
+    total=0
+    docketQuerySet = DriverShiftDocket.objects.filter(tripId=tripObj.id)
+    
+    for docket in docketQuerySet:
+        # print(docket.docketNumber , docket.shiftDate , docket.clientId , docket.truckConnectionId)
+        reconciliationObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber , docketDate = docket.shiftDate, clientId = docket.clientId, truckConnectionId = docket.truckConnectionId).first()
+        # print(reconciliationObj)
+        # exit()
+        total += (float(reconciliationObj.driverLoadAndKmCost) + float(reconciliationObj.driverLoadDeficit))if 'loading_cost_per_cubic_meter_included' in checkedList else 0
+        # total += float(reconciliationObj.driverLoadAndKmCost) if 'km_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverSurchargeCost) if 'surcharge_included' in checkedList else 0
+        total += float(reconciliationObj.driverTransferKmCost)  if 'transfer_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverReturnKmCost) if 'return_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverStandByCost) if 'standby_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverWaitingTimeCost) if 'waiting_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverCallOut) if 'call_out_fees_included' in checkedList else 0
+    return total
 
+def checkShiftRevenueDifference(tripObjs): 
+    for trip in tripObjs:
+        shiftObj = DriverShift.objects.filter(pk=trip.shiftId).first()
+        shiftType = shiftObj.shiftType
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first()
+        rateCardObj = clientTruckConnectionObj.rate_card_name
+        if shiftType == 'Day':
+            thresholdDayShiftObj = ThresholdDayShift.objects.filter(rate_card_name = rateCardObj ,start_date__lte = trip.startDateTime.date() , end_date__gte = trip.startDateTime.date()).first()
+            thresholdDayShiftAmount = thresholdDayShiftObj.threshold_amount_per_day_shift
+            if thresholdDayShiftAmount > 0:
+                res = getSelectedCostComponent(thresholdDayShiftObj)
+                totalRevenue = calculateIncludedTripRevenue(trip,res)
+                if totalRevenue <  thresholdDayShiftAmount:
+                    trip.revenueDeficit = thresholdDayShiftAmount - totalRevenue
+                    trip.save()
+                    
+            # exit()
+        else:
+            thresholdNightShiftObj = ThresholdNightShift.objects.filter(rate_card_name = rateCardObj ,start_date__lte = trip.startDateTime.date() , end_date__gte = trip.startDateTime.date()).first()
+            thresholdNightShiftAmount = thresholdNightShiftObj.threshold_amount_per_day_shift
+            res = getSelectedCostComponent(thresholdNightShiftObj)
+            if thresholdNightShiftAmount > 0:
+                res = getSelectedCostComponent(thresholdNightShiftObj)
+                totalRevenue = calculateIncludedTripRevenue(trip,res)
+                if totalRevenue <  thresholdNightShiftAmount:
+                    trip.revenueDeficit = thresholdNightShiftAmount - totalRevenue
+                    trip.save()
+                    
 def run():
     warnings.filterwarnings('ignore')
     f = open(r"pastTrip_entry.txt", 'r')
@@ -26,22 +86,18 @@ def run():
     txtFile.write(f'File:{file_name}\n\n')
     txtFile.close()
 
+    tripObjs = set()
     with open(fileName, 'r') as pastData:
         count = 0
+        
         for line in pastData:
             res_ = ''
-            if ' ' in str(data[0]):
-                res_ = str(data[0]).split()[0]
-            elif '/' in str(data[0]):
-                str_ = str(data[0]).split('/')
-                res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
-            else:
-                res_ = str(data[0])
+            
             try:
                 if '"' in line:
-                   line = str(line).replace('"','')
+                    line = str(line).replace('"','')
                 if "'" in line:
-                   line =  str(line).replace("'","")
+                    line =  str(line).replace("'","")
                 count += 1
                 if count == 1:
                     continue
@@ -50,7 +106,7 @@ def run():
                 data = line.split(',')
                 
 
-                if len(data) != 25:
+                if len(data) != 30:
                     pastTripErrorObj = PastTripError(
                                     clientName = clientName_,
                                     tripDate = res_,
@@ -162,7 +218,6 @@ def run():
                         shiftId = shiftObj.id
                         
                         
-                        
                         tripObj = DriverShiftTrip.objects.filter(shiftId = shiftId , truckConnectionId = clientTruckConnectionObj.id).first()
                         if tripObj is None:
                             # print('Creating New Trip')
@@ -176,6 +231,7 @@ def run():
                             # print('truckConnection ',clientTruckConnectionObj,tripObj)
                             
                             tripObj.save()
+                            tripObjs.add(tripObj)
                         #     print('Trip Obj Created')
                         # print('tripId',tripObj.id)
 
@@ -420,7 +476,7 @@ def run():
                                 costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 
-                                minimumLoadIncludedFlag = True if data[28].strip().lower() == 'yes' else False
+                                minimumLoadIncludedFlag = False if data[28].strip().lower() == 'no' else True
                                 driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj, minimumLoadIncluded = minimumLoadIncludedFlag)
                                 
                                 driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
@@ -539,3 +595,5 @@ def run():
                     )
                 pastTripErrorObj.save()
                 
+    
+    checkShiftRevenueDifference(tripObjs=tripObjs)

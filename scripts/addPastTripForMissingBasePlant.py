@@ -459,7 +459,8 @@ for i in rctiMatchingData:
         #     dataList[2] = dateConvert(dataList[2])
     
     if str(dataList[3]) == basePlantName:
-        
+        i.status = True
+        i.save()
         try:
             errorSolve = dataList
             RCTIobj = None
@@ -576,8 +577,7 @@ for i in rctiMatchingData:
                         # exit()
                 RCTIobj.rctiReport = rctiReportObj
                 RCTIobj.save()
-                i.status = True
-                i.save()
+                
                 
 
                 # print('save')

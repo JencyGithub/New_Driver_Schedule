@@ -47,38 +47,63 @@ $(".toggleValidationTooltips")
   })
   .prop("checked", false);
 
-   function showBreaks(shiftId){
-       $("#driverBreaks").modal("show");
-       $.ajax({
-         type: "POST",
-         url: "/account/get/driver/break/",
-         data: {
-             shiftId: shiftId
-         },
-         beforeSend: function (xhr) {
-           xhr.setRequestHeader("X-CSRFToken", csrftoken);
-         },
-         success: function (data) {
-           if (data.status) {
+  function showBreaks(shiftId){
+      $("#driverBreaks").modal("show");
+      $.ajax({
+        type: "POST",
+        url: "/account/get/driver/break/",
+        data: {
+            shiftId: shiftId
+        },
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (data) {
+          if (data.status) {
 
-             tableData = ''
-             if(data.driverBreaks.length > 0){
-                 data.driverBreaks.forEach(function(breakObj) {
-                     tableData += `<tr>`
-                     tableData += `<td>${breakObj['startDateTime']}</td>`
-                     tableData += `<td>${breakObj['endDateTime']}</td>`
-                     tableData += `<td>${breakObj['description']}</td>`
-                     tableData += `</tr>`
-                 });
-             }else{
-                tableData += `<tr><td><h6 class="text-secondary">No breaks found</h6></td></tr>`
-             }
-             $('#driverBreaks tbody').empty().append(tableData);
-           }
-         },
-       });
-   }
+            tableData = ''
+            if(data.driverBreaks.length > 0){
+                data.driverBreaks.forEach(function(breakObj) {
+                    tableData += `<tr>`
+                    tableData += `<td>${breakObj['startDateTime']}</td>`
+                    tableData += `<td>${breakObj['endDateTime']}</td>`
+                    tableData += `<td>${breakObj['description']}</td>`
+                    tableData += `</tr>`
+                });
+            }else{
+              tableData += `<tr><td><h6 class="text-secondary">No breaks found</h6></td></tr>`
+            }
+            $('#driverBreaks tbody').empty().append(tableData);
+          }
+        },
+      });
+  }
 
+function checkDeficitFun(shiftObj) {  
+  let selected = $(`#verified`).is(":checked");
+  if (selected){
+    $.ajax({
+      type: "POST",
+      url: "/account/check/trip/deficit",
+      data: {
+          shiftId: shiftObj
+      },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function (data) {
+        if (data.status) {
+          alert('Get Deficit')
+        }else{
+          alert('Not Deficit')
+        }
+      },
+    });
+  }
+  else{
+    alert('false') 
+  }
+}
 $("#driverBreaks .close").on("click", function(){
     console.log('close')
     $('#driverBreaks').modal('hide');

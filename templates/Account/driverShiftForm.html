@@ -71,7 +71,7 @@
                         {%csrf_token%}
                         <div class="x_title">
                             <h2>{% if id == 0 %}Completed Jobs {% elif id == 1 %} Charged Jobs {% endif %}</h2>
-                            {% if id == 0 %}
+                            {% if id == 1 %}
                             <div class="float-right">
                                 <a class="btn btn-sm btn-default" href="{% url 'Account:uplodedPastTrip'%}">Existing Files</a>
                             </div>                        
