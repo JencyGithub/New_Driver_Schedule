@@ -483,6 +483,14 @@ class ReconciliationReport(models.Model):
     driverCallOut = models.FloatField(default=0)
     rctiCallOut = models.FloatField(default=0)
     
+    # cancellation 
+    driverCancellationCost = models.FloatField(default=0)
+    rctiCancellatioCost = models.FloatField(default=0)
+
+    # demurage 
+    driverDemurageCost = models.FloatField(default=0)
+    rctiDemurageCost = models.FloatField(default=0)
+
     # Total 
     driverTotalCost = models.FloatField(default=0)
     rctiTotalCost = models.FloatField(default=0)
