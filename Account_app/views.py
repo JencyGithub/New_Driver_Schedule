@@ -1376,7 +1376,6 @@ def rctiHolcimFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
-    return HttpResponse('123')
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     startDate = request.POST.get('startDate')
@@ -2476,8 +2475,13 @@ def reconciliationAnalysis(request,dataType):
         }
         return render(request, 'Account/Tables/expensesTable.html',params)
     
-    for data in dataList:        
-        data['clientName'] = Client.objects.filter(pk=data['clientId']).first().name
+    for data in dataList:   
+        client = Client.objects.filter(pk=data['clientId']).first()
+        if client:
+            data['clientName'] = client.name
+        else:
+            data['clientName' ]= None
+
     params['dataList'] = dataList
     
     return render(request, 'Reconciliation/reconciliation-result.html', params)
