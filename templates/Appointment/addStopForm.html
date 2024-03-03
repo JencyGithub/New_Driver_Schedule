@@ -1,0 +1,127 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Add stop {% endblock %}
+
+{% block headStyle %}
+<style>
+    .isInvalid{
+        border: 1px solid #CE5454;
+    }
+    label, select{
+        cursor: pointer;
+    }
+    label{
+        margin-bottom: 0.2rem!important;
+    }
+
+    /* Custom styles */
+    
+    .form-check-label {
+        font-weight: normal;
+    }
+    .file-upload-label {
+        font-size: 14px;
+    }
+    @media (max-width: 576px) {
+        .stopDiv1 {
+        padding: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="clearfix"></div>
+    <form action="{% if obj %}{% url 'Appointment:editStopSave' stopId=stopId%}{% else %}{% url 'Appointment:addStopSave' jobId=jobId %}{% endif %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container">
+            <div class="x_panel">
+                <h5>Add stop</h5>
+            </div>
+            <div class="x_panel">
+                <div class="row px-2">
+                    <div class="col-md-12 col-sm-12 stopSection">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-8">
+                                <label for="appStop">Select Stop :</label>
+                                <div class="field item form-group">
+                                    <select name="appStop" class="form-select form-control text-capitalize" id="appStop" required>
+                                        <option selected disabled>Select Stop</option>
+                                        {% for origin in origins %}
+                                        <option class="text-capitalize text-lowercase" {% if obj.stopName.id == origin.id %}selected{% endif %} value="{{origin.id}}">{{ origin.basePlant }} - {{ origin.address }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>            
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label for="stopType" class="font-weight-bold text-dark">Stop Type:</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="stopType" {% if obj.stopType == 'Stop' %}checked{% endif %} id="stop" value="Stop" checked>
+                                        <label class="form-check-label" for="stop">Stop</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="stopType" {% if obj.stopType == 'Pickup' %}checked{% endif %} id="pickup" value="Pickup">
+                                        <label class="form-check-label" for="pickup">Pickup</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="stopType" {% if obj.stopType == 'Dropoff' %}checked{% endif %} id="dropoff" value="Dropoff">
+                                        <label class="form-check-label" for="dropoff">Dropoff</label>
+                                    </div>
+                                </div>                          
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group">
+                                    <label class="file-upload-label" for="arrivalTime">Arrival time:</label>
+                                    <input type="time" class="form-control" id="arrivalTime" value="{% if obj.arrivalTime %}{{ obj.arrivalTime|time:'H:i' }}{% endif %}" name="arrivalTime">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="form-group">
+                                    <label class="file-upload-label" for="duration">Duration:</label>
+                                    <input type="number" class="form-control" id="duration" value="{% if obj.duration %}{{ obj.duration }}{% endif %}" name="duration" min="0">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6">
+                                <label for="stopNotes">Notes :</label>
+                                <div class="field item form-group">
+                                    <textarea name="stopNotes" id="stopNotes" rows="1" class="form-control">{% if obj.notes %}{{ obj.notes }}{% endif %}</textarea>
+                                </div>
+                            </div>
+                        </div>        
+                    </div>
+                </div>
+            </div>
+            <div class="row position-sticky" style ="bottom:3%;">
+                <div class="col-md-12 text-right py-2 px-1" style ="bottom:3%;">
+                    <button type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3">Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- /page content -->
+{% endblock %}
+
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+<script>
+    $('form').submit(function(e){
+        if(!$('#appStop').val()){
+            e.preventDefault();
+            $('#appStop').css('border', '1px solid red');
+            return false; 
+        }else{
+            return true
+        }
+    });
+    
+</script>
+
+{% endblock %}

@@ -40,6 +40,7 @@
                     <div class="x_title">
                         <h2>Truck Table</h2>
                         <a href="{% url 'gearBox:truckForm'%}"  class="btn btn-sm btn-dark float-right">Add new truck</a>
+                        <a href="{% url 'gearBox:bulkTruckEntryForm'%}"  class="btn btn-sm btn-dark float-right">Bulk truck entry</a>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
@@ -51,18 +52,23 @@
                                         <thead>
                                             <tr>
                                                 <th>Truck No</th>
+                                                <th>Client Truck No</th>
+
+                                                <th>Client Name</th>
                                                 <th>Created By</th>
-                                                <th>Action</th>
+                                                <th style="width:10%" class = "text-center">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for truck in adminTrucks %}
                                             <tr>
-                                                <td>{{ truck.adminTruckNumber}}</td>
-                                                <td>{{ truck.createdBy.username }}</td>
-                                                <td>
-                                                    <a href="{% url 'gearBox:truckView' id=truck.id %}">
-                                                        <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.adminTruckNumber}} </a></td>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientTruckNumber}} </a></td>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientName}} </a></td>
+                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.createdBy}} </a></td>
+                                                <td class = "text-center">
+                                                    <a href="{% url 'gearBox:truckEditView' id=truck.adminTruckId %}">
+                                                        <i class="fa-solid fa-pen-to-square" style="font-size:1.3rem"></i>
                                                     </a>
                                                 </td>
                                             </tr>

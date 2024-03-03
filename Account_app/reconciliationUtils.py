@@ -5,6 +5,7 @@ import datetime
 from django.shortcuts import get_object_or_404
 from CRUD import *
 from datetime import datetime
+import math
 
 costDict = {
     'rctiCosts': {
@@ -26,13 +27,20 @@ def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterOb
     docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
     totalWaitingTime = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
     
-    if float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
+    if  graceObj.waiting_load_calculated_on_load_size :
+        loadSize = graceObj.minimum_load_size_for_waiting_time_grace
+        
+        if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
+            loadSize = float(docketObj.cubicMl)
+        loadWaitingMinuteCount = float(loadSize) * float(graceObj.waiting_time_grace_per_cubic_meter) + float(graceObj.waiting_time_grace_in_minutes)
+        totalWaitingTime = float(totalWaitingTime) - math.ceil(loadWaitingMinuteCount)
+    
+    elif float(totalWaitingTime) > graceObj.chargeable_waiting_time_starts_after:
         totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
-        if totalWaitingTime < 0:
-            totalWaitingTime = 0    
     else:
         totalWaitingTime = 0
-    return round(totalWaitingTime,2)
+    return round(totalWaitingTime,2) if  totalWaitingTime > 0 else  0
+
     
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
 
@@ -44,7 +52,8 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
         standBySlot = totalStandByTime//costParameterObj.standby_time_slot_size
     return standBySlot
     
-def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj , minimumLoadIncluded = False):
+    
     try:
         date_= docketObj.shiftDate
         driverDocketLoadSize = docketObj.cubicMl 
@@ -59,7 +68,7 @@ def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , grac
         else:
             shiftType = ThresholdNightShift.objects.filter(rate_card_name = rateCard.id,start_date__lte = date_,end_date__gte = date_).first()
             
-        if  float(driverDocketLoadSize) < float(shiftType.min_load_in_cubic_meters) :
+        if  float(driverDocketLoadSize) < float(shiftType.min_load_in_cubic_meters) and minimumLoadIncluded == True :
             docketObj.minimumLoad = (float(shiftType.min_load_in_cubic_meters) - float(driverDocketLoadSize))*float(costParameterObj.loading_cost_per_cubic_meter)
             docketObj.minimumLoad = docketObj.minimumLoad +  (float(driverDocketKm) * float(costParameterObj.km_cost) * float(driverDocketLoadSize))
             docketObj.save()
@@ -134,8 +143,8 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
         
         if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
             docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
-        
-            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
+            # print('Total Waiting Time' , docketObj.totalWaitingInMinute)
+            totalWaitingTime = float(docketObj.totalWaitingInMinute) 
             if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
                 totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
                 if totalWaitingTime > 0: 
@@ -151,7 +160,31 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
     except Exception as e :
         return -404.0
     
-
+def checkLoadCalculatedWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+    try:
+        date_= docketObj.shiftDate
+        loadSize = graceObj.minimum_load_size_for_waiting_time_grace
+        if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
+            docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
+        
+            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
+            
+            if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
+                loadSize = float(docketObj.cubicMl)
+                
+            loadWaitingMinuteCount = float(loadSize) * float(graceObj.waiting_time_grace_per_cubic_meter) + float(graceObj.waiting_time_grace_in_minutes)
+            totalWaitingTime = float(totalWaitingTime) - math.ceil(loadWaitingMinuteCount)
+            if totalWaitingTime > 0:
+                totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)    
+                return round(totalWaitingCost,2)     
+            else:
+                return 0
+        else:
+            return 0
+        
+    except Exception as e :
+        return -404.0
+    
 def checkStandByTotal( docketObj , shiftObj , rateCard , costParameterObj , graceObj, slotSize):
     try:
         if slotSize > 0:
@@ -311,6 +344,8 @@ def checkMissingComponents(reconciliationReportObj):
     if float(reconciliationReportObj.driverCallOut) > 0 and float(reconciliationReportObj.rctiCallOut) == 0:
         components += 'Call Out Cost' + ', '
     reconciliationReportObj.missingComponent = components
+    if reconciliationReportObj.driverTotalCost == round(reconciliationReportObj.rctiTotalCost,2):
+        reconciliationReportObj.reconciliationType = 7
     reconciliationReportObj.save()
 
 

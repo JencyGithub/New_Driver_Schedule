@@ -6,12 +6,22 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User , Group
 import pytz
 
+def getDatabase(request):
+    return request.session.db_name
 
 def dateConverterFromTableToPageFormate(date):
     formated_data = str(date).split()[0]
     return formated_data
 
 def timeDifference(startTime,endTime):
+    try:
+        startTime = startTime.strftime('%H:%M:%S')
+    except:
+        pass
+    try:
+        endTime = endTime.strftime('%H:%M:%S')
+    except:
+        pass
     start_datetime = datetime.strptime(startTime, '%H:%M:%S')
     end_datetime = datetime.strptime(endTime, '%H:%M:%S')
     time_difference_minutes = (end_datetime - start_datetime).total_seconds() / 60

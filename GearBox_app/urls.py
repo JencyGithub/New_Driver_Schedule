@@ -78,10 +78,11 @@ urlpatterns = [
     path('truckForm/add/', views.truckFormSave, name='truckFormSave'),
     path('truckForm/update/<int:truckId>', views.truckFormSave, name='truckFormUpdate'),
     
-    path('truckForm/Axles/View/<int:truckId>', views.truckAxlesFormView, name='truckAxlesFormView'),
+    path('truckForm/Axles/View/<int:truckId>/<int:viewOnly>/', views.truckAxlesFormView, name='truckAxlesFormView'),
     path('truckForm/Axles/Save/<int:truckId>', views.truckAxlesFormSave, name='truckAxlesFormSave'),
+    path('truckForm/Axles/Information/Save/<int:axleId>/<int:inputNumber>', views.axleInformationSave, name='axleInformationSave'),
     
-    path('truckForm/Setting/View/<int:truckId>', views.truckSettingFormView, name='truckSettingFormView'),
+    path('truckForm/Setting/View/<int:truckId>/<int:viewOnly>/', views.truckSettingFormView, name='truckSettingFormView'),
     path('truckForm/Setting/Save', views.truckSettingFormSave, name='truckSettingFormSave'),
     
     path('truckForm/Reminders/View', views.truckRemindersFormView, name='truckRemindersFormView'),
@@ -102,12 +103,15 @@ urlpatterns = [
     path('truckForm/Documents/View', views.truckDocumentsFormView, name='truckDocumentsFormView'),
     path('truckForm/Documents/Save', views.truckDocumentsFormSave, name='truckDocumentsFormSave'),
     
-    path('truck/view/<int:id>/', views.truckForm, name='truckView'),
+    path('truck/edit/view/<int:id>/', views.truckForm, name='truckEditView'),
+    path('truck/view/<int:id>/<int:viewOnly>/', views.truckForm, name='truckView'),
     
     
     path('truckConnection/add/view/<int:id>/', views.truckConnectionForm, name='truckConnectionAddView'),
     path('truckConnection/add/save/<int:id>/', views.truckConnectionSave, name='truckConnectionSaveView'),
+    path('truck/connection/deactivate>/', views.truckConnectionDeactivate, name='truckConnectionDeactivate'),
     path('getRateCard/', views.getRateCard, name='getRateCard'),
+    path('getClientOffice/', views.getClientOffice, name='getClientOffice'),
     
     # dockument 
     # path('document/', views.documentView, name="do
@@ -124,19 +128,37 @@ urlpatterns = [
     
     path('client/add/', views.clientForm, name='clientAdd'),
     path('client/add/save/', views.clientChange, name='clientAddSave'),
+
+    path('client/ofc/view/', views.clientOfcView, name='clientOfcView'),
+    path('client/new/ofc/save/<int:clientId>/', views.clientOfcEditSave, name='clientOfcNewSave'),
+    path('client/ofc/edit/save/<int:id>/', views.clientOfcEditSave, name='clientOfcEditSave'),
+
     
     path('client/edit/<int:id>/', views.clientForm, name='clientEdit'),
     path('client/edit/save/<int:id>/', views.clientChange, name='clientEditSave'),
+
+
 
     # Groups
 
     path('truck/groups/view', views.groupsView, name='groupsView'),
     path('truck/groups/add/save/', views.addGroupsSave, name='addGroupsSave'),
+    path('truck/groups/edit/<int:id>', views.addGroupsSave, name='addGroupsEdit'),
+    path('subGroup/get/', views.getSubGroup, name='getSubGroup'),
 
     # Sub groups 
-    path('subgroups/add/', views.addSubGroups, name='addSubGroups'),
+    path('subgroups/form/', views.subGroupForm, name='subGroupForm'),
+    path('subgroups/save/', views.subGroupSave, name='subGroupSave'),
+    path('subgroups/edit/<int:id>', views.subGroupSave, name='subGroupEdit'),
 
     # Fleet Settings 
     path('fleet/Settings/', views.fleetSettings, name='fleetSettings'),    
     path('fleet/customInformation/save', views.fleetCustomInformationSave, name='fleetCustomInformationSave'),    
+    path('fleet/customInformation/update/<int:id>', views.fleetCustomInformationSave, name='fleetCustomInformationUpdate'),    
+    
+    
+    path('truckSampleCsv/', views.truckSampleCsv, name='truckSampleCsv'),
+    path('Bulk/Truck/Entry/', views.bulkTruckEntryForm, name='bulkTruckEntryForm'), 
+    path('Bulk/Truck/Entry/Save', views.uploadBulkData, name='uploadBulkData'), 
+    
 ]

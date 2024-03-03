@@ -56,22 +56,16 @@
                                                 <th>Last name</th>
                                                 <th>Contact</th>
                                                 <th>Email</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for driver in drivers %}
                                             <tr>
-                                                <td>{{ driver.driverId }}</td>
-                                                <td>{{ driver.firstName }}</td>
-                                                <td>{{ driver.lastName }}</td>
-                                                <td>{{ driver.phone }}</td>
-                                                <td>{{ driver.email }}</td>
-                                                <td>
-                                                    <a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">
-                                                        <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                                                    </a>
-                                                </td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.driverId }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.firstName }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.lastName }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.phone }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.email }}</a></td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>

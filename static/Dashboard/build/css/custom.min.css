@@ -5518,13 +5518,14 @@ fieldset {
 	text-align: right
 }
 
+@media (max-width: 576px) {
+	.label-align {
+		text-align: left
+	}
+}
 @media (max-width: 414px) {
 	.item {
 		display: block
-	}
-
-	.label-align {
-		text-align: left
 	}
 }
 

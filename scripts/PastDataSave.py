@@ -6,13 +6,75 @@ from datetime import datetime
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
+from variables import *
+def getSelectedCostComponent(obj):
+    checked = []
+    
+    checked.append('loading_cost_per_cubic_meter_included') if obj.loading_cost_per_cubic_meter_included else None
+    checked.append('km_cost_included') if obj.km_cost_included else None
+    checked.append('surcharge_included') if obj.surcharge_included else None
+    checked.append('transfer_cost_included') if obj.transfer_cost_included else None
+    checked.append('return_cost_included') if obj.return_cost_included else None
+    checked.append('standby_cost_included') if obj.standby_cost_included else None
+    checked.append('waiting_cost_included') if obj.waiting_cost_included else None
+    checked.append('call_out_fees_included') if obj.call_out_fees_included else None
+        
+    return checked  
+    
+def calculateIncludedTripRevenue(tripObj,checkedList:list):
+    total=0
+    docketQuerySet = DriverShiftDocket.objects.filter(tripId=tripObj.id)
+    
+    for docket in docketQuerySet:
+        # print(docket.docketNumber , docket.shiftDate , docket.clientId , docket.truckConnectionId)
+        reconciliationObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber , docketDate = docket.shiftDate, clientId = docket.clientId, truckConnectionId = docket.truckConnectionId).first()
+        # print(reconciliationObj)
+        # exit()
+        total += (float(reconciliationObj.driverLoadAndKmCost) + float(reconciliationObj.driverLoadDeficit))if 'loading_cost_per_cubic_meter_included' in checkedList else 0
+        # total += float(reconciliationObj.driverLoadAndKmCost) if 'km_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverSurchargeCost) if 'surcharge_included' in checkedList else 0
+        total += float(reconciliationObj.driverTransferKmCost)  if 'transfer_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverReturnKmCost) if 'return_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverStandByCost) if 'standby_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverWaitingTimeCost) if 'waiting_cost_included' in checkedList else 0
+        total += float(reconciliationObj.driverCallOut) if 'call_out_fees_included' in checkedList else 0
+    return total
 
+def checkShiftRevenueDifference(tripObjs): 
+    for trip in tripObjs:
+        shiftObj = DriverShift.objects.filter(pk=trip.shiftId).first()
+        shiftType = shiftObj.shiftType
+        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first()
+        rateCardObj = clientTruckConnectionObj.rate_card_name
+        if shiftType == 'Day':
+            thresholdDayShiftObj = ThresholdDayShift.objects.filter(rate_card_name = rateCardObj ,start_date__lte = trip.startDateTime.date() , end_date__gte = trip.startDateTime.date()).first()
+            thresholdDayShiftAmount = thresholdDayShiftObj.threshold_amount_per_day_shift
+            if thresholdDayShiftAmount > 0:
+                res = getSelectedCostComponent(thresholdDayShiftObj)
+                totalRevenue = calculateIncludedTripRevenue(trip,res)
+                if totalRevenue <  thresholdDayShiftAmount:
+                    trip.revenueDeficit = thresholdDayShiftAmount - totalRevenue
+                    trip.save()
+                    
+            # exit()
+        else:
+            thresholdNightShiftObj = ThresholdNightShift.objects.filter(rate_card_name = rateCardObj ,start_date__lte = trip.startDateTime.date() , end_date__gte = trip.startDateTime.date()).first()
+            thresholdNightShiftAmount = thresholdNightShiftObj.threshold_amount_per_day_shift
+            res = getSelectedCostComponent(thresholdNightShiftObj)
+            if thresholdNightShiftAmount > 0:
+                res = getSelectedCostComponent(thresholdNightShiftObj)
+                totalRevenue = calculateIncludedTripRevenue(trip,res)
+                if totalRevenue <  thresholdNightShiftAmount:
+                    trip.revenueDeficit = thresholdNightShiftAmount - totalRevenue
+                    trip.save()
+                    
 def run():
     warnings.filterwarnings('ignore')
     f = open(r"pastTrip_entry.txt", 'r')
     data = f.read().split(',')
     file_name = data[0]
     clientName_ = data[1]
+    # res_ = None
     
     monthFileName = open(r"pastTrip_entry_month.txt",'r')
     monthAndYear = monthFileName.read()
@@ -24,22 +86,27 @@ def run():
     txtFile.write(f'File:{file_name}\n\n')
     txtFile.close()
 
+    tripObjs = set()
     with open(fileName, 'r') as pastData:
         count = 0
+        
         for line in pastData:
+            res_ = ''
+            
             try:
                 if '"' in line:
-                   line = str(line).replace('"','')
+                    line = str(line).replace('"','')
                 if "'" in line:
-                   line =  str(line).replace("'","")
+                    line =  str(line).replace("'","")
                 count += 1
                 if count == 1:
                     continue
                 # if count == 10:
                 #     exit() 
                 data = line.split(',')
+                
 
-                if len(data) != 25:
+                if len(data) != 30:
                     pastTripErrorObj = PastTripError(
                                     clientName = clientName_,
                                     tripDate = res_,
@@ -64,13 +131,7 @@ def run():
                 else:
                     res_ = str(data[0])
 
-                # with open(r'pastDataRow.txt','a') as f:
-                #     f.write(str(data[0]) + '\n')
-                # print(count)
                 shiftDate = datetime.strptime(res_, '%Y-%m-%d')
-                # print('-----------------------------------------')
-                # print('shiftDate',shiftDate , type(shiftDate))
-                # print('-----------------------------------------')
                 startTime = datetime.strptime(str(data[6]), '%H:%M:%S').time()
                 startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
                 startTimeStr = startTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
@@ -99,10 +160,16 @@ def run():
                     continue
                     
 
-                driverName = data[4].strip().replace(' ','').lower()
+
+                
+                # driverName = data[4].strip().replace(' ','').lower()
+                driverID = int(data[4].strip())
                 clientObj = Client.objects.filter(name = clientName_).first()
                 
-                driverObj = Driver.objects.filter(name = driverName).first()
+                # driverObj = Driver.objects.filter(name = driverName).first()
+                driverObj = Driver.objects.filter(driverId=driverID).first()
+                # driverObj = Driver.objects.filter(name = driverName).first()
+                driverObj = Driver.objects.filter(driverId=driverID).first()
                 
                 if driverObj:
                     
@@ -144,12 +211,11 @@ def run():
                             shiftObj = DriverShift()
                             shiftObj.shiftDate =  shiftDate
                             shiftObj.driverId =  driverObj.driverId
-                            shiftObj.shiftType = 'Day'
+                            shiftObj.shiftType = 'Day' if data[25].strip().lower() == 'day' else  'Night'
                             shiftObj.verified = True
                             shiftObj.save()
                             
                         shiftId = shiftObj.id
-                        
                         
                         
                         tripObj = DriverShiftTrip.objects.filter(shiftId = shiftId , truckConnectionId = clientTruckConnectionObj.id).first()
@@ -165,6 +231,7 @@ def run():
                             # print('truckConnection ',clientTruckConnectionObj,tripObj)
                             
                             tripObj.save()
+                            tripObjs.add(tripObj)
                         #     print('Trip Obj Created')
                         # print('tripId',tripObj.id)
 
@@ -242,7 +309,7 @@ def run():
                         # print('startDateTime Set' , tripObj.startDateTime)
                         # print('EndDateTime Set' , tripObj.endDateTime)
 
-                        surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
+                        surCharge = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
                         docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                         if docketObj :
                             pastTripErrorObj = PastTripError(
@@ -286,7 +353,6 @@ def run():
                                 continue
 
                             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard).first()
-
                             if not costParameterObj:
                                 pastTripErrorObj = PastTripError(
                                     clientName = clientName_,
@@ -317,13 +383,51 @@ def run():
                                 docketObj.returnToYard = True if data[16].lower() == 'yes' else False
                                 docketObj.returnQty = 0 if str(data[14]).lower() == '' else data[14]
                                 docketObj.returnKm = 0 if str(data[15]).lower() == '' else data[15]
-                                docketObj.waitingTimeStart = None if str(data[11]).strip().lower() == '' else str(datetime.strptime(data[11].strip(), '%H:%M:%S').time()) 
-                                docketObj.waitingTimeEnd = None if str(data[12]).strip().lower() == '' else str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
-                                # docketObj.totalWaitingInMinute = totalWaitingTime
                                 docketObj.cubicMl = 0 if str(data[8]).lower() == '' else data[8]
-                                docketObj.standByStartTime =None if str(data[20]).lower() == '' else str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
-                                docketObj.standByEndTime =None if str(data[21]).lower() == '' else str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
-                                # docketObj.standBySlot = standBySlot
+                                waitingTimeStart = None if str(data[11]).strip().lower() == '' else str(data[11]).strip().lower()
+                                waitingTimeEnd = None if str(data[12]).strip().lower() == '' else str(data[12]).strip().lower()
+
+                                waitingTimeStartCount = 0 
+                                waitingTimeEndCount = 0
+                                if waitingTimeStart != None:
+                                    waitingTimeStartCount = waitingTimeStart.count(':')
+                                if waitingTimeEnd != None:
+                                    waitingTimeEndCount = waitingTimeEnd.count(':')
+
+                                if waitingTimeStart is not None and waitingTimeStartCount == 1:
+                                    waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M').time())
+                                elif waitingTimeStartCount == 2:
+                                    waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M:%S').time())
+                                if waitingTimeEnd is not None and waitingTimeEndCount == 1:
+                                    waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M').time())
+                                elif waitingTimeEndCount == 2:
+                                    waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
+                                docketObj.waitingTimeStart = waitingTimeStart
+                                docketObj.waitingTimeEnd = waitingTimeEnd
+                                # docketObj.totalWaitingInMinute = totalWaitingTime
+                                standByStartTime = None if str(data[20]).strip().lower() == '' else str(data[20]).strip().lower()
+                                standByEndTime = None if str(data[21]).strip().lower() == '' else str(data[21]).strip().lower()
+
+                                # Initialize counts to 0
+                                standByStartCount = 0 
+                                standByEndCount = 0
+                                if standByStartTime != None:
+                                    standByStartCount = standByStartTime.count(':')
+                                if standByEndTime != None:
+                                    standByEndCount = standByEndTime.count(':')
+
+                                if standByStartCount == 1 and standByStartTime is not None:
+                                    standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M').time())
+                                elif standByStartCount == 2:
+                                    standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
+                                    
+                                if standByEndCount == 1 and standByEndTime is not None:
+                                    standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M').time())
+                                elif standByEndCount == 2:
+                                    standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
+
+                                docketObj.standByStartTime = standByStartTime
+                                docketObj.standByEndTime = standByEndTime
                                 docketObj.comment = data[17]
                                 # modification for adding blow back and replacement.
                                 if data[19].strip().replace(' ','') != None:
@@ -354,6 +458,7 @@ def run():
                                 # print('Docket save Error:', e)
                                 continue
                             # print('Docket obj saved')
+                            # exit()
                             try:
                                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
                                 
@@ -371,7 +476,8 @@ def run():
                                 costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docketObj.shiftDate,end_date__gte = docketObj.shiftDate).first()
                                 
-                                driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                minimumLoadIncludedFlag = False if data[28].strip().lower() == 'no' else True
+                                driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj, minimumLoadIncluded = minimumLoadIncludedFlag)
                                 
                                 driverSurchargeCost = checkSurcharge(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
 
@@ -379,16 +485,28 @@ def run():
                                 driverStandByCost = 0
                                 
                                 if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-                                    driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                    if graceObj.waiting_load_calculated_on_load_size:
+                                        driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                    else:  
+                                        driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                        
+
                                 if docketObj.standByStartTime and docketObj.standByEndTime:
                                     slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                     driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                                 driverTransferKmCost = checkTransferCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 driverReturnKmCost = checkReturnCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                                 # minLoad 
-                                driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                driverLoadDeficit = 0
+                                if minimumLoadIncludedFlag:
+                                    driverLoadDeficit = checkMinLoadCost(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                                
+                                callOutFees =  costParameterObj.call_out_fees if data[29].strip().lower() == 'yes' else 0
+                                cancellationFees =  costParameterObj.cancellation_fees if data[29].strip().lower() == 'yes' else 0
+                                demurrageFees =  costParameterObj.demurrage_fees if data[29].strip().lower() == 'yes' else 0
                                 # TotalCost 
-                                driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
+                                driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit + callOutFees+cancellationFees + demurrageFees
+                                
                                 reconciliationDocketObj.docketNumber = docketObj.docketNumber  
                                 reconciliationDocketObj.docketDate = shiftObj.shiftDate 
                                 reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
@@ -399,8 +517,12 @@ def run():
                                 reconciliationDocketObj.driverTransferKmCost = driverTransferKmCost 
                                 reconciliationDocketObj.driverReturnKmCost = driverReturnKmCost  
                                 reconciliationDocketObj.driverTotalCost = round(driverTotalCost,2)
-                                reconciliationDocketObj.fromDriver = True 
+                                reconciliationDocketObj.fromDriver = True
+                                reconciliationDocketObj.driverCallOut = callOutFees
+                                reconciliationDocketObj.driverCancellationCost = cancellationFees
+                                reconciliationDocketObj.driverDemurageCost = demurrageFees
                                 reconciliationDocketObj.save()
+                                checkMissingComponents(reconciliationDocketObj)
                                 # print("reconciliation done!!!!")
                             except Exception as e:
                                 pastTripErrorObj = PastTripError(
@@ -473,3 +595,5 @@ def run():
                     )
                 pastTripErrorObj.save()
                 
+    
+    checkShiftRevenueDifference(tripObjs=tripObjs)

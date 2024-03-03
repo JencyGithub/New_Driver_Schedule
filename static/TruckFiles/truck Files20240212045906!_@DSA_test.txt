@@ -1,0 +1,227 @@
+1- Given head, the head of a singly linked list, find if the linked list is circular or not. A
+linked list is called circular if it is not NULL terminated and all nodes are connected in
+the form of a cycle. An empty linked list is considered circular.
+Input:
+LinkedList: 1->2->3->4->5
+(the first and last node is connected,
+i.e. 5 --> 1)
+Output: 1
+
+
+
+class NewNode(data):
+	def __init__(self):
+		self.data = data
+		self.next = None
+
+class LinkedList():
+	def __init__(self):
+		self.start = None
+
+Mylist = LinkedList()
+Mylist.start = NewNode(1)
+Mylist.start.next = NewNode(2)
+Mylist.start.next.next = NewNode(3)
+Mylist.start.next.next.next = NewNode(4)
+Mylist.start.next.next.next.next = NewNode(5)
+Mylist.start.next.next.next.next.next = NewNode(6)
+
+1.````````````````````````````````````````````````````````````````````````
+def circuler_linkedlist(node)
+	temp = node.start
+	address_ = id(node.start)
+	while temp:
+		if address_ == id(temp) 
+			return 1
+		else:
+			temp = temp.next
+
+
+return_ = circuler_linkedlist(Mylist)
+if return_ == 1:
+	print('List are circular')
+else:
+	print('List are not circular')
+
+2```````````````````````````````````````````````````````````````````````
+
+2- Given two strings 'str1' and 'str2', check if these two strings are isomorphic to each
+other.
+Two strings str1 and str2 are called isomorphic if there is a one to one mapping
+possible for every character of str1 to every character of str2 while preserving the
+order.
+Your task is to complete the function areIsomorphic() which takes the string str1 and
+string str2 as input parameters and check if two strings are isomorphic. The function
+returns 1 if strings are isomorphic else it returns 0.
+Input:
+str1 = aab
+str2 = xxy
+Output: 1
+
+
+def Isomorphic(str1,str2):
+    return 1 if len(str1) == len(str2) else 0
+
+try:
+    str1 = input("Enter first string: ")
+    str2 = input("Enter second string: ")
+
+    print(Isomorphic(str1,str2))
+except Exception as e:
+    print(f"Error: {e}")
+
+
+3``````````````````````````````````````````````````````````````````````````
+
+3- You are given an array arr[] of size n. Find the total count of sub-arrays having
+their sum equal to 0. Write the function findSubarray() that takes the array arr
+and its size n as input parameters and returns the total number of sub-arrays
+with 0 sum.
+Input:
+n = 6
+arr[] = {0,0,5,5,0,0}
+Output: 6
+
+def find_subset_sum_0(list_):
+    subsets = []
+    for i in range(len(list_)):
+        if list_[i] == 0:
+            subsets.append([list_[i]])
+        for j in range(i+2,len(list_)+1):
+            dump = list_[i:j]
+            if sum(dump) == 0:
+                subsets.append(dump)
+    return subsets
+
+try:
+    len1 = int(input("Enter length of list: "))
+    arr1 = [int(input(f"Enter {i+1} value: ")) for i in range(len1)]
+
+    print(find_subset_sum_0(arr1))
+except Exception as e:
+    print(f"Error: {e}")
+
+
+4 `````````````````````````````````````````````````````````````````````````````
+
+4- Bishu went to fight for the Coding Club. There were N soldiers with various
+powers. There will be Q rounds to fight and in each round, Bishu's power will be
+varied. With power M, Bishu can kill all the soldiers whose power is less than or
+equal to M(<=M). After each round, All the soldiers who died in the previous round
+will be reborn. Such that in each round there will be N soldiers to fight. As Bishu is
+
+weak in mathematics, help him to count the number of soldiers that he can kill in
+each round and the total sum of their powers.
+INPUT:
+The first line of the input contains N, the number of soldiers.
+The second line contains an array of N numbers denoting the power of each soldier
+This third line contains Q, which denotes the number of rounds.
+Q lines follow, each line having one number denoting the power of Bishu.
+7
+1 2 3 4 5 6 7
+3
+3
+10
+2
+Output:
+For each round, the output should be an array of two numbers. The first number
+should be the number of soldiers that Bishu can beat, and the second number
+denotes the cumulative strength of all the soldiers that Bishu can beat.
+3 6
+7 28
+2 3
+
+
+def game_(user_input):
+	player_list_ = []
+
+	for i in range(user_input):
+		player_list.append(i+1)
+
+	choice_power = int(input('enter player choice'))
+	power_ = []
+
+	for j in range(choice_power):
+		power_val = int(input(f'enter {j+1} power'))
+		a_ = sum(player_list_[:power_val])
+		power_.append([power_val,a_])
+
+	return power_
+
+
+user_input = int(input('Enter player'))
+val_ = game_(user_input)
+print(val_)
+
+
+
+
+
+5- Given a singly linked list, remove all the nodes in the list which have any node on
+their right whose value is greater. (Not just immediate Right , but entire List on the
+Right)
+Input:
+LinkedList = 12->15->10->11->5->6->2->3
+Output:
+15 11 6 3
+
+5```````````````````````````````````````````````````````````````````````
+
+
+
+MyList_ = LinkedList_()
+MyList_.start = NewNode(12)
+MyList_.start.next = NewNode(15)
+MyList_.start.next.next = NewNode(10)
+MyList_.start.next.next.next = NewNode(11)
+MyList_.start.next.next.next.next = NewNode(5)
+MyList_.start.next.next.next.next.next = NewNode(6)
+MyList_.start.next.next.next.next.next.next = NewNode(2)
+MyList_.start.next.next.next.next.next.next.next = NewNode(3)
+
+
+
+def remove_greater_value(node):
+        temp = node.start
+        next_ = temp.next
+        while temp:
+                if temp.data < next_.data:
+                        temp.data,temp.next  = next_.data ,next_.next
+                temp = temp.next
+                if temp != None:
+                        next_ = temp.next
+
+remove_greater_value(MyList_)
+
+
+6````````````````````````````````````````````````````````````````````````````````
+
+6- Write a function to rotate the elements of a list to the left by a given number of
+positions without using any built-in functions like rotate().
+Input:
+[1, 2, 3, 4, 5],
+k=2
+Expected Output:
+[3, 4, 5, 1, 2]
+
+def rotate_list(arr1,k):
+	list_ = []
+	list_.extend(arr1[k:])
+	list_.extend(arr1[:k])
+	return list_
+
+	
+try:
+	
+	len1 = int(input("Enter length of list: "))
+	arr1 = [int(input(f"Enter {i+1} value: ")) for i in range(len1)]
+	k = int(input('enter k value'))
+	print(rotate_list(arr1,k))
+
+except Exception as e:
+	print('Error',{e})
+
+
+
+	
+

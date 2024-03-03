@@ -23,6 +23,9 @@ class BasePlant(models.Model):
     #if not any select that means plant name is location
     clientDepot = models.BooleanField(default=False) 
     clientBasePlant = models.BooleanField(default=False) 
+    depotCode = models.CharField(max_length=100, null=True , default='')
+    email = models.CharField(max_length=100, null=True , default='')
+    clientOfficeId = models.ForeignKey(ClientOffice, null=True, on_delete=models.CASCADE)
     
     class Meta:
         unique_together = (('lat', 'long'),)
@@ -78,6 +81,7 @@ class DriverShiftTrip(models.Model):
     truckConnectionId = models.IntegerField(null=True, blank=True)
     dispute = models.BooleanField(default = False)
     numberOfLoads = models.FloatField(default=0)
+    revenueDeficit = models.FloatField(default=0)
     loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
     
@@ -479,6 +483,14 @@ class ReconciliationReport(models.Model):
     driverCallOut = models.FloatField(default=0)
     rctiCallOut = models.FloatField(default=0)
     
+    # cancellation 
+    driverCancellationCost = models.FloatField(default=0)
+    rctiCancellatioCost = models.FloatField(default=0)
+
+    # demurage 
+    driverDemurageCost = models.FloatField(default=0)
+    rctiDemurageCost = models.FloatField(default=0)
+
     # Total 
     driverTotalCost = models.FloatField(default=0)
     rctiTotalCost = models.FloatField(default=0)

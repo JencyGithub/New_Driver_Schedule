@@ -5,10 +5,11 @@ from datetime import datetime
 from Account_app.reconciliationUtils import  *
 from datetime import time
 import sys
+from variables import *
 
 
 f = open(r"scripts/addPastTripForMissingDriver.txt", 'r')
-driverName = f.read()
+driverId = f.read()
 
 matchingData = PastTripError.objects.filter(errorFromPastTrip="Driver matching query does not exist.", status=False)
 
@@ -19,7 +20,7 @@ for i in matchingData:
         data = data.split(',')
         
 
-        pastDriver = data[4].strip().replace(' ','').lower()
+        pastDriverId = int(data[4].strip())
         if ' ' in str(data[0].strip()):
             res_ = str(data[0].strip()).split()[0]
         elif '/' in str(data[0].strip()):
@@ -40,9 +41,9 @@ for i in matchingData:
         endTimeStr =endTimeDateTime.strftime('%Y-%m-%d %H:%M:%S')
         clientObj = Client.objects.filter(name = i.clientName).first()
         
-        driverObj = Driver.objects.filter(name = driverName).first()
+        driverObj = Driver.objects.filter(driverId = driverId).first()
 
-        if pastDriver == driverName:
+        if pastDriverId == driverId:
             i.status = True
             i.save()
             try:
@@ -168,7 +169,7 @@ for i in matchingData:
                 shiftObj.save()
                 tripObj.save()
 
-                surCharge = Surcharge.objects.filter(surcharge_Name = 'No Surcharge').first()
+                surCharge = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
                 docketObj = DriverShiftDocket.objects.filter(docketNumber = data[5].strip() , tripId=tripObj.id , truckConnectionId = tripObj.truckConnectionId).first()
                 if docketObj :
                     pastTripErrorObj = PastTripError(
@@ -238,12 +239,50 @@ for i in matchingData:
                         docketObj.returnQty = 0 if str(data[14].strip()).lower() == '' else data[14].strip()
                         docketObj.returnKm = 0 if str(data[15].strip()).lower() == '' else data[15].strip()
                         docketObj.cubicMl = 0 if str(data[8].strip()).lower() == '' else data[8].strip()
-                        docketObj.waitingTimeStart = None if str(data[11]).strip().lower() == '' else datetime.strptime(data[11].strip(), '%H:%M:%S').time()
-                        docketObj.waitingTimeEnd = None if str(data[12]).strip().lower() == '' else datetime.strptime(data[12].strip(), '%H:%M:%S').time()
-                        docketObj.standByStartTime = None if str(data[20].strip()).lower() == '' else datetime.strptime(data[20].strip(), '%H:%M:%S').time()
-                        docketObj.standByEndTime = None if str(data[21].strip()).lower() == '' else datetime.strptime(data[21].strip(), '%H:%M:%S').time()
-                        
-                        # docketObj.standBySlot = standBySlot
+                        waitingTimeStart = None if str(data[11]).strip().lower() == '' else str(data[11]).strip().lower()
+                        waitingTimeEnd = None if str(data[12]).strip().lower() == '' else str(data[12]).strip().lower()
+
+                        waitingTimeStartCount = 0 
+                        waitingTimeEndCount = 0
+                        if waitingTimeStart != None:
+                            waitingTimeStartCount = waitingTimeStart.count(':')
+                        if waitingTimeEnd != None:
+                            waitingTimeEndCount = waitingTimeEnd.count(':')
+
+                        if waitingTimeStart is not None and waitingTimeStartCount == 1:
+                            waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M').time())
+                        elif waitingTimeStartCount == 2:
+                            waitingTimeStart = str(datetime.strptime(data[11].strip(), '%H:%M:%S').time())
+                        if waitingTimeEnd is not None and waitingTimeEndCount == 1:
+                            waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M').time())
+                        elif waitingTimeEndCount == 2:
+                            waitingTimeEnd = str(datetime.strptime(data[12].strip(), '%H:%M:%S').time())
+                        docketObj.waitingTimeStart = waitingTimeStart
+                        docketObj.waitingTimeEnd = waitingTimeEnd
+                        # docketObj.totalWaitingInMinute = totalWaitingTime
+                        standByStartTime = None if str(data[20]).strip().lower() == '' else str(data[20]).strip().lower()
+                        standByEndTime = None if str(data[21]).strip().lower() == '' else str(data[21]).strip().lower()
+
+                        # Initialize counts to 0
+                        standByStartCount = 0 
+                        standByEndCount = 0
+                        if standByStartTime != None:
+                            standByStartCount = standByStartTime.count(':')
+                        if standByEndTime != None:
+                            standByEndCount = standByEndTime.count(':')
+
+                        if standByStartCount == 1 and standByStartTime is not None:
+                            standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M').time())
+                        elif standByStartCount == 2:
+                            standByStartTime = str(datetime.strptime(data[20].strip(), '%H:%M:%S').time())
+                            
+                        if standByEndCount == 1 and standByEndTime is not None:
+                            standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M').time())
+                        elif standByEndCount == 2:
+                            standByEndTime = str(datetime.strptime(data[21].strip(), '%H:%M:%S').time())
+
+                        docketObj.standByStartTime = standByStartTime
+                        docketObj.standByEndTime = standByEndTime  # docketObj.standBySlot = standBySlot
                         docketObj.comment = data[17].strip()
                         # modification for adding blow back and replacement.
                         if data[19].strip().replace(' ','') != None:
@@ -294,7 +333,11 @@ for i in matchingData:
                         driverWaitingTimeCost =0
                         driverStandByCost = 0
                         if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-                            driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                            if graceObj.waiting_load_calculated_on_load_size:
+                                driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                            else:  
+                                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                            
                         if docketObj.standByStartTime and docketObj.standByEndTime:
                             slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                             driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)

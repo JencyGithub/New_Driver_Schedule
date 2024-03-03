@@ -91,3 +91,7 @@ button:focus{
     text-overflow: ellipsis;
     width: auto;
 }
+
+#appointmentModel p{
+    margin-bottom: 0;
+}

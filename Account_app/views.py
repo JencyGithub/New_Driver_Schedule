@@ -25,6 +25,8 @@ from django.db.models import F, ExpressionWrapper, fields
 from django.db.models.functions import Cast
 from datetime import datetime
 from collections import defaultdict
+from variables import *
+from scripts.PastDataSave import *
 
 
 def index(request):
@@ -239,7 +241,7 @@ def formsSave(request):
                     docketFile='static/img/docketFiles/' + Docket_file[i],
                     basePlant=BasePlantVal
                 )
-                docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = 'No Surcharge')[0]
+                docket_.surcharge_type = Surcharge.objects.get_or_create(surcharge_Name = noSurcharge)[0]
                 docket_.save()
 
     else:
@@ -430,7 +432,7 @@ def uploadDocketSave(request, id):
         docketObj.tripId = tripObj
         docketObj.shiftDate = startDateObj.date()
 
-        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = "No Surcharge").first()
+        docketObj.surcharge_type = Surcharge.objects.filter(surcharge_Name = noSurcharge).first()
 
         tripObj.numberOfLoads += 1
         tripObj.save()
@@ -1357,6 +1359,8 @@ def rctiHolcimFormSave(request):
 def rctiSave(request):
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
+    startDate = request.POST.get('startDate')
+    
     time = getCurrentTimeInString()
     location = None
     if rctiPdf:
@@ -1390,59 +1394,60 @@ def rctiSave(request):
         date_ = 0
         total = 0
         clientNameID  = Client.objects.filter(name = clientName).first()
-        if save_data == '1':
-            if 'boral' in clientName.lower():
-                with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
-                    fileData = csv.reader(f)
-                    for data in fileData:
-                        data = data[0]
-                        dataList = data.split()
-                        if 'documentnumber' in data.lower().strip().replace(" ",""):
-                            date_ += 1
-                        elif 'date' in data.lower().strip().replace(" ","") and date_ == 1 :
-                            fileDetails.insert(0,str(invoiceFile))
-                            fileDetails.insert(1,dataList[-1])
-                        elif 'totalexcludinggst' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(2,float(dataList[-1].replace(",","").replace('$','')))
-                        elif 'gstpayable' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(3,float(dataList[-1].replace(",","").replace('$','')))
-                        elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
-                            fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
-                            date_ = 0
-                            
-                date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
-                # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
-                # # print('shiftObj',shiftObj)
-                # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
-                # # print('pastTripErrorObj',pastTripErrorObj)
-                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
-                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                #     return redirect(request.META.get('HTTP_REFERER'))
-                # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
-                #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
-                #     return redirect(request.META.get('HTTP_REFERER'))
-                rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
-                if rctiReport:
-                    messages.error(request, "This file already exists!")
-                    return redirect(request.META.get('HTTP_REFERER'))
-                else:
-                    rctiReport = RctiReport()
-                    rctiReport.fileName = fileDetails[0]
-                    rctiReport.clientName = clientNameID
-                    rctiReport.reportDate = date_object
-                    rctiReport.gstPayable = fileDetails[2]
-                    rctiReport.totalExGST = fileDetails[3]
-                    rctiReport.total = fileDetails[4]
-                    rctiReport.save()
-                    with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id) +','+ str(clientName))
-                    # return HttpResponse('work')
-                        
-                    colorama.AnsiToWin32.stream = None
-                    os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
-                    cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
-                    subprocess.Popen(cmd, stdout=subprocess.PIPE)
-            elif 'holcim' in clientName.lower():
+        if 'boral' in clientName.lower():
+            with open( f'static/Account/RCTI/tempRCTIInvoice/{newFileName}' , 'r') as f:
+                fileData = csv.reader(f)
+                for data in fileData:
+                    data = data[0]
+                    dataList = data.split()
+                    if 'documentnumber' in data.lower().strip().replace(" ",""):
+                        date_ += 1
+                    elif 'date' in data.lower().strip().replace(" ","") and date_ == 1 :
+                        fileDetails.insert(0,str(invoiceFile))
+                        fileDetails.insert(1,dataList[-1])
+                    elif 'totalexcludinggst' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(2,float(dataList[-1].replace(",","").replace('$','')))
+                    elif 'gstpayable' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(3,float(dataList[-1].replace(",","").replace('$','')))
+                    elif 'total' in data.lower().strip().replace(" ","") and date_ == 1:
+                        fileDetails.insert(4,float(dataList[-1].replace(",","").replace('$','')))
+                        date_ = 0
+            
+            # date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
+            original_date = datetime.strptime(fileDetails[1], '%d/%m/%y')
+            date_object = original_date.strftime('%Y-%m-%d')
+            # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
+            # # print('shiftObj',shiftObj)
+            # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
+            # # print('pastTripErrorObj',pastTripErrorObj)
+            # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+            #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+            #     return redirect(request.META.get('HTTP_REFERER'))
+            # if len(shiftObj) == 0 or len(pastTripErrorObj) > 0:
+            #     messages.error(request,'Please Resolve PastTrip Error / Upload Past Trip File')
+            #     return redirect(request.META.get('HTTP_REFERER'))
+            rctiReport = RctiReport.objects.filter(reportDate= date_object, total= fileDetails[-1] ,  fileName= fileDetails[0]).first()
+            if rctiReport:
+                messages.error(request, "This file already exists!")
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                rctiReport = RctiReport()
+                rctiReport.fileName = fileDetails[0]
+                rctiReport.clientName = clientNameID
+                rctiReport.reportDate = date_object
+                rctiReport.gstPayable = fileDetails[2]
+                rctiReport.totalExGST = fileDetails[3]
+                rctiReport.total = fileDetails[4]
+                rctiReport.save()
+                with open('rctiReportId.txt','w')as f:
+                    f.write(str(rctiReport.id) +','+ str(clientNameID.name) + ',' + str(startDate))
+                # return HttpResponse('work')
+                    
+                colorama.AnsiToWin32.stream = None
+                os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+                cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
+                subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        elif 'holcim' in clientName.lower():
                 with open( f'static/Account/RCTI/RCTIInvoice/{newFileName}' , 'r') as f:
                     fileData = csv.reader(f)
                     for row in fileData:
@@ -1470,7 +1475,7 @@ def rctiSave(request):
                     rctiReport.total = fileDetails[-1]
                     rctiReport.save()
                     with open('rctiReportId.txt','w')as f:
-                        f.write(str(rctiReport.id) +','+ str(clientName))
+                        f.write(str(rctiReport.id) +','+ str(clientName) + ',' + str(startDate))
                 with open("File_name_file.txt",'w+',encoding='utf-8') as f:
                     file_name = f.write(newFileName)
                 colorama.AnsiToWin32.stream = None
@@ -1655,10 +1660,11 @@ def driverDocketEntry(request, tripId , errorId = None):
 @csrf_protect
 def countDocketWaitingTime(request):
     tripId = request.POST.get('tripId')
-    print(tripId)
+    docketId = request.POST.get('docketId')
     waitingTimeStart = request.POST.get('waitingTimeStart')
     waitingTimeEnd = request.POST.get('waitingTimeEnd')
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    docketObj = DriverShiftDocket.objects.filter(pk=docketId).first()
     totalWaitingTime =0
     if tripObj:
         clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
@@ -1666,15 +1672,23 @@ def countDocketWaitingTime(request):
         clientTruckObj = ClientTruckConnection.objects.filter(truckNumber = adminTruckObj).first()
         rateCardObj = RateCard.objects.filter(rate_card_name = clientTruckObj.rate_card_name.rate_card_name).first()
         graceObj = Grace.objects.filter(rate_card_name = rateCardObj).first()
-
+        
         totalWaitingTime = getTimeDifference(waitingTimeStart,waitingTimeEnd)
-        if totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
+        if graceObj.waiting_load_calculated_on_load_size:
+            loadSize = graceObj.minimum_load_size_for_waiting_time_grace
+        
+            if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
+                loadSize = float(docketObj.cubicMl)
+            loadWaitingMinuteCount = float(loadSize) * float(graceObj.waiting_time_grace_per_cubic_meter) + float(graceObj.waiting_time_grace_in_minutes)
+            totalWaitingTime = float(totalWaitingTime) - math.ceil(loadWaitingMinuteCount)
+        elif totalWaitingTime > graceObj.chargeable_waiting_time_starts_after:
             totalWaitingTime = totalWaitingTime - graceObj.waiting_time_grace_in_minutes
             if totalWaitingTime < 0:
                 totalWaitingTime = 0
         else:
             totalWaitingTime = 0
-                    
+    if totalWaitingTime < 0:
+        totalWaitingTime = 0
     return JsonResponse({'status': True,'totalWaitingTime':totalWaitingTime})
 
 
@@ -1825,7 +1839,10 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             driverStandByCost = 0
 
             if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-                driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                if graceObj.waiting_load_calculated_on_load_size:
+                    driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                else:  
+                    driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
             if docketObj.standByStartTime and docketObj.standByEndTime:
                 slotSize = DriverTripCheckStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
@@ -1909,17 +1926,19 @@ def HolcimDocketView(request,id):
     return render(request, 'Account/Holcim/docketView.html',params)
 def basePlantTable(request):
     basePlants = BasePlant.objects.all()
+
     # locations = Location.objects.all()
     return render(request, 'Account/Tables/basePlantTable.html', {'basePlants': basePlants})
 
 def basePlantForm(request, id=None):
     
     basePlant = None
+    clientOfficeObj = ClientOffice.objects.all()
     if id:
         basePlant = BasePlant.objects.get(pk=id)
-        
     params = {
         'basePlant': basePlant,
+        'clientOfficeObj':clientOfficeObj
     }
     return render(request, "Account/basePlantForm.html", params)
 
@@ -1940,6 +1959,8 @@ def basePlantForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
+    clientBasePlant = request.POST.get('clientBasePlant')
+    clientDepot = request.POST.get('clientDepot')
     dataList = {
         'basePlant': request.POST.get('basePlant').upper(),
         'address': request.POST.get('address'),
@@ -1948,10 +1969,14 @@ def basePlantSave(request, id=None):
         'managerName': request.POST.get('managerName'),
         'lat': request.POST.get('lat'),
         'long': request.POST.get('long'),
-        'basePlantType' : False if  request.POST.get('basePlantType') == "typeLocation" else True
+        # if not any select that means plant name is location 
+        'clientDepot' :  True if  clientDepot else False , 
+        'clientBasePlant' :  True if  clientBasePlant else False,
+        'depotCode' :  request.POST.get('depotCode'),
+        'email' :  request.POST.get('email'),
+        'clientOfficeId' : ClientOffice.objects.filter(id=request.POST.get('clientOfficeId')).first() if clientDepot and  clientBasePlant else None 
     }
 
-    
     result = None
     if id:
         result = updateIntoTable(record_id=id, tableName='BasePlant', dataSet=dataList)
@@ -2146,6 +2171,7 @@ def driverEntryUpdate(request, shiftId):
             if request.POST.get(f'waitingCheck{docket.id}'):
                 docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
                 docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
+                # return HttpResponse(docket.waitingTimeEnd)
             else:
                 docket.waitingTimeStart = None
                 docket.waitingTimeEnd = None
@@ -2175,7 +2201,6 @@ def driverEntryUpdate(request, shiftId):
 
                 # tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj)
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
-                        
                 if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
                     
@@ -2193,8 +2218,12 @@ def driverEntryUpdate(request, shiftId):
                 driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 
                 driverSurchargeCost = checkSurcharge(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-
-                driverWaitingTimeCost = checkWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                if docket.waitingTimeStart and docket.waitingTimeEnd:
+                    if graceObj.waiting_load_calculated_on_load_size:
+                        driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                    else:  
+                        driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                            
                 slotSize = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                 driverTransferKmCost = checkTransferCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
@@ -2261,6 +2290,26 @@ def getDriverBreak(request):
     
     return JsonResponse({'status': True, 'driverBreaks': list(driverBreaks)})
     
+@csrf_protect
+@api_view(['POST'])
+def checkTripDeficit(request):
+    shiftId = request.POST.get('shiftId')
+    tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftId)
+    checkShiftRevenueDifference(tripObjs)
+    dict_ = {}
+    getDeficit = []
+    getTrueOrFalse = []
+    count_ = 1
+    for trip in tripObjs:
+        if trip.revenueDeficit > 0:
+            dict_ ={
+                'get_deficit' : f'Trip{count_}',
+                'deficit_value': trip.revenueDeficit,
+            }
+            getDeficit.append(dict_)
+            getDeficit.append('True')
+            count_+=1
+    return JsonResponse({'status':True if 'True' in getDeficit else False,}) 
     
 # ````````````````````````````````````
 # Reconciliation
@@ -2768,17 +2817,25 @@ def publicHolidaySave(request, id=None):
 
 # ```````````````````````````````````
 
-def rateCardTable(request,clientId = None):
+def rateCardTable(request,clientId = None, clientOfcId=None):
     
-    RateCards = RateCard.objects.filter(clientName=clientId)
+    if not clientOfcId and not clientId :
+        return redirect(request.META.get('HTTP_REFERER'))
+    
+    rateCards = RateCard.objects.filter(clientName=clientId)
+    
+    if clientOfcId:
+        # rateCards = ClientOfcWithRateCardConnection.objects.filter(clientOfc_id=clientOfcId)
+        rateCards = RateCard.objects.filter(clientofcwithratecardconnection__clientOfc_id=clientOfcId)
     params = {
-        'rateCard': RateCards,
+        'rateCard': rateCards,
         'clientId':clientId,
+        'clientOfcId' : clientOfcId
     }
     return render(request, 'Account/Tables/rateCardTable.html', params)
 
 
-def rateCardForm(request, id=None , clientId=None):
+def rateCardForm(request, id=None , clientId=None , clientOfcId=None):
     rateCard = rateCardSurcharges = surchargesEntry = costParameters = thresholdDayShift = thresholdNightShift = grace = onLease = tds = startDate = endDate = None
     surchargesEntry =Surcharge.objects.all()
     rateCardDates = []
@@ -2829,6 +2886,7 @@ def rateCardForm(request, id=None , clientId=None):
         'endDate' : endDate,
         'rateCardDates' : rateCardDates,
         'clientId':clientId,
+        'clientOfcId':clientOfcId,
         # 'onLease' : onLease,
     }
     return render(request, 'Account/rateCardForm.html', params)
@@ -2851,7 +2909,7 @@ def checkOnOff(val_):
 
 
 @csrf_protect
-def rateCardSave(request, id=None, edit=0):
+def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
     # Rate Card
     rateCardID = None
     startDate = request.POST.get('startDate')
@@ -2863,6 +2921,7 @@ def rateCardSave(request, id=None, edit=0):
         rateCard.rate_card_name=request.POST.get('rate_card_name')
         clientId =request.POST.get('clientName')
         rateCard.clientName = Client.objects.filter(pk = clientId).first()
+        rateCard.clientOfc = ClientOffice.objects.filter(pk = clientOfcId).first()
         rateCard.save()
         rateCardID = RateCard.objects.filter(rate_card_name=request.POST.get('rate_card_name')).first()
 
@@ -2969,6 +3028,9 @@ def rateCardSave(request, id=None, edit=0):
         updatedValues.append('chargeable_standby_time_starts_after') if grace.chargeable_standby_time_starts_after != float(request.POST.get('grace_chargeable_standby_time_starts_after')) else None
         updatedValues.append('waiting_time_grace_in_minutes') if grace.waiting_time_grace_in_minutes != float(request.POST.get('grace_waiting_time_grace_in_minutes')) else None
         updatedValues.append('chargeable_waiting_time_starts_after') if grace.chargeable_waiting_time_starts_after != float(request.POST.get('grace_chargeable_waiting_time_starts_after')) else None
+        updatedValues.append('waiting_load_calculated_on_load_size') if grace.waiting_load_calculated_on_load_size != checkOnOff(request.POST.get('grace_waiting_load_calculated_on_load_size')) else None
+        updatedValues.append('waiting_time_grace_per_cubic_meter') if grace.waiting_time_grace_per_cubic_meter != float(request.POST.get('grace_waiting_time_grace_per_cubic_meter')) else None
+        updatedValues.append('minimum_load_size_for_waiting_time_grace') if grace.minimum_load_size_for_waiting_time_grace != float(request.POST.get('grace_minimum_load_size_for_waiting_time_grace')) else None
         
         # return HttpResponse(updatedValues) 
 
@@ -3038,11 +3100,15 @@ def rateCardSave(request, id=None, edit=0):
     grace.chargeable_standby_time_starts_after=float(request.POST.get('grace_chargeable_standby_time_starts_after'))
     grace.waiting_time_grace_in_minutes=float(request.POST.get('grace_waiting_time_grace_in_minutes'))
     grace.chargeable_waiting_time_starts_after=float(request.POST.get('grace_chargeable_waiting_time_starts_after'))
+    if request.POST.get('grace_waiting_load_calculated_on_load_size') == 'on':
+        grace.waiting_load_calculated_on_load_size= True
+        grace.waiting_time_grace_per_cubic_meter=float(request.POST.get('grace_waiting_time_grace_per_cubic_meter'))
+        grace.minimum_load_size_for_waiting_time_grace=float(request.POST.get('grace_minimum_load_size_for_waiting_time_grace'))
+        grace.chargeable_waiting_time_starts_after= 0
     grace.start_date=startDate
     grace.end_date=endDate
     grace.save()
     
-
     
     updatedValues.insert(0,rateCardID.id)
     updatedValues.insert(1,startDate)
@@ -3053,7 +3119,6 @@ def rateCardSave(request, id=None, edit=0):
             f.write(str(val) + ',')
 
     if edit != 0:
-
         colorama.AnsiToWin32.stream = None
         os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
         cmd = ["python", "manage.py", "runscript", 'updateTripsAndReconciliationData','--continue-on-error']
@@ -3080,6 +3145,11 @@ def rateCardSave(request, id=None, edit=0):
     # )
     # onLease.save()
 
+    clientOfcObj = ClientOffice.objects.filter(pk=clientOfcId).first()
+    clientOfcWithRateCardConnectionObj = ClientOfcWithRateCardConnection()
+    clientOfcWithRateCardConnectionObj.clientOfc = clientOfcObj
+    clientOfcWithRateCardConnectionObj.rateCard = rateCardID
+    clientOfcWithRateCardConnectionObj.save()
     messages.success(request, 'Data successfully add.')
     return redirect('gearBox:clientTable')
 
@@ -3167,14 +3237,16 @@ def archiveResetRCTI(request):
     return JsonResponse({'status': True})
 
 
+# @api_view(['POST'])
 @csrf_protect
-@api_view(['POST'])
 def pastTripSave(request):
-
     monthAndYear = str(request.POST.get('monthAndYear'))
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')
     pastTrip_csv_file = request.FILES.get('pastTripFile')
+    if '@_!' in pastTrip_csv_file.name:
+        messages.error(request, "File name shouldn't contain @.")
+        return redirect(request.META.get('HTTP_REFERER'))
     if not pastTrip_csv_file:
         return HttpResponse("No file uploaded")
     try:
@@ -3223,7 +3295,7 @@ def uplodedPastTrip(request):
     pastTripFile = os.listdir('static/Account/PastTripsEntry')
     pasrTripFileNameList = []
     for file in pastTripFile:
-        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[1]])
+        pasrTripFileNameList.append([file.split('@_!')[0],file.split('@_!')[-1]])
         
     return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
 # --------------------------------------------
@@ -3278,8 +3350,7 @@ def DriverShiftForm(request,id):
     pasrTripFileNameList = []
     
     for pastFile in pastTripFile:
-        pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[1]])
-        
+        pasrTripFileNameList.append([pastFile.split('@_!')[0],pastFile.split('@_!')[-1]])
     # return render(request, 'Account/uplodedPastTrip.html', {'pasrTripFileNameLists' : pasrTripFileNameList})
     client = Client.objects.all()
     pastTripErrors = PastTripError.objects.filter(status = False , errorType = 0).values()
@@ -3306,7 +3377,9 @@ def  ShiftDetails(request,id):
     id_ = id
     shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False )
     for shift in shifts:
-        shift.driverName = Driver.objects.filter(pk = shift.driverId).first().name
+        shift.driverName = Driver.objects.filter(pk = shift.driverId).first()
+        if shift.driverName:
+            shift.driverName = shift.driverName.name
     params = {
         'shifts': shifts,
         'startDate': startDate,

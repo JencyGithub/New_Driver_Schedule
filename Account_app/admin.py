@@ -163,12 +163,12 @@ admin.site.register(DriverTrip,DriverTrip_)
 #     search_fields = ["docketNo","TotalInGST"]
 
 
-class clientTripAdmin(admin.ModelAdmin):
+class RCTI_(admin.ModelAdmin):
     # inlines = [WaitingTimeCost_ ,TransferKMSCost_]
-    list_display = ["docketNumber","truckNo","clientName"]
+    list_display = ["docketNumber","truckNo","clientName" , "docketDate"]
     search_fields = ["docketNumber","truckNo"]
     
-admin.site.register(RCTI, clientTripAdmin)
+admin.site.register(RCTI, RCTI_)
 
 
 
@@ -182,10 +182,16 @@ def download_csv(modeladmin, request, queryset):
 
     return response
 
+class ClientOfficeInline(admin.StackedInline):
+    model = ClientOffice
+    extra = 0
+
+
 class ClientAdmin(admin.ModelAdmin):
     list_display = ["clientId", "name", 'docketGiven']
     search_fields = ["clientId", "name"]
     actions = [download_csv]
+    inlines = [ClientOfficeInline]
 
 admin.site.register(Client, ClientAdmin)
 
@@ -260,15 +266,18 @@ def admin_truck_download_csv(modeladmin, request, queryset):
     return response
 
 
-admin.site.register(RateCard)
 admin.site.register(CostParameters)
 admin.site.register(ThresholdDayShift)
 admin.site.register(TruckGroup)
+admin.site.register(TruckSubGroup)
 admin.site.register(Axles)
 admin.site.register(ThresholdNightShift)
 admin.site.register(Grace)
 admin.site.register(OnLease)
 admin.site.register(TruckInformationCustom)
+admin.site.register(TruckSettingCustom)
+admin.site.register(TruckSetting)
+
 class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]
@@ -282,9 +291,9 @@ class ClientTruckConnection_(admin.ModelAdmin):
     search_fields = ['clientTruckId']
 
 admin.site.register(ClientTruckConnection,ClientTruckConnection_)
+
+
     
-
-
 
 def driver_download_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
@@ -325,6 +334,12 @@ class LeaveRequestAdmin(admin.ModelAdmin):
     actions = [leave_download_csv]
 
 admin.site.register(LeaveRequest, LeaveRequestAdmin)
+
+class RateCardAdmin(admin.ModelAdmin):
+    list_display = ["rate_card_name","clientName"]
+    search_fields = ["rate_card_name","clientName"]
+
+admin.site.register(RateCard, RateCardAdmin)
 
 
 def nature_leave_download_csv(modeladmin, request, queryset):
@@ -378,6 +393,7 @@ admin.site.register(NatureOfLeave, NatureOfLeaveAdmin)
 
 admin.site.register(Surcharge)
 admin.site.register(PublicHoliday)
+admin.site.register(ClientOfficeAdditionalInformation)
 
 
 class RctiErrors_(admin.ModelAdmin):
@@ -392,8 +408,8 @@ admin.site.register(PastTripError,PastTripError_)
 
 
 class ReconciliationReportAdmin(admin.ModelAdmin):
-    list_display = ["docketNumber","reconciliationType","docketDate"]
-    search_fields = ["docketNumber"]
+    list_display = ["docketNumber","reconciliationType","docketDate" , "truckConnectionId"]
+    search_fields = ["docketNumber","truckConnectionId"]
 
 admin.site.register(ReconciliationReport , ReconciliationReportAdmin)
 
@@ -405,8 +421,19 @@ admin.site.register(RctiExpense , RctiExpenseAdmin)
 
 # admin.site.register(Location)
 
+class ClientOfcWithRateCardConnectionAdmin(admin.ModelAdmin):
+    list_display = ["clientOfc","rateCard"]
+    search_fields = ["clientOfc","rateCard"]
+
+admin.site.register(ClientOfcWithRateCardConnection , ClientOfcWithRateCardConnectionAdmin)
+
 admin.site.register(TruckInformation)
 admin.site.register(TruckDocument)
+class TruckEntryErrorAdmin(admin.ModelAdmin):
+    list_display = ["truckNo","exceptionText"]
+    search_fields = ["truckNo"]
+
+admin.site.register(TruckEntryError , TruckEntryErrorAdmin)
 
 # admin.site.register(AppointmentTruck)
 # admin.site.register(AppointmentDriver)
@@ -492,11 +519,21 @@ admin.site.register(HolcimTrip,HolcimTrip_)
 
 
 admin.site.register(RctiReport)
-admin.site.register(RctiAdjustment)
+class RctiAdjustment_(admin.ModelAdmin):
+    
+    list_display = ['docketNumber','docketDate']
+    search_fields = ["docketNumber"]
+admin.site.register(RctiAdjustment,RctiAdjustment_)
+
 class DriverShift_(admin.ModelAdmin):
     list_display = ['verified','shiftDate','driverId']
     search_fields = ["driverId"]
 admin.site.register(DriverShift,DriverShift_)
+
+class DriverShiftTrip_(admin.ModelAdmin):
+    list_display = ['verified','shiftId','truckConnectionId','revenueDeficit']
+    search_fields = ["truckConnectionId","shiftId"]
+admin.site.register(DriverShiftTrip,DriverShiftTrip_)
 
 class DriverShiftDocket_(admin.ModelAdmin):
     list_display = ['tripId','shiftId','clientId','docketNumber']
@@ -504,7 +541,7 @@ class DriverShiftDocket_(admin.ModelAdmin):
 
 
 admin.site.register(DriverShiftDocket,DriverShiftDocket_)
-admin.site.register(DriverShiftTrip)
+# admin.site.register(DriverShiftTrip)
 admin.site.register(DriverBreak)
 admin.site.register(DriverReimbursement)
 

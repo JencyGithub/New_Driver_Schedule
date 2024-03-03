@@ -23,6 +23,35 @@ class Client(models.Model):
 
     def __str__(self) -> str:
         return str(self.name) 
+
+class ClientOffice(models.Model):
+    clientId = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+    locationType = models.CharField(max_length=10, choices=(('Home', 'Home'), ('Workplace', 'Workplace')))
+    description = models.CharField(max_length=2048, default='', null=True)
+    address1 = models.CharField(max_length=1024, null=True, default='')
+    address2 = models.CharField(max_length=1024, null=True, default='')
+    city = models.CharField(max_length=100, null=True, default='')
+    state = models.CharField(max_length=100, null=True, default='')
+    country = models.CharField(max_length=100, null=True, default='')
+    postalCode = models.IntegerField(null=True, default=0)
+
+
+    def __str__(self) -> str:
+        return str(self.description) + str(self.clientId) + str(self.locationType)
+
+    
+class ClientOfficeAdditionalInformation(models.Model):
+    clientOfficeId = models.ForeignKey(ClientOffice, on_delete=models.CASCADE, null=True)
+    personName = models.CharField(max_length=100, null=True, default='')
+    primaryContact = models.IntegerField(null=True, default=0)
+    alternativeContact = models.IntegerField(null=True, default=0)
+    email = models.CharField(max_length = 255 , null = True , default='')
+    
+    def __str__(self) -> str:
+        return str(self.personName) + str(self.email)
+
+    
+
     
 # -----------------------------------
 # Rate Card
@@ -45,8 +74,8 @@ standby_time_grace_options = (
 class RateCard(models.Model):
     rate_card_name = models.CharField(max_length=255 , unique=True)
     tds = models.FloatField(default=0)
-    clientName = models.ForeignKey(Client,on_delete=models.CASCADE , default=1)
-
+    clientName = models.ForeignKey(Client,on_delete=models.CASCADE , null=True)
+    # clientOfc = models.ForeignKey(ClientOffice,on_delete=models.CASCADE , null=True)
 
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -152,6 +181,9 @@ class Grace(models.Model):
     chargeable_standby_time_starts_after = models.FloatField(default=0)
     waiting_time_grace_in_minutes = models.FloatField(default=0)
     chargeable_waiting_time_starts_after = models.FloatField(default=0)
+    waiting_load_calculated_on_load_size = models.BooleanField(default=False)
+    waiting_time_grace_per_cubic_meter = models.FloatField(default=0)
+    minimum_load_size_for_waiting_time_grace = models.FloatField(default=0)
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
@@ -175,9 +207,16 @@ class OnLease(models.Model):
 
 
 
+class ClientOfcWithRateCardConnection(models.Model):
+    clientOfc = models.ForeignKey(ClientOffice, on_delete=models.CASCADE , null=True)
+    rateCard = models.ForeignKey(RateCard, on_delete=models.CASCADE , null=True)
 
-
+    def __str__(self):
+        return str(self.clientOfc ) +'-'+ str(self.rateCard)
     
+    class Meta:
+        unique_together = (('clientOfc', 'rateCard'),)
+
 # -----------------------------------
 # Trucks section
 # -----------------------------------
@@ -203,6 +242,7 @@ class TruckInformation(models.Model):
     informationConfiguration = models.CharField(max_length=100, default='', null=True, blank=True)
     informationChassis = models.CharField(max_length=100, default='', null=True, blank=True)
     informationBuildYear = models.PositiveIntegerField(default=0)
+    
     informationIcon = models.CharField(max_length=100, default='', null=True, blank=True)
     customFieldLabel1 = models.CharField(max_length=100, default='', null=True, blank=True)
     customFieldLabel2 = models.CharField(max_length=100, default='', null=True, blank=True)
@@ -231,7 +271,7 @@ class TruckInformation(models.Model):
     engineGearBox = models.CharField(max_length=100, default='', null=True, blank=True)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.fleet)
     
 class TruckInformationCustom(models.Model):
     customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
@@ -250,25 +290,171 @@ class Axles(models.Model):
         (4, 'Quad'),
     )
     vehicle_axle1 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make1 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims1 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size1 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions1 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes1 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters1 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential1 =models.CharField(max_length=100, default='', null=True, blank=True)
+    
     vehicle_axle2 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make2 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims2 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size2 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions2 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes2 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters2 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential2 =models.CharField(max_length=100, default='', null=True, blank=True)
+    
     vehicle_axle3 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make3 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims3 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size3 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions3 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes3 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters3 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential3 =models.CharField(max_length=100, default='', null=True, blank=True)
+    
     vehicle_axle4 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make4 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims4 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size4 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions4 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes4 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters4 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential4 =models.CharField(max_length=100, default='', null=True, blank=True)
+    
     vehicle_axle5 = models.IntegerField(choices=AXLES_CHOICES, default=0)
-    vehicle_axle6 = models.IntegerField(choices=AXLES_CHOICES, default=0)
-    vehicle_axle7 = models.IntegerField(choices=AXLES_CHOICES, default=0)
-    vehicle_axle8 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make5 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims5 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size5 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions5 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes5 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters5 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential5 =models.CharField(max_length=100, default='', null=True, blank=True)
 
-    def __str__(self):
+    vehicle_axle6 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make6 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims6 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size6 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions6 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes6 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters6 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential6 =models.CharField(max_length=100, default='', null=True, blank=True)
+
+    vehicle_axle7 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make7 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims7 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size7 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions7 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes7 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters7 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential7 =models.CharField(max_length=100, default='', null=True, blank=True)
+
+    vehicle_axle8 = models.IntegerField(choices=AXLES_CHOICES, default=0)
+    axle_make8 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_rims8 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_tyre_size8 = models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_suspensions8 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_brakes8 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_slack_adjusters8 =models.CharField(max_length=100, default='', null=True, blank=True)
+    axle_differential8 =models.CharField(max_length=100, default='', null=True, blank=True)
+
+    
+    def _str_(self):
             return str(self.id)
 
 #SETTINGS TAB
-# class Settings(models.Model):
+class TruckSetting(models.Model):
+    # Configuration
+    fuelType = models.CharField(max_length=1024, null=True, blank=True)
+    fuelCreditCategory = models.CharField(max_length=1024, null=True, blank=True)
+    adbluePercent = models.CharField(max_length=1024, null=True, blank=True)
+    kilometersOffset = models.CharField(max_length=1024, null=True, blank=True)
+    hoursOffset = models.CharField(max_length=1024, null=True, blank=True)
+    preStartChecklist = models.CharField(max_length=1024, null=True, blank=True)
+    trailers = models.CharField(max_length=1024, null=True, blank=True)
+    
+    # Dimensions
+    GCM = models.CharField(max_length=1024, null=True, blank=True)
+    GVM = models.CharField(max_length=1024, null=True, blank=True)
+    TARE = models.CharField(max_length=1024, null=True, blank=True)
+    ATM = models.CharField(max_length=1024, null=True, blank=True)
+    length = models.CharField(max_length=1024, null=True, blank=True)
+    height = models.CharField(max_length=1024, null=True, blank=True)
+    width = models.CharField(max_length=1024, null=True, blank=True)
+    volume = models.CharField(max_length=1024, null=True, blank=True)
+    pallets = models.CharField(max_length=1024, null=True, blank=True)
+
+    # 16 Custom Fields
+    customText1 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue1 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText2 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue2 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText3 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue3 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText4 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue4 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText5 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue5 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText6 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue6 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText7 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue7 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText8 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue8 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText9 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue9 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText10 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue10 = models.CharField(max_length=2048, null=True, blank=True)
+
+    customText11 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue11 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText12 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue12 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText13 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue13 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText14 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue14 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText15 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue15 = models.CharField(max_length=2048, null=True, blank=True)
+    
+    customText16 = models.CharField(max_length=1024, null=True, blank=True)
+    customValue16 = models.CharField(max_length=2048, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.id)
+
+    
+class TruckSettingCustom(models.Model):
+    customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
+    active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return str(self.customFieldLabel) + str(self.active)
+    
+
 
 class AdminTruck(models.Model):
     # adminTruckNumber = models.PositiveIntegerField(validators=[MaxValueValidator(999999),MinValueValidator(100000)], unique=True)
     adminTruckNumber = models.PositiveIntegerField(unique=True)
     truckInformation = models.ForeignKey(TruckInformation, on_delete = models.CASCADE , null = True)
     truckAxles = models.ForeignKey(Axles, on_delete = models.CASCADE , null = True)
+    truckSetting = models.ForeignKey(TruckSetting, on_delete = models.CASCADE , null = True)
     truckActive = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     
@@ -277,7 +463,7 @@ class AdminTruck(models.Model):
     
 class Driver(models.Model):
     # driverId = models.IntegerField(primary_key=True, unique=True, default=generate_4digit_unique_key, editable=False)
-    driverId = models.IntegerField(primary_key=True, unique=True)
+    driverId = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=200)
     phone = models.CharField(max_length=100,null=True)
     email = models.CharField(max_length=200)
@@ -292,13 +478,15 @@ class Driver(models.Model):
         
 
 class ClientTruckConnection(models.Model):
-    truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE)
+    truckNumber = models.ForeignKey(AdminTruck, on_delete=models.CASCADE , null=True)
+    clientOfc = models.ForeignKey(ClientOffice, on_delete=models.CASCADE,null=True)
     truckType = models.CharField(max_length=254 , choices=TRUCK_TYPE_CHOICES, default='Embedded')
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
     pre_start_name = models.PositiveIntegerField(default=0)
     clientId = models.ForeignKey(Client, on_delete=models.CASCADE)
     clientTruckId = models.PositiveIntegerField(default=0)
-    basePlantId = models.PositiveIntegerField(default=0)  
+    neverEnding = models.BooleanField(default=False)
+    # basePlantId = models.PositiveIntegerField(default=0)  
     # clientTruckId = models.PositiveIntegerField(validators=[MaxValueValidator(999999)])  
     startDate = models.DateField(default=timezone.now())  
     endDate = models.DateField(null=True, blank=True)
@@ -342,7 +530,12 @@ class TruckGroup(models.Model):
     def __str__(self):
         return self.name
 
+class TruckSubGroup(models.Model):
+    truckGroup = models.ForeignKey(TruckGroup, on_delete=models.CASCADE , null=True)
+    name = models.CharField(max_length=100, default=None)
 
+    def __str__(self):
+        return self.name
 
 # DOCUMENTS TAB
 class TruckDocument(models.Model):
@@ -353,3 +546,14 @@ class TruckDocument(models.Model):
     def __str__(self):
         return str(self.tags)
     
+class TruckEntryError(models.Model):
+    truckNo = models.IntegerField(default=0,null=True) 
+    errorDescription = models.CharField(max_length=255, default=None, null=True, blank=True)
+    exceptionText = models.CharField(max_length=255, default=None, null=True, blank=True)
+    fileName = models.CharField(max_length=255, default=None, null=True, blank=True)
+    status = models.BooleanField(default=False)
+    errorType = models.FloatField(default=0) 
+    data = models.CharField(max_length=2048, default=' ')
+
+    def __str__(self):
+        return str(self.truckNo)

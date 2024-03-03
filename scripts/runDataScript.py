@@ -106,7 +106,8 @@ trucks = [
 
 for truck in trucks:
     try:
-        obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckStatus = truck['truckStatus'])
+        
+        obj = AdminTruck(id =  truck['id'], adminTruckNumber = truck['adminTruckNumber'], truckActive = truck['truckStatus'], createdBy=User.objects.filter().first())
         # obj = AdminTruck(adminTruckNumber = truck)
         obj.save()
     except Exception as e:
@@ -119,11 +120,11 @@ for truck in trucks:
 
 
 def truckConnectionInsert(data):
-    print(str(data))
     try:
-        print(data['id'])
+        # print(data['id'])
         adminTruckObj = AdminTruck.objects.get(pk = data['truckNumber'])
-        rateCardObj = RateCard.objects.filter(pk=data['rate_card_name']).first()
+        # rateCardObj = RateCard.objects.filter(pk=data['rate_card_name']).first()
+        rateCardObj = RateCard.objects.filter().first()
         clientObj = Client.objects.get(pk = data['clientId'])
         
         clientTruckConnectionObj = ClientTruckConnection(
@@ -133,12 +134,13 @@ def truckConnectionInsert(data):
             clientId =  clientObj,
             clientTruckId =  data['clientTruckId'],
             startDate =  data['startDate'],
-            endDate =  data['endDate']
+            endDate =  data['endDate'],
+            createdBy=User.objects.filter().first()
         )
         clientTruckConnectionObj.save()
         return
     except Exception as e :
-        print(f'Truck Number : {data}, {e}')
+        print(f'Error Truck Number :, {e}')
         return
     
 
@@ -326,7 +328,7 @@ for data in basePlant:
         obj.long = data['long']
         obj.save()
     except Exception as e:
-        print(str(data))
+        print("Error:",str(data))
     
 # def run():
 #     data = ClientTruckConnection.objects.all().values()

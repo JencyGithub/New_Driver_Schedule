@@ -142,10 +142,12 @@ urlpatterns = [
 
     # Rate Card 
     path('RateCardTable', views.rateCardTable, name='rateCardTable'),
-    path('RateCardTable/<int:clientId>', views.rateCardTable, name='rateCardTableClient'),
-    path('RateCardForm/<int:clientId>', views.rateCardForm, name='rateCardForm'),
+    path('RateCardTable/<int:clientId>/', views.rateCardTable, name='rateCardTableClient'),
+    path('RateCardTable/<int:clientId>/<int:clientOfcId>/', views.rateCardTable, name='rateCardTableClientOfc'),
+    
+    path('RateCardForm/<int:clientId>/<int:clientOfcId>/', views.rateCardForm, name='rateCardForm'),
     # path('RateCardForm/<int:clientId>', views.rateCardForm, name='rateCardWithClient'),
-    path('RateCardSave', views.rateCardSave, name='rateCardSave'),
+    path('RateCardSave/<int:clientOfcId>/', views.rateCardSave, name='rateCardSave'),
     path('RateCard/view/<int:id>/', views.rateCardForm, name='rateCardView'),
     path('RateCard/revision/<int:id>/', views.rateCardSave, name='rateCardRevision'),
     path('RateCard/revision/<int:id>/<int:edit>/', views.rateCardSave, name='rateCardRevision'),
@@ -163,6 +165,7 @@ urlpatterns = [
     path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
     path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
+    path('check/trip/deficit', views.checkTripDeficit, name='checkTripDeficit'), 
     
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  

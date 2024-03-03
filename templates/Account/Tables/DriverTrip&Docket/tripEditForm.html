@@ -52,11 +52,13 @@
                     enctype="multipart/form-data">
                     {% csrf_token %}                    
                     <div class="x_title">
-                        <h2>Shift Details</h2>                        
+                        <h2>Shift Details</h2> 
+                        {{shiftObj.id}}                       
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right" style="margin-top: .5rem;" onclick="showBreaks({{shiftObj.id}})">Breaks </label>
                         {% if not shiftObj.verified and shiftObj.endDateTime %}
+                        
                             <label for="verified" class="float-right ml-2" style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
-                            <input type="checkbox" id="verified" name="verified" value = 'True' {% if shiftObj.verified %}checked{% endif %} class="float-right" style="margin-top: .8rem;">
+                            <input type="checkbox" id="verified" name="verified" value = 'True' {% if shiftObj.verified %}checked{% endif %} onclick="checkDeficitFun({{shiftObj.id}})" class="float-right" style="margin-top: .8rem;">
                         {% endif %}
 
                         <div class="clearfix"></div>
@@ -293,6 +295,8 @@
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
+                                        <input type="checkbox" class="float-right" id="waitingCheck{{docket.id}}" name="waitingCheck{{docket.id}}" value="waitingCheck{{docket.id}}"
+                                            onclick="waitingCheck({{docket.id}},this)" {% if docket.waitingTimeStart %} checked {% endif %}>
                                         <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">

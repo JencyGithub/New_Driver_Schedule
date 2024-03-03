@@ -39,7 +39,10 @@
         <div class="x_panel">
           <div class="x_title">
             <h2>Rate Card Table : </h2>
-            <a href="{% url 'Account:rateCardForm' clientId=clientId%}" class="btn btn-dark float-right">Add</a>
+            {% if clientOfcId %}
+            <a href="{% url 'Account:rateCardForm' clientId=clientId clientOfcId=clientOfcId %}" class="btn btn-sm btn-dark float-right">Add</a>
+            {% endif %}
+
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -50,20 +53,12 @@
                     <thead>
                       <tr>
                         <th class="w-50">Rate card name</th>
-                        <th class="w-50">Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for card in rateCard %}
                       <tr>
-                        <td>{{ card.rate_card_name }}</td>
-                        <td>
-                          <label type="button" class="btn" id="redirectButton">
-                            <a href="{% url 'Account:rateCardView' id=card.id%}">
-                              <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                            </a>
-                          </label>
-                        </td>
+                        <td><a href="{% url 'Account:rateCardView' id=card.id%}">{{ card.rate_card_name }}</a></td>
                       </tr>
                       {% endfor %}
                     </tbody>

@@ -5,7 +5,7 @@ $(document).ready(function () {
     if (questionCount && !isNaN(questionCount) && questionCount > 0 && preStartName != "" ) {
       $("#questionsContainer").empty();
 
-      for (var i = 1; i <= questionCount; i++) {
+      for (var i = 0; i < questionCount; i++) {
         var questionSection = `
                 <div class="x_panel mt-2">
                     <div class="container">

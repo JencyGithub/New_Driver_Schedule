@@ -44,8 +44,37 @@
                 <div class="x_panel">
                     <h2 class="text-uppercase" style="font-weight:bold">Axles tab</h2>
                 </div>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Axles Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form id="axleForm"  method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body" id="modal-body-content">
+                                    <!-- Content will be dynamically added here -->
+                                </div>
+                                {% if viewOnly == 0 %}
+                                
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-default btn-sm">Save</button>
+                                </div>
+                                {% endif %}
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 <form action="{% url 'gearBox:truckAxlesFormSave' truckId=adminTruckObj.id %}" method="post">
                     {% csrf_token %}
+                    <input value="{{viewOnly}}" name ="viewOnly" hidden id="viewOnly">
+                    <input value="{{truckAxlesObj.id}}" name ="truckAxleId" hidden id="truckAxleId">
+
                     {% comment %} <h2>Axles Form </h2> {% endcomment %}
                     <div class="x_panel">
                         <div class="x_content">
@@ -68,7 +97,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 3 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 2 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle1 >= 1 and truckAxlesObj.vehicle_axle1 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make1 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(1)">
+                                                Information
+                                            </a>
+                                            {% endif %}
                                             
                                         </div>
                                         
@@ -88,8 +121,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 3 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 2 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle2 >= 1 and truckAxlesObj.vehicle_axle2 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make2 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(2)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                             
                                         </div>
                                         <div class="col-md-3">
@@ -108,8 +144,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 3 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 2 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle3 >= 1 and truckAxlesObj.vehicle_axle3 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make3 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(3)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle4" name="vehicle_axle4" >
@@ -127,8 +166,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 3 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 2 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle4 >= 1 and truckAxlesObj.vehicle_axle4 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make4 %}text-danger{% endif %}"  data-toggle="modal" data-target="#exampleModal" onclick="showModel(4)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
                                         
                                     </div>
@@ -149,8 +191,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 3 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 2 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle5 >= 1 and truckAxlesObj.vehicle_axle5 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make5 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(5)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle6" name="vehicle_axle6" >
@@ -168,8 +213,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 3 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 2 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle6 >= 1 and truckAxlesObj.vehicle_axle6 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                               
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make6 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(6)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle7" name="vehicle_axle7" >
@@ -187,8 +235,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 3 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 2 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle7 >= 1 and truckAxlesObj.vehicle_axle7 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make7 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(7)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
                                         <div class="col-md-3">
                                             <select class="form-control"  id="vehicle_axle8" name="vehicle_axle8" >
@@ -206,8 +257,11 @@
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 3 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 2 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
                                             <div class="col brick my-1" {% if truckAxlesObj.vehicle_axle8 >= 1 and truckAxlesObj.vehicle_axle8 <= 4 %}style="background-color: black;"{% endif %}></div>
-                                            
-                                            
+                                            {% if truckAxlesObj %}
+                                            <a style="cursor: pointer;" class="ml-4 mt-1 {% if not truckAxlesObj.axle_make8 %}text-danger{% endif %}" data-toggle="modal" data-target="#exampleModal" onclick="showModel(8)">
+                                                Information
+                                            </a>
+                                            {%endif%}
                                         </div>
 
                                     </div>
@@ -216,7 +270,98 @@
                             </div>
                         </div>
                     </div>
-
+                    {% comment %} <div class="x_panel">
+                        <div class="x_content">
+                            <div id="accordion">
+                                <div class="card">
+                                <div class="card-header" id="headingOne">
+                                    <h5 class="mb-0">
+                                        <h2 class="btn btn-link text-uppercase text-default" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"style="font-weight:bold">Axles Information</h2>
+                                    </h5>
+                                </div>
+                                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                    <div class="col-md-6">
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make1"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make1" id="vehicleaxle_make1"></div>
+                                          <div class="form-group  vehicle_rims1"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims1" id="vehiclerims1"></div>
+                                          <div class="form-group  vehicle_size1"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize1" id="vehiclesize1"></div>
+                                          <div class="form-group  vehicle_suspension1"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension1" id="vehiclesuspension1"></div>
+                                          <div class="form-group  vehicle_brakes1"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes1" id="vehiclebrakes1"></div>
+                                          <div class="form-group  vehicle_slacks1"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks1" id="vehicleslacks1"></div>
+                                          <div class="form-group  vehicle_diff1"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff1" id="vehiclediff1"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make2"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make2" id="vehicleaxle_make2"></div>
+                                          <div class="form-group  vehicle_rims2"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims2" id="vehiclerims2"></div>
+                                          <div class="form-group  vehicle_size2"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize2" id="vehiclesize2"></div>
+                                          <div class="form-group  vehicle_suspension2"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension2" id="vehiclesuspension2"></div>
+                                          <div class="form-group  vehicle_brakes2"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes2" id="vehiclebrakes2"></div>
+                                          <div class="form-group  vehicle_slacks2"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks2" id="vehicleslacks2"></div>
+                                          <div class="form-group  vehicle_diff2"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff2" id="vehiclediff2"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make3"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make3" id="vehicleaxle_make3"></div>
+                                          <div class="form-group  vehicle_rims3"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims3" id="vehiclerims3"></div>
+                                          <div class="form-group  vehicle_size3"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize3" id="vehiclesize3"></div>
+                                          <div class="form-group  vehicle_suspension3"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension3" id="vehiclesuspension3"></div>
+                                          <div class="form-group  vehicle_brakes3"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes3" id="vehiclebrakes3"></div>
+                                          <div class="form-group  vehicle_slacks3"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks3" id="vehicleslacks3"></div>
+                                          <div class="form-group  vehicle_diff3"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff3" id="vehiclediff3"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make4"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make4" id="vehicleaxle_make4"></div>
+                                          <div class="form-group  vehicle_rims4"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims4" id="vehiclerims4"></div>
+                                          <div class="form-group  vehicle_size4"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize4" id="vehiclesize4"></div>
+                                          <div class="form-group  vehicle_suspension4"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension4" id="vehiclesuspension4"></div>
+                                          <div class="form-group  vehicle_brakes4"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes4" id="vehiclebrakes4"></div>
+                                          <div class="form-group  vehicle_slacks4"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks4" id="vehicleslacks4"></div>
+                                          <div class="form-group  vehicle_diff4"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff4" id="vehiclediff4"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make5"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make5" id="vehicleaxle_make5"></div>
+                                          <div class="form-group  vehicle_rims5"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims5" id="vehiclerims5"></div>
+                                          <div class="form-group  vehicle_size5"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize5" id="vehiclesize5"></div>
+                                          <div class="form-group  vehicle_suspension5"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension5" id="vehiclesuspension5"></div>
+                                          <div class="form-group  vehicle_brakes5"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes5" id="vehiclebrakes5"></div>
+                                          <div class="form-group  vehicle_slacks5"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks5" id="vehicleslacks5"></div>
+                                          <div class="form-group  vehicle_diff5"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff5" id="vehiclediff5"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make6"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make6" id="vehicleaxle_make6"></div>
+                                          <div class="form-group  vehicle_rims6"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims6" id="vehiclerims6"></div>
+                                          <div class="form-group  vehicle_size6"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize6" id="vehiclesize6"></div>
+                                          <div class="form-group  vehicle_suspension6"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension6" id="vehiclesuspension6"></div>
+                                          <div class="form-group  vehicle_brakes6"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes6" id="vehiclebrakes6"></div>
+                                          <div class="form-group  vehicle_slacks6"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks6" id="vehicleslacks6"></div>
+                                          <div class="form-group  vehicle_diff6"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff6" id="vehiclediff6"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make7"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make7" id="vehicleaxle_make7"></div>
+                                          <div class="form-group  vehicle_rims7"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims7" id="vehiclerims7"></div>
+                                          <div class="form-group  vehicle_size7"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize7" id="vehiclesize7"></div>
+                                          <div class="form-group  vehicle_suspension7"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension7" id="vehiclesuspension7"></div>
+                                          <div class="form-group  vehicle_brakes7"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes7" id="vehiclebrakes7"></div>
+                                          <div class="form-group  vehicle_slacks7"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks7" id="vehicleslacks7"></div>
+                                          <div class="form-group  vehicle_diff7"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff7" id="vehiclediff7"></div>
+                                        </div>
+                                        <div class="col-md-3 st-axle">
+                                          <div class="form-group  vehicle_axle_make8"><input class="form-control mt-3" style="margin: 0px;"  placeholder="Axle Make" type="text" value="" name="vehicleaxle_make8" id="vehicleaxle_make8"></div>
+                                          <div class="form-group  vehicle_rims8"><input class="form-control " style="margin: 0px;"  placeholder="Rims" type="text" value="" name="vehiclerims8" id="vehiclerims8"></div>
+                                          <div class="form-group  vehicle_size8"><input class="form-control " style="margin: 0px;"  placeholder="Tyre Size" type="text" value="" name="vehiclesize8" id="vehiclesize8"></div>
+                                          <div class="form-group  vehicle_suspension8"><input class="form-control " style="margin: 0px;"  placeholder="Suspension" type="text" value="" name="vehiclesuspension8" id="vehiclesuspension8"></div>
+                                          <div class="form-group  vehicle_brakes8"><input class="form-control " style="margin: 0px;"  placeholder="Brakes" type="text" value="" name="vehiclebrakes8" id="vehiclebrakes8"></div>
+                                          <div class="form-group  vehicle_slacks8"><input class="form-control " style="margin: 0px;"  placeholder="Slack Adjusters" type="text" value="" name="vehicleslacks8" id="vehicleslacks8"></div>
+                                          <div class="form-group  vehicle_diff8"><input class="form-control " style="margin: 0px;"  placeholder="Differential" type="text" value="" name="vehiclediff8" id="vehiclediff8"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div> {% endcomment %}
                     <div class="col-md-12 text-right py-2 position-sticky px-0" style ="bottom:3%;">
                         <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Next</button>
                     </div>
@@ -244,7 +389,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
+<script type="text/javascript"  >
     $(document).ready(function() {
         $('.col-md-3').each(function() {
             var $bricks = $(this).find('.brick');
@@ -271,8 +416,73 @@
             // based on how you want to interact with the bricks directly.
         });
     });
+
+function showModel(inputNumber) {
     
-    
+    var modalBodyContent = document.getElementById("modal-body-content");
+
+    // Clear the modal body content before adding new input fields
+    modalBodyContent.innerHTML = '';
+
+    // Array of predefined names and placeholders
+    var names = ["axle_make", "axle_rims", "axle_tyre_size", "axle_suspensions", "axle_brakes", "axle_slack_adjusters", "axle_differential"];
+    var placeholders = ["Axle Make", "Rims", "Tyre Size", "Suspensions", "Brakes", "Slack Adjusters", "Differential"];
+    var truckAxlesObj = JSON.parse('{{ truckAxlesObj_serialized|escapejs }}');
+
+    // Generate 7 input boxes
+    for (var i = 0; i < 7; i++) {
+        // Calculate the index for names and placeholders
+        var index = (i % names.length);
+
+        // Create input group div
+        var inputGroupDiv = document.createElement("div");
+        inputGroupDiv.setAttribute("class", "input-group mb-3");
+
+        // Create input element
+        var inputElement = document.createElement("input");
+        inputElement.setAttribute("type", "text");
+        inputElement.setAttribute("placeholder", placeholders[index]);
+        inputElement.setAttribute("name",  names[index] + inputNumber);
+        inputElement.setAttribute("id",  names[index] + inputNumber);
+        inputElement.setAttribute("class", "form-control");
+        var propertyValue = truckAxlesObj[0].fields[names[index] + inputNumber]; // Assuming truckAxlesObj is an array
+        inputElement.setAttribute("value", `${propertyValue || ''}`);
+        
+        
+        
+
+        
+
+
+        // Append input element to input group div
+        inputGroupDiv.appendChild(inputElement);
+
+        // Append input group div to modal body
+        modalBodyContent.appendChild(inputGroupDiv);
+    }
+
+    // Assuming 'viewOnly' is a variable representing the condition
+    var viewOnly = $('#viewOnly').val();
+
+    // Check if viewOnly is 1
+    if (viewOnly == 1) {
+        // Disable input, select, and textarea elements
+        $('input, select, textarea').prop("disabled", true);
+        // Remove disabled attribute from specific elements
+        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+    }
+    var form = document.getElementById('axleForm');
+    var truckAxleObjId = $('#truckAxleId').val()
+    form.setAttribute('action','/gearBox/truckForm/Axles/Information/Save/' + truckAxleObjId + '/' + inputNumber);
+    //form.action = '/gearBox/truckForm/Axles/Information/Save/' + truckAxlesObj.id + '/' + inputNumber;
+}
+var viewOnly = $('#viewOnly').val();
+if (viewOnly == 1) {
+    // Disable input, select, and textarea elements
+    $('input, select, textarea').prop("disabled", true);
+    // Remove disabled attribute from specific elements
+    $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+}
 
     // initialize a validator instance from the "FormValidator" constructor.
     // A "<form>" element is optionally passed as an argument, but is not a must

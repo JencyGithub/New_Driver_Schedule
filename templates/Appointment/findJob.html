@@ -172,23 +172,33 @@
                       </div>
                       <div class="tab-pane fade" id="origin" role="tabpanel" aria-labelledby="origin-tab">
                         <div class="row">
-                          <div class="col-md-6">
-                            <h6>Origin</h6>
-                            <hr>
-                            <p><strong>Base Plant:</strong> <span id="originBasePlant" class="text-capitalize"></span></p>
-                            <p><strong>Address:</strong> <span id="originAddress" class="text-capitalize"></span></p>
+                          <div class="col-12">
+                            <h6 class="d-inline-block">Origin</h6>
+                            <a href="#" class="text-info text-decoration-none float-right addStopBtn">Add stop +</a>
+                            <hr class="mt-1">
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-4">
+                            <p><strong>Origin:</strong> <span id="originBasePlant" class="text-capitalize"></span></p>
+                          </div>
+                          <div class="col-md-4">
                             <p><strong>Phone:</strong> <span id="originPhone" class="text-capitalize"></span></p>
-                            <p><strong>Person On Name:</strong> <span id="originPersonOnName" class="text-capitalize"></span></p>
+                          </div>
+                          <div class="col-md-4">
                             <p><strong>Manager Name:</strong> <span id="originManagerName" class="text-capitalize"></span></p>
                           </div>
-                          <div class="col-md-6 modalStopSection d-none">
-                            <h6>Stop</h6>
-                            <hr>
-                            <p><strong>Stop Name:</strong> <span id="originStopName" class="text-capitalize"></span></p>
-                            <p><strong>Address:</strong> <span id="originStopAddress" class="text-capitalize"></span></p>
-                            <p><strong>Phone:</strong> <span id="originStopPhone" class="text-capitalize"></span></p>
-                            <p><strong>Person On Name:</strong> <span id="originStopPersonOnName" class="text-capitalize"></span></p>
-                            <p><strong>Manager Name:</strong> <span id="originStopManagerName" class="text-capitalize"></span></p>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-4">
+                            <p><strong>Person On Name:</strong> <span id="originPersonOnName" class="text-capitalize"></span></p>
+                          </div>
+                          <div class="col-md-8 col-sm-8">
+                            <p><strong>Address:</strong> <span id="originAddress" class="text-capitalize"></span></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 modalStopSection d-none mt-3">
                           </div>
                         </div>
                       </div>
@@ -408,7 +418,9 @@
   </div>
 </div>
 
+
 {% endblock %}
+
 {% block footerStyleEnd %}
 <!-- Date range picker and multi select dropdown JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>

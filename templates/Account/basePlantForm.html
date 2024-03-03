@@ -54,10 +54,10 @@
                 <div class="x_title">
                     <h2>{% if basePlant %}Edit{% else %}Add{% endif %} Depot / Location</h2>
                     <div class="float-right">
-                        <input type="radio" checked id="typeDepot"value="typeDepot" name="basePlantType" style="margin-top: .8rem;">
-                        <label for="typeDepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
-                        <input type="radio" id="typeLocation" value="typeLocation" name="basePlantType"style="margin-top: .8rem;" {% if basePlant %} {% if basePlant.basePlantType is False %} checked {% endif %}{% endif %}>
-                        <label for="typeLocation" class="ml-2"style="margin-right: 1rem;">Location</label>
+                        <input type="checkbox"  id="clientDepot" onclick="clientDepotFun()"value="clientDepot" name="clientDepot" style="margin-top: .8rem;" {% if basePlant.clientDepot is True %} checked {% endif %}>
+                        <label for="clientDepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
+                        <input type="checkbox" id="clientBasePlant" onclick="clientBasePlantFun()" value="clientBasePlant" name="clientBasePlant"style="margin-top: .8rem;" {% if basePlant.clientBasePlant is True %} checked {% endif %}>
+                        <label for="clientBasePlant" class="ml-2"style="margin-right: 1rem;">BasePlant</label>
                     </div>
                     <div class="clearfix"></div>
                 </div>
@@ -106,10 +106,35 @@
                                     <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="longitude">
                                 </div>
                             </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="depotCode">Depot Code:</label> 
+                                    <input class="form-control" type="number" name="depotCode"   value="{% if basePlant %}{{ basePlant.depotCode }}{% endif %}" id="depotCode">
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="email">Email :<span class="required">*</span></label> 
+                                    <input class="form-control" type="email" name="email" required  value="{% if basePlant %}{{ basePlant.email }}{% endif %}" id="email">
+                                </div>
+                            </div>
+                            <!-- <div class="col-sm-12 clientOfficeId {% if  basePlant.clientDepot is False  and basePlant.clientBasePlant is False %}d-none{% endif %} "> -->
+                            <div class="col-sm-12 clientOfficeId {% if  basePlant is None or basePlant.clientBasePlant is False %}d-none{% endif %} ">
+                                <div class="form-group">
+                                    <label for="clientOfficeId">Client Office  :<span class="required">*</span></label> 
+                                    <select class="form-control" {% if  basePlant.clientDepot and  basePlant.clientBasePlant or  basePlant %}required{% endif %} name="clientOfficeId" id="clientOfficeId">
+                                        <option value="" disabled selected> Select Client Office</option>
+                                        {% for clientOffice in clientOfficeObj %}
+                                        <option value="{{clientOffice.id}}" {% if clientOffice.id == basePlant.clientOfficeId.id %}selected{% endif %} > {{clientOffice.clientId.name}} - {{clientOffice.description}}</option>
+                                        
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-9 col-sm-9 text-right">
-                                <button type='submit' class="btn btn-primary px-4">Submit</button>
+                            <div class="col-md-12 col-sm-12 text-right">
+                                <button type='submit' class="btn btn-default btn sm px-4">Submit</button>
                             </div>
                         </div>
                     </div>
@@ -144,6 +169,52 @@
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+    function clientDepotFun() {
+        var clientDepot = document.getElementById("clientDepot").checked;
+        var clientBasePlant = document.getElementById("clientBasePlant").checked;
+        var clientOfficeSelect = document.getElementById("clientOffice");
+        if (clientDepot && clientBasePlant) {
+            $(".clientOfficeId").removeClass('d-none');
+            $("#clientOfficeId").prop('required', true); // Use prop to set required attribute
+        } 
+        else if (clientBasePlant && !clientDepot) {
+            document.getElementById("clientBasePlant").checked = false;
+            $(".clientOfficeId").addClass('d-none');
+            $("#clientOfficeId").prop('required', false);
+            clientOfficeIdSelect.value = "";
+        }
+        else {
+            $(".clientOfficeId").addClass('d-none');
+            $("#clientOffice").prop('required', false); // Use prop to remove required attribute
+            clientOfficeSelect.value = "";
+        }
+    }
+    
+
+    function clientBasePlantFun() {
+        var clientDepot = document.getElementById("clientDepot").checked;
+        var clientBasePlant = document.getElementById("clientBasePlant").checked;
+        var clientOfficeSelect = document.getElementById("clientOffice");
+
+        if (clientBasePlant) {
+            // If clientBasePlant is checked, check clientDepot
+            document.getElementById("clientDepot").checked = true;
+            $(".clientOfficeId").removeClass('d-none');
+            $("#clientOfficeId").attr('required',true);
+        }
+        else if (clientDepot && !clientBasePlant) {
+            document.getElementById("clientDepot").checked = false;
+            $(".clientOfficeId").addClass('d-none');
+            $("#clientOfficeId").prop('required', false);
+            clientOfficeSelect.value = "";
+        }
+        else{
+            document.getElementById("clientBasePlant").checked = false;
+            $(".clientOfficeId").addClass('d-none');
+            $("#clientOfficeId").removeAttr('required');
+            clientOfficeSelect.value = "";
+        }
+    }
     function showMap() {
         // Get values from the form
         var cityName = document.getElementById('city').value;

@@ -1,4 +1,6 @@
 {% load static %}
+{% load pwa %} 
+{% progressive_web_app_meta %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -151,14 +153,44 @@
   <script>
     $(document).ready(function(){
 
-      function success(position) {}
-      function error(err) {}
-      
-      if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(success, error);
-      } else {
-          console.warn("Geolocation is not supported by this browser.");
+      function success(position) {
+        // Handle successful retrieval of location
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        console.log("Latitude: " + latitude + ", Longitude: " + longitude);
       }
+    
+      function error(err) {
+        // Handle errors when retrieving location
+        console.error("Error getting location:", err.message);
+      }
+
+
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition(showPosition);
+        } 
+      }
+
+      function showPosition(position) {
+        console.log("Lat:", position.coords.latitude,", Long:", position.coords.longitude)
+      }
+      // getLocation()
+      
+      // if ("geolocation" in navigator) {
+        // Custom alert message to request location permission
+        // var confirmation = confirm("This website would like to access your location. Allow access?");
+        // navigator.geolocation.getCurrentPosition(success, error);
+        // if (confirmation) {
+        //   // Request location permission if the user confirms
+        // } else {
+        //   // Handle denial of location access
+        //   console.warn("User denied access to location.");
+        // }
+      // } else {
+        // Inform the user if geolocation is not supported
+        // console.warn("Geolocation is not supported by this browser.");
+      // }
     });
     
   </script>

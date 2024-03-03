@@ -27,11 +27,60 @@ def dateConvert(date_):
 
 docket_pattern = r'^\d{8}$|^\d{6}$'
 
-
+def reconciliationSave(docketNumber , docketDate ,clientObj ,rctiAdjustmentObj = None , RCTIobj = None):
+    
+    try:
+        reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketNumber , docketDate = docketDate ).first()
+        rctiTotalCost = 0
+        if not reconciliationDocketObj :
+            reconciliationDocketObj = ReconciliationReport()
+        
+            reconciliationDocketObj.docketNumber =  docketNumber
+            reconciliationDocketObj.docketDate =  docketDate
+            # reconciliationDocketObj.clientName =  clientNames
+            reconciliationDocketObj.clientId =  clientObj.clientId
+        # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
+        if rctiAdjustmentObj:
+            description_ = checkStr(rctiAdjustmentObj.description)
+            if  'cartage' in description_: 
+                reconciliationDocketObj.rctiLoadAndKmCost += rctiAdjustmentObj.totalExGST
+            elif  'waitingtime' in description_:
+                reconciliationDocketObj.rctiWaitingTimeCost += rctiAdjustmentObj.totalExGST
+            elif "trucktransfer" in description_:
+                reconciliationDocketObj.rctiTransferKmCost += rctiAdjustmentObj.totalExGST
+            elif "returnperkm" in description_:
+                reconciliationDocketObj.rctiReturnKmCost += rctiAdjustmentObj.totalExGST
+            elif "standbyper" in description_:
+                reconciliationDocketObj.rctiStandByCost += rctiAdjustmentObj.totalExGST
+            elif "minimumload" in description_:
+                reconciliationDocketObj.rctiLoadDeficit += rctiAdjustmentObj.totalExGST
+            rctiTotalCost = reconciliationDocketObj.rctiLoadAndKmCost + reconciliationDocketObj.rctiTransferKmCost + reconciliationDocketObj.rctiReturnKmCost + + reconciliationDocketObj.rctiWaitingTimeCost + reconciliationDocketObj.rctiStandByCost + reconciliationDocketObj.rctiLoadDeficit + reconciliationDocketObj.rctiSurchargeCost + reconciliationDocketObj.rctiOtherCost
+            
+        else:
+            rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
+            
+            reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
+            
+            reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
+            reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
+            reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
+            # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
+            reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
+            reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
+        reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
+        reconciliationDocketObj.fromRcti = True 
+        
+        reconciliationDocketObj.save()
+        checkMissingComponents(reconciliationDocketObj)
+        reconciliationTotalCheck(reconciliationDocketObj)
+        return
+    except Exception as e: 
+        print('Error' , e)
 def insertIntoModel(dataList,file_name , data):
     RCTIobj = None
     rctiReportId = data[0]
     clientNames = data[1]
+    rctiFirstDocketDate = data[2]
     rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
     try:
         data_str = ','.join(dataList)
@@ -70,14 +119,18 @@ def insertIntoModel(dataList,file_name , data):
         
         dataList = dataList[1:]
         
-        
+        adjustmentFlag = False
         while dataList:
             if re.match(docket_pattern ,str(dataList[0])):
                 RCTIobj.docketNumber = str(dataList[0])
                 basePlants = BasePlant.objects.all()
                 BasePlant_ = [basePlant.basePlant for basePlant in basePlants]
                 description = checkStr(dataList[3])
-                                    
+                # if RCTIobj.docketNumber != 25652880:
+                #     dataList = dataList[11:]
+                #     print(dataList[0])
+                #     continue
+                
                 RCTIobj.docketDate = dateConvert(dataList[1])
                 bp = dataList[2]
                 if dataList[2] not in BasePlant_:
@@ -96,7 +149,6 @@ def insertIntoModel(dataList,file_name , data):
                         if bp in BasePlant_:
                             dataList[2] = bp
                             RCTIobj.docketYard = dataList[2]
-                            # print(RCTIobj.docketNumber,RCTIobj.docketYard)
                             break
                         i = i + 1
                     else :
@@ -110,7 +162,13 @@ def insertIntoModel(dataList,file_name , data):
                         return
                 else:
                     RCTIobj.docketYard = dataList[2] 
-                if convertIntoFloat(dataList[10]) < 0:
+                # if convertIntoFloat(dataList[10]) < 0:
+                # adjustmentStartDate =  '16' if rctiReportObj.reportDate.day > 15 else '01'
+                # month_ = '0'+str(rctiReportObj.reportDate.month) if rctiReportObj.reportDate.month  < 10 else  str(rctiReportObj.reportDate.month)
+                # date_ = str(rctiReportObj.reportDate.year)+'-'+ month_+'-'+ adjustmentStartDate
+                # print(dateConvert(dataList[1]) , date_ , dateConvert(dataList[1])  < date_ , dataList)
+                if dateConvert(dataList[1])  < rctiFirstDocketDate:
+                    adjustmentFlag = True
                     rctiAdjustmentObj = RctiAdjustment()
                     rctiAdjustmentObj.truckNo = RCTIobj.truckNo
                     rctiAdjustmentObj.docketNumber = dataList[0]
@@ -127,6 +185,8 @@ def insertIntoModel(dataList,file_name , data):
                     rctiAdjustmentObj.GSTPayable = convertIntoFloat(dataList[9])
                     rctiAdjustmentObj.Total = convertIntoFloat(dataList[10])
                     rctiAdjustmentObj.save()
+                    reconciliationSave(rctiAdjustmentObj.docketNumber , rctiAdjustmentObj.docketDate ,clientObj , rctiAdjustmentObj = rctiAdjustmentObj)
+                    
                 elif "trucktransfer" in description:
                     RCTIobj.transferKM = convertIntoFloat(dataList[5])
                     RCTIobj.transferKMCost = convertIntoFloat(dataList[7])
@@ -147,6 +207,12 @@ def insertIntoModel(dataList,file_name , data):
                     RCTIobj.returnKmTotalExGST = convertIntoFloat(dataList[8])
                     RCTIobj.returnKmGSTPayable = convertIntoFloat(dataList[9])
                     RCTIobj.returnKmTotal = convertIntoFloat(dataList[10])
+                elif "waitingtimesched" in description:
+                    RCTIobj.waitingTimeSCHED = convertIntoFloat(dataList[5])
+                    RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dataList[7])
+                    RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dataList[8])
+                    RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dataList[9])
+                    RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dataList[10])
                 elif "waitingtime" in description:
                     RCTIobj.waitingTimeInMinutes = convertIntoFloat(dataList[5])
                     RCTIobj.waitingTimeCost = convertIntoFloat(dataList[7])
@@ -172,12 +238,7 @@ def insertIntoModel(dataList,file_name , data):
                     RCTIobj.surchargeTotalExGST = convertIntoFloat(dataList[8])
                     RCTIobj.surchargeGSTPayable = convertIntoFloat(dataList[9])
                     RCTIobj.surchargeTotal = convertIntoFloat(dataList[10])
-                elif "waitingtimesched" in description:
-                    RCTIobj.waitingTimeSCHED = convertIntoFloat(dataList[5])
-                    RCTIobj.waitingTimeSCHEDCost = convertIntoFloat(dataList[7])
-                    RCTIobj.waitingTimeSCHEDTotalExGST = convertIntoFloat(dataList[8])
-                    RCTIobj.waitingTimeSCHEDGSTPayable = convertIntoFloat(dataList[9])
-                    RCTIobj.waitingTimeSCHEDTotal = convertIntoFloat(dataList[10])
+                
                 else:
                     RCTIobj.otherDescription += dataList[3]
                     RCTIobj.others = RCTIobj.others + convertIntoFloat(dataList[5])
@@ -186,45 +247,14 @@ def insertIntoModel(dataList,file_name , data):
                     RCTIobj.othersTotalExGST = RCTIobj.othersTotalExGST + convertIntoFloat(dataList[9])
                     RCTIobj.othersTotal =  RCTIobj.othersTotal +convertIntoFloat(dataList[10])
                     
+                
                 dataList = dataList[11:]
-        RCTIobj.rctiReport = rctiReportObj
-        RCTIobj.save()
-        # print('Rcti Obj - ', RCTIobj)
-        # print('CLIENT---',Client.objects.filter(name = clientNames).first())
-        # clientObj = Client.objects.filter(name = clientNames).first()
-        # print('Client Obj',clientObj.clientId)
-        try:
-            reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
-            rctiTotalCost = RCTIobj.cartageTotalExGST + RCTIobj.transferKMTotalExGST + RCTIobj.returnKmTotalExGST + RCTIobj.waitingTimeSCHEDTotalExGST + RCTIobj.waitingTimeTotalExGST + RCTIobj.standByTotalExGST + RCTIobj.minimumLoadTotalExGST + RCTIobj.surchargeTotalExGST + RCTIobj.othersTotalExGST
-
-            if not reconciliationDocketObj :
-                reconciliationDocketObj = ReconciliationReport()
-            
-            reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
-            reconciliationDocketObj.docketDate =  RCTIobj.docketDate
-            reconciliationDocketObj.rctiLoadAndKmCost =  RCTIobj.cartageTotalExGST
-            # reconciliationDocketObj.clientName =  clientNames
-            reconciliationDocketObj.clientId =  clientObj.clientId
-            # print('reconciliationDocketObj client Obj',reconciliationDocketObj.clientId)
-            
-            # reconciliationDocketObj.rctiSurchargeCost =   RCTIobj.docketDate
-            reconciliationDocketObj.rctiWaitingTimeCost = RCTIobj.waitingTimeTotalExGST
-            reconciliationDocketObj.rctiTransferKmCost = RCTIobj.transferKMTotalExGST
-            reconciliationDocketObj.rctiReturnKmCost =  RCTIobj.returnKmTotalExGST
-            # reconciliationDocketObj.rctiOtherCost =  RCTIobj.docketDate 
-            reconciliationDocketObj.rctiStandByCost =  RCTIobj.standByTotalExGST
-            reconciliationDocketObj.rctiLoadDeficit =  RCTIobj.minimumLoadTotalExGST
-            reconciliationDocketObj.rctiTotalCost =  round(rctiTotalCost,2)
-            reconciliationDocketObj.fromRcti = True 
-            
-            reconciliationDocketObj.save()
-            checkMissingComponents(reconciliationDocketObj)
-            reconciliationTotalCheck(reconciliationDocketObj)
-            return
-        except Exception as e: 
-            pass
-            # print('Exception' , e)
+        if not adjustmentFlag :
+            RCTIobj.rctiReport = rctiReportObj
+            RCTIobj.save()
+            reconciliationSave(RCTIobj.docketNumber , RCTIobj.docketDate ,clientObj , RCTIobj = RCTIobj)
     except Exception as e:
+        
         rctiErrorObj.clientName = clientNames
         rctiErrorObj.docketNumber = dataList[0]
         rctiErrorObj.docketDate =  dataList[1]

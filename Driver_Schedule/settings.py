@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'GearBox_app',   
     'Appointment_app',
     'Gss_app',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,11 @@ TEMPLATES = [
         },
     },
 ]
+# AUTHENTICATION_BACKENDS = [
+#     'Driver_Schedule.auth_backends.CustomAuthBackend',
+#     # Add other authentication backends if needed
+#     'django.contrib.auth.backends.ModelBackend',  # Default authentication backend
+# ]
 
 WSGI_APPLICATION = 'Driver_Schedule.wsgi.application'
 
@@ -94,7 +100,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+    
 }
+
+
 
 
 # Password validation
@@ -152,3 +161,35 @@ MODEL_TO_CSV_FILE_NAME = ''
 
 
 CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1','https://*.azurewebsites.net','https://globalsmartsolutions.biz']
+
+
+
+PWA_APP_NAME = 'robotrack'
+PWA_APP_DESCRIPTION = "Robo Track"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
+PWA_APP_ICONS = [
+	{
+		'src': 'static/img/logo.png',
+		'sizes': '160x160'
+	}
+]
+PWA_APP_ICONS_APPLE = [
+	{
+		'src': 'static/img/logo.png',
+		'sizes': '160x160'
+	}
+]
+PWA_APP_SPLASH_SCREEN = [
+	{
+		'src': 'static/img/logo.png',
+		'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+	}
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-US'

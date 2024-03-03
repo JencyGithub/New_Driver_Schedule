@@ -310,21 +310,44 @@ function showAppointment(appointmentId) {
           $("#originManagerName").text('Not assigned');
         }
 
-        if (data.stopObj) {
-          $(".modalStopSection").removeClass('d-none');
-          $("#originStopName").text(data.stopObj.basePlant);
-          $("#originStopAddress").text(data.stopObj.address);
-          $("#originStopPhone").text(data.stopObj.phone);
-          $("#originStopPersonOnName").text(data.stopObj.personOnName);
-          $("#originStopManagerName").text(data.stopObj.managerName);
-        }else{
-          $(".modalStopSection").addClass('d-none');
+        $('.modalStopSection').empty();
+        content = `<h5 class="mb-0">Stop</h5>`
+        data.stopObjs.forEach(function(stop){
+          content += `<hr>`
+          content += `<div class="row">`
+          content += `<div class="col-md-4">`
+          content += `<p><strong>Stop name:</strong> <span id="originBasePlant" class="text-capitalize">${stop.stopName}</span></p>`
+          content += `</div>`
+          content += `<div class="col-md-3">`
+          content += `<p><strong>Phone:</strong> <span id="originPhone" class="text-capitalize">${stop.stopPhone}</span></p>`
+          content += `</div>`
+          content += `<div class="col-md-3">`
+          content += `<p><strong>Duration :</strong> <span id="originManagerName" class="text-capitalize">${stop.duration}</span></p>`
+          content += `</div>`
+          content += `<div class="col-md-2">`
+          content += `<a href="/appointment/edit/stop/view/${stop.id}/"><i class="fa-regular fa-pen-to-square float-right" style="font-size:1.1em"></i></a>`
+          content += `</div>`
+          content += `</div>`
+          content += `<div class="row">`
+          content += `<div class="col-md-4">`
+          content += `<p><strong>Stop type:</strong> <span id="originPersonOnName" class="text-capitalize">${stop.stopType}</span></p>`
+          content += `</div>`
+          content += `<div class="col-md-8 col-sm-8">`
+          content += `<p><strong>Address:</strong> <span id="originAddress" class="text-capitalize">${stop.stopAddress}</span></p>`
+          content += `</div>`
+          content += `</div>`
+        })
+        if (data.stopObjs.length > 0) {
+          $(".modalStopSection").removeClass('d-none').append($(content));
         }
 
         $("#editBtn").attr(
           "href",
           `/appointment/appointmentForm/update/view/${appointmentId}/1/`
         );
+
+        $('.addStopBtn').attr('href',`/appointment/add/stop/view/${appointmentId}`)
+
         $("#cancelModel #yes").attr("onClick", `cancelJob(${appointmentId})`);
         $("#appointmentModel").modal("show");
       }

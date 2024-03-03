@@ -80,6 +80,10 @@ class AppointmentDriver(models.Model):
 class AppointmentStop(models.Model):
     appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE, default=None)
     stopName = models.ForeignKey(BasePlant,on_delete=models.CASCADE)
+    stopType = models.CharField(max_length=100,choices=[('Stop','Stop'),('Pickup','Pickup'),('Dropoff','Dropoff')], default="Stop") 
+    arrivalTime = models.TimeField(null=True, blank=True)
+    duration = models.PositiveBigIntegerField(default=0)
+    notes = models.CharField(default='', null=True, max_length=2048)
     
     def __str__(self):
         return str(self.stopName.basePlant)
@@ -148,11 +152,11 @@ class DriverPreStart(models.Model):
     clientId =  models.ForeignKey(Client, on_delete=models.CASCADE, default=None, null=True)
     preStartId =  models.ForeignKey(PreStart, on_delete=models.CASCADE, default=None, null=True)
     driverId =  models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
-    curDateTime = models.DateTimeField(default=None, null=True)
+    curDateTime = models.DateTimeField(null=True)
     comment = models.CharField(max_length=2048, default='', null=True)
 
     def __str__(self):
-        return str(self.driverId.name) + '-->' + str(self.curDateTime)
+        return str(self.curDateTime)
     
     
 class DriverPreStartQuestion(models.Model):

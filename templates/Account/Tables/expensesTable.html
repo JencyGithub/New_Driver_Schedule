@@ -129,24 +129,18 @@
                                                 <th>Unit</th>
                                                 <th>Unit Price</th>
                                                 <th>Total</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for expensesObj in dataList %}
                                                 <tr>
-                                                    <td>{{ expensesObj.docketDate }}</td>
-                                                    <td>{{ expensesObj.truckNo }}</td>
-                                                    <td>{{ expensesObj.docketYard }}</td>
-                                                    <td>{{ expensesObj.invoiceQuantity }}</td>
-                                                    <td>{{ expensesObj.unit }}</td>
-                                                    <td>{{ expensesObj.unitPrice }}</td>
-                                                    <td>{{ expensesObj.total }}</td>
-                                                    <td>
-                                                        <a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">
-                                                            <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                                                        </a>
-                                                    </td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.docketDate }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.truckNo }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.docketYard }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.invoiceQuantity }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.unit }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.unitPrice }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.total }}</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </tbody>
