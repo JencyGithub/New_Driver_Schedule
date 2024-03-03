@@ -120,7 +120,7 @@
           </div>
           <div class="x_content">
             <div class="cuatom-continer">
-              <form class="" method="POST" action="{% url 'Account:rctiSave'%}" enctype="multipart/form-data">
+              <form class="" id="RCTIentry" method="POST" action="{% url 'Account:rctiSave'%}" enctype="multipart/form-data" notvalidate>
                 {% csrf_token %}
                 <div class="col-md-3 col-sm-3">
                   <label for="RctiFile">Upload RCTI Invoice csv:<span class="required">*</span></label>
@@ -451,7 +451,25 @@
 <script>
   // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
-  $(document).ready(function () {
+  $(document).ready(function () {    
+
+    $('#RCTIentry').submit(function (e) {
+      var isSubmit = true
+      var selectedDate = new Date($('#RCTIentry #startDate').val());
+      var currentDate = new Date()
+      var timeDifference = currentDate.getTime() - selectedDate.getTime();
+      var daysDifference = timeDifference / (1000 * 3600 * 24);
+      daysDifference = Math.round(daysDifference);
+      console.log(daysDifference)
+      if (daysDifference > 20){
+        if (confirm("It appears that your uploaded file is historical. Please confirm whether your past data has been uploaded previously or not") == false) {
+          isSubmit = false
+        }
+      }
+      if (!isSubmit){
+        e.preventDefault();
+      }
+    }) 
 
     var activeTable = $("#activeTable").DataTable({
       'columnDefs': [{

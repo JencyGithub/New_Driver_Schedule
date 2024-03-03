@@ -1089,6 +1089,7 @@ def rcti(request):
     rctiSolve = RctiErrors.objects.filter(status = True, errorType=0).values()
     archiveError = RctiErrors.objects.filter(errorType=2).values() 
     client = Client.objects.all()
+    # return HttpResponse(client)
     BasePlant_ = BasePlant.objects.all()
     params = {
         'rctiErrors' : rctiErrors,
@@ -1357,6 +1358,7 @@ def rctiHolcimFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
+    return HttpResponse('123')
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     startDate = request.POST.get('startDate')
@@ -1447,7 +1449,7 @@ def rctiSave(request):
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        elif 'holcim' in clientName.lower():
+        elif 'holcim' in clientName.lower().strip():
                 with open( f'static/Account/RCTI/RCTIInvoice/{newFileName}' , 'r') as f:
                     fileData = csv.reader(f)
                     for row in fileData:
