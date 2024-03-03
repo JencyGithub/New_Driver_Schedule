@@ -1071,7 +1071,7 @@ def getTrucks(request):
         connections.append(trip.truckConnectionId)
     
     truckList = []
-    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId)
+    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte =getCurrentDateTimeObj().date() , endDate__gte =getCurrentDateTimeObj().date())
     docket = client.docketGiven
 
     for truck_connection in truck_connections:
@@ -1085,14 +1085,15 @@ def getTrucks(request):
 
 def rcti(request):
 
-    rctiErrors = RctiErrors.objects.filter(status = False).values()
-    rctiSolve = RctiErrors.objects.filter(status = True).values()
+    rctiErrors = RctiErrors.objects.filter(status = False, errorType=0).values()
+    rctiSolve = RctiErrors.objects.filter(status = True, errorType=0).values()
+    archiveError = RctiErrors.objects.filter(errorType=2).values() 
     client = Client.objects.all()
     BasePlant_ = BasePlant.objects.all()
     params = {
         'rctiErrors' : rctiErrors,
         'rctiSolve' :rctiSolve,
-        # 'archiveError':archiveError,
+        'archiveError':archiveError,
         'client':client,
         'basePlants': BasePlant_
     }
@@ -1386,7 +1387,7 @@ def rctiSave(request):
 
         lfs = FileSystemStorage(location=location)
         lfs.save(newFileName, invoiceFile)
-        if 'boral' in clientName.lower() and save_data == '1':
+        if 'boral' in clientName.lower() :
             cmd = ["python", "Account_app/utils.py", newFileName]
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
         fileDetails = [] 
@@ -2081,6 +2082,8 @@ def DriverTripEditForm(request, id):
     tripObj = DriverShiftTrip.objects.filter(shiftId=id)
     for i in tripObj:
         clientObj = Client.objects.filter(pk=i.clientId).first()
+        i.clientTruckConnectionObj = ClientTruckConnection.objects.filter(clientId=clientObj.clientId , startDate__lte =getCurrentDateTimeObj().date() , endDate__gte =getCurrentDateTimeObj().date())
+        # return HttpResponse(i.clientTruckConnectionObj)
         i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
         for docket in i.tripDockets:
             # clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
@@ -2097,7 +2100,7 @@ def DriverTripEditForm(request, id):
 
     driver = Driver.objects.all()
     clientName = Client.objects.all()
-    clientTruck = ClientTruckConnection.objects.all()
+    # clientTruck = ClientTruckConnection.objects.all()
     surcharges = Surcharge.objects.all()
         
     base_plant = BasePlant.objects.all()
@@ -2105,7 +2108,7 @@ def DriverTripEditForm(request, id):
     params = {
         'driverTrip': tripObj,
         'shiftObj':shiftObj,
-        'clientTruck':clientTruck,
+        # 'clientTruck':clientTruck,
         'basePlants': base_plant,
         'Driver': driver,
         'Client': clientName,
@@ -2136,9 +2139,8 @@ def driverDocketUpdate(request):
 def driverEntryUpdate(request, shiftId):
     # Update Trip Save
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
-    
-    for trip in tripObj:
+    tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+    for trip in tripObjs:
         trip.truckConnectionId = request.POST.get(f'truckNo{trip.id}')
         if request.FILES.get(f'loadSheet{trip.id}'):
             loadSheet = request.FILES.get(f'loadSheet{trip.id}')
@@ -2146,9 +2148,11 @@ def driverEntryUpdate(request, shiftId):
 
         trip.comment = request.POST.get(f'comment{trip.id}')
         trip.save()
+        
         # print(trip.id,trip.truckConnectionId)
         # return HttpResponse(trip)
         docketObj = DriverShiftDocket.objects.filter(shiftId=shiftId,tripId = trip.id)
+        
         for docket in docketObj:
             if request.FILES.get(f'docketFile{docket.id}'):
                 docketFiles = request.FILES.get(f'docketFile{docket.id}')
@@ -2189,6 +2193,7 @@ def driverEntryUpdate(request, shiftId):
             
             docket.others = request.POST.get(f'others{docket.id}')
             docket.comment = request.POST.get(f'comment{docket.id}')
+            docket.truckConnectionId = trip.truckConnectionId
             
             docket.save()
 
@@ -2206,8 +2211,8 @@ def driverEntryUpdate(request, shiftId):
                     
                 reconciliationDocketObj.driverId = shiftObj.driverId  
                 reconciliationDocketObj.clientId = docket.clientId
-                reconciliationDocketObj.truckId = trip.truckConnectionId
-                
+                reconciliationDocketObj.truckConnectionId = trip.truckConnectionId
+                # return HttpResponse(reconciliationDocketObj.truckId)
                 # for ReconciliationReport 
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = trip.clientId).first()
                 rateCard = clientTruckConnectionObj.rate_card_name
@@ -2215,14 +2220,13 @@ def driverEntryUpdate(request, shiftId):
                 graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
                 
                 driverLoadAndKmCost = checkLoadAndKmCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                
                 driverSurchargeCost = checkSurcharge(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                driverWaitingTimeCost = 0
                 if docket.waitingTimeStart and docket.waitingTimeEnd:
                     if graceObj.waiting_load_calculated_on_load_size:
                         driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                     else:  
-                        driverWaitingTimeCost = checkWaitingTime(docketObj=docketObj, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
-                            
+                        driverWaitingTimeCost = checkWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 slotSize = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                 driverTransferKmCost = checkTransferCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
@@ -2249,6 +2253,9 @@ def driverEntryUpdate(request, shiftId):
                 shiftObj.verified = True
                 shiftObj.verifiedBy = request.user
                 shiftObj.save()
+    
+    # return HttpResponse(tripObjsSet)
+    checkShiftRevenueDifference(tripObjs)
     
     messages.success(request, "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
@@ -2294,8 +2301,8 @@ def getDriverBreak(request):
 def checkTripDeficit(request):
     shiftId = request.POST.get('shiftId')
     tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftId)
+    print(tripObjs)
     checkShiftRevenueDifference(tripObjs)
-    dict_ = {}
     getDeficit = []
     getTrueOrFalse = []
     count_ = 1
@@ -2306,9 +2313,11 @@ def checkTripDeficit(request):
                 'deficit_value': trip.revenueDeficit,
             }
             getDeficit.append(dict_)
-            getDeficit.append('True')
+            getTrueOrFalse.append('True')
             count_+=1
-    return JsonResponse({'status':True if 'True' in getDeficit else False,}) 
+    print(getDeficit)
+    return JsonResponse({'status':True if 'True' in getTrueOrFalse else False, 'getDeficit':getDeficit}) 
+    return JsonResponse({'status':True }) 
     
 # ````````````````````````````````````
 # Reconciliation
@@ -3188,21 +3197,52 @@ def pastTripErrorSolve(request, id):
     else:
         return HttpResponse("Error: PastTripError not found")
 
-
-def archivePastTrip(request ,errorId):
-    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
-    pastTripErrorObj.errorType = 2
-    pastTripErrorObj.save()
-    messages.success(request,'Archive successfully..')
-    return redirect(request.META.get('HTTP_REFERER'))  
+@api_view(['POST'])
+def archivePastTrip(request ):
+    errorIds = request.POST.getlist('errorIds[]')
+    for errorId in errorIds:
+        pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+        pastTripErrorObj.errorType = 2
+        pastTripErrorObj.save()
+    return JsonResponse({'status': True})
+    # pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    # pastTripErrorObj.errorType = 2
+    # pastTripErrorObj.save()
+    # messages.success(request,'Archive successfully..')
+    # return redirect(request.META.get('HTTP_REFERER'))  
   
-def archiveReset(request ,errorId):
-    pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
-    pastTripErrorObj.errorType = 0
-    pastTripErrorObj.save()
-    messages.success(request,'Archive Reset successfully..')
-    return redirect(request.META.get('HTTP_REFERER'))    
-    
+@api_view(['POST'])
+def archiveReset(request ):
+    errorIds = request.POST.getlist('errorIds[]')
+    for errorId in errorIds:
+        pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+        pastTripErrorObj.errorType = 0
+        pastTripErrorObj.save()
+    return JsonResponse({'status': True})
+
+    # pastTripErrorObj = PastTripError.objects.filter(pk=errorId).first()
+    # pastTripErrorObj.errorType = 0
+    # pastTripErrorObj.save()
+    # messages.success(request,'Archive Reset successfully..')
+    # return redirect(request.META.get('HTTP_REFERER'))    
+
+@api_view(['POST'])
+def archiveRCTI(request):
+    errorIDs = request.POST.getlist('errorIDs[]')
+    for errorId in errorIDs:
+        RCTIErrorObj = RctiErrors.objects.filter(pk=errorId).first()
+        RCTIErrorObj.errorType = 2
+        RCTIErrorObj.save()
+    return JsonResponse({'status': True})
+
+@api_view(['POST'])
+def archiveResetRCTI(request):
+    errorIDs = request.POST.getlist('errorIDs[]')
+    for errorId in errorIDs:
+        RCTIErrorObj = RctiErrors.objects.filter(pk=errorId).first()
+        RCTIErrorObj.errorType = 0
+        RCTIErrorObj.save()
+    return JsonResponse({'status': True})
 
 
 # @api_view(['POST'])

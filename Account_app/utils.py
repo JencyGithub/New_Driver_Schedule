@@ -63,8 +63,8 @@ def setTopUp(dataList:list):
     return dataList[:2] + [''] + [' '.join(dataList[2:-6])] + [''] + dataList[-6:]
 
 args = sys.argv[-1]
-# args = '01-01-2024.csv'
-
+# print(args)
+# args = '20240302083758@_!Artarmon-Jan-2024_1.csv'
 file_path = 'static/Account/RCTI/tempRCTIInvoice/' + args
 # file_path = args
 

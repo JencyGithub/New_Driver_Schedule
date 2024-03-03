@@ -4,14 +4,18 @@
 {% block headStyle %}
 
 <!-- Datatables -->
-<link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% comment %} <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"
     rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"
     rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
-    rel="stylesheet">
+    rel="stylesheet"> {% endcomment %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link type="text/css"
+    href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" />
 
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
 <style>
@@ -277,17 +281,19 @@
                                 <div class="x_panel">
                                     <div class="x_title">
                                         <h2>Error</h2>
+                                        <button id="archiveButton" class="btn btn-sm btn-success float-right" >Archive</button>
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="card-box table-responsive">
-                                                    <table id="datatable-buttons"
-                                                        class="table table-striped table-bordered"
+                                                    <table id="activeTable"
+                                                        class="table table-striped table-bordered "
                                                         style="width:100%">
                                                         <thead>
                                                             <tr>
+                                                                <th></th>
                                                                 <th>Id</th>
                                                                 <th>Docket Date</th>
                                                                 <th>Truck No</th>
@@ -301,6 +307,7 @@
                                                         <tbody>
                                                             {% for error in pastTripErrors %}
                                                             <tr>
+                                                                <td>{{ error.id }}</td>
                                                                 <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                                                 <td>{{ error.tripDate }}</td>
                                                                 <td>{{ error.truckNo }}</td>
@@ -309,7 +316,7 @@
                                                                 <td>{{ error.errorFromPastTrip }}</td>
                                                                 <td>{{ error.fileName }}</td>
                                                                 <td>
-                                                                    <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+                                                                    {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
 
                                                                     {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
                                                                     <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
@@ -360,15 +367,17 @@
                                 <div class="x_panel">
                                     <div class="x_title">
                                         <h2>Solved</h2>
+                                        <button id="solveButton" class="btn btn-sm btn-success float-right" >Archive</button>
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="card-box table-responsive">
-                                                    <table id="solved-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                                                    <table id="solveTable" class="table table-striped table-bordered" style="width:100%">
                                                         <thead>
                                                             <tr>
+                                                                <th></th>
                                                                 <th>Id</th>
                                                                 <th>Status</th>
                                                                 <th>Docket Date</th>
@@ -382,6 +391,7 @@
                                                         <tbody>
                                                             {% for solve in pastTripSolved %}
                                                             <tr>
+                                                                <td>{{ solve.id }}</td>
                                                                 <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                                                 <td><i class="fa fa-check text-success "></td>
                                                                 <td>{{ solve.tripDate }}</td>
@@ -390,7 +400,7 @@
                                                                 <td>{{ solve.errorFromPastTrip }}</td>
                                                                 <td>{{ solve.fileName }}</td>
                                                                 <td>
-                                                                    <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}" style="font-size:0.7rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a>
+                                                                    {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}" style="font-size:0.7rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
                                                                     <a class="btn btn-success btn-sm text-light" style="font-size:0.7rem;" type="button" onclick="showSolveErrorModel({{solve.id}})" id="solveDocket{{solve.id}}"> Docket</a>
                                                                 </td>
                                                             </tr>
@@ -415,15 +425,17 @@
                                 <div class="x_panel">
                                     <div class="x_title">
                                         <h2>Archive</h2>
+                                        <button id="restoreButton" class="btn btn-sm btn-default float-right" >Restore</button>
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="card-box table-responsive">
-                                                    <table id="archive-datatable-buttons" class="table table-striped table-bordered" style="width:100%">
+                                                    <table id="archiveTable" class="table table-striped table-bordered" style="width:100%">
                                                         <thead>
                                                             <tr>
+                                                                <th></th>
                                                                 <th>Id</th>
                                                                 <th>Status</th>
                                                                 <th>Docket Date</th>
@@ -431,12 +443,12 @@
                                                                 <th>Docket Number</th>
                                                                 <th>Error Description</th>
                                                                 <th>File name</th>
-                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {% for archive in pastTripArchive %}
                                                             <tr>
+                                                                <td>{{archive.id}}</td>
                                                                 <td><button type="button" onclick="showModel(this)" id="{{archive.id}}"><i class="fa-solid fa-eye"></i></button></td>
                                                                 <td><i class="fa fa-check text-success "></td>
                                                                 <td>{{ archive.tripDate }}</td>
@@ -444,9 +456,6 @@
                                                                 <td>{{ archive.docketNumber }}</td>
                                                                 <td>{{ archive.errorFromPastTrip }}</td>
                                                                 <td>{{ archive.fileName }}</td>
-                                                                <td>
-                                                                    <a href="{% url 'Account:archiveReset' errorId=archive.id%}"type="button" class="btn btn-default btn-sm" value="{{solve.id}}">Restore</a>
-                                                                </td>
                                                             </tr>
                                                             {% endfor %}
                                                         </tbody>
@@ -641,13 +650,109 @@
 
 {% block footerStyleEnd %}
 <script src="{% static 'js/reconciliation_analysis.js' %}"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
     // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     $(document).ready(function () {
-        $('#datatable-buttons').DataTable();
+
+        var activeTable = $("#activeTable").DataTable({
+            'columnDefs': [{
+                'targets': 0,
+                'checkboxes': {
+                    'selectRow': true
+                }
+            }]
+        });
+
+        var solveTable = $("#solveTable").DataTable({
+            'columnDefs': [{
+                'targets': 0,
+                'checkboxes': {
+                    'selectRow': true
+                }
+            }]
+        });
+
+        var archiveTable = $("#archiveTable").DataTable({
+            'columnDefs': [{
+                'targets': 0,
+                'checkboxes': {
+                    'selectRow': true
+                }
+            }]
+        });
+
+        function getSelectedDockets(table){
+            var selectedRows = table.column(0).checkboxes.selected();
+            var errorIds = [];
+            $.each(selectedRows, function(key,docket){
+                errorIds.push(docket)
+            })
+            console.log(errorIds)
+            if(errorIds.length > 0){
+                return errorIds
+            }else{
+                alert("Please select at least one docket");
+                return false
+            }
+        }
+
+        function setArchive(errorIds){
+            $.ajax({
+                type: "POST",
+                url: "/account/archive/pastTrip/",
+                data: {
+                    errorIds: errorIds,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    window.location.reload();
+                    alert('Selected errors successfully archived.');
+                }
+            }); 
+        }
+
+        $('#archiveButton').on('click', function () {
+            let errorIds = getSelectedDockets(activeTable)
+            if(errorIds){ 
+                setArchive(errorIds);
+            }
+        });
+
+        $('#solveButton').on('click', function () {
+            let errorIds = getSelectedDockets(solveTable)
+            if(errorIds){ 
+                setArchive(errorIds);
+            }
+        });
+
+        $('#restoreButton').on('click', function () {
+            let errorIds = getSelectedDockets(archiveTable)
+            if(errorIds){ 
+                $.ajax({
+                    type: "POST",
+                    url: "/account/archive/reset/pastTrip/",
+                    data: {
+                        errorIds: errorIds,
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        window.location.reload();
+                        alert('Selected errors successfully Restored.');
+                    }
+                }); 
+            }
+        });
+
+       /* $('#datatable-buttons').DataTable();
         $('#solved-datatable-buttons').DataTable();
-        $('#archive-datatable-buttons').DataTable();
+        $('#archive-datatable-buttons').DataTable(); */
 
         $('#no').click(function(){
             $('#save_').prop('checked', false);
@@ -729,7 +834,7 @@
 </script>
 
 <!-- Datatables -->
-<script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+{% comment %} <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
@@ -743,6 +848,8 @@
 <script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script> {% endcomment %}
+<script type="text/javascript"
+    src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
 
 {% endblock %}
