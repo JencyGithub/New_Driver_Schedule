@@ -318,11 +318,11 @@
                                                                 <td>
                                                                     {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
 
-                                                                    {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
-                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+                                                                    {% comment %} {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
+                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a> {% endcomment %}
 
                                                                     {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
-                                                                    {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                    {% if 'Client truck connection object does not exist' in error.errorFromPastTrip %}
                                                                     <a href="{% url 'gearBox:truckTable' %}" style="font-size:0.6rem;" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
 
                                                                     {% elif   'BasePlant does not exist.' in error.errorFromPastTrip %}

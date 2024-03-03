@@ -274,7 +274,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 # reconciliationDocketObj.truckConnectionId = rctiObjData.truckNo if reconciliationDocketObj.truckId == 0  else reconciliationDocketObj.truckId
                 reconciliationDocketObj.docketDate =  rctiObjData.docketDate
                 reconciliationDocketObj.rctiLoadAndKmCost =  rctiObjData.cartageTotal
-                reconciliationDocketObj.clientName =  clientNames
+                reconciliationDocketObj.clientId =  clientNames
                 reconciliationDocketObj.rctiWaitingTimeCost = rctiObjData.waitingTimeTotal
                 reconciliationDocketObj.rctiTransferKmCost = rctiObjData.transferKMTotal
                 reconciliationDocketObj.rctiStandByCost =  rctiObjData.standByTotal
