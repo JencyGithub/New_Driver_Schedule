@@ -34,6 +34,9 @@
     height: auto;
     margin: auto;
   }
+  .bg-danger-light{
+    background-color:#ff18001a !important;
+  }
 </style>
 {% endblock %}
 {% block content %}
@@ -52,43 +55,12 @@
           <div class="x_title">
             <form action="{% url 'Account:driverShiftCsv' %}" class="d-inline" method="POST" id="filterForm">
               {% csrf_token %}
-              <!-- Button trigger modal -->
-
-              <a href="#" class="btn btn-default" data-toggle="modal" data-target="#myModal">View OCR</a>
-
-              <!-- Modal -->
-              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">OCR Details</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="form-group">
-                        <label for="ocrText">OCR Text:</label>
-                        <input type="text" class="form-control" id="ocrText">
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="button" class="btn btn-primary" onclick="saveOCR()">Save</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-              <input  hidden  name="startDate" value="{{startDate}}">
-              <input  hidden  name="endDate" value="{{endDate}}">
-              <input  hidden  name="id_" value="{{id_}}">
-              
+              <input hidden name="startDate" value="{{startDate}}">
+              <input hidden name="endDate" value="{{endDate}}">
+              <input hidden name="id_" value="{{id_}}">              
               <button type="submit" class="btn btn-app float-right mr-1 d-inline">
                 <i class="fa fa-download" style="font-size:1rem"></i>
               </button>
-
             </form>
             <div class="clearfix"></div>
           </div>
@@ -108,7 +80,7 @@
                     <tbody>
                       {% if shifts %}
                       {% for shift in shifts %}
-                      <tr>
+                      <tr class="{% if shift.deficit %}bg-danger-light{% endif %}">
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate }}</a></td>

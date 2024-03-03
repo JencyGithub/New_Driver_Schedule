@@ -27,6 +27,10 @@ from datetime import datetime
 from collections import defaultdict
 from variables import *
 from scripts.PastDataSave import *
+from rembg import remove
+import numpy as np
+from PIL import Image
+import pytesseract
 
 
 def index(request):
@@ -953,7 +957,6 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     
     if not clientObj.docketGiven:
         for load in range(1,noOfLoads+1):
-            
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
             docketObj.shiftId = shiftId
@@ -963,13 +966,11 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
             docketObj.comment = request.POST.get(f'comment{load}')
             docketFile = request.FILES.get(f'docketFile{load}')
-            
-            print(tripObj.id,request.POST.get(f'docketNumber{load}'),request.POST.get(f'comment{load}'))
             if docketFile:
-                fileName = loadSheetFile.name
-                newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
-                pfs = FileSystemStorage(location=docketPath)
-                pfs.save(newFileName, loadSheetFile)
+                docketFileName = docketFile.name
+                newFileName = 'load-sheet' + curTimeStr + '!_@' + docketFileName
+                docketPfs = FileSystemStorage(location=docketPath)
+                docketPfs.save(newFileName, docketFile)
                 docketObj.docketFile = f'{docketPath}/{newFileName}'
             docketObj.save()
     else:
@@ -1000,10 +1001,27 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         messages.success(request, "Shift completed successfully.")
         return redirect('index')
     else:
-        
         return redirect('Account:recurringTrip', 1)
     
+@api_view(['POST'])
+def ormRead(request):
+    try:
+        docketObj = DriverShiftDocket.objects.filter(pk=request.POST.get('docketId')).first()
+        input_image = Image.open(str(docketObj.docketFile))
+        # docketImg = "static/img/docketFiles/12.jpeg"
+        # input_image = Image.open(docketImg)
+        input_array = np.array(input_image)
+        # output_array = remove(input_array)
+        output_image = Image.fromarray(input_array  )
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+        docketData = str(pytesseract.image_to_string(output_image)).replace("-", "").replace("=", "")
+        print(docketData)
+        return JsonResponse({'status': True,'docketData': docketData})
+    except Exception as e:
+        return JsonResponse({'status': False, 'e' : str(e)})
+
     
+
 def driverLeaveRequestShow(request):
     reasons = NatureOfLeave.objects.all()
     params = {
@@ -2090,11 +2108,10 @@ def DriverTripEditForm(request, id):
         for docket in i.tripDockets:
             # clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
             clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId).first()
-            print(clientTruckConnectionObj)
             rateCard = clientTruckConnectionObj.rate_card_name
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
-
+            docket.reconciliationObj = ReconciliationReport.objects.filter(docketNumber=docket.docketNumber, clientId=docket.clientId, truckConnectionId=docket.truckConnectionId, docketDate=docket.shiftDate).first()
             if docket.waitingTimeStart and docket.waitingTimeEnd:
                 docket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
             if docket.standByStartTime and docket.standByEndTime:
@@ -3383,20 +3400,24 @@ def  ShiftDetails(request,id):
     # return HttpResponse(id)
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-
     id_ = id
-    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False )
+    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False)
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first()
         if shift.driverName:
             shift.driverName = shift.driverName.name
+        shift.deficit = False
+        tripObjs = DriverShiftTrip.objects.filter(shiftId=shift.id)
+        for tripObj in tripObjs:
+            if tripObj.revenueDeficit > 0:
+                shift.deficit = True
+        
     params = {
         'shifts': shifts,
         'startDate': startDate,
         'endDate': endDate,
         'id_': id_,
-        
-        }
+    }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
     
 @csrf_protect

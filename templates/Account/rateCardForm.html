@@ -76,7 +76,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2" style="padding-top: 1.7rem;">
-                                <input type="submit" value="Get" class="btn btn-default px-5">
+                                <input type="submit" value="Get" class="btn btn-sm btn-default px-5">
                             </div>
                         </div>
                     </form>
@@ -92,9 +92,9 @@
                             <h2> Add Rate Card Form :- </h2>
                             {% if rateCard %}
                                 {% if request.session.user_type != 'Driver' and request.session.user_type != 'Accounts' and request.session.user_type != 'HR'  %}
-                                    <label id="editRateCard" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
+                                    <label id="editRateCard" class="btn btn-sm btn-default float-right" onclick="rateRevision({{rateCard.id}},0)">Edit rate card </label>
                                 {% endif %}
-                                <label id="rateRevision" class="btn btn-default float-right" onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
+                                <label id="rateRevision" class="btn btn-sm btn-default float-right" onclick="rateRevision({{rateCard.id}})">Rate revision <input type="hidden" name="rateRevisionVal" id="rateRevisionVal" value="open"> </label>
                             {% endif %}
                             <div class="clearfix"></div>
                         </div>

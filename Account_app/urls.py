@@ -167,6 +167,8 @@ urlpatterns = [
     path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
     path('check/trip/deficit', views.checkTripDeficit, name='checkTripDeficit'), 
     
+    path('orm/read/', views.ormRead, name='ormRead'), 
+    
     # Filters
     path('verifiedFilter/', views.verifiedFilter, name='verifiedFilter'),  
     path('clientFilter/', views.clientFilter, name='clientFilter'),  

@@ -20,6 +20,10 @@
         border-radius: 7px !important;
     }
 
+    b.ormBtn{
+        cursor: pointer;
+    }
+
     @media (max-width: 576px) {
         .cuatom-continer {
             margin: 0;
@@ -48,8 +52,7 @@
         <div class="clearfix"></div>
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" novalidate
-                    enctype="multipart/form-data">
+                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" novalidate enctype="multipart/form-data">
                     {% csrf_token %}                    
                     <div class="x_title">
                         <h2>Shift Details</h2> 
@@ -67,8 +70,10 @@
                         <div class="x_panel">
                             <div class="x_title ">
                                 <h2 class="text-primary">  Trip  {{forloop.counter}}</h2>
+                                {% if trip.revenueDeficit > 0 %}
+                                <i class="text-danger float-right" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
+                                {% endif %}
                                 {% if shiftObj.verified is False %}
-                                
                                 <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}"
                                 class="float-right btn btn-dark btn-sm">Add Docket</a>
                                 {% endif %}
@@ -184,7 +189,8 @@
                         {% for docket in trip.tripDockets %}
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2 class ="text-primary"> Load #{{forloop.counter}} </h2>
+                                <!-- {% if docket.reconciliationObj %}<a href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" class="mr-2" style="font-size: 1.2rem;" target="_blank" data-toggle="tooltip" data-placement="top" title="View Reconciliation"><i class="fa-solid fa-paste"></i></a>{% endif %}<h5 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h5> -->
+                                <a {% if docket.reconciliationObj %} href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" target="_blank" {% endif %}><h2 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h2></a>
                                 <div class="float-right">
                                     <input type="radio" id="tippingToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="tippingToYard{{docket.id}}"
                                     style="margin-top: .8rem;"  onclick="returnToYard({{docket.id}},this)" {% if item.tippingToYard %} checked {% endif %}>
@@ -248,14 +254,14 @@
                                         <label for="docketFile{{docket.id}}">Docket File :<span class="required">*</span></label>
                                         {% if docket.docketFile %}
                                         <a href="/{{docket.docketFile}}" class="text-primary" target="_blank">Docket File</a>
-                                        
                                         {% endif %}
+
+                                        <b class="float-right text-default ormBtn" id="orm{{docket.id}}">ORM</b>
                                         <div class="field item form-group">
                                             <input class="form-control" value="{{docket.docketFile}}" type="file"
                                                 name="docketFile{{docket.id}}" style="padding: 0.25rem 0.2rem;"
                                                 id="docketFile{{docket.id}}">
                                         </div>
-
                                     </div>
                                     <!-- basePlant noOfKm  transferKM  -->
                                     <div class="col-md-4 col-sm-4 ">
@@ -356,28 +362,36 @@
                                             <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% endif %} name="standByEndTime{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
                                         </div>
                                     </div>
-                                    
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+
+                                    <div class="col-md-8 col-sm-8">
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-sm-6">
+                                                <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <input class="form-control" value="{{docket.others}}" type="number" name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12">
+                                                <label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>
+                                                <div class="field item form-group">
+                                                    <textarea placeholder="comment" name="comment{{docket.id}}" class="form-control">{{docket.comment}}</textarea>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
+                                        <label for="ormTextArea{{docket.id}}">ORM content :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.others}}" type="number" name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <textarea placeholder="comment" name="comment{{docket.id}}" class="form-control">{{docket.comment}}</textarea>
+                                            <textarea name="ormTextArea{{docket.id}}" id="ormTextArea{{docket.id}}" rows="5" class="form-control" disabled></textarea>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         {% endfor %}
@@ -418,7 +432,9 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
+
+
 <!-- /page content -->
 {% endblock %}
 

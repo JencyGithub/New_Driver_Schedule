@@ -6,6 +6,32 @@ $(document).ready(function () {
     $("#verified").css("display", "none");
   }
 });
+
+$('.ormBtn').on('click', function(){
+  let element = $(this)
+  let elementId = $(this).attr('id').replace('orm', '')
+
+  element.html('Loading...');
+  $.ajax({
+    type: "POST",
+    url: "/account/orm/read/",
+    data: {
+      docketId: elementId
+    },
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    },
+    success: function (data) {
+      element.html('ORM');
+      if (data.status) {
+        $(`#ormTextArea${elementId}`).val(`${data.docketData}`)
+      }else{
+        alert(data.e)
+      }
+    },
+  });
+})
+
 function hideshow() {
   var password = document.getElementById("password1");
   var slash = document.getElementById("slash");
