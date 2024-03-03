@@ -93,16 +93,18 @@ function checkDeficitFun(shiftObj) {
       },
       success: function (data) {
         if (data.status) {
-          alert('Get Deficit')
-        }else{
-          alert('Not Deficit')
+          if (data.getDeficit.length > 0) {
+            let deficitMessage = "Total Deficit with Trip:\n";
+            data.getDeficit.forEach(function(deficit) {
+              deficitMessage += `${deficit.get_deficit}: ${deficit.deficit_value}\n`;
+            });
+            alert(deficitMessage);
+          }
         }
       },
     });
   }
-  else{
-    alert('false') 
-  }
+
 }
 $("#driverBreaks .close").on("click", function(){
     console.log('close')

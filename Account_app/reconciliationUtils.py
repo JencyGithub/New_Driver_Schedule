@@ -158,6 +158,7 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
             return 0
         
     except Exception as e :
+        print('Error',e)
         return -404.0
     
 def checkLoadCalculatedWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):

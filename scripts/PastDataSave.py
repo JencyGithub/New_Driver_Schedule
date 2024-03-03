@@ -24,10 +24,10 @@ def getSelectedCostComponent(obj):
 def calculateIncludedTripRevenue(tripObj,checkedList:list):
     total=0
     docketQuerySet = DriverShiftDocket.objects.filter(tripId=tripObj.id)
-    
     for docket in docketQuerySet:
         # print(docket.docketNumber , docket.shiftDate , docket.clientId , docket.truckConnectionId)
-        reconciliationObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber , docketDate = docket.shiftDate, clientId = docket.clientId, truckConnectionId = docket.truckConnectionId).first()
+        reconciliationObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber , docketDate = docket.shiftDate, clientId = docket.clientId).first()
+        # print('reconciliationObj',reconciliationObj)
         # print(reconciliationObj)
         # exit()
         total += (float(reconciliationObj.driverLoadAndKmCost) + float(reconciliationObj.driverLoadDeficit))if 'loading_cost_per_cubic_meter_included' in checkedList else 0
@@ -53,7 +53,7 @@ def checkShiftRevenueDifference(tripObjs):
                 res = getSelectedCostComponent(thresholdDayShiftObj)
                 totalRevenue = calculateIncludedTripRevenue(trip,res)
                 if totalRevenue <  thresholdDayShiftAmount:
-                    trip.revenueDeficit = thresholdDayShiftAmount - totalRevenue
+                    trip.revenueDeficit = round((thresholdDayShiftAmount - totalRevenue),2)
                     trip.save()
                     
             # exit()
@@ -65,7 +65,7 @@ def checkShiftRevenueDifference(tripObjs):
                 res = getSelectedCostComponent(thresholdNightShiftObj)
                 totalRevenue = calculateIncludedTripRevenue(trip,res)
                 if totalRevenue <  thresholdNightShiftAmount:
-                    trip.revenueDeficit = thresholdNightShiftAmount - totalRevenue
+                    trip.revenueDeficit = round((thresholdNightShiftAmount - totalRevenue),2)
                     trip.save()
                     
 def run():
@@ -236,8 +236,8 @@ def run():
                         # print('tripId',tripObj.id)
 
                         # Docket save
-                        # existingDockets = DriverShiftDocket.objects.filter(tripId = tripObj.id,shiftId = shiftObj.id).count()
-                        # tripObj.numberOfLoads = existingDockets + 1
+                        existingDockets = DriverShiftDocket.objects.filter(tripId = tripObj.id,shiftId = shiftObj.id).count()
+                        tripObj.numberOfLoads = existingDockets + 1
                         
                         shiftDate = datetime.strptime(res_, '%Y-%m-%d')
 
