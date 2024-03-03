@@ -408,7 +408,7 @@ admin.site.register(PastTripError,PastTripError_)
 
 
 class ReconciliationReportAdmin(admin.ModelAdmin):
-    list_display = ["docketNumber","reconciliationType","docketDate" , "truckConnectionId"]
+    list_display = ["docketNumber","driverTotalCost","reconciliationType","docketDate" , "truckConnectionId"]
     search_fields = ["docketNumber","truckConnectionId"]
 
 admin.site.register(ReconciliationReport , ReconciliationReportAdmin)
@@ -531,13 +531,13 @@ class DriverShift_(admin.ModelAdmin):
 admin.site.register(DriverShift,DriverShift_)
 
 class DriverShiftTrip_(admin.ModelAdmin):
-    list_display = ['verified','shiftId','truckConnectionId','revenueDeficit']
+    list_display = ['verified','shiftId','truckConnectionId','revenueDeficit','numberOfLoads']
     search_fields = ["truckConnectionId","shiftId"]
 admin.site.register(DriverShiftTrip,DriverShiftTrip_)
 
 class DriverShiftDocket_(admin.ModelAdmin):
     list_display = ['tripId','shiftId','clientId','docketNumber']
-    search_fields = ["docketNumber" , "shiftId"]
+    search_fields = ["docketNumber" , "tripId"]
 
 
 admin.site.register(DriverShiftDocket,DriverShiftDocket_)

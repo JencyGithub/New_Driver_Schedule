@@ -7,7 +7,6 @@ from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
 from variables import *
-
 def getSelectedCostComponent(obj):
     checked = []
     
@@ -51,7 +50,6 @@ def checkShiftRevenueDifference(tripObjList):
             thresholdDayShiftObj = ThresholdDayShift.objects.filter(rate_card_name = rateCardObj ,start_date__lte = trip.startDateTime.date() , end_date__gte = trip.startDateTime.date()).first()
             thresholdDayShiftAmount = thresholdDayShiftObj.threshold_amount_per_day_shift
             if thresholdDayShiftAmount > 0:
-                
                 res = getSelectedCostComponent(thresholdDayShiftObj)
                 totalRevenue = calculateIncludedTripRevenue(trip,res)
                 if totalRevenue <  thresholdDayShiftAmount:
@@ -454,112 +452,3 @@ def saveDate(driverObj,clientObj,data,shiftDate,startTimeDateTime,endTimeDateTim
         )
         pastTripErrorObj.save()
 
-
-def run():
-    warnings.filterwarnings('ignore')
-    f = open(r"pastTrip_entry.txt", 'r')
-    data = f.read().split(',')
-    file_name = data[0]
-    clientName_ = data[1]
-    # res_ = None
-    
-    monthFileName = open(r"pastTrip_entry_month.txt",'r')
-    monthAndYear = monthFileName.read()
-
-    fileName = f'static/Account/PastTripsEntry/{file_name}'
-    # fileName = f'static/Account/PastTripsEntry/20240121134630@_!01JanData1-152023.xlsx-Pasttrip.csv'
-
-    txtFile = open(r'static/subprocessFiles/errorFromPastTrip.txt','w')
-    txtFile.write(f'File:{file_name}\n\n')
-    txtFile.close()
-    tripIdList = set()
-    with open(fileName, 'r') as pastData:
-        count_ = 0
-        
-        for line in pastData:
-            try:
-            
-                res_ = ''
-                count_ += 1
-                if '"' in line:
-                    line = str(line).replace('"','')
-                if "'" in line:
-                    line =  str(line).replace("'","")
-                if count_ == 1:
-                    continue
-                data = line.split(',')
-                
-                
-                if len(data) != 30:
-                    pastTripErrorObj = PastTripError(
-                                    clientName = clientName_,
-                                    tripDate = res_,
-                                    docketNumber = data[5],
-                                    truckNo = data[1],
-                                    lineNumber = count_,
-                                    errorFromPastTrip = "File Data in wrong format.",
-                                    fileName = fileName.split('@_!')[-1],
-                                    exceptionText = "File Data in wrong format.",
-                                    data = data
-                                )                    
-                    pastTripErrorObj.save()
-                    continue
-                
-                if ' ' in str(data[0]):
-                    res_ = str(data[0]).split()[0]
-                elif '/' in str(data[0]):
-                    str_ = str(data[0]).split('/')
-                    res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
-                else:
-                    res_ = str(data[0])
-
-                shiftDate = datetime.strptime(res_, '%Y-%m-%d')
-                startTime = datetime.strptime(str(data[6]), '%H:%M:%S').time()
-                startTimeDateTime = datetime.combine(shiftDate.date(), startTime)
-                
-                endTime = datetime.strptime(str(data[7]), '%H:%M:%S').time()
-                endTimeDateTime = datetime.combine(shiftDate.date(),endTime)
-                if res_.split('-')[1] != monthAndYear.split('-')[-1] or res_.split('-')[0] != monthAndYear.split('-')[0]:
-                    pastTripErrorObj = PastTripError(
-                                clientName = clientName_,
-                                tripDate = res_,
-                                docketNumber = data[5],
-                                truckNo = data[1],
-                                lineNumber = count_,
-                                errorFromPastTrip = "Incorrect month/year values present in file.",
-                                fileName = fileName.split('@_!')[-1],
-                                exceptionText = "Incorrect month/year values present in file.",
-                                
-                                data = data
-                            ) 
-                            # print('grace card not found')                   
-                    pastTripErrorObj.save()
-                    continue
-                    
-                
-                clientObj = Client.objects.filter(name = clientName_).first()
-                driverObj = Driver.objects.filter(driverId=int(data[4].strip())).first()
-                tripObjGet = saveDate(driverObj = driverObj ,clientObj = clientObj ,data = data ,shiftDate = shiftDate ,startTimeDateTime =startTimeDateTime , endTimeDateTime = endTimeDateTime  , clientName_= clientName_, fileName =fileName ,res_ =res_,count_ =count_)
-                # if tripObjGet not in tripObjList:
-                if tripObjGet:
-                    tripIdList.add(tripObjGet.id)
-                
-            except Exception as e:
-                pastTripErrorObj = PastTripError(
-                        clientName = clientName_,
-                        tripDate = res_,
-                        docketNumber = data[5],
-                        truckNo = data[1],
-                        lineNumber = count_,
-                        errorFromPastTrip = e,
-                        fileName = fileName.split('@_!')[-1],
-                        exceptionText = e,
-                        data = data
-                    )
-                pastTripErrorObj.save()
-    # print(tripObjList)
-    try:
-        tripObjList = DriverShiftTrip.objects.filter(pk__in = tripIdList)
-        checkShiftRevenueDifference(tripObjList=tripObjList)
-    except Exception as e:
-        print('PastTrip Error Difference Check',e)
