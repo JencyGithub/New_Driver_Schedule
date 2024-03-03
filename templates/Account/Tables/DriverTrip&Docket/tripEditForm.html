@@ -20,7 +20,7 @@
         border-radius: 7px !important;
     }
 
-    b.ormBtn{
+    b.ocrBtn{
         cursor: pointer;
     }
 
@@ -256,7 +256,7 @@
                                         <a href="/{{docket.docketFile}}" class="text-primary" target="_blank">Docket File</a>
                                         {% endif %}
 
-                                        <b class="float-right text-default ormBtn" id="orm{{docket.id}}">ORM</b>
+                                        <b class="float-right text-default ocrBtn" id="ocr{{docket.id}}">OCR</b>
                                         <div class="field item form-group">
                                             <input class="form-control" value="{{docket.docketFile}}" type="file"
                                                 name="docketFile{{docket.id}}" style="padding: 0.25rem 0.2rem;"
@@ -386,9 +386,9 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="ormTextArea{{docket.id}}">ORM content :<span class="required">*</span></label>
+                                        <label for="ocrTextArea{{docket.id}}">OCR content :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <textarea name="ormTextArea{{docket.id}}" id="ormTextArea{{docket.id}}" rows="5" class="form-control" disabled></textarea>
+                                            <textarea name="ocrTextArea{{docket.id}}" id="ocrTextArea{{docket.id}}" rows="5" class="form-control" disabled></textarea>
                                         </div>
                                     </div>
                                 </div>

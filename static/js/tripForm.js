@@ -7,14 +7,14 @@ $(document).ready(function () {
   }
 });
 
-$('.ormBtn').on('click', function(){
+$('.ocrBtn').on('click', function(){
   let element = $(this)
-  let elementId = $(this).attr('id').replace('orm', '')
+  let elementId = $(this).attr('id').replace('ocr', '')
 
   element.html('Loading...');
   $.ajax({
     type: "POST",
-    url: "/account/orm/read/",
+    url: "/account/ocr/read/",
     data: {
       docketId: elementId
     },
@@ -24,7 +24,7 @@ $('.ormBtn').on('click', function(){
     success: function (data) {
       element.html('ORM');
       if (data.status) {
-        $(`#ormTextArea${elementId}`).val(`${data.docketData}`)
+        $(`#ocrTextArea${elementId}`).val(`${data.docketData}`)
       }else{
         alert(data.e)
       }
