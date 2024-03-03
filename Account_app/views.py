@@ -27,7 +27,6 @@ from datetime import datetime
 from collections import defaultdict
 from variables import *
 from scripts.PastDataSave import *
-from rembg import remove
 import numpy as np
 from PIL import Image
 import pytesseract
@@ -1004,9 +1003,12 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         return redirect('Account:recurringTrip', 1)
     
 @api_view(['POST'])
-def ormRead(request):
+def ocrRead(request):
     try:
         docketObj = DriverShiftDocket.objects.filter(pk=request.POST.get('docketId')).first()
+        if not docketObj.docketFile:
+            return JsonResponse({'status': False,'e' : str("Docket image not exist.")})
+            
         input_image = Image.open(str(docketObj.docketFile))
         # docketImg = "static/img/docketFiles/12.jpeg"
         # input_image = Image.open(docketImg)
