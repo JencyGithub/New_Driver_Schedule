@@ -1,6 +1,0 @@
-['683', 'Manpreet singh(Pendlehill)', '451786971', 'mkajla5@gmail.com', 'Manpreet singh(Pendlehill)123', 'Manpreet', '', 'singh(Pendlehill)']20240209134417@_!Driver Details.csv
-['253', 'Mohit Singh Rana', '61477377783', 'g.singh.mohit@gmail.com', 'Mohit Singh Rana123', 'Mohit Singh', '', 'Rana']20240209134417@_!Driver Details.csv
-['442', 'Tushar', '', '61409598937', 'tushar40440@gmail.com']20240215090121@_!ROBOTRACK   Exsisting drivers (2).csv
-['450', 'Ashish', '', '61499577370', 'Ashishsahal091@gmail.com']20240215090121@_!ROBOTRACK   Exsisting drivers (2).csv
-['688', 'Arun', 'Sharma', '61415479905', 'arun8095@yahoo.com']20240215090121@_!ROBOTRACK   Exsisting drivers (2).csv
-['1000', 'test', 'testl', '61123456789', 'test@test.com']20240215090121@_!ROBOTRACK   Exsisting drivers (2).csv
