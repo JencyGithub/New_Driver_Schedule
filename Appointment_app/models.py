@@ -115,6 +115,8 @@ class PreStartQuestion(models.Model):
     }
     questionText = models.CharField(max_length=1024, default='', null=True)
     questionType = models.CharField(max_length=20, choices=QUESTION_TYPE)
+    questionNo = models.FloatField(default=0)
+
     preStartId = models.ForeignKey(PreStart, on_delete=models.CASCADE, default=None)
     
     # Four options for this question

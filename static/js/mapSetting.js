@@ -9,13 +9,12 @@ function initMap() {
 
   // Call the geolocation function immediately after initializing the map
 }
-$('#getLocation').on('click', function(){
-  getLocation();
-})
+// $('#getLocation').on('click', function(){
+// })
 
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.watchPosition(
       (position) => {
         console.log(position.coords);
         const pos = {
@@ -34,9 +33,9 @@ function getLocation() {
         // infoWindow.open(map);
         // map.setCenter(pos);
       },
-      // () => {
-      //   handleLocationError(true, infoWindow, map.getCenter());
-      // }
+      () => {
+        handleLocationError(true, infoWindow, map.getCenter());
+      }
     );
   } 
   // else {
@@ -51,7 +50,12 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
       ? "Error: The Geolocation service failed."
       : "Error: Your browser doesn't support geolocation."
   );
+ 
   infoWindow.open(map);
 }
+$(document).ready(function(){
+  getLocation();
+})
+
 
 // window.initMap = initMap;
