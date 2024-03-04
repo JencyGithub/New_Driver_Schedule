@@ -55,7 +55,8 @@
                                                 <th>First name</th>
                                                 <th>Last name</th>
                                                 <th>Contact</th>
-                                                <th>Email</th>
+                                                <th>Username</th>
+                                                <th>Password</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -65,7 +66,8 @@
                                                 <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.firstName }}</a></td>
                                                 <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.lastName }}</a></td>
                                                 <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.phone }}</a></td>
-                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.email }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.name }}</a></td>
+                                                <td><a href="{% url 'gearBox:driverFormEdit' id=driver.driverId %}">{{ driver.password }}</a></td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>

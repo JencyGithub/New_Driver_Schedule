@@ -326,7 +326,7 @@
                                         <label for="contact" class="col-form-label col-md-3 col-sm-3 label-align">Phone :</label>
                                         <div class="field item form-group col-md-6 col-sm-6 d-flex">
                                             <input class="form-control" name="contact" id="contact" type="number"
-                                            value="{% if data %}{{data.contact}}{% endif %}" />
+                                            value="{% if data %}{{data.phone}}{% endif %}" />
                                         </div>
                                     </div>
                                 </div>
@@ -337,7 +337,7 @@
                                         <label for="password" class="col-form-label col-md-3 col-sm-3 label-align">Password :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="password" required="required" id="password"
-                                                type="password" {% if data %}disabled{% endif %}    
+                                                type="text"     
                                                 value="{% if data %}{{data.password}}{% else %}{% endif %}" autocomplete="off"/>
                                         </div>
                                     </div>

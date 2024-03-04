@@ -120,7 +120,7 @@ def saveDate(driverObj,clientObj,data,shiftDate,startTimeDateTime,endTimeDateTim
             shiftObj = DriverShift()
             shiftObj.shiftDate =  shiftDate
             shiftObj.driverId =  driverObj.driverId
-            shiftObj.shiftType = 'Day' if data[25].strip().lower() == 'day' else  'Night'
+            shiftObj.shiftType = 'Day' if 'day' in data[25].strip().lower()  else  'Night'
             shiftObj.verified = True
             shiftObj.save()
         shiftId = shiftObj.id

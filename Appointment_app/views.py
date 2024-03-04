@@ -364,6 +364,8 @@ def preStartSave(request, id=None):
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
     msg = "Pre-start updated successfully."
    
+    if id:
+        questionIds = PreStartQuestion.objects.filter(preStartId=preStartObj).values('id')
     preStartObj.preStartName = preStartName
     preStartObj.createdDate = currentDateTime
     preStartObj.createdBy = request.user
@@ -372,7 +374,7 @@ def preStartSave(request, id=None):
         count = question
         questionObj = PreStartQuestion() 
         if id:
-            questionObj = PreStartQuestion.objects.filter(preStartId=preStartObj).first()
+            questionObj = PreStartQuestion.objects.filter(pk=questionIds[question]['id']).first()
             questionObj.wantFile1 = questionObj.wantFile2 = questionObj.wantFile3 =questionObj.wantFile4 = False
             questionObj.save()
             count = questionObj.id

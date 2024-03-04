@@ -178,7 +178,7 @@ def driverFormSave(request, id= None):
     firstName = request.POST.get('firstName').strip().replace(' ','').lower()
     middleName = request.POST.get('middleName').strip().replace(' ','').lower()
     lastName = request.POST.get('lastName').strip().replace(' ','').lower()
-
+    password = request.POST.get('password')
     # Update 
     if id :
         driverObj = Driver.objects.get(pk=id)
@@ -207,6 +207,8 @@ def driverFormSave(request, id= None):
         if driverObj.phone != request.POST.get('phone'):
             driverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone'))  
             
+        driverObj.password = password
+        user.set_password(password)
         user.save()
         driverObj.save()
         messages.success(request,'Updating successfully')

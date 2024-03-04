@@ -122,7 +122,7 @@ def saveDate(driverObj,clientObj,data,shiftDate,startTimeDateTime,endTimeDateTim
             shiftObj = DriverShift()
             shiftObj.shiftDate =  shiftDate
             shiftObj.driverId =  driverObj.driverId
-            shiftObj.shiftType = 'Day' if data[25].strip().lower() == 'day' else  'Night'
+            shiftObj.shiftType = 'Day' if 'day' in data[25].strip().lower()  else  'Night'
             shiftObj.verified = True
             shiftObj.save()
         shiftId = shiftObj.id
@@ -490,7 +490,7 @@ def run():
                 data = line.split(',')
                 
                 
-                if len(data) != 30:
+                if len(data) < 30:
                     pastTripErrorObj = PastTripError(
                                     clientName = clientName_,
                                     tripDate = res_,
@@ -509,7 +509,14 @@ def run():
                     res_ = str(data[0]).split()[0]
                 elif '/' in str(data[0]):
                     str_ = str(data[0]).split('/')
-                    res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
+                    year_ = '20'+str_[-1] if len(str_[-1]) == 2 else str_[-1]
+                    month_ = '0'+str_[-2] if len(str_[-2]) == 1 else str_[-2]
+                    res_ = year_+'-'+month_+'-'+str_[0]
+                elif '-' in str(data[0]):
+                    str_ = str(data[0]).split('-')
+                    year_ = '20'+str_[-1] if len(str_[-1]) == 2 else str_[-1]
+                    month_ = '0'+str_[-2] if len(str_[-2]) == 1 else str_[-2]
+                    res_ = year_+'-'+month_+'-'+str_[0]
                 else:
                     res_ = str(data[0])
 

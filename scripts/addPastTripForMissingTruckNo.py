@@ -25,13 +25,20 @@ for i in boralMatchingData:
         for j in range(len(data)):
             data[j] = data[j].strip()
             
-        if ' ' in str(data[0].strip()):
-            res_ = str(data[0].strip()).split()[0]
-        elif '/' in str(data[0].strip()):
-            str_ = str(data[0].strip()).split('/')
-            res_ = str_[-1]+'-'+str_[-2]+'-'+str_[0]
+        if ' ' in str(data[0]):
+            res_ = str(data[0]).split()[0]
+        elif '/' in str(data[0]):
+            str_ = str(data[0]).split('/')
+            year_ = '20'+str_[-1] if len(str_[-1]) == 2 else str_[-1]
+            month_ = '0'+str_[-2] if len(str_[-2]) == 1 else str_[-2]
+            res_ = year_+'-'+month_+'-'+str_[0]
+        elif '-' in str(data[0]):
+            str_ = str(data[0]).split('-')
+            year_ = '20'+str_[-1] if len(str_[-1]) == 2 else str_[-1]
+            month_ = '0'+str_[-2] if len(str_[-2]) == 1 else str_[-2]
+            res_ = year_+'-'+month_+'-'+str_[0]
         else:
-            res_ = str(data[0].strip())
+            res_ = str(data[0])
 
 
         shiftDate = datetime.strptime(res_, '%Y-%m-%d')
