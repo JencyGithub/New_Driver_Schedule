@@ -12,7 +12,7 @@ $(document).ready(function () {
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="form-group">
-                                    <label for="q${i}txt" class="label-align">Question ${i}:<span class="required">*</span></label>
+                                    <label for="q${i}txt" class="label-align">Question ${i+1}:<span class="required">*</span></label>
                                     <input class="form-control" name="q${i}txt" required="required" id="q${i}txt" type="text" />
                                 </div>
                             </div>
@@ -88,3 +88,8 @@ $(document).ready(function () {
     }
   });
 });
+
+function questionNoFun(questionNo,queId){
+    $('#questionNo').val(questionNo);
+    $('#preQueId').val(queId);
+}

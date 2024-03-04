@@ -343,10 +343,13 @@ def preStartTableView(request):
 def preStartForm(request, id=None, edit=None):
     if id:
         data = PreStart.objects.filter(pk=id).first()
-        questions = PreStartQuestion.objects.filter(preStartId=data.id)
+        # questions = PreStartQuestion.objects.filter(preStartId=data.id)
+        questions = PreStartQuestion.objects.filter(preStartId=data.id).order_by('questionNo')
+        
         params = {
             'data' : data,
             'questions' : questions,
+            'maximum' : questions.count(),
             'queLen' : len(questions),
             'edit' : edit if edit == 1 else None
         }
@@ -360,7 +363,6 @@ def preStartSave(request, id=None):
     currentDateTime = datetime.now(tz=currentTimezone)
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
-
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
     msg = "Pre-start updated successfully."
    
@@ -384,6 +386,7 @@ def preStartSave(request, id=None):
             
         questionObj.questionText = request.POST.get(f'q{count}txt')
         questionObj.questionType = request.POST.get(f'q{count}type')
+        questionObj.questionNo = question + 1
         print(count,request.POST.get(f'q{count}type'))
         
         queTxt1 = request.POST.get(f'q{count}o1')
@@ -415,6 +418,41 @@ def preStartSave(request, id=None):
     messages.success(request, msg)
     return redirect('Appointment:preStartTableView')
     
+@csrf_protect
+def swapQueNoSave(request):
+    preStartId = request.POST.get('preStartId')
+    queId = request.POST.get('preQueId')
+    toQuePos = int(request.POST.get('questionNo')) 
+    preStartObj = PreStart.objects.filter(pk=preStartId).first()
+    editPreStartQueObj = PreStartQuestion.objects.filter(pk=queId).first()
+    fromQuePos = int(editPreStartQueObj.questionNo)
+        
+    if fromQuePos < toQuePos:
+
+        objs = PreStartQuestion.objects.filter(preStartId=preStartObj,questionNo__range=(fromQuePos,toQuePos)).order_by('questionNo')
+        
+        for obj in objs:
+            if fromQuePos ==  obj.questionNo:
+                obj.questionNo = toQuePos
+                obj.save()
+            else:
+                obj.questionNo -= 1
+                obj.save()
+    else:
+        print(fromQuePos,toQuePos)
+        objs = PreStartQuestion.objects.filter(preStartId=preStartObj,questionNo__range=(toQuePos,fromQuePos)).order_by('-questionNo')
+        
+        for obj in objs:
+            print(obj.questionText , obj.questionNo)
+            
+            if fromQuePos ==  obj.questionNo:
+                obj.questionNo = toQuePos
+                obj.save()
+            else:
+                obj.questionNo += 1
+                obj.save()
+    messages.success(request,'Question No updated successfully.')
+    return redirect(request.META.get('HTTP_REFERER'))
 
 def questionAddView(request, id):
     preStartObj = PreStart.objects.filter(pk=id).first()

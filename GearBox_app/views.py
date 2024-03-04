@@ -195,6 +195,8 @@ def driverFormSave(request, id= None):
                 user.username = driverObj.name
                 user.first_name = driverObj.firstName
                 user.last_name = driverObj.LastName
+                
+                
             
         if driverObj.email != request.POST.get('email'):
             if request.POST.get('email') in email_addresses:
@@ -206,9 +208,10 @@ def driverFormSave(request, id= None):
         
         if driverObj.phone != request.POST.get('phone'):
             driverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone'))  
-            
+        
         driverObj.password = password
         user.set_password(password)
+        # return HttpResponse( driverObj.password)
         user.save()
         driverObj.save()
         messages.success(request,'Updating successfully')

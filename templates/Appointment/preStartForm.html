@@ -11,6 +11,38 @@
 <div class="right_col" role="main">
     <div class="">
         <div class="clearfix"></div>
+        <!-- Question No Swap Model  -->
+        <div class="modal fade" id="editQuetModel" tabindex="-1" role="dialog" aria-labelledby="editQuetModelLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="editQuetModelLabel">Swap Question Number </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <form action="{% url 'Appointment:swapQueNoSave' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                            <div class="modal-body">
+                                <label for="questionNo">Swap Question Number :<span class="required">*</span></label>
+                                <div class="field item form-group">
+                                <input class="form-control" type="number" min="1" max="{{maximum}}" name="questionNo" required='required' style="padding: 0.25rem 0.2rem;"
+                                    id="questionNo">
+                                <input class="form-control" type="text" readonly hidden name="preStartId" value={{data.id}} required='required' style="padding: 0.25rem 0.2rem;"
+                                    id="preStartId">
+                                <input class="form-control" type="text" readonly hidden name="preQueId"  required='required' style="padding: 0.25rem 0.2rem;"
+                                    id="preQueId">
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="submit" " class="btn btn-default btn-sm">Save </button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
         <form action="{% if data and edit %}{% url 'Appointment:preStartEditSave' id=data.id %}{% else %}{% url 'Appointment:preStartSave' %}{% endif %}" method="POST">
             {% csrf_token %}
             <div class="row">
@@ -53,10 +85,14 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <label for="q{{question.id}}txt" class="label-align">Question {{forloop.counter}}:<span class="required">*</span></label>
+                                        <label for="q{{question.id}}txt" class="label-align">Question {{question.questionNo}}:<span class="required">*</span></label>
+                                        {% if  edit %}
+                                        <a href="#"  onclick="questionNoFun({{question.questionNo}},{{question.id}})" class="text-primary " data-toggle="modal" data-target="#editQuetModel">Swap Question Number</a>
+                                        {% endif %}
                                         <input class="form-control" name="q{{question.id}}txt" required="required" id="q{{question.id}}txt" value="{{question.questionText}}" type="text" {% if not edit %}readonly{% endif %}/>
                                     </div>
                                 </div>
+                                
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="q{{question.id}}type" class="label-align">Question Type:<span class="required">*</span></label>
