@@ -302,6 +302,7 @@ class RCTI(models.Model):
         ('slot','SLOT'),
     )
 
+    # ClientTruck id
     truckNo = models.FloatField(default=0)
     docketNumber = models.CharField(max_length=10,default='')
     docketDate = models.DateField()

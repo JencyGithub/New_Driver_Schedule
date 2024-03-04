@@ -53,7 +53,6 @@
                                             <tr>
                                                 <th>Truck No</th>
                                                 <th>Client Truck No</th>
-
                                                 <th>Client Name</th>
                                                 <th>Created By</th>
                                                 <th style="width:10%" class = "text-center">Action</th>
@@ -62,10 +61,20 @@
                                         <tbody>
                                             {% for truck in adminTrucks %}
                                             <tr>
-                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.adminTruckNumber}} </a></td>
-                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientTruckNumber}} </a></td>
-                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientName}} </a></td>
-                                                <td> <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.createdBy}} </a></td>
+                                                <td><a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.adminTruckNumber}} </a></td>
+                                                {% comment %} <td><a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientTruckNumber}} </a></td>
+                                                <td><a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}"> {{ truck.clientName}} </a></td> {% endcomment %}
+                                                <td>
+                                                    {% for connection in truck.connections %}
+                                                        <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}">{{ connection.clientTruckId}}</a><br>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    {% for connection in truck.connections %}
+                                                        <a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}" class="text-capitalize">{{ connection.clientId.name}}</a><br>
+                                                    {% endfor %}
+                                                </td>
+                                                <td><a href="{% url 'gearBox:truckView' id=truck.adminTruckId viewOnly=1 %}" class="text-capitalize"> {{ truck.createdBy}} </a></td>
                                                 <td class = "text-center">
                                                     <a href="{% url 'gearBox:truckEditView' id=truck.adminTruckId %}">
                                                         <i class="fa-solid fa-pen-to-square" style="font-size:1.3rem"></i>

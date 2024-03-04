@@ -178,6 +178,8 @@ urlpatterns = [
     # Reconciliation
     path('reconciliation/form/<int:dataType>/', views.reconciliationForm, name='reconciliationForm'),
     path('reconciliation/analysis/<int:dataType>/', views.reconciliationAnalysis, name='reconciliationAnalysis'),
+    path('reconciliation/analysis/<int:dataType>/<int:download>/', views.reconciliationAnalysis, name='reconciliationAnalysisDownload'),
+
     path('reconciliation/docket/view/<int:reconciliationId>/', views.reconciliationDocketView, name='reconciliationDocketView'),
     path('reconciliation/setMark/', views.reconciliationSetMark, name='reconciliationSetMark'),
     

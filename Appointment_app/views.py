@@ -364,6 +364,9 @@ def preStartSave(request, id=None):
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
+    if id:
+        questionIds = PreStartQuestion.objects.filter(preStartId=preStartObj).values('id')
+        
     msg = "Pre-start updated successfully."
    
     if id:
@@ -372,10 +375,12 @@ def preStartSave(request, id=None):
     preStartObj.createdDate = currentDateTime
     preStartObj.createdBy = request.user
     preStartObj.save()
+    
     for question in range(0,int(questionCount)):
         count = question
         questionObj = PreStartQuestion() 
         if id:
+            questionObj = PreStartQuestion.objects.filter(pk=questionIds[question]['id']).first()
             questionObj = PreStartQuestion.objects.filter(pk=questionIds[question]['id']).first()
             questionObj.wantFile1 = questionObj.wantFile2 = questionObj.wantFile3 =questionObj.wantFile4 = False
             questionObj.save()
@@ -384,6 +389,8 @@ def preStartSave(request, id=None):
             questionObj.preStartId = preStartObj
             msg = "Pre-start added successfully."
             
+        print(questionObj,count)
+
         questionObj.questionText = request.POST.get(f'q{count}txt')
         questionObj.questionType = request.POST.get(f'q{count}type')
         questionObj.questionNo = question + 1

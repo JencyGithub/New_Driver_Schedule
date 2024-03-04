@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
-import shutil, os, colorama, subprocess, csv, re, pytz
+import shutil, os, colorama, subprocess, csv, re, pytz, json
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime , time, timedelta, timezone
 from django.core.files.storage import FileSystemStorage
@@ -30,6 +30,8 @@ from scripts.PastDataSave import *
 import numpy as np
 from PIL import Image
 import pytesseract
+from djqscsv import render_to_csv_response
+
 
 
 def index(request):
@@ -594,23 +596,14 @@ def mapDataSave(request, recurring=None):
         lng = request.POST.get('longitude')
         date = request.POST.get('date')
         time = request.POST.get('time')
-        if not lat or not lng:
-            messages.error(request, "Please on the location")
+        locationImg = request.FILES.get('locationImg')
+        if (not lat or not lng) and (not locationImg) :
+            messages.error(request, "Please enable location access to proceed.")
             return redirect(request.META.get('HTTP_REFERER'))
-        
+                
         currentHour = currentDateTime.time().hour
-        if 6 <= currentHour <= 17 :
-            result = "Day"
-        else:
-            result = "Night"
         
-        lat = request.POST.get('latitude')
-        lng = request.POST.get('longitude')
-        date = request.POST.get('date')
-        time = request.POST.get('time')
-        if not lat or not lng:
-            messages.error(request, "Please on the location")
-            return redirect(request.META.get('HTTP_REFERER'))
+        result = "Day" if 6 <= currentHour <= 17 else "Night"
         
         shiftObj = DriverShift()
         shiftObj.latitude = lat
@@ -620,6 +613,14 @@ def mapDataSave(request, recurring=None):
         shiftObj.verifiedBy = request.user
         shiftObj.startDateTime = currentDateTime
         shiftObj.driverId = driverObj.driverId
+        
+        if locationImg:
+            path = 'static/Account/driverLocationFiles'
+            fileName = locationImg.name
+            newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
+            pfs = FileSystemStorage(location=path)
+            pfs.save(newFileName, locationImg)            
+            shiftObj.locationImg = f'{path}/{newFileName}'
         shiftObj.save()
         
     return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
@@ -664,16 +665,28 @@ def clientAndTruckDataSave(request, id):
         
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
+    startOdometers = request.POST.get('startOdometers')
+    endOdometers = request.POST.get('endOdometers')
+    startEngineHours = request.POST.get('startEngineHours')
+    endEngineHours = request.POST.get('endEngineHours')
     
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
     clientTruckNum = truckNum[1]
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
-    
+    truckInfoObj = truckConnectionObj.truckNumber.truckInformation
+    truckInfoObj.odometerKms= endOdometers
+    truckInfoObj.engineHours= endEngineHours
+    truckInfoObj.save()
+
     tripObj = DriverShiftTrip()
     tripObj.shiftId = id
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
+    tripObj.startOdometerKms = startOdometers
+    tripObj.endOdometerKms = endOdometers
+    tripObj.startEngineHours = startEngineHours
+    tripObj.endEngineHours = endEngineHours
     tripObj.save()
     
     return redirect('Account:showPreStartForm', shiftId=tripObj.shiftId, tripId=tripObj.id)
@@ -2345,16 +2358,22 @@ def checkTripDeficit(request):
 # ```````````````````````````````````
 
 def reconciliationForm(request, dataType):
-    
     drivers = Driver.objects.all()
     clients = Client.objects.all()
     trucks = AdminTruck.objects.all()
-    
+    folder_path = 'static/Account/ReportFiles'  
+    files = []
+    for file_name in os.listdir(folder_path):
+        if file_name[-6:-4] == '_'+str(dataType):
+            files.append(file_name)
+            
     params = {
         'drivers': drivers,
         'clients': clients,
-        'trucks': trucks ,
+        'trucks': trucks,
+        'files': files,
     }
+    
     # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of, 7: revenue, 10: expenses, 9: custom report
     if dataType == 0:
         params['dataType'] = 'Reconciliation Report'
@@ -2375,12 +2394,15 @@ def reconciliationForm(request, dataType):
         params['dataType'] = 'Custom Report'
         params['dataTypeInt'] = 9
         
+    
+        
     return render(request, 'Reconciliation/reconciliation.html', params)
 
 @csrf_protect
-def reconciliationAnalysis(request,dataType):
+def reconciliationAnalysis(request,dataType, download=None):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
+    redirectUrl = 'Reconciliation/reconciliation-result.html'
     
     params = {}
     if dataType == 0:
@@ -2400,68 +2422,25 @@ def reconciliationAnalysis(request,dataType):
         params['dataType'] = 'Revenue'
         params['dataTypeInt'] = 7
     elif dataType == 9:
-        # params['dataType'] = 'Custom'
-        # params['dataTypeInt'] = 9
-
-        from django.db.models import Q
-
-# Filter the LeaveRequest objects to include only those with 'Approved' status
         leave_requests = LeaveRequest.objects.filter(status='Approved').annotate(
             start_date_cast=Cast('start_date', output_field=fields.DateField()),
             end_date_cast=Cast('end_date', output_field=fields.DateField())
         )
-
-        # Dictionary to store leave days for each driver
         driver_leave_days_dict = defaultdict(int)
-
-        # Calculate leave days for each driver
         for leave in leave_requests:
             if leave.start_date_cast and leave.end_date_cast:
                 duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
                 driver_leave_days_dict[leave.employee.name] += duration
 
-        # Prepare a list of dictionaries containing driver names and their leave days
         driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
 
-        # Prepare parameters to pass to the template
         params = {
             'response_content': driver_leave_days_list,
             'dataType': 'Custom',
             'dataTypeInt': 9,
         }
-
-        # Render the template with the parameters
-        return render(request, 'Account/Tables/customTable.html', params)
-
-        # leave_requests = LeaveRequest.objects.annotate(
-        # start_date_cast=Cast('start_date', output_field=fields.DateField()),
-        # end_date_cast=Cast('end_date', output_field=fields.DateField())
-        # )
-
-        # driver_leave_days_dict = defaultdict(int)
-
-        # for leave in leave_requests:
-        #     if leave.start_date_cast and leave.end_date_cast:
-        #         duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
-        #         driver_leave_days_dict[leave.employee.name] += duration
-
-        # all_drivers = Driver.objects.all()
-
-        # for driver in all_drivers:
-        #     if driver.name not in driver_leave_days_dict:
-        #         driver_leave_days_dict[driver.name] = 0
-
-        # driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
-
-        # driver_leave_days_list = sorted(driver_leave_days_list, key=lambda x: x['days'])
-
-        # # for item in driver_leave_days_list:
-        # #     print(item['driver'], item['days'])
-
-        # context = {'response_content': driver_leave_days_list}
-        # return render(request, 'Account/Tables/customTable.html', context)
-
-
+        redirectUrl = "Account/Tables/customTable.html"
+        # return render(request, 'Account/Tables/customTable.html', params)
     elif dataType == 10:
         dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate))
         clientObj = Client.objects.all()
@@ -2475,20 +2454,35 @@ def reconciliationAnalysis(request,dataType):
             'startDate':dateConverterFromTableToPageFormate(startDate),
             'endDate':dateConverterFromTableToPageFormate(endDate),
         }
-        return render(request, 'Account/Tables/expensesTable.html',params)
-    
+        redirectUrl = "Account/Tables/expensesTable.html"
+
     for data in dataList:   
         client = Client.objects.filter(pk=data['clientId']).first()
-        if client:
-            data['clientName'] = client.name
-        else:
-            data['clientName' ]= None
-
+        data['clientName'] = client.name if client else None
     params['dataList'] = dataList
     
-    return render(request, 'Reconciliation/reconciliation-result.html', params)
-     
+    if download:
+        with open('scripts/data.json', 'r') as file:
+            data = json.load(file)
+        data["reportDownload"] = {
+            "startDate": str(startDate),
+            "endDate": str(endDate),
+            "type": dataType,
+            "reportType" : params['dataType']
+        }
+        
+        with open('scripts/data.json', 'w') as file:
+            json.dump(data, file, indent=2)
+            
+        colorama.AnsiToWin32.stream = None
+        os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
+        cmd = ["python", "manage.py", "runscript", 'reportDownload','--continue-on-error']
+        subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        
+        messages.success(request,"Generating your report, please wait.")
+        return redirect(request.META.get("HTTP_REFERER"))
 
+    return render(request, redirectUrl, params)     
 
 def reconciliationDocketView(request, reconciliationId):
     # try:

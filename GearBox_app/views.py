@@ -315,10 +315,12 @@ def truckTable(request):
     adminTruck = AdminTruck.objects.all()
     admin_truck_data = {}
     for admin_truck in adminTruck:
-        latest_connection = ClientTruckConnection.objects.filter(truckNumber=admin_truck).order_by('-startDate').first()
+        # latest_connection = ClientTruckConnection.objects.filter(truckNumber=admin_truck).order_by('-startDate').first()
+        latest_connection = ClientTruckConnection.objects.filter(truckNumber=admin_truck)
         admin_truck_data = {
-            'clientTruckNumber' : latest_connection.clientTruckId if latest_connection else '-',
-            'clientName' : latest_connection.clientId.name if latest_connection else '-',
+            # 'clientTruckNumber' : latest_connection.clientTruckId if latest_connection else '-',
+            # 'clientName' : latest_connection.clientId.name if latest_connection else '-',
+            'connections' : latest_connection,
             'createdBy' : admin_truck.createdBy.username,
             'adminTruckId' : admin_truck.id,
             'adminTruckNumber' : admin_truck.adminTruckNumber
