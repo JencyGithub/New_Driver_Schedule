@@ -29,17 +29,47 @@
         <div class="clearfix"></div>
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                <div class="x_panel" style="max-height: 120vh; overflow-y: auto;">
-                    <div class="x_title">
-                        <h2>{{dataType}} result Driver / RCTI</h2>
-                        {% if dataType == 'Reconciliation' %}
-                            <div class="float-right">
-                                <button class="btn btn-sm btn-default escalate" value="Escalate">Escalate</button>
-                                <button class="btn btn-sm btn-default markAsComplete" value="Mark as complete">Mark ascomplete</button>
+                <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
+                    {% csrf_token %}
+                    <div  class="x_panel">
+                        <div class="row">
+                            <div class="col-md-3">
                             </div>
-                        {% endif %}
+                            <div class="col-md-4">
+                                <label for="startDate">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="endDate">End Date</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate }}">
+                            </div>
+                            <div class="col-md-1 mt-4">
+                                <button type="submit" class="btn btn-default">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="x_panel" style="max-height: 120vh; overflow-y: auto;">
+
+                    <div class="x_title">
+                        
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h2>{{dataType}} result Driver / RCTI</h2>
+                            </div>
+                            <div class="col-md-6">
+                                {% if dataType == 'Reconciliation' %}
+                                    <div class="float-right">
+                                        <button class="btn btn-sm btn-default escalate" value="Escalate">Escalate</button>
+                                        <button class="btn btn-sm btn-default markAsComplete" value="Mark as complete">Mark as complete</button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div class="clearfix"></div>
                     </div>
+                
                     <div class="x_content">
                         <div class="row">
                             <div class="col-sm-12">
