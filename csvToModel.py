@@ -2,7 +2,8 @@ import csv , re
 from Account_app.models import *
 from Account_app.reconciliationUtils import *
 import time
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 def convertIntoFloat(str_):
     if '(' in str_:
         str_ = '-'+str_.strip('()')
@@ -332,3 +333,6 @@ try:
 except Exception as e:
     with open ('Expense_error.txt','a') as f:
         f.write(str(e))
+        
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')

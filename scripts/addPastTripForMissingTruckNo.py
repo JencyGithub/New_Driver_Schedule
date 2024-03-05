@@ -8,7 +8,8 @@ from datetime import time
 import sys
 from variables import *
 from utils import *
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 f = open(r"scripts/addPastTripForMissingTruckNo.txt", 'r')
 truckNo = f.read()
 # data = data.split(',')[0:-1]
@@ -82,7 +83,8 @@ except Exception as e:
 
 
 
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')
 
 
 

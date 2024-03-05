@@ -8,6 +8,8 @@ from datetime import time
 import sys
 
 def run():
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('0')
     with open(r"scripts/addSurchargeToRateCard.txt", 'r') as f:
         surchargeName = f.read().strip().lower()
         # print(f'Surcharge Name: {surchargeName}')
@@ -35,3 +37,5 @@ def run():
             newSurchargeValueObj.end_date = ratecardVariantEndDate
             newSurchargeValueObj.surcharge = newSurchargeObj
             newSurchargeValueObj.save()
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('1')

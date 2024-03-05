@@ -465,10 +465,10 @@ def questionAddSave(request, id):
     preStartObj = PreStart.objects.filter(pk=id).first()
     questionObj = PreStartQuestion()
     questionObj.preStartId = preStartObj
-    
+    countPreStartQuestion = PreStartQuestion.objects.filter(preStartId=preStartObj).count() + 1
     questionObj.questionText = request.POST.get("quetxt")
     questionObj.questionType = request.POST.get("quetype")
-    
+    questionObj.questionNo = countPreStartQuestion
     queTxt1 = request.POST.get('opt1')
     queTxt2 = request.POST.get('opt2')
     queTxt3 = request.POST.get('opt3')

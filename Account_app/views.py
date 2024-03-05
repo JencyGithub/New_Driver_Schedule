@@ -30,8 +30,7 @@ from scripts.PastDataSave import *
 import numpy as np
 from PIL import Image
 import pytesseract
-
-
+from django.utils.timezone import make_aware
 def index(request):
     curDate = getCurrentDateTimeObj().date()
     totalShiftsCount = DriverShift.objects.filter(shiftDate=curDate)
@@ -1378,6 +1377,15 @@ def rctiHolcimFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     startDate = request.POST.get('startDate')
@@ -1463,8 +1471,9 @@ def rctiSave(request):
                 with open('rctiReportId.txt','w')as f:
                     f.write(str(rctiReport.id) +','+ str(clientNameID.name) + ',' + str(startDate))
                 # return HttpResponse('work')
-                    
+
                 colorama.AnsiToWin32.stream = None
+               
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -1623,6 +1632,15 @@ def driverEntry(request):
 
 @csrf_protect
 def driverEntrySave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     Driver_csv_file = request.FILES.get('driverEntryFile')
     if not Driver_csv_file:
         return HttpResponse("No file uploaded")
@@ -1980,6 +1998,15 @@ def basePlantForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     clientBasePlant = request.POST.get('clientBasePlant')
     clientDepot = request.POST.get('clientDepot')
     dataList = {
@@ -2943,7 +2970,15 @@ def checkOnOff(val_):
 
 @csrf_protect
 def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
-    # Rate Card
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rateCardID = None
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
@@ -3273,6 +3308,15 @@ def archiveResetRCTI(request):
 # @api_view(['POST'])
 @csrf_protect
 def pastTripSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     monthAndYear = str(request.POST.get('monthAndYear'))
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')
@@ -3355,6 +3399,15 @@ def surchargeForm(request, id=None):
 
 @csrf_protect
 def surchargeSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     dataList = {
         'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
     }
@@ -3558,6 +3611,15 @@ def report(request):
 
 @csrf_protect
 def reportSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     primaryFile = request.FILES.get('primaryFile')
     secondaryFile = request.FILES.get('secondaryFile')
 

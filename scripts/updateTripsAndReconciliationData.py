@@ -3,7 +3,8 @@ from Account_app.models import *
 from GearBox_app.models import *
 from CRUD import *
 from datetime import datetime
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 f = open(r"scripts/updateTripsAndReconciliationData.txt", 'r')
 data = f.read()
 data = data.split(',')[0:-1]
@@ -64,3 +65,7 @@ for obj in reconciliationReportData:
     except Exception as e:
         with open("scripts/updateTripsAndReconciliationDataError.txt", 'a') as f:
             f.write(str(e)+','+'\n')
+            
+            
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')
