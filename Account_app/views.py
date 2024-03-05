@@ -675,8 +675,8 @@ def clientAndTruckDataSave(request, id):
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
     truckInfoObj = truckConnectionObj.truckNumber.truckInformation
-    truckInfoObj.odometerKms= endOdometers
-    truckInfoObj.engineHours= endEngineHours
+    # truckInfoObj.odometerKms= endOdometers
+    # truckInfoObj.engineHours= endEngineHours
     truckInfoObj.save()
 
     tripObj = DriverShiftTrip()
