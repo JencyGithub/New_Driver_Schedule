@@ -71,7 +71,13 @@
                 <a href="{% url 'frontend_app:services'%}" class="nav-item nav-link "id="services">Services</a>
                 <a href="{% url 'frontend_app:career'%}" class="nav-item nav-link active_" id="career">Career</a>
                 <a href="{% url 'frontend_app:contact'%}" class="nav-item nav-link active_" id="contact">Contact</a>
-                <a href="{% url 'login'%}" class="nav-item nav-link active_" id="team">Log-In</a>
+
+                {% if request.session.user_type %}
+                    <a href="{% if request.session.user_type == 'Driver' %}{% url 'index'%}{% else %}{% url 'Account:index'%}{% endif %}" class="nav-item nav-link active_" id="team">Dashboard</a>
+                {% else %}
+                    <a href="{% url 'login'%}" class="nav-item nav-link active_" id="team">Log-In</a>
+                {% endif %}
+
                 {% comment %} <a href="{% url 'frontend_app:SignUp'%}" class="nav-item nav-link active_" id="SignUp">SignUp</a> {% endcomment %}
             </div>
             {% comment %} <div class="h-100 d-lg-inline-flex align-items-center d-none">
