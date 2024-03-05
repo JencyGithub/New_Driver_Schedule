@@ -17,21 +17,21 @@
             <div class="row">
                 <div class="col-md-1 col-12"></div>
                 <div class="col-md-10 col-12">
-                    <form action="{% url 'Account:saveDriverBreak' shiftId=shiftObj.id %}" method="post" enctype="multipart/form-data">
+                    <form action="{% if breakData %}{% url 'Account:editSaveDriverBreak' shiftId=shiftObj.id breakId=breakData.id %}{% else %}{% url 'Account:saveDriverBreak' shiftId=shiftObj.id %}{% endif %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-12 d-flex justify-content-between flex-wrap">
-                                <h5 class="card-title text-uppercase text-default ">Add Break</h5>
+                                <h5 class="card-title text-uppercase text-default ">{% if breakData %}Edit{% else %}Add{% endif %} Break</h5>
                                 <span class="text-secondary">You are adding break for <b class="text-uppercase">{{ clientName}} / {{shiftObj.startDateTime}} </b></span>
                             </div>
                             <hr>
                             <div class="col-md-6 col-12 my-1">
                                 <label for="startDateTime">Start break time:</label>
-                                <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" required>
+                                <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" value="{% if breakData %}{{ breakData.startDateTime }}{% endif %}" required>
                             </div>
                             <div class="col-md-6 col-12 my-1">
                                 <label for="endDateTime">End break time:</label>
-                                <input type="datetime-local" name="endDateTime" id="endDateTime" class="form-control" readonly required>
+                                <input type="datetime-local" name="endDateTime" id="endDateTime" class="form-control" value="{% if breakData %}{{ breakData.endDateTime }}{% endif %}" {% if not breakData %}readonly{% endif %} required>
                             </div>
                             {% comment %} <div class="col-md-8 col-12 my-1">
                                 <label for="curLocation">Your current location:</label>
@@ -44,7 +44,7 @@
                             
                             <div class="col-12 my-1">
                                 <label for="description">Notes:</label>
-                                <textarea name="description" id="description" rows="2" class="form-control"></textarea>
+                                <textarea name="description" id="description" rows="2" class="form-control">{% if breakData %}{{ breakData.description }}{% endif %}</textarea>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-sm btn-default float-end mt-2">Submit</button>

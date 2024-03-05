@@ -7,6 +7,9 @@
     .nav-link{
         color: #7c8792;
     }
+    .fa-regular.fa-pen-to-square{
+        cursor: pointer;
+    }
 
     @media (max-width: 721px) {
        body{
@@ -37,7 +40,7 @@
                 <li class="nav-item" role="presentation">
                   <button class="nav-link" id="reimbursementTab" data-bs-toggle="tab" data-bs-target="#reimbursement" type="button" role="tab" aria-controls="reimbursement" aria-selected="false">Reimbursements</button>
                 </li>
-              </ul>
+            </ul>
               
               <!-- Tab panes -->
               <div class="tab-content py-4">
@@ -135,20 +138,18 @@
                                 <thead>
                                 <tr>
                                     <th scope="col">SR.</th>
-                                    {% comment %} <th scope="col">Client </th>
-                                    <th scope="col">Truck</th> {% endcomment %}
                                     <th scope="col">Start Time</th>
                                     <th scope="col">End Time</th>
+                                    <th scope="col" class="text-center">Edit</th> 
                                 </tr>
                                 </thead>
                                 <tbody>
                                     {% for break in breaks %}
                                         <tr>
                                             <th scope="row">{{ forloop.counter }}</th>
-                                            {% comment %} <td class="text-capitalize">{{ break.clientName }}</td>
-                                            <td>{{ break.truckNum }}</td> {% endcomment %}
                                             <td>{{ break.startDateTime }}</td>
                                             <td>{{ break.endDateTime }}</td>
+                                            <td class="text-center"><a href="{% url 'Account:editDriverBreak' shiftId=shiftObj.id breakId=break.id %}"><i class="fa-regular fa-pen-to-square text-default"></i></a></td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

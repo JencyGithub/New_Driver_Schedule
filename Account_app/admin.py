@@ -278,6 +278,11 @@ admin.site.register(TruckInformationCustom)
 admin.site.register(TruckSettingCustom)
 admin.site.register(TruckSetting)
 
+class TruckInformationAdmin(admin.ModelAdmin):
+    list_display = ["fleet","group","odometerKms","engineHours"]
+    search_fields = ["fleet","group","odometerKms","engineHours"]
+admin.site.register(TruckInformation, TruckInformationAdmin)
+
 class AdminTruckAdmin(admin.ModelAdmin):
     list_display = ["adminTruckNumber"]
     search_fields = ["adminTruckNumber"]
@@ -427,7 +432,8 @@ class ClientOfcWithRateCardConnectionAdmin(admin.ModelAdmin):
 
 admin.site.register(ClientOfcWithRateCardConnection , ClientOfcWithRateCardConnectionAdmin)
 
-admin.site.register(TruckInformation)
+# admin.site.register(TruckInformation)
+
 admin.site.register(TruckDocument)
 class TruckEntryErrorAdmin(admin.ModelAdmin):
     list_display = ["truckNo","exceptionText"]

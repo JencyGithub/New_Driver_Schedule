@@ -59,7 +59,9 @@ urlpatterns = [
     path('DriverPreStart/save/<int:tripId>/', views.DriverPreStartSave, name='DriverPreStartSave'),
 
     path('Driver/break/add/view/<int:shiftId>/', views.addDriverBreak, name='addDriverBreak'),
+    path('Driver/break/add/view/<int:shiftId>/<int:breakId>/', views.addDriverBreak, name='editDriverBreak'),
     path('Driver/break/add/save/<int:shiftId>/', views.saveDriverBreak, name='saveDriverBreak'),
+    path('Driver/break/add/save/<int:shiftId>/<int:breakId>/', views.saveDriverBreak, name='editSaveDriverBreak'),
 
     path('Driver/reimbursement/view/<int:shiftId>/', views.addReimbursementView, name='addReimbursementView'),
     path('Driver/reimbursement/save/<int:shiftId>/', views.addReimbursementSave, name='addReimbursementSave'),

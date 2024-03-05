@@ -15,8 +15,8 @@
     <div class="card border-0">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-1 col-12"></div>
-                <div class="col-md-10 col-12">
+                {% comment %} <div class="col-md-1 col-12"></div> {% endcomment %}
+                <div class="col-md-12 col-12">
                     {% comment %} <form action="{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripObj.id endShift=endShift %}" method="post" enctype="multipart/form-data" id="docketsForm"> {% endcomment %}
                     <form action="#" method="post" enctype="multipart/form-data" id="docketsForm">
                         {% csrf_token %}
@@ -25,23 +25,52 @@
                                 <h5 class="card-title text-uppercase text-default">Add Trip Details</h5>
                                 <hr>
                             </div>
-                            <div class="col-md-4 col-12 my-1">
-                                <label for="loadSheet">Load sheet:</label>
-                                <input type="file" name="loadSheet" id="loadSheet" class="form-control" required>
+                            <div class="col-12">
+                                {% if breaks|length < 1 %}
+                                <h6 class="text-secondary">No breaks found</h6>
+                                <hr class="my-2">
+                                {% else %}
+                                    <div class="row">
+                                        {% for break in breaks %}
+                                            <div class="col-lg-4 col-md col-sm-6">
+                                                <a href="{% url 'Account:editDriverBreak' shiftId=shiftId breakId=break.id %}" class="text-default text-decoration-none">
+                                                    <b>1.</b> <span>{{ break.startDateTime }}</span> to <span>{{ break.endDateTime }}</span>
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <hr>
+                                {% endif %}
                             </div>
-                            <div class="col-md-4 col-12 my-1">
-                                <label for="noOfLoads">Number of loads:</label>
-                                <input type="number" name="noOfLoads" id="noOfLoads" class="form-control" required>
+                            <div class="col-md-8 col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 my-1">
+                                        <label for="loadSheet">Load sheet:</label>
+                                        <input type="file" name="loadSheet" id="loadSheet" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 col-12 my-1">
+                                        <label for="noOfLoads">Number of loads:</label>
+                                        <input type="number" name="noOfLoads" id="noOfLoads" class="form-control" required>
+                                    </div>
+                                     <div class="col-md-6 col-sm-6 my-1">
+                                        <label for="endOdometers">Odometers End</label>
+                                        <input type="number" class="form-control" id="endOdometers" name="endOdometers" required> 
+                                    </div>
+                                     <div class="col-md-6 col-sm-6 my-1">
+                                        <label for="endEngineHours">Engine Hours End</label>
+                                        <input type="number" class="form-control" id="endEngineHours" name="endEngineHours" required> 
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4 col-12 my-1 d-flex align-items-center">
-                                <div class="form-check">
-                                    <input type="checkbox" name="dispute" id="dispute" value="dispute" class="form-check-input">
-                                    <label for="dispute" class="form-check-label">Dispute</label>
-                                </div>  
-                            </div>
-                            <div class="col-12 my-1">
-                                <label for="comment">Comment:</label>
-                                <textarea name="comment" id="comment" rows="2" class="form-control"></textarea>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="col-12 my-1">
+                                    <label for="comment">Comment:</label>
+                                    <div class="form-check d-inline-block float-end">
+                                        <input type="checkbox" name="dispute" id="dispute" value="dispute" class="form-check-input">
+                                        <label for="dispute" class="form-check-label">Dispute</label>
+                                    </div>  
+                                    <textarea name="comment" id="comment" rows="4" class="form-control"></textarea>
+                                </div>
                             </div>
                         </div>
                         <span class="btn btn-sm btn-default float-end mt-2" id="uploadLoads" onclick="addDocketFiles(this, {{docket}})">Upload Loads</span>
@@ -86,7 +115,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-1 col-12"></div>
+                {% comment %} <div class="col-md-1 col-12"></div> {% endcomment %}
 
             </div>
         </div>
@@ -97,6 +126,56 @@
 
 {% block footerStyleEnd %}
 <script>
+
+    $(`#dispute`).on('change', function(){
+        if($(this).prop('checked')){
+            $('textarea[name="comment"]').attr('required', true)
+        }else{
+            $('textarea[name="comment"]').removeAttr('required')
+        }
+    })
+
+    $('#docketsForm').submit(function(event) {
+        event.preventDefault();
+        var validExtensions = ['jpg', 'jpeg']
+        var values = [];
+        var docketNumberInputs = $('input[name^="docketNumber"]');
+        var docketFileInputs = $('input[name^="docketFile"]');
+        var isUnique = true;
+
+        docketNumberInputs.each(function() {
+            var inputValue = $(this).val();
+            if (values.includes(inputValue)) {
+                isUnique = false;
+                msg = "Please make sure that all docket numbers are unique."
+                return false;
+            }
+            values.push(inputValue);
+        });
+
+        docketFileInputs.each(function() {
+            var inputValue = $(this).val();
+            var fileExt = inputValue.split('.').pop()
+            // console.log(inputValue.split('.').pop() == "jpg", inputValue.split('.').pop())
+            if (values.includes(inputValue)) {
+                isUnique = false;
+                msg = "Please ensure you haven't uploaded the same file multiple times."
+                return false;
+            }
+            else if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
+                isUnique = false;
+                msg = "Please Upload docket file in JPG, JPEG pr PNG formate."
+                return false;
+            }
+            values.push(inputValue);
+        });
+
+        if (!isUnique) {
+            alert(msg);
+        } else {
+            this.submit();
+        }
+    });
 
     function changeStatus(startId, endId = null) {
         const startInput = $(`#${startId}`);
@@ -117,24 +196,20 @@
     }
     
     function checkFields(){
-        let loadSheet = $('input[name="loadSheet"]').val()
-        let noOfLoads = $('input[name="noOfLoads"]').val()
-        let comment = $('textarea[name="comment"]').val()
-
-        if($(`#dispute`).prop('checked')){
-            if (loadSheet.trim() !== "" && noOfLoads.trim() !== "" && comment.trim() !== ""){
-                return true;
-            }else{
-                alert('Please fill in all the required fields before proceeding')
+        var allFieldsFilled = true;
+        $('input[required], textarea[required]').each(function() {
+            if($(this).attr('id') == "noOfLoads" && $(this).val() <= 0){
+                alert("Please enter valid docket count.");
+                allFieldsFilled = false;
                 return false
             }
-        }
-        else if(loadSheet.trim() !== "" && noOfLoads.trim() !== ""){
-            return true
-        }else{
-            alert('Please fill in all the required fields before proceeding')
-            return false
-        }
+            else if ($(this).val() === '') {
+                alert('Please fill in all the required fields before proceeding')
+                allFieldsFilled = false;
+                return false
+            }
+        });
+        return allFieldsFilled
     }
 
     function docketAdd(count){
@@ -224,7 +299,6 @@
 
     function addDocketFiles(data, gotDocket){
         if(checkFields()){
-
             let noOfLoads = $('input[name="noOfLoads"]')
             if(gotDocket == 0){
                 $('#loadsContainer').append(docketAdd(noOfLoads));
@@ -247,39 +321,7 @@
         }
     }
 
-    $('#docketsForm').submit(function(event) {
-        event.preventDefault();
-        var values = [];
-        var docketNumberInputs = $('input[name^="docketNumber"]');
-        var docketFileInputs = $('input[name^="docketFile"]');
-        var isUnique = true;
-
-        docketNumberInputs.each(function() {
-            var inputValue = $(this).val();
-            if (values.includes(inputValue)) {
-                isUnique = false;
-                msg = "Please make sure that all docket numbers are unique."
-                return false;
-            }
-            values.push(inputValue);
-        });
-
-        docketFileInputs.each(function() {
-            var inputValue = $(this).val();
-            if (values.includes(inputValue)) {
-                isUnique = false;
-                msg = "Please ensure you haven't uploaded the same file multiple times."
-                return false;
-            }
-            values.push(inputValue);
-        });
-
-        if (!isUnique) {
-            alert(msg);
-        } else {
-            this.submit();
-        }
-    });
+    
 
 </script>
 {% endblock %}
