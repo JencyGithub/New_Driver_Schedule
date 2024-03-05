@@ -1151,7 +1151,7 @@ def rctiForm(request, id= None):
     basePlant = BasePlant.objects.all()
     if id:
         rcti = RCTI.objects.filter(pk=id).first()
-        rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
+        # rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
         
     params = {
         'rcti': rcti,
@@ -2404,7 +2404,10 @@ def reconciliationAnalysis(request,dataType, download=None):
     endDate = dateConvert(request.POST.get('endDate'))
     redirectUrl = 'Reconciliation/reconciliation-result.html'
     
-    params = {}
+    params = {
+        'startDate': dateConverterFromTableToPageFormate(startDate),
+        'endDate': dateConverterFromTableToPageFormate(endDate),
+    }
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
         params['dataType'] = 'Reconciliation'
@@ -2433,32 +2436,30 @@ def reconciliationAnalysis(request,dataType, download=None):
                 driver_leave_days_dict[leave.employee.name] += duration
 
         driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+        params['response_content']= driver_leave_days_list
+        params['dataType']= 'Custom'
+        params['dataTypeInt']= 9
 
-        params = {
-            'response_content': driver_leave_days_list,
-            'dataType': 'Custom',
-            'dataTypeInt': 9,
-        }
         redirectUrl = "Account/Tables/customTable.html"
         # return render(request, 'Account/Tables/customTable.html', params)
     elif dataType == 10:
-        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate))
+        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate)).values()
         clientObj = Client.objects.all()
         clientTruckConnectionObj = ClientTruckConnection.objects.all()
         basePlantObj = BasePlant.objects.all()
-        params = {
-            'clientObj':clientObj,
-            'clientTruckConnectionObj':clientTruckConnectionObj,
-            'basePlantObj':basePlantObj,
-            'dataList':dataList,
-            'startDate':dateConverterFromTableToPageFormate(startDate),
-            'endDate':dateConverterFromTableToPageFormate(endDate),
-        }
+        params['clientObj']= clientObj
+        params['clientTruckConnectionObj']= clientTruckConnectionObj
+        params['basePlantObj']= basePlantObj
+        params['dataList']= dataList
+        params['dataTypeInt']= 10
+        # params['startDate']= dateConverterFromTableToPageFormate(startDate)
+        # params['endDate']= dateConverterFromTableToPageFormate(endDate)
+        
         redirectUrl = "Account/Tables/expensesTable.html"
-
-    for data in dataList:   
-        client = Client.objects.filter(pk=data['clientId']).first()
-        data['clientName'] = client.name if client else None
+    if dataType != 10:
+        for data in dataList:   
+            client = Client.objects.filter(pk=data['clientId']).first()
+            data['clientName'] = client.name if client else None
     params['dataList'] = dataList
     
     if download:
