@@ -5,7 +5,8 @@ from Appointment_app.models import *
 from datetime import datetime
 from Account_app.reconciliationUtils import *
 
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 
 def checkStr(data:str):
     return data.lower().strip().replace(" ","")
@@ -14,7 +15,7 @@ with open("rctiReportId.txt", 'r') as f:
     data = f.read().split(',')
 
     rctiReportId = data[0] 
-    clientNames = data[1]
+    clientName = Client.objects.filter(name = str(data[1])).first()
 fileName = None
 with open('File_name_file.txt','r')as f:
     fileName = f.read()
@@ -44,7 +45,6 @@ with open('holcim.txt', 'w') as file:
 with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     csv_reader = csv.reader(f)
     rctiErrorObj = RctiErrors()
-    clientName = Client.objects.filter(name = clientNames).first()
     finalList = []
     prepared = []
     tempData = []
@@ -79,7 +79,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 # for docket pattern = 'G-111111'
             elif  re.fullmatch(datePattern, splitRow[0].strip()) and  re.fullmatch(docketPattern2, str(splitRow[1].strip())) :
                 rctiErrorObj = RctiErrors()
-                rctiErrorObj.clientName = clientNames
+                rctiErrorObj.clientName = clientName.id
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
                 rctiErrorObj.errorDescription = "Manually Manage."
@@ -91,7 +91,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 # for top up in docketnumber  
             elif  re.fullmatch(datePattern, splitRow[0].strip()) and  'topup' in row[0].lower() :
                 rctiErrorObj = RctiErrors()
-                rctiErrorObj.clientName = clientNames
+                rctiErrorObj.clientName = clientName.clientId
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
                 rctiErrorObj.errorDescription = "topup"
@@ -109,7 +109,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
 
             elif flag and 'gst' in checkStr(row[0]):
                 rctiErrorObj = RctiErrors()
-                rctiErrorObj.clientName = clientNames
+                rctiErrorObj.clientName = clientName.clientId
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
                 rctiErrorObj.errorDescription = rowErrorDescription
@@ -123,7 +123,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             # docket number pattern like 'WI200941/1'  or 'T2' 
             elif re.fullmatch(datePattern, splitRow[0].strip()) and (len(splitRow[1].strip()) > 8 or len(str(splitRow[1].strip())) < 3):
                 rctiErrorObj = RctiErrors()
-                rctiErrorObj.clientName = clientNames
+                rctiErrorObj.clientName = clientName.clientId
                 rctiErrorObj.docketNumber = None
                 rctiErrorObj.docketDate = None
                 rctiErrorObj.errorDescription = "Manually Manage."
@@ -139,7 +139,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     try:
                         if '-' in splitRow[2] and float(splitRow[2].replace('-','')):
                             rctiErrorObj = RctiErrors()
-                            rctiErrorObj.clientName = clientNames
+                            rctiErrorObj.clientName = clientName.clientId
                             rctiErrorObj.docketNumber = None
                             rctiErrorObj.docketDate = None
                             rctiErrorObj.errorDescription = "Manually Manage."
@@ -162,7 +162,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                     except:
                         if '-' in splitRow[-1] and float(splitRow[-1].replace('-','')):
                             rctiErrorObj = RctiErrors()
-                            rctiErrorObj.clientName = clientNames
+                            rctiErrorObj.clientName = clientName.clientId
                             rctiErrorObj.docketNumber = None
                             rctiErrorObj.docketDate = None
                             rctiErrorObj.errorDescription = "Manually Manage."
@@ -206,13 +206,15 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     for data in finalList:
         rctiReportObj = RctiReport.objects.filter(pk = rctiReportId).first()
         try:
-            
+            docketDate = datetime.strptime(data[1], '%d.%m.%Y').date()
             if len(data) > 0:
-                rctiObj = RCTI()
+                rctiObj = RCTI.objects.filter(truckNo = float(data[0]) ,docketNumber=int(data[2]),docketDate = docketDate).first()
+                if not rctiObj:
+                    rctiObj = RCTI()
                 rctiObj.clientName = clientName
                 rctiObj.truckNo =data[0]
                 rctiObj.docketNumber = data[2]
-                rctiObj.docketDate =  datetime.strptime(data[1], '%d.%m.%Y').date()
+                rctiObj.docketDate =  docketDate
 
                 if len(data) > 5:
                     rctiObj.cubicMl = data[3]
@@ -240,7 +242,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                         rctiObj.blowBackCost = dataList[1]
                         rctiObj.blowBackTotal = dataList[1]
                     # elif 'topup' in dataList[0].lower().replace(' ',''):
-                    #     rctiErrorObj.clientName = clientNames
+                    #     rctiErrorObj.clientName = clientName.clientId
                     #     rctiErrorObj.docketNumber = rctiObj.docketNumber
                     #     rctiErrorObj.docketDate = rctiObj.docketDate
                     #     rctiErrorObj.errorDescription = "Manage Top-up."
@@ -274,7 +276,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
                 # reconciliationDocketObj.truckConnectionId = rctiObjData.truckNo if reconciliationDocketObj.truckId == 0  else reconciliationDocketObj.truckId
                 reconciliationDocketObj.docketDate =  rctiObjData.docketDate
                 reconciliationDocketObj.rctiLoadAndKmCost =  rctiObjData.cartageTotal
-                reconciliationDocketObj.clientId =  clientNames
+                reconciliationDocketObj.clientId =  clientName.clientId
                 reconciliationDocketObj.rctiWaitingTimeCost = rctiObjData.waitingTimeTotal
                 reconciliationDocketObj.rctiTransferKmCost = rctiObjData.transferKMTotal
                 reconciliationDocketObj.rctiStandByCost =  rctiObjData.standByTotal
@@ -295,7 +297,7 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             with open('holcim.txt','a')as f:
                 f.write('error' +str(e) + ', '.join(data) +  fileName.split('@_!')[-1] +'\n')
             rctiErrorObj = RctiErrors()
-            rctiErrorObj.clientName = clientNames
+            rctiErrorObj.clientName = clientName.clientId
             rctiErrorObj.docketNumber = None
             rctiErrorObj.docketDate = None
             rctiErrorObj.exceptionText = e
@@ -308,3 +310,5 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
     
 
 
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')

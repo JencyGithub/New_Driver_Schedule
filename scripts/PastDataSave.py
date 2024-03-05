@@ -7,7 +7,8 @@ from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
 from variables import *
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 def getSelectedCostComponent(obj):
     checked = []
     
@@ -570,3 +571,6 @@ def run():
         checkShiftRevenueDifference(tripObjList=tripObjList)
     except Exception as e:
         print('PastTrip Error Difference Check',e)
+        
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('1')

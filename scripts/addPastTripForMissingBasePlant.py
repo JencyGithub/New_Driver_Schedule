@@ -7,7 +7,8 @@ from datetime import time
 import csv , re
 from variables import *
 from utils import *
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 f = open(r"scripts/addPastTripForMissingBasePlant.txt", 'r')
 basePlantName = f.read()
 
@@ -298,3 +299,7 @@ for i in rctiMatchingData:
             )
             rctiErrorObj.save()
             pass
+
+
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')

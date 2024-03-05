@@ -30,7 +30,6 @@ from scripts.PastDataSave import *
 import numpy as np
 from PIL import Image
 import pytesseract
-from djqscsv import render_to_csv_response
 
 
 
@@ -1184,7 +1183,7 @@ def rctiForm(request, id= None):
     basePlant = BasePlant.objects.all()
     if id:
         rcti = RCTI.objects.filter(pk=id).first()
-        rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
+        # rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
         
     params = {
         'rcti': rcti,
@@ -1424,6 +1423,15 @@ def rctiHolcimFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     startDate = request.POST.get('startDate')
@@ -1509,8 +1517,9 @@ def rctiSave(request):
                 with open('rctiReportId.txt','w')as f:
                     f.write(str(rctiReport.id) +','+ str(clientNameID.name) + ',' + str(startDate))
                 # return HttpResponse('work')
-                    
+
                 colorama.AnsiToWin32.stream = None
+               
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -1669,6 +1678,15 @@ def driverEntry(request):
 
 @csrf_protect
 def driverEntrySave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     Driver_csv_file = request.FILES.get('driverEntryFile')
     if not Driver_csv_file:
         return HttpResponse("No file uploaded")
@@ -2026,6 +2044,15 @@ def basePlantForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     clientBasePlant = request.POST.get('clientBasePlant')
     clientDepot = request.POST.get('clientDepot')
     dataList = {
@@ -2437,7 +2464,10 @@ def reconciliationAnalysis(request,dataType, download=None):
     endDate = dateConvert(request.POST.get('endDate'))
     redirectUrl = 'Reconciliation/reconciliation-result.html'
     
-    params = {}
+    params = {
+        'startDate': dateConverterFromTableToPageFormate(startDate),
+        'endDate': dateConverterFromTableToPageFormate(endDate),
+    }
     if dataType == 0:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
         params['dataType'] = 'Reconciliation'
@@ -2466,32 +2496,30 @@ def reconciliationAnalysis(request,dataType, download=None):
                 driver_leave_days_dict[leave.employee.name] += duration
 
         driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
+        params['response_content']= driver_leave_days_list
+        params['dataType']= 'Custom'
+        params['dataTypeInt']= 9
 
-        params = {
-            'response_content': driver_leave_days_list,
-            'dataType': 'Custom',
-            'dataTypeInt': 9,
-        }
         redirectUrl = "Account/Tables/customTable.html"
         # return render(request, 'Account/Tables/customTable.html', params)
     elif dataType == 10:
-        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate))
+        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate)).values()
         clientObj = Client.objects.all()
         clientTruckConnectionObj = ClientTruckConnection.objects.all()
         basePlantObj = BasePlant.objects.all()
-        params = {
-            'clientObj':clientObj,
-            'clientTruckConnectionObj':clientTruckConnectionObj,
-            'basePlantObj':basePlantObj,
-            'dataList':dataList,
-            'startDate':dateConverterFromTableToPageFormate(startDate),
-            'endDate':dateConverterFromTableToPageFormate(endDate),
-        }
+        params['clientObj']= clientObj
+        params['clientTruckConnectionObj']= clientTruckConnectionObj
+        params['basePlantObj']= basePlantObj
+        params['dataList']= dataList
+        params['dataTypeInt']= 10
+        # params['startDate']= dateConverterFromTableToPageFormate(startDate)
+        # params['endDate']= dateConverterFromTableToPageFormate(endDate)
+        
         redirectUrl = "Account/Tables/expensesTable.html"
-
-    for data in dataList:   
-        client = Client.objects.filter(pk=data['clientId']).first()
-        data['clientName'] = client.name if client else None
+    if dataType != 10:
+        for data in dataList:   
+            client = Client.objects.filter(pk=data['clientId']).first()
+            data['clientName'] = client.name if client else None
     params['dataList'] = dataList
     
     if download:
@@ -2970,7 +2998,15 @@ def checkOnOff(val_):
 
 @csrf_protect
 def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
-    # Rate Card
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rateCardID = None
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
@@ -3300,6 +3336,15 @@ def archiveResetRCTI(request):
 # @api_view(['POST'])
 @csrf_protect
 def pastTripSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     monthAndYear = str(request.POST.get('monthAndYear'))
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')
@@ -3382,6 +3427,15 @@ def surchargeForm(request, id=None):
 
 @csrf_protect
 def surchargeSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     dataList = {
         'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
     }
@@ -3585,6 +3639,15 @@ def report(request):
 
 @csrf_protect
 def reportSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     primaryFile = request.FILES.get('primaryFile')
     secondaryFile = request.FILES.get('secondaryFile')
 
