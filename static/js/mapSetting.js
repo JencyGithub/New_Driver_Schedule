@@ -1,4 +1,5 @@
 let map, infoWindow;
+getLocation();
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -10,6 +11,7 @@ function initMap() {
   // Call the geolocation function immediately after initializing the map
 }
 // $('#getLocation').on('click', function(){
+//  getLocation();
 // })
 
 function getLocation() {
@@ -57,5 +59,17 @@ $(document).ready(function(){
   getLocation();
 })
 
+
+$('#locationCheck').on('change', function(){
+  console.log($(this).prop("checked"))
+  if($(this).prop("checked") == true){
+    $('.fileUpload').removeClass('d-none')
+    $('.fileUpload input[type="file"]').attr('required', true)
+  }
+  else{
+    $('.fileUpload').addClass('d-none')
+    $('.fileUpload input[type="file"]').removeAttr('required')
+  }
+})
 
 // window.initMap = initMap;

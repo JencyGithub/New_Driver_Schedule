@@ -126,7 +126,7 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group ">
                                                                 <label for="docketDate">Docket date :<span class="required">*</span></label>
-                                                                <input class="form-control" type=date
+                                                                <input class="form-control" type="date" value="{{ rcti.docketDate|date:"Y-m-d" }}"
                                                                     style="padding: 0.25rem 0.2rem;" value="{{rcti.docketDate}}"
                                                                 {% if rcti %} readonly {% endif  %} >
                                                             </div>
@@ -622,7 +622,7 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="clientName"><span class="required">clientName*</span></label>
+                                                                <label for="clientName"><span class="required"><a href="{% url 'gearBox:clientEdit' id=rcti.clientName.clientId %}" target="blank">clientName*</a></span></label>
                                                                 <select class="form-control" {% if rcti or errorObj%} disabled {% endif %} required id="clientName" name="clientName">
                                                                     <option value="" disabled selected>Select Client Name</option>
                                                                     {% for clientName in clientNames %}
@@ -664,7 +664,7 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="docketDate">Docket date:<span class="required">*</span></label>
-                                                                <input class="form-control"  {% if rcti %} type="text"  {% else  %}  type="date" {% endif %} name="docketDate"  value="{{rcti.docketDate}}" id="docketDate" {% if rcti %} readonly {% endif %}>
+                                                                <input class="form-control"  type="date" value="{{ rcti.docketDate|date:"Y-m-d" }}" name="docketDate"  value="{{rcti.docketDate}}" id="docketDate" {% if rcti %} readonly {% endif %}>
                                                             </div>
                                                         </div>
                                                         

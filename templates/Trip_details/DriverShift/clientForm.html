@@ -12,11 +12,11 @@
             height:auto!important;
         } 
         .select2-selection__rendered{
-            padding:0.5rem!important;
+            padding:0.3rem 0.5rem !important;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: auto!important;
-            top: 1.4em!important;
+            top: 1.15em!important;
             right: 0.8em!important;
         }
     </style>
@@ -30,7 +30,7 @@
             <form action="{% url 'Account:clientAndTruckDataSave' id=shiftObj.id %}" method="POST" id="clientForm">
                 {% csrf_token %}
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6 col-sm-6">
                         <div class="col-md-12">
                             <label for="clientId">Client:<label>
                         </div>
@@ -47,7 +47,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6 col-sm-6">
                         <div>
                             <label for="truckNum">Truck:<label>
                         </div>
@@ -59,10 +59,26 @@
                                 </select>
                             {% endif %}
                     </div>
-                    <div class="col-md-4">
-                        <input type="submit" id="submit" value="Next" class="btn btn-default responsive-btn float-end w-100 mt-4" style="padding:.6rem 0;"/>
-                    </div>
                 </div>
+                <div class="row my-2">
+                    <div class="col-md-3 col-sm-3">
+                        <label for="startOdometers">Odometers Start</label>
+                        <input type="number" class="form-control" id="startOdometers" name="startOdometers" required> 
+                    </div>
+                    <!-- <div class="col-md-3 col-sm-3">
+                        <label for="endOdometers">Odometers End</label>
+                        <input type="number" class="form-control" id="endOdometers" name="endOdometers" required> 
+                    </div> -->
+                    <div class="col-md-3 col-sm-3">
+                        <label for="startEngineHours">Engine Hours Start</label>
+                        <input type="number" class="form-control" id="startEngineHours" name="startEngineHours" required> 
+                    </div>
+                    <!-- <div class="col-md-3 col-sm-3">
+                        <label for="endEngineHours">Engine Hours End</label>
+                        <input type="number" class="form-control" id="endEngineHours" name="endEngineHours" required> 
+                    </div> -->
+                </div>
+                <input type="submit" id="submit" value="Next" class="btn btn-sm btn-default float-end px-4"/>
             </form>
         </div>
     </div>
@@ -85,41 +101,42 @@
         $('#truckNum').select2();
         
         $("#clientId").on("change", function () {
-        let clientId = $(this).val();
-        let shiftId = {{ shiftObj.id }}
-        
-        if (clientId) {
-            $("#truckNum").prop("disabled", false);
-            $("#truckNum").html('<option value="">Loading...</option>');
-            $.ajax({
-            type: "POST",
-            url: "/account/getTrucks/",
-            data: {
-                clientName: $(this).val(),
-                shiftId: shiftId
-            },
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            },
-            success: function (data) {
-                $("#truckNum").html('<option value="">Select an Item</option>');
-                data.trucks.forEach(function (item) {
-                    $("#truckNum").append(
-                        // `<option value="${item}"  >${item}</option>`
-                        `<option value="${item}" ${item.includes('Occupied') ? 'disabled' : ''}>${item}</option>`
-                    );
+            let clientId = $(this).val();
+            let shiftId = "{{ shiftObj.id }}"
+            
+            if (clientId) {
+                $("#truckNum").prop("disabled", false);
+                $("#truckNum").html('<option value="">Loading...</option>');
+                $.ajax({
+                    type: "POST",
+                    url: "/account/getTrucks/",
+                    data: {
+                        clientName: $(this).val(),
+                        shiftId: shiftId
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (data) {
+                        $("#truckNum").html('<option value="">Select an Item</option>');
+                        data.trucks.forEach(function (item) {
+                            $("#truckNum").append(
+                                // `<option value="${item}"  >${item}</option>`
+                                `<option value="${item}" ${item.includes('Occupied') ? 'disabled' : ''}>${item}</option>`
+                            );
+                        });
+                        $("#truckNum").trigger("change.select2");
+                
+                        if (data.docket) {
+                        $("#nextBtn").val("Submit");
+                        } else {
+                        $("#nextBtn").val("Next");
+                        }
+                    },
                 });
-                $("#truckNum").trigger("change.select2");
-        
-                if (data.docket) {
-                $("#nextBtn").val("Submit");
-                } else {
-                $("#nextBtn").val("Next");
-                }
-            },
-            });
-        }
+            }
         });
+
     });
 </script>
 {% endblock  %}

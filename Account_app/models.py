@@ -67,6 +67,7 @@ class DriverShift(models.Model):
     startDateTime = models.DateTimeField(null=True, blank=True)
     endDateTime = models.DateTimeField(null=True, blank=True)
     driverId = models.IntegerField(null=True, blank=True)
+    locationImg = models.FileField(null=True)
     
     def __str__(self) -> str:
         return str(self.shiftDate) + '-' + str(self.id)
@@ -84,6 +85,11 @@ class DriverShiftTrip(models.Model):
     revenueDeficit = models.FloatField(default=0)
     loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
+    
+    startOdometerKms = models.FloatField(default=0, null=True)
+    endOdometerKms = models.FloatField(default=0, null=True)
+    startEngineHours = models.FloatField(default=0, null=True)
+    endEngineHours = models.FloatField(default=0, null=True)
     
     def __str__(self) -> str:
         return str(self.clientId) + str(self.startDateTime) + str(self.endDateTime) 
@@ -296,6 +302,7 @@ class RCTI(models.Model):
         ('slot','SLOT'),
     )
 
+    # ClientTruck id
     truckNo = models.FloatField(default=0)
     docketNumber = models.CharField(max_length=10,default='')
     docketDate = models.DateField()

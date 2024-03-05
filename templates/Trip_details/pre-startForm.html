@@ -66,55 +66,106 @@
 
         <div class="col-md-10 py-2 px-0">
             <!-- For validation -->
-            <form action="{% url 'Account:DriverPreStartSave' tripId=tripObj.id %}" method="post" id="preStartForm" onsubmit="return validateForm()" enctype="multipart/form-data">
+            <form action="#" method="post" id="preStartForm" onsubmit="return validateForm()" enctype="multipart/form-data">
                 {% csrf_token %}
-
                 <div class="card border-0">
                     <div class="card-body">
                         <h5>Pre-start </h5>
                         <hr>
-                        {% for question in preStartQuestions %}
-                            <div class="bg-light mb-3 px-3 py-1">
-                                <div class="row d-flex flex-wrap">
-                                    <div class="mb-2" style="width: 60%; min-width: 15em;">
-                                        <strong class="questionText">{{ question.questionText }}</strong>
+                        <div id="driverQues">
+                            {% comment %} Driver Related {% endcomment %}
+                            {% for question in preStartQuestions %}
+                                {% if question.questionType == "Driver related" %}
+                                    <div class="bg-light mb-3 px-3 py-1">
+                                        <div class="row d-flex flex-wrap">
+                                            <div class="mb-2" style="width: 60%; min-width: 15em;">
+                                                <strong class="questionText">{{ question.questionText }}</strong>
+                                            </div>
+                                            <div class="d-flex align-items-center" style="width: 40%;">
+                                                {% if question.optionTxt1 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt1 }}" id="q{{question.id}}o1" name="selector{{question.id}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o1" class="form-check-label">{{ question.optionTxt1 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt2 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt2 }}" id="q{{question.id}}o2" name="selector{{question.id}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o2" class="form-check-label">{{ question.optionTxt2 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt3 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt3 }}" id="q{{question.id}}o3" name="selector{{question.id}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o3" class="form-check-label">{{ question.optionTxt3 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt4 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt4 }}" id="q{{question.id}}o4" name="selector{{question.id}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o4" class="form-check-label">{{ question.optionTxt4 }}</label>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="row" id="requiredSection{{question.id}}">
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-center" style="width: 40%;">
-                                        {% if question.optionTxt1 is not None %}
-                                            <div class="form-check form-check-inline">
-                                                <input type="radio" value="{{ question.optionTxt1 }}" id="q{{question.id}}o1" name="selector{{question.id}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
-                                                <label for="q{{question.id}}o1" class="form-check-label">{{ question.optionTxt1 }}</label>
-                                            </div>
-                                        {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
 
-                                        {% if question.optionTxt2 is not None %}
-                                            <div class="form-check form-check-inline">
-                                                <input type="radio" value="{{ question.optionTxt2 }}" id="q{{question.id}}o2" name="selector{{question.id}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
-                                                <label for="q{{question.id}}o2" class="form-check-label">{{ question.optionTxt2 }}</label>
+                        <div id="otherQues" class="d-none">
+                            {% comment %} Other {% endcomment %}
+                            {% for question in preStartQuestions %}
+                                {% if question.questionType != "Driver related" %}
+                                    <div class="bg-light mb-3 px-3 py-1">
+                                        <div class="row d-flex flex-wrap">
+                                            <div class="mb-2" style="width: 60%; min-width: 15em;">
+                                                <strong class="questionText">{{ question.questionText }}</strong>
                                             </div>
-                                        {% endif %}
-
-                                        {% if question.optionTxt3 is not None %}
-                                            <div class="form-check form-check-inline">
-                                                <input type="radio" value="{{ question.optionTxt3 }}" id="q{{question.id}}o3" name="selector{{question.id}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
-                                                <label for="q{{question.id}}o3" class="form-check-label">{{ question.optionTxt3 }}</label>
+                                            <div class="d-flex align-items-center" style="width: 40%;">
+                                                {% if question.optionTxt1 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt1 }}" id="q{{question.id}}o1" name="selector{{question.id}}" onclick="checkRequired(optionNumber=1, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o1" class="form-check-label">{{ question.optionTxt1 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt2 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt2 }}" id="q{{question.id}}o2" name="selector{{question.id}}" onclick="checkRequired(optionNumber=2, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o2" class="form-check-label">{{ question.optionTxt2 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt3 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt3 }}" id="q{{question.id}}o3" name="selector{{question.id}}" onclick="checkRequired(optionNumber=3, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o3" class="form-check-label">{{ question.optionTxt3 }}</label>
+                                                    </div>
+                                                {% endif %}
+    
+                                                {% if question.optionTxt4 is not None %}
+                                                    <div class="form-check form-check-inline">
+                                                        <input type="radio" value="{{ question.optionTxt4 }}" id="q{{question.id}}o4" name="selector{{question.id}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
+                                                        <label for="q{{question.id}}o4" class="form-check-label">{{ question.optionTxt4 }}</label>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                        {% endif %}
-
-                                        {% if question.optionTxt4 is not None %}
-                                            <div class="form-check form-check-inline">
-                                                <input type="radio" value="{{ question.optionTxt4 }}" id="q{{question.id}}o4" name="selector{{question.id}}" onclick="checkRequired(optionNumber=4, questionNumber={{forloop.counter}}, questionId={{question.id}})" class="required-field form-check-input">
-                                                <label for="q{{question.id}}o4" class="form-check-label">{{ question.optionTxt4 }}</label>
-                                            </div>
-                                        {% endif %}
+                                        </div>
+                                        <div class="row" id="requiredSection{{question.id}}">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row" id="requiredSection{{question.id}}">
-                                </div>
-                            </div>
-                        {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
                         <textarea name="comment" id="comment" rows="3" class="form-control my-2" placeholder="Additional comment"></textarea>
-                        <button type="submit" class="btn btn-default float-end float-right">Submit</button>
+                        <span id="validateBtn" class="btn btn-sm btn-outline-dark float-end" onclick="checkDriverValidate()">Validate</span>
                     </div>
                 </div>
             </form>
@@ -123,12 +174,64 @@
         <div class="col-md-1"></div>
     </div>
 </div>
-
-
-
 {% endblock %}
+
 {% block footerStyleEnd %}
 <script>
+
+    function checkDriverValidate(){
+        let isValid = true
+        let url = "{% url 'Account:DriverPreStartSave' tripId=tripObj.id %}"
+        $('#driverQues .required-field').each(function() {
+            if ($(this).is(':radio')) {
+                var name = $(this).attr('name');
+                if ($('input[name=' + name + ']:checked').length == 0) {
+                    isValid = false;
+                    alert('Please answer all questions.');
+                    openTabs(this);
+                    return false; 
+                }
+            } else if ($(this).val().trim() === '') {
+                isValid = false;
+                let tagName = $(this).prop('tagName').toLowerCase()
+                if(tagName == 'textarea'){
+                    alert('Please add the required comment.');
+                }else{
+                    alert('Please answer all questions.');
+                }
+                openTabs(this);
+                return false; 
+            }
+        });
+        if(isValid){
+            console.log("files:",$('#driverQues input[type="file"]').length)
+
+            if($('#driverQues input[type="file"]').length > 0){
+                if(confirm('It appears you might not have the necessary authorization. Please reach out to our management team for further assistance.') == true){
+                    $("#validateBtn").remove()
+                    $("#preStartForm .card-body").append('<span id="endShiftBtn" class="btn btn-sm btn-outline-danger float-end" onclick="endShiftFun()">End shift</span>')
+
+                }                
+            }else{
+                $('#otherQues').removeClass('d-none')
+                $('#driverQues').addClass('d-none')
+                $('#endShiftBtn').remove()
+                $("#validateBtn").remove()
+                $("#preStartForm .card-body").append('<button type="submit" class="btn btn-sm btn-default float-end">Submit</button>')
+                $('#preStartForm').attr('action', url)
+            }
+        }
+    }
+
+    function endShiftFun(){
+        console.log('end')
+        if(confirm('Are you sure you want to complete this shift?') == true){
+            console.log('complete')
+        }else{
+            $('#endShiftBtn').remove()
+            $("#preStartForm .card-body").append('<span id="validateBtn" class="btn btn-sm btn-outline-dark float-end" onclick="checkDriverValidate()">Validate</span>')
+        }
+    }
 
     function openTabs(dataElement){
         $('.accordion-collapse').removeClass('show')
@@ -175,7 +278,6 @@
         }
         return isValid;
     }
-
     
     function checkRequired(optionNumber, questionNumber, questionId){
         $.ajax({
@@ -188,21 +290,17 @@
                 $(`#requiredSection${questionId}`).empty()
                 if(data.status){
                     let elementText = ''
-
                     elementText += `<div class="col-md-4 col-lg-3 col-sm-6 d-flex align-items-center p-0">`
                     elementText += `<input type="file" name="f${questionId}o${optionNumber}" id="f${questionId}o${optionNumber}">`
                     elementText += `</div>`
                     elementText += `<div class="col-md-8 col-lg-9 col-sm-6 p-0">`
                     elementText += `<textarea name="c${questionId}o${optionNumber}" id="c${questionId}o${optionNumber}" class="form-control mt-2 required-field w-100" placeholder="Add comment" rows="1"></textarea>`
                     elementText += `</div>`
-
-
                     $(`#requiredSection${questionId}`).append(elementText).addClass('p-2');
                 }
             },
         });        
     }
 
-    
 </script>
 {% endblock %}

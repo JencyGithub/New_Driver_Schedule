@@ -35,11 +35,19 @@
         <div class="card-body">
             <div class="d-flex justify-content-between">
                 <h5 class="card-title text-uppercase text-default d-inline-block">Start Shift</h5>
-                <!-- <span class="text-default" style="cursor: pointer;" id="getLocation">Get location</span> -->
+                {% comment %} <span class="text-default" style="cursor: pointer;" id="getLocation">Get location</span> {% endcomment %}
+                <div class="float-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="locationCheck" value="locationCheck">
+                        <label class="form-check-label" for="locationCheck">
+                            Suffering from location
+                        </label>
+                      </div>
+                </div>
 
             </div>
             <hr class="mt-1">  
-            <form action="{% url 'Account:mapDataSave' %}" method="POST">
+            <form action="{% url 'Account:mapDataSave' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %} 
                 <!-- <div class="col-md-8 my-2" style="min-height:25rem;">
                    <div id="map"></div>
@@ -68,7 +76,13 @@
                             <label for="time">Time</label>
                             <input type="time" name="time" id="time" class="form-control" value="{{time}}" readonly>
                         </div>
-                    </div>                
+                    </div> 
+                    <div class="col-sm-3 col-md-3 fileUpload d-none">
+                        <div class="my-1">
+                            <label for="locationImg">Upload location image</label>
+                            <input type="file" name="locationImg" id="locationImg" class="form-control">
+                        </div>
+                    </div>               
                 </div> 
                 <div class="row mt-2">
                     <div class="col-12">

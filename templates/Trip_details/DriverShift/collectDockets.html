@@ -102,12 +102,12 @@
         const startInput = $(`#${startId}`);
         const endInput = $(`#${endId}`);
         if (startInput.prop("readonly")) {
-            startInput.removeAttr("readonly");
+            startInput.removeAttr("readonly").attr('required', true);
             if (endId) {
                 endInput.removeAttr("readonly");
             }
         } else {
-            startInput.prop("readonly", true);
+            startInput.prop("readonly", true).removeAttr('required');
             startInput.val('');
             if (endId) {
                 endInput.prop("readonly", true);
