@@ -64,7 +64,11 @@
     {% block content %}{% endblock %} 
 
     {% include "Trip_details/main/footer.html"%}
-
+    <script type = "text/javascript" >
+      function preventBack() { window.history.forward(); }
+      setTimeout("preventBack()", 0);
+      window.onunload = function () { null };
+    </script>
     <script>
       function setTime(elementId) {
         var now = new Date();
@@ -101,6 +105,8 @@
         var dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
         document.getElementById(elementId).value = dateTimeString;
       }
+
+    
     </script>
     <!-- footer start scripts  -->
     {% block footerStyle %} {% endblock %}
@@ -130,11 +136,11 @@
     <script>
       alertify.set('notifier', 'position', 'top-right');
       {% if message.tags == 'error' %}
-        alertify.error('{{ message|escapejs }}');
+        alertify.error('{{ message|escapejs }}').delay(15);
       {% elif message.tags == 'success' %}
-        alertify.success('{{ message|escapejs }}');
+        alertify.success('{{ message|escapejs }}').delay(15);
       {% elif message.tags == 'warning' %}
-        alertify.warning('{{ message|escapejs }}');
+        alertify.warning('{{ message|escapejs }}').delay(15);
       {% endif %}
 
     </script>

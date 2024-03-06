@@ -67,7 +67,6 @@
         <div class="col-md-10 py-2 px-0">
             <!-- For validation -->
             <form action="#" method="post" id="preStartForm" onsubmit="return validateForm()" enctype="multipart/form-data">
-                <input type="hidden" name="dateTime" id="dateTime">
                 {% csrf_token %}
                 <div class="card border-0">
                     <div class="card-body">
@@ -75,6 +74,8 @@
                         <hr>
                         <div id="driverQues">
                             {% comment %} Driver Related {% endcomment %}
+                            <input type="hidden" name="dateTime" id="dateTime">
+
                             {% for question in preStartQuestions %}
                                 {% if question.questionType == "Driver related" %}
                                     <div class="bg-light mb-3 px-3 py-1">
@@ -205,8 +206,6 @@
             }
         });
         if(isValid){
-            console.log("files:",$('#driverQues input[type="file"]').length)
-
             if($('#driverQues input[type="file"]').length > 0){
                 if(confirm('It appears you might not have the necessary authorization. Please reach out to our management team for further assistance.') == true){
                     $("#validateBtn").remove()
@@ -225,9 +224,10 @@
     }
 
     function endShiftFun(){
-        console.log('end')
         if(confirm('Are you sure you want to complete this shift?') == true){
-            console.log('complete')
+            setDateTime("dateTime");            
+            $('#preStartForm').attr('action',"{% url 'Account:DriverPreStartSaveWithEndShift' tripId=tripObj.id endShift=1 %}").removeAttr('onsubmit').submit()
+
         }else{
             $('#endShiftBtn').remove()
             $("#preStartForm .card-body").append('<span id="validateBtn" class="btn btn-sm btn-outline-dark float-end" onclick="checkDriverValidate()">Validate</span>')
