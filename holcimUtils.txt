@@ -1,152 +1,152 @@
-pattern not match['Holcim Australia Pty Ltd']holcim.csv
-pattern not match['Holcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                Page 1 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                Page 1 of 7']holcim.csv
-pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908         INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908         INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Total Income:                459.00']holcim.csv
-pattern not match['Total Income:                459.00']holcim.csv
-pattern not match['Total GST Paid:              45.90']holcim.csv
-pattern not match['Total GST Paid:              45.90']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['0             0.000         0.00                                                      504.90']holcim.csv
-pattern not match['0             0.000         0.00                                                      504.90']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                             Page 2 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                             Page 2 of 7']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                               23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                               23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                           Page 3 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                           Page 3 of 7']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']holcim.csv
-pattern not match['Total Income:                9,545.40']holcim.csv
-pattern not match['Total Income:                9,545.40']holcim.csv
-pattern not match['Total GST Paid:              954.54']holcim.csv
-pattern not match['Total GST Paid:              954.54']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['54            283.000        288.40     M3       565                                   10,499.94']holcim.csv
-pattern not match['54            283.000        288.40     M3       565                                   10,499.94']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                Page 4 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                Page 4 of 7']holcim.csv
-pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908         INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908         INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Total Income:                378.00']holcim.csv
-pattern not match['Total Income:                378.00']holcim.csv
-pattern not match['Total GST Paid:              37.80']holcim.csv
-pattern not match['Total GST Paid:              37.80']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['0             0.000         0.00       M3                                             415.80']holcim.csv
-pattern not match['0             0.000         0.00       M3                                             415.80']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 5 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                            Page 5 of 7']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                              23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                              23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                           Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                           Adjustment Reason']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                           Page 6 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                                                           Page 6 of 7']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:       321908          INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:        02.02.2024']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']holcim.csv
-pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']holcim.csv
-pattern not match['Total Income:                10,992.58']holcim.csv
-pattern not match['Total Income:                10,992.58']holcim.csv
-pattern not match['Total GST Paid:              1,099.26']holcim.csv
-pattern not match['Total GST Paid:              1,099.26']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']holcim.csv
-pattern not match['58            325.800        333.40     M3       504                                   12,091.84']holcim.csv
-pattern not match['58            325.800        333.40     M3       504                                   12,091.84']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['\x0cHolcim Australia Pty Ltd']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                  Page 7 of 7']holcim.csv
-pattern not match['ABN:      87099732297                                                                                                                  Page 7 of 7']holcim.csv
-pattern not match['Area:     15                                                                          GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Area:     15                                                                          GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']holcim.csv
-pattern not match['Owner:     321908           INVEST DASH PTY LTD']holcim.csv
-pattern not match['Owner:     321908           INVEST DASH PTY LTD']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['44 ELEEBANA AVENUE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['HUGHESDALE']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Payment Cut-Off Date:       02.02.2024']holcim.csv
-pattern not match['Adjustments for Vendor:     321908              INVEST DASH PTY LTD']holcim.csv
-pattern not match['Adjustments for Vendor:     321908              INVEST DASH PTY LTD']holcim.csv
-pattern not match['Date        Docket #       Load Qty      Paid Qty   Units   KM/Zone   Description                    Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Date        Docket #       Load Qty      Paid Qty   Units   KM/Zone   Description                    Amount (AUD)   Delivery Address             Adjustment Reason']holcim.csv
-pattern not match['Total Adjustments:             19,549.44']holcim.csv
-pattern not match['Total Adjustments:             19,549.44']holcim.csv
-pattern not match['Total for Vendor: Trips    Load Qty      Paid Qty   Units   Km/Zone                                  Amount (AUD)']holcim.csv
-pattern not match['Total for Vendor: Trips    Load Qty      Paid Qty   Units   Km/Zone                                  Amount (AUD)']holcim.csv
-pattern not match['112           608.800       621.80     M3      1069                                     43,061.92']holcim.csv
-pattern not match['112           608.800       621.80     M3      1069                                     43,061.92']holcim.csv
+pattern not match['Holcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['Holcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                Page 1 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                Page 1 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908         INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908         INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                459.00']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                459.00']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              45.90']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              45.90']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['0             0.000         0.00                                                      504.90']Yeppoon-January-2024Cartage.csv
+pattern not match['0             0.000         0.00                                                      504.90']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                             Page 2 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                             Page 2 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                               23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                               23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                            Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                           Page 3 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                           Page 3 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                9,545.40']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                9,545.40']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              954.54']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              954.54']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['54            283.000        288.40     M3       565                                   10,499.94']Yeppoon-January-2024Cartage.csv
+pattern not match['54            283.000        288.40     M3       565                                   10,499.94']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                Page 4 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                Page 4 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                        GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908         INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908         INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty      Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                378.00']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                378.00']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              37.80']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              37.80']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty      Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['0             0.000         0.00       M3                                             415.80']Yeppoon-January-2024Cartage.csv
+pattern not match['0             0.000         0.00       M3                                             415.80']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                            Page 5 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                            Page 5 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                              23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                              23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                           Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                 Amount (AUD)   Delivery Address                                                           Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                           Page 6 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                                                           Page 6 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                         GROSS CARTAGE INCOME STATEMENT                                                             23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:       321908          INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:        02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date          Docket #     Load Qty       Paid Qty   Units   KM/Zone   Description                  Amount (AUD)   Delivery Address                                                       Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                10,992.58']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Income:                10,992.58']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              1,099.26']Yeppoon-January-2024Cartage.csv
+pattern not match['Total GST Paid:              1,099.26']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Truck: Trips     Load Qty       Paid Qty   Units   Km/Zone                                Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['58            325.800        333.40     M3       504                                   12,091.84']Yeppoon-January-2024Cartage.csv
+pattern not match['58            325.800        333.40     M3       504                                   12,091.84']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['\x0cHolcim Australia Pty Ltd']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                  Page 7 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['ABN:      87099732297                                                                                                                  Page 7 of 7']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                          GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Area:     15                                                                          GROSS CARTAGE INCOME STATEMENT                   23.02.2024 13:52:35']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:     321908           INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Owner:     321908           INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['44 ELEEBANA AVENUE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['HUGHESDALE']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Payment Cut-Off Date:       02.02.2024']Yeppoon-January-2024Cartage.csv
+pattern not match['Adjustments for Vendor:     321908              INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Adjustments for Vendor:     321908              INVEST DASH PTY LTD']Yeppoon-January-2024Cartage.csv
+pattern not match['Date        Docket #       Load Qty      Paid Qty   Units   KM/Zone   Description                    Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Date        Docket #       Load Qty      Paid Qty   Units   KM/Zone   Description                    Amount (AUD)   Delivery Address             Adjustment Reason']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Adjustments:             19,549.44']Yeppoon-January-2024Cartage.csv
+pattern not match['Total Adjustments:             19,549.44']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Vendor: Trips    Load Qty      Paid Qty   Units   Km/Zone                                  Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['Total for Vendor: Trips    Load Qty      Paid Qty   Units   Km/Zone                                  Amount (AUD)']Yeppoon-January-2024Cartage.csv
+pattern not match['112           608.800       621.80     M3      1069                                     43,061.92']Yeppoon-January-2024Cartage.csv
+pattern not match['112           608.800       621.80     M3      1069                                     43,061.92']Yeppoon-January-2024Cartage.csv

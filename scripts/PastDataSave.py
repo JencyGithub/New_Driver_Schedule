@@ -7,8 +7,7 @@ from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
 from variables import *
-with open('last_subprocess_run_time.txt','w')as f:
-    f.write('0')
+
 def getSelectedCostComponent(obj):
     checked = []
     
@@ -457,6 +456,8 @@ def saveDate(driverObj,clientObj,data,shiftDate,startTimeDateTime,endTimeDateTim
 
 
 def run():
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('0')
     warnings.filterwarnings('ignore')
     f = open(r"pastTrip_entry.txt", 'r')
     data = f.read().split(',')
@@ -570,7 +571,8 @@ def run():
         tripObjList = DriverShiftTrip.objects.filter(pk__in = tripIdList)
         checkShiftRevenueDifference(tripObjList=tripObjList)
     except Exception as e:
-        print('PastTrip Error Difference Check',e)
+        pass
+        # print('PastTrip Error Difference Check',e)
         
     with open('last_subprocess_run_time.txt','w')as f:
         f.write('1')

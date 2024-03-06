@@ -559,19 +559,11 @@ def timeOfStartSave(request):
     
 def mapFormView(request):
     driverObj = Driver.objects.filter(name=request.user.username).first()
-    shiftObj = DriverShift.objects.filter(driverId=driverObj.driverId).first()
-
-    if shiftObj:
-        messages.error(request, "You can only have one shift per day. Please complete your current shift before starting a new one.")
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    
     if not driverObj:
         messages.error(request, "Only driver can access this.")
         return redirect(request.META.get('HTTP_REFERER'))
     
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
-    
     if shiftObj:
         existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
         if existingTrip:
@@ -584,11 +576,17 @@ def mapFormView(request):
             return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
         currentDate = getCurrentDateTimeObj()
-        params = {
-            'date':dateConverterFromTableToPageFormate(currentDate),
-            'time':str(currentDate.time()).split('.')[0],
-        }
-        return render(request, 'Trip_details/DriverShift/mapForm.html', params)
+        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate.date()).first()
+
+        if todayShiftObj:
+            messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            params = {
+                'date':dateConverterFromTableToPageFormate(currentDate),
+                'time':str(currentDate.time()).split('.')[0],
+            }
+            return render(request, 'Trip_details/DriverShift/mapForm.html', params)
 
 @csrf_protect
 def mapDataSave(request, recurring=None):

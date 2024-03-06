@@ -86,7 +86,8 @@ try:
     checkShiftRevenueDifference(tripObjList=tripObjList)
 except Exception as e:
     pass
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')
 # # RCTI FUNCTION 
 def convertIntoFloat(str_):
     if '(' in str_:
