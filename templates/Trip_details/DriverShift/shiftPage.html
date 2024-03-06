@@ -101,6 +101,7 @@
                             {% endfor %} 
                             <form action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" method="post">
                                 {% csrf_token %}
+                                <input type="hidden" name="dateTime" id="dateTime">
                                 <div class="col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col-md-8 col-sm-8 my-2">
@@ -217,6 +218,7 @@
         })
 
         $('#endShift').on('click', function(event) {
+            setDateTime("dateTime");            
             if ($('#forgetEnd').is(':checked')) {
                 if(!$('#endDateTime').val()){
                     console.log($('#endDateTime').val())

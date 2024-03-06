@@ -173,9 +173,10 @@ def holcimDateConvertStr(str_):
 
 
 def getCurrentDateTimeObj():
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDateTime = datetime.now(tz=currentTimezone)
-    return currentDateTime
+    # currentTimezone = pytz.timezone('Asia/Kolkata')
+    # currentDateTime = datetime.now(tz=currentTimezone)
+    # return currentDateTime
+    return datetime.now()
 
 def formatDateTimeForDBSave(dateTimeStr):
     if dateTimeStr:
@@ -184,7 +185,21 @@ def formatDateTimeForDBSave(dateTimeStr):
         dateTimeStr = None
     return dateTimeStr
 
-
+def dateTimeObj(date=None, time=None, dateTimeObj=None):
+    if dateTimeObj:
+        return datetime.fromisoformat(dateTimeObj)
+    elif date and time:
+        year, month, day = map(int, date.split('-'))
+        hours, minutes, seconds = map(int, time.split(':'))
+        return datetime(year, month, day, hours, minutes, seconds)
+    elif date:
+        year, month, day = map(int, date.split('-'))
+        return date(year, month, day)
+    elif time:
+        hours, minutes, seconds = map(int, time.split(':'))
+        return time(hours, minutes, seconds)
+    else:
+        return None
 
 # driverShift form admin side 
 

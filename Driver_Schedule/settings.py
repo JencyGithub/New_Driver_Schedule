@@ -100,11 +100,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-    
 }
-
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -134,7 +130,7 @@ TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -161,8 +157,6 @@ MODEL_TO_CSV_FILE_NAME = ''
 
 
 CSRF_TRUSTED_ORIGINS = ['https://*.127.0.0.1','https://*.azurewebsites.net','https://globalsmartsolutions.biz']
-
-
 
 PWA_APP_NAME = 'robotrack'
 PWA_APP_DESCRIPTION = "Robo Track"

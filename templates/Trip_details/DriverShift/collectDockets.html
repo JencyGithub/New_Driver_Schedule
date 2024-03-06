@@ -19,6 +19,7 @@
                 <div class="col-md-12 col-12">
                     {% comment %} <form action="{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripObj.id endShift=endShift %}" method="post" enctype="multipart/form-data" id="docketsForm"> {% endcomment %}
                     <form action="#" method="post" enctype="multipart/form-data" id="docketsForm">
+                        <input type="hidden" name="dateTime" id="dateTime">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-12">
@@ -137,6 +138,7 @@
 
     $('#docketsForm').submit(function(event) {
         event.preventDefault();
+        setDateTime("dateTime");            
         var validExtensions = ['jpg', 'jpeg']
         var values = [];
         var docketNumberInputs = $('input[name^="docketNumber"]');

@@ -4,6 +4,9 @@
   .panel_toolbox {
     min-width: 0;
   }
+  .count{
+    cursor: pointer;
+  }
 </style>
 
 {% endblock %}
@@ -17,32 +20,41 @@
       <div class="col-md-2 col-sm-4 tile_stats_count">
         <span class="count_top">Driver Dispute</span>
         <div class="count">{{disputeCount}}</div>
-       
       </div>
       <div class="col-md-2 col-sm-4 tile_stats_count">
         <span class="count_top">Driver Reimbursement</span>
         <div class="count">{{reimbursementCount}}</div>
-        
       </div>
       <div class="col-md-2 col-sm-4 tile_stats_count">
-        <span class="count_top">Pre-start not filled </span>
-        <div class="count ">{{preStartPendingCount}}</div>
-        
+        <form action="{% url 'Account:ShiftDetails' id=3 %}" method="POST" id="preStartNotFilled">
+          {% csrf_token %}
+          <input type="hidden" name="startDate" id="preStartNotFilledStartDate">
+          <input type="hidden" name="endDate" id="preStartNotFilledEndDate">
+          <span class="count_top">Pre-start not filled </span>
+          <div class="count ">{{preStartPendingCount}}</div>
+        </form>
       </div>
       <div class="col-md-2 col-sm-4 tile_stats_count">
-        <span class="count_top">Shift Completed</span>
-        <div class="count">{{completedShiftsCount}}</div>
-        
+        <form action="{% url 'Account:ShiftDetails' id=0 %}" method="POST" id="completedShift">
+          {% csrf_token %}
+          <input type="hidden" name="startDate" id="completedShiftStartDate">
+          <input type="hidden" name="endDate" id="completedShiftEndDate">
+          <span class="count_top">Shift Completed</span>
+          <div class="count">{{completedShiftsCount}}</div>
+        </form>
       </div>
       <div class="col-md-2 col-sm-4 tile_stats_count">
-        <span class="count_top">Pre-start completed </span>
-        <div class="count">{{continueShiftsCount}}</div>
-        
+        <form action="{% url 'Account:ShiftDetails' id=2 %}" method="POST" id="preStartForm">
+          {% csrf_token %}
+          <input type="hidden" name="startDate" id="preStartStartDate">
+          <input type="hidden" name="endDate" id="preStartEndDate">
+          <span class="count_top">Pre-start completed </span>
+          <div class="count">{{continueShiftsCount}}</div>
+        </form></form>
       </div>
       <div class="col-md-2 col-sm-4 tile_stats_count">
         <span class="count_top">Total shifts</span>
         <div class="count green">{{totalShiftsCount}}</div>
-        
       </div>
       
     </div>
@@ -149,7 +161,6 @@
                   {% endfor %}
                 </tbody>
               </table>
-
             </div>
           </div>
         </div>
@@ -166,6 +177,23 @@
   $(document).ready(function(){
     canvasDoughnutSet()
   });
+
+  $('#completedShift .count').on('click', function(){
+    setDate("completedShiftStartDate")
+    setDate("completedShiftEndDate")
+    $("#completedShift").submit()
+  })
+  $('#preStartForm .count').on('click', function(){
+    setDate("preStartStartDate")
+    setDate("preStartEndDate")
+    $("#preStartForm").submit()
+  })
+  $('#preStartNotFilled .count').on('click', function(){
+    setDate("preStartNotFilledStartDate")
+    setDate("preStartNotFilledEndDate")
+    $("#preStartNotFilled").submit()
+  })
+
   function canvasDoughnutSet() {
     if (
       "undefined" != typeof Chart &&
@@ -178,7 +206,7 @@
           labels: ["Reconciliation", "Write-off", "Short-paid"],
           datasets: [
             {
-              data: [{{reconciliationCount}}, {{writeOfCount}}, {{shortPaidCount}}],
+              data: ["{{reconciliationCount}}", "{{writeOfCount}}", "{{shortPaidCount}}"],
               backgroundColor: [
                 "#BDC3C7",
                 "#9B59B6",

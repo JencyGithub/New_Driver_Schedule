@@ -89,6 +89,44 @@
         {% block content %}{% endblock %} {% include "main/footer.html"%}
       </div>
     </div>
+
+    <script>
+      function setTime(elementId) {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+        hours = (hours < 10 ? "0" : "") + hours;
+        minutes = (minutes < 10 ? "0" : "") + minutes;
+        seconds = (seconds < 10 ? "0" : "") + seconds;
+        var timeString = hours + ":" + minutes + ":" + seconds;
+        $(`#${elementId}`).val(timeString);
+      }
+
+      function setDate(elementId) {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1; // January is 0, so we add 1
+        var day = now.getDate();
+        month = (month < 10 ? "0" : "") + month;
+        day = (day < 10 ? "0" : "") + day;
+        var dateString = year + "-" + month + "-" + day;
+        document.getElementById(elementId).value = dateString;
+      }
+
+      function setDateTime(elementId) {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = (now.getMonth() + 1).toString().padStart(2, '0'); // January is 0, so we add 1
+        var day = now.getDate().toString().padStart(2, '0');
+        var hours = now.getHours().toString().padStart(2, '0');
+        var minutes = now.getMinutes().toString().padStart(2, '0');
+        var seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        var dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        document.getElementById(elementId).value = dateTimeString;
+      }
+    </script>
     <!-- footer start scripts  -->
     {% block footerStyle %} {% endblock %}
     

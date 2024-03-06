@@ -1,5 +1,4 @@
 let map, infoWindow;
-getLocation();
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -10,9 +9,6 @@ function initMap() {
 
   // Call the geolocation function immediately after initializing the map
 }
-// $('#getLocation').on('click', function(){
-//  getLocation();
-// })
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -39,7 +35,7 @@ function getLocation() {
         handleLocationError(true, infoWindow, map.getCenter());
       }
     );
-  } 
+  }
   // else {
   //   handleLocationError(false, infoWindow, map.getCenter());
   // }
@@ -52,24 +48,31 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
       ? "Error: The Geolocation service failed."
       : "Error: Your browser doesn't support geolocation."
   );
- 
+
   infoWindow.open(map);
 }
-$(document).ready(function(){
+
+$(document).ready(function () {
   getLocation();
-})
-
-
-$('#locationCheck').on('change', function(){
-  console.log($(this).prop("checked"))
-  if($(this).prop("checked") == true){
-    $('.fileUpload').removeClass('d-none')
-    $('.fileUpload input[type="file"]').attr('required', true)
-  }
-  else{
-    $('.fileUpload').addClass('d-none')
-    $('.fileUpload input[type="file"]').removeAttr('required')
-  }
-})
+});
 
 // window.initMap = initMap;
+
+$("#locationCheck").on("change", function () {
+  if ($(this).prop("checked") == true) {
+    $(".fileUpload").removeClass("d-none");
+    $('.fileUpload input[type="file"]').attr("required", true);
+  } else {
+    $(".fileUpload").addClass("d-none");
+    $('.fileUpload input[type="file"]').removeAttr("required");
+  }
+});
+
+$('#mapForm').submit(function(e){
+  setTime("time");
+  setDate("date");
+});
+
+getLocation();
+setTime("time");
+setDate("date");

@@ -155,6 +155,14 @@ class DriverBreak(models.Model):
     def __str__(self) -> str:
         return str(self.driverId.name)
 
+    def save(self, *args, **kwargs):
+        if self.startDateTime and self.endDateTime:
+            duration = (self.endDateTime - self.startDateTime).total_seconds() / 60
+            self.durationInMinutes = max(duration, 0) 
+        else:
+            self.durationInMinutes = 0  
+        super().save(*args, **kwargs)
+
 class DriverReimbursement(models.Model):
     shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None, null=True)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)

@@ -47,7 +47,7 @@
 
             </div>
             <hr class="mt-1">  
-            <form action="{% url 'Account:mapDataSave' %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url 'Account:mapDataSave' %}" method="POST" enctype="multipart/form-data" id="mapForm">
                 {% csrf_token %} 
                 <!-- <div class="col-md-8 my-2" style="min-height:25rem;">
                    <div id="map"></div>
@@ -68,13 +68,16 @@
                     <div class="col-md-3 col-sm-4">
                         <div class="my-1">
                             <label for="date">Date</label>
-                            <input type="date" name="date" id="date" class="form-control" value="{{date}}" readonly>
+                            <!-- <input type="date" name="date" id="date" class="form-control" value="{{date}}" readonly> -->
+                            <input type="date" name="date" id="date" class="form-control" readonly>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-4">
                         <div class="my-1">
+                            <label for="" id="time1"></label>
                             <label for="time">Time</label>
-                            <input type="time" name="time" id="time" class="form-control" value="{{time}}" readonly>
+                            <!-- <input type="time" name="time" id="time" class="form-control" value="{{time}}" readonly> -->
+                            <input type="time" name="time" id="time" class="form-control" readonly>
                         </div>
                     </div> 
                     <div class="col-sm-3 col-md-3 fileUpload d-none">
