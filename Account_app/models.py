@@ -148,6 +148,7 @@ class DriverBreak(models.Model):
     startDateTime = models.DateTimeField(default='', null=True)
     endDateTime = models.DateTimeField(default='', null=True)
     breakFile = models.FileField(default='', null=True)
+    durationInMinutes = models.FloatField(default=0, null=True) 
     location = models.CharField(max_length=2048, default='', null=True)
     description = models.CharField(max_length=2048, default='', null=True)
     

@@ -476,6 +476,7 @@ def questionAddSave(request, id):
     questionObj.questionText = request.POST.get("quetxt")
     questionObj.questionType = request.POST.get("quetype")
     questionObj.questionNo = countPreStartQuestion
+    questionObj.questionNo = countPreStartQuestion
     
     queTxt1 = request.POST.get('opt1')
     queTxt2 = request.POST.get('opt2')

@@ -36,6 +36,7 @@ def checkStr(data:str):
     
 manuallyManaged = ["creekpayment","accommodation","topup","ampol","inspectionfailure","diwalisweets","missingdocketpayment"]
 
+# for clear old data 
 with open('holcimUtils.txt', 'w') as file:
     pass 
 with open('holcim.txt', 'w') as file:
@@ -306,7 +307,8 @@ with open(f'static/Account/RCTI/RCTIInvoice/{fileName}','r') as f:
             rctiErrorObj.data = ', '.join(data)
             # rctiErrorObj.errorType = 1
             rctiErrorObj.save()
-
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('1')
     
 
 

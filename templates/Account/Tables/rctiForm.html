@@ -622,7 +622,7 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="clientName"><span class="required"><a href="{% url 'gearBox:clientEdit' id=rcti.clientName.clientId %}" target="blank">clientName*</a></span></label>
+                                                                <label for="clientName"><span class="required"><a href="{% if rcti%}{% url 'gearBox:clientEdit' id=rcti.clientName.clientId %}{% else %}#{% endif %}" target="blank">clientName*</a></span></label>
                                                                 <select class="form-control" {% if rcti or errorObj%} disabled {% endif %} required id="clientName" name="clientName">
                                                                     <option value="" disabled selected>Select Client Name</option>
                                                                     {% for clientName in clientNames %}

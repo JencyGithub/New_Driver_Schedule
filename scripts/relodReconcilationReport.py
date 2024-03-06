@@ -6,7 +6,8 @@ from Account_app.reconciliationUtils import  *
 from datetime import time
 import warnings
 from variables import *
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 
 reconciliationQuerySet = ReconciliationReport.objects.filter(fromDriver = True)
 
@@ -61,3 +62,6 @@ for reconciliationDocketObj in reconciliationQuerySet:
     reconciliationDocketObj.save()
     checkMissingComponents(reconciliationDocketObj)
     print('Save' , reconciliationDocketObj.docketNumber ,driverWaitingTimeCost)
+    
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')

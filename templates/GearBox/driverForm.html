@@ -41,7 +41,7 @@
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="name" required="required"
-                                                id="name" type="text"
+                                                id="name" type="text" {% if data %}readonly{% endif %}
                                                 value="{% if data %}{{data.name}}{% else %}{% endif %}" />
                                         </div>
                                     </div>
@@ -326,7 +326,6 @@
                                         <label for="contact" class="col-form-label col-md-3 col-sm-3 label-align">Phone :</label>
                                         <div class="field item form-group col-md-6 col-sm-6 d-flex">
                                             <input class="form-control" name="contact" id="contact" type="number"
-                                            value="{% if data %}{{data.phone}}{% endif %}" />
                                             value="{% if data %}{{data.phone}}{% endif %}" />
                                         </div>
                                     </div>

@@ -21,7 +21,7 @@ from dateutil.relativedelta import relativedelta
 from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
-from django.db.models import F, ExpressionWrapper, fields
+from django.db.models import F, ExpressionWrapper, fields, Max
 from django.db.models.functions import Cast
 from datetime import datetime
 from collections import defaultdict
@@ -30,7 +30,6 @@ from scripts.PastDataSave import *
 import numpy as np
 from PIL import Image
 import pytesseract
-from djqscsv import render_to_csv_response
 
 
 
@@ -560,13 +559,11 @@ def timeOfStartSave(request):
     
 def mapFormView(request):
     driverObj = Driver.objects.filter(name=request.user.username).first()
-    
     if not driverObj:
         messages.error(request, "Only driver can access this.")
         return redirect(request.META.get('HTTP_REFERER'))
     
     shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
-    
     if shiftObj:
         existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
         if existingTrip:
@@ -579,11 +576,17 @@ def mapFormView(request):
             return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
         currentDate = getCurrentDateTimeObj()
-        params = {
-            'date':dateConverterFromTableToPageFormate(currentDate),
-            'time':str(currentDate.time()).split('.')[0],
-        }
-        return render(request, 'Trip_details/DriverShift/mapForm.html', params)
+        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate.date()).first()
+
+        if todayShiftObj:
+            messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            params = {
+                'date':dateConverterFromTableToPageFormate(currentDate),
+                'time':str(currentDate.time()).split('.')[0],
+            }
+            return render(request, 'Trip_details/DriverShift/mapForm.html', params)
 
 @csrf_protect
 def mapDataSave(request, recurring=None):
@@ -666,17 +669,15 @@ def clientAndTruckDataSave(request, id):
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
     startOdometers = request.POST.get('startOdometers')
-    endOdometers = request.POST.get('endOdometers')
     startEngineHours = request.POST.get('startEngineHours')
-    endEngineHours = request.POST.get('endEngineHours')
     
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
     clientTruckNum = truckNum[1]
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
     truckInfoObj = truckConnectionObj.truckNumber.truckInformation
-    truckInfoObj.odometerKms= endOdometers
-    truckInfoObj.engineHours= endEngineHours
+    # truckInfoObj.odometerKms= endOdometers
+    # truckInfoObj.engineHours= endEngineHours
     truckInfoObj.save()
 
     tripObj = DriverShiftTrip()
@@ -684,9 +685,7 @@ def clientAndTruckDataSave(request, id):
     tripObj.clientId = clientObj.clientId
     tripObj.truckConnectionId = truckConnectionObj.id
     tripObj.startOdometerKms = startOdometers
-    tripObj.endOdometerKms = endOdometers
     tripObj.startEngineHours = startEngineHours
-    tripObj.endEngineHours = endEngineHours
     tripObj.save()
     
     return redirect('Account:showPreStartForm', shiftId=tripObj.shiftId, tripId=tripObj.id)
@@ -805,7 +804,7 @@ def driverShiftView(request, shiftId):
     return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
 
 
-def addDriverBreak(request, shiftId):
+def addDriverBreak(request, shiftId, breakId=None):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
     shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
@@ -818,14 +817,20 @@ def addDriverBreak(request, shiftId):
         'clientName' : clientName,
         'currentTime' : currentTime
     }
+    
+    if breakId:
+        breakData = DriverBreak.objects.filter(pk=breakId).first()
+        breakData.startDateTime = breakData.startDateTime.strftime('%Y-%m-%dT%H:%M')
+        breakData.endDateTime = breakData.endDateTime.strftime('%Y-%m-%dT%H:%M')
+        params['breakData'] = breakData
+
     return render(request, 'Trip_details/DriverShift/addBreak.html', params)
 
-
 @csrf_protect
-def saveDriverBreak(request, shiftId):
+def saveDriverBreak(request, shiftId, breakId=None):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     driverId = Driver.objects.filter(name=request.user.username).first()
-    breakObj = DriverBreak()
+    breakObj = DriverBreak() if not breakId else DriverBreak.objects.filter(pk=breakId).first()
     breakObj.shiftId = shiftObj
     breakObj.driverId = driverId
     breakObj.startDateTime = request.POST.get('startDateTime') 
@@ -901,7 +906,10 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
     driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
     manualEndTime = request.POST.get('endDateTime')
-    
+    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    for obj in breaks:
+        obj.startDateTime = str(obj.startDateTime).split('+')[0]   
+        obj.endDateTime = str(obj.endDateTime).split('+')[0]   
     if manualEndTime:
         manualEndTime = pytz.timezone(TIME_ZONE).localize(datetime.strptime(manualEndTime, '%Y-%m-%dT%H:%M'))
         if manualEndTime < shiftObj.startDateTime:
@@ -935,23 +943,43 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         messages.error(request, "You have not entered enough breaks.")
         return redirect(request.META.get('HTTP_REFERER'))      
         
-        
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
         'endShift': endShift,
-        'tripObj' : tripObj
+        'tripObj' : tripObj,
+        'breaks' : breaks
     }
     return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
 
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
+    endOdometers = request.POST.get('endOdometers')
+    endEngineHours = request.POST.get('endEngineHours')
     curTimeStr = getCurrentTimeInString()
     currentDateTime = getCurrentDateTimeObj()
     docketPath = 'static/img/docketFiles'
     loadPath = 'static/img/finalloadSheet'
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    
+    # largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
+    # driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
+
+    # if driver_break_object.endDateTime > currentDateTime:
+    #     messages.error(request, "Entered breaks is not valid, please  enter the correct break details.")
+    #     return redirect(request.META.get('HTTP_REFERER'))
+    # else:
+    #     return HttpResponse('Save')
+    # return HttpResponse(driver_break_object.endDateTime < currentDateTime)
+    
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+    truckInfoObj = truckConnectionObj.truckNumber.truckInformation
+    truckInfoObj.odometerKms = endOdometers
+    truckInfoObj.engineHours = endEngineHours
+    truckInfoObj.save()
+    
+    
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
 
     loadSheetFile = request.FILES.get('loadSheet')
@@ -959,6 +987,8 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     tripObj.numberOfLoads = noOfLoads
     tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
     tripObj.endDateTime = currentDateTime
+    tripObj.endOdometerKms = endOdometers
+    tripObj.endEngineHours = endEngineHours
     
     if loadSheetFile:
         fileName = loadSheetFile.name
@@ -1391,6 +1421,15 @@ def rctiHolcimFormSave(request):
 
 @csrf_protect
 def rctiSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rctiPdf = request.FILES.get('rctiPdf')
     clientName = request.POST.get('clientName')
     startDate = request.POST.get('startDate')
@@ -1476,8 +1515,9 @@ def rctiSave(request):
                 with open('rctiReportId.txt','w')as f:
                     f.write(str(rctiReport.id) +','+ str(clientNameID.name) + ',' + str(startDate))
                 # return HttpResponse('work')
-                    
+
                 colorama.AnsiToWin32.stream = None
+               
                 os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
                 cmd = ["python", "manage.py", "runscript", 'csvToModel.py']
                 subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -1636,6 +1676,15 @@ def driverEntry(request):
 
 @csrf_protect
 def driverEntrySave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     Driver_csv_file = request.FILES.get('driverEntryFile')
     if not Driver_csv_file:
         return HttpResponse("No file uploaded")
@@ -1993,6 +2042,15 @@ def basePlantForm(request, id=None):
 @csrf_protect
 @api_view(['POST'])
 def basePlantSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     clientBasePlant = request.POST.get('clientBasePlant')
     clientDepot = request.POST.get('clientDepot')
     dataList = {
@@ -2936,7 +2994,15 @@ def checkOnOff(val_):
 
 @csrf_protect
 def rateCardSave(request, id=None, edit=0 , clientOfcId=None):
-    # Rate Card
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     rateCardID = None
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
@@ -3266,6 +3332,15 @@ def archiveResetRCTI(request):
 # @api_view(['POST'])
 @csrf_protect
 def pastTripSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     monthAndYear = str(request.POST.get('monthAndYear'))
     save = int(request.POST.get('save'))
     clientName = request.POST.get('clientName')
@@ -3348,6 +3423,15 @@ def surchargeForm(request, id=None):
 
 @csrf_protect
 def surchargeSave(request, id=None):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     dataList = {
         'surcharge_Name': (request.POST.get('surcharge_Name')).strip()
     }
@@ -3560,6 +3644,15 @@ def report(request):
 
 @csrf_protect
 def reportSave(request):
+    flag = True
+    with open('last_subprocess_run_time.txt','r')as f:
+        data = f.read()
+        if data != '1':
+            flag = False
+    
+    if not flag:
+        messages.warning(request,f"You are making too many requests in a short time frame. Please try again after a while")
+        return redirect(request.META.get('HTTP_REFERER'))
     primaryFile = request.FILES.get('primaryFile')
     secondaryFile = request.FILES.get('secondaryFile')
 

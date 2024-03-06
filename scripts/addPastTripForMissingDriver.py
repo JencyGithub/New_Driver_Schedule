@@ -7,7 +7,8 @@ from datetime import time
 import sys
 from variables import *
 from scripts.PastDataSave import *
-
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('0')
 f = open(r"scripts/addPastTripForMissingDriver.txt", 'r')
 driverId = f.read()
 
@@ -418,3 +419,5 @@ for i in matchingData:
         )
         pastTripErrorObj.save()
     
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')

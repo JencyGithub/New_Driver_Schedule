@@ -3,6 +3,8 @@ from django.contrib.auth.models import User , Group
 
 
 def run():
+    with open('last_subprocess_run_time.txt','w')as f:
+        f.write('0')
     f = open("Driver_reg_file.txt", 'r')
     file_name = f.read()
 
@@ -74,3 +76,6 @@ def run():
                     f.write(str(e)+str(data)+'\n')
             
 
+
+with open('last_subprocess_run_time.txt','w')as f:
+    f.write('1')
