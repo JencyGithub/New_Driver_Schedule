@@ -34,16 +34,36 @@
                     <div  class="x_panel">
                         <div class="row">
                             <div class="col-md-3">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="startDate">Start Date</label>
+                                <label for="startDate">Start Date: </label>
                                 <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate }}">
                             </div>
-                            <div class="col-md-4">
-                                <label for="endDate">End Date</label>
+                            <div class="col-md-3">
+                                <label for="endDate">End Date: </label>
                                 <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate }}">
                             </div>
-                            <div class="col-md-1 mt-4">
+                            <div class="col-md-3">
+                                <label for="clientName">Client Name: </label>
+                                <select class="form-control" id="clientName" name="clientName">
+                                    <option value="">All</option>
+                                    {% for client in clientAll %}
+                                    <option {% if client.clientId == clientId %}selected{%endif%} value="{{ client.clientId }}">{{ client.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="driverId">Driver Name: </label>
+                                <select class="form-control" id="driverId" name="driverId">
+                                    <option value="">All</option>
+                                    {% for driver in driverAll %}
+                                        <option {% if driver.driverId == driver_Id %}selected {% endif %} value="{{ driver.driverId }}">{{ driver.driverId }}-{{driver.firstName}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-9">
+                            </div>
+                            <div class="col-md-3 text-right">
                                 <button type="submit" class="btn btn-default">Submit</button>
                             </div>
                         </div>
@@ -79,6 +99,7 @@
                                             <th></th>
                                             <th>Docket number</th>
                                             <th>Client</th>
+                                            <th>Driver ID</th>
                                             <th>Load & Km cost</th>
                                             <th>Surcharge </th>
                                             <th>Waiting cost</th> 
@@ -98,7 +119,7 @@
                                                         </a>
                                                     </td>
                                                     <td class="text-capitalize">{{ item.clientName }}</td>
-
+                                                    <td class="text-capitalize">{{ item.driverId }}</td>
                                                     <td class="{% if item.driverLoadAndKmCost == item.rctiLoadAndKmCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverLoadAndKmCost}} / {{ item.rctiLoadAndKmCost }} </td>
                                                     <td class="{% if item.driverSurchargeCost == item.rctiSurchargeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverSurchargeCost}} / {{ item.rctiSurchargeCost }} </td>
                                                     <td class="{% if item.driverWaitingTimeCost == item.rctiWaitingTimeCost %} text-success{% else %} text-danger {%endif%}">{{ item.driverWaitingTimeCost}} / {{ item.rctiWaitingTimeCost }} </td>
@@ -128,6 +149,57 @@
 
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
+
+    function filterFun(){
+        let selectClient = document.getElementById("clientName");
+        let client = selectClient.value
+        let selectDriver = document.getElementById("driverId");
+        let driver = selectDriver.value
+        let selectStartDate = $("#startDate").val();
+        let selectEndDate = $("#endDate").val();   
+        
+        $.ajax({
+            url: "/account/reconciliation/report/filter/",
+            method: "POST",
+            data: {
+                client_: client,
+                driver_: driver,
+                selectStartDate_: selectStartDate,
+                selectEndDate_: selectEndDate,
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+
+                if (data.status) {
+                    $('#dataTable').DataTable().clear().draw();
+                    
+                    data.reconciliationObjList.forEach(function(item) {
+                        {% comment %} var docketColorClass = item.fromDriver && item.fromRcti ? 'text-success' : 'text-danger'; {% endcomment %}
+                        $('#dataTable').DataTable().row.add([
+                            item.docketNumber,
+                            `<a href="/account/reconciliation/docket/view/${item.id}/" target="_blank" class="${item.fromDriver && item.fromRcti ? 'text-success' : 'text-danger'}">${item.docketNumber} </a>`, item.clientId, item.driverId,
+                            `<span class="${item.driverLoadAndKmCost == item.rctiLoadAndKmCost ? 'text-success' : 'text-danger'}">${item.driverLoadAndKmCost} / ${item.rctiLoadAndKmCost}</span>`,
+                            `<span class="${item.driverSurchargeCost == item.rctiSurchargeCost ? 'text-success' : 'text-danger'}">${item.driverSurchargeCost} / ${item.rctiSurchargeCost}</span>`,
+                            `<span class="${item.driverWaitingTimeCost == item.rctiWaitingTimeCost ? 'text-success' : 'text-danger'}">${item.driverWaitingTimeCost} / ${item.rctiWaitingTimeCost}</span>`,
+                            `<span class="${item.driverStandByCost == item.rctiStandByCost ? 'text-success' : 'text-danger'}">${item.driverStandByCost} / ${item.rctiStandByCost}</span>`,
+                            `<span class="${item.driverTotalCost == item.rctiTotalCost ? 'text-success' : 'text-danger'}">${item.driverTotalCost} / ${item.rctiTotalCost}</span>`,
+                            `<span class="text-danger">${item.missingComponent}</span>`,
+                        ]).draw();
+                    });
+                }
+              {% comment %} setDataInTable("datatable-buttons", data.data); {% endcomment %}
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+
+      }
+
+     
+
     const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     $(document).ready(function () {
 

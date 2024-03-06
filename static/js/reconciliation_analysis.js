@@ -91,21 +91,24 @@ function setDateRangeFun(checkbox) {
     var today = new Date();
     var currentYear = today.getFullYear();
     var currentMonth = today.getMonth(); // Current month (0-indexed)
+    var currentQuarter = Math.floor(currentMonth / 3); // Determine current quarter (0-indexed)
 
     // Calculate the start month and end month of the last quarter
-    var endMonth = currentMonth - 1; // End month is the previous month
+    var startMonth, endMonth;
 
-    // Adjust for the year change if the current month is January
-    var startYear = currentYear;
-    if (currentMonth < 2) {
-        endMonth = 11; // December (0-indexed)
-        startYear = currentYear - 1; // Adjust start year accordingly
+    if (currentQuarter === 0) {
+        // If current quarter is Q1, last quarter is Q4 of previous year
+        startMonth = 9; // October
+        endMonth = 11; // December
+        currentYear--; // Adjust current year accordingly
+    } else {
+        // Otherwise, last quarter is the previous quarter of the current year
+        startMonth = (currentQuarter - 1) * 3; // Calculate start month of last quarter
+        endMonth = currentQuarter * 3 - 1; // Calculate end month of last quarter
     }
 
-    var startMonth = endMonth - 2; // Calculate the start month based on the end month
-
     // Create Date objects for the start and end dates of the last quarter
-    var quarterStartDate = new Date(startYear, startMonth, 1);
+    var quarterStartDate = new Date(currentYear, startMonth, 1);
     var quarterEndDate = new Date(currentYear, endMonth + 1, 0); // Last day of the end month
 
     // Format dates as YYYY-MM-DD for input fields
@@ -115,7 +118,7 @@ function setDateRangeFun(checkbox) {
     // Set the formatted dates to the input fields
     $('#startDate').val(formattedStartDate);
     $('#endDate').val(formattedEndDate);
-  }
+}
 
   else if (selectedValue == "lastYear") {
     var today = new Date();
@@ -248,3 +251,4 @@ $(document).ready(function () {
   }); 
 
 });
+

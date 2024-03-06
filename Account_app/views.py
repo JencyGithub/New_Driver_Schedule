@@ -1119,7 +1119,7 @@ def getTrucks(request):
 def rcti(request):
 
     rctiErrors = RctiErrors.objects.filter(status = False, errorType=0).values()
-    rctiSolve = RctiErrors.objects.filter(status = True, errorType=0).values()
+    rctiSolve = RctiErrors.objects.filter(status = True, errorType=1).values()
     archiveError = RctiErrors.objects.filter(errorType=2).values() 
     client = Client.objects.all()
     # return HttpResponse(client)
@@ -2373,28 +2373,29 @@ def reconciliationForm(request, dataType):
         'trucks': trucks,
         'files': files,
     }
+
+    params['dataType'] = typeDict[dataType]
+    params['dataTypeInt'] = dataType
     
     # 0:reconciliation, 1:Short Paid, 2: Top up solved, 3: wright-of, 7: revenue, 10: expenses, 9: custom report
-    if dataType == 0:
-        params['dataType'] = 'Reconciliation Report'
-        params['dataTypeInt'] = 0
-    elif dataType ==  1:
-        params['dataType'] = 'Short paid Report'
-        params['dataTypeInt'] = 1
-    elif dataType ==  3:
-        params['dataType'] = 'Write Off Report'
-        params['dataTypeInt'] = 3
-    elif dataType ==  7:
-        params['dataType'] = 'Revenue Report'
-        params['dataTypeInt'] = 7
-    elif dataType ==  10:
-        params['dataType'] = 'Expenses Report'
-        params['dataTypeInt'] = 10
-    elif dataType ==  9:
-        params['dataType'] = 'Custom Report'
-        params['dataTypeInt'] = 9
-        
-    
+    # if dataType == 0:
+    #     params['dataType'] = 'Reconciliation Report'
+    #     params['dataTypeInt'] = 0
+    # elif dataType ==  1:
+    #     params['dataType'] = 'Short paid Report'
+    #     params['dataTypeInt'] = 1
+    # elif dataType ==  3:
+    #     params['dataType'] = 'Write Off Report'
+    #     params['dataTypeInt'] = 3
+    # elif dataType ==  7:
+    #     params['dataType'] = 'Revenue Report'
+    #     params['dataTypeInt'] = 7
+    # elif dataType ==  10:
+    #     params['dataType'] = 'Expenses Report'
+    #     params['dataTypeInt'] = 10
+    # elif dataType ==  9:
+    #     params['dataType'] = 'Custom Report'
+    #     params['dataTypeInt'] = 9
         
     return render(request, 'Reconciliation/reconciliation.html', params)
 
@@ -2402,66 +2403,63 @@ def reconciliationForm(request, dataType):
 def reconciliationAnalysis(request,dataType, download=None):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
+    driverId = request.POST.get('driverId')
+    clientId = request.POST.get('clientName')
+    clientAll = Client.objects.all()
+    driverAll = Driver.objects.all()
     redirectUrl = 'Reconciliation/reconciliation-result.html'
-    
+
     params = {
         'startDate': dateConverterFromTableToPageFormate(startDate),
         'endDate': dateConverterFromTableToPageFormate(endDate),
+        'clientAll' : clientAll,
+        'driverAll' : driverAll,
+        'clientId' : int(clientId) if clientId else None,
+        'driver_Id' : int(driverId) if driverId else None,
     }
-    if dataType == 0:
-        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 0).values()
-        params['dataType'] = 'Reconciliation'
-        params['dataTypeInt'] = 0
-    elif dataType == 1:
-        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 1).values()
-        params['dataType'] = 'Short paid'
-        params['dataTypeInt'] = 1
-    elif dataType == 3:
-        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = 3).values()
-        params['dataType'] = 'Write Off'
-        params['dataTypeInt'] = 3
-    elif dataType == 7:
-        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
-        params['dataType'] = 'Revenue'
-        params['dataTypeInt'] = 7
-    elif dataType == 9:
-        leave_requests = LeaveRequest.objects.filter(status='Approved').annotate(
-            start_date_cast=Cast('start_date', output_field=fields.DateField()),
-            end_date_cast=Cast('end_date', output_field=fields.DateField())
-        )
-        driver_leave_days_dict = defaultdict(int)
-        for leave in leave_requests:
-            if leave.start_date_cast and leave.end_date_cast:
-                duration = (leave.end_date_cast - leave.start_date_cast).days + 1  
-                driver_leave_days_dict[leave.employee.name] += duration
 
-        driver_leave_days_list = [{"driver": driver, "days": days} for driver, days in driver_leave_days_dict.items()]
-        params['response_content']= driver_leave_days_list
-        params['dataType']= 'Custom'
-        params['dataTypeInt']= 9
+    params['dataType'] = typeDict[dataType]
+    params['dataTypeInt'] = dataType
 
-        redirectUrl = "Account/Tables/customTable.html"
-        # return render(request, 'Account/Tables/customTable.html', params)
-    elif dataType == 10:
-        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate)).values()
-        clientObj = Client.objects.all()
-        clientTruckConnectionObj = ClientTruckConnection.objects.all()
-        basePlantObj = BasePlant.objects.all()
-        params['clientObj']= clientObj
-        params['clientTruckConnectionObj']= clientTruckConnectionObj
-        params['basePlantObj']= basePlantObj
-        params['dataList']= dataList
-        params['dataTypeInt']= 10
-        # params['startDate']= dateConverterFromTableToPageFormate(startDate)
-        # params['endDate']= dateConverterFromTableToPageFormate(endDate)
-        
-        redirectUrl = "Account/Tables/expensesTable.html"
-    if dataType != 10:
-        for data in dataList:   
-            client = Client.objects.filter(pk=data['clientId']).first()
-            data['clientName'] = client.name if client else None
-    params['dataList'] = dataList
+    dataList = []
+
+    if clientId and driverId :
+        if dataType == 7 :   
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId).values()
+        else:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId,reconciliationType=dataType).values()
+
+    elif clientId :
+        if dataType == 7:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId).values()
+        elif dataType == 10:
+            dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName__clientId=clientId).values()
+            redirectUrl = "Account/Tables/expensesTable.html"
+        else:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,reconciliationType=dataType).values()
+    elif driverId :
+        if dataType == 7:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),driverId=driverId).values()
+        else:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),driverId=driverId,reconciliationType=dataType).values()
+    else:
+        if dataType == 7:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
+        elif dataType == 10:
+            dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate)).values()
+            redirectUrl = "Account/Tables/expensesTable.html"
+        else:
+            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate,endDate),reconciliationType=dataType).values()
+  
+    clientName = 'clientName_id' if dataType == 10 else 'clientId'
+    for data in dataList:   
+        client = Client.objects.filter(pk=data[clientName]).first()
+        data['clientName'] = client.name if client else None
     
+    params['dataList']= dataList
+    params['dataType']= typeDict[dataType]
+    params['dataTypeInt']= dataType
+
     if download:
         with open('scripts/data.json', 'r') as file:
             data = json.load(file)
@@ -3401,12 +3399,19 @@ def  ShiftDetails(request,id):
     # return HttpResponse(id)
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
-    id_ = id
-    shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False)
+    driverId = request.POST.get('driverId')
+    driverAll = Driver.objects.all()
+
+    if driverId:
+        shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, verified= True if id==1 else False)
+        
+    else:
+        shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False)
+
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first()
         if shift.driverName:
-            shift.driverName = shift.driverName.name
+            shift.driverName = f'{shift.driverName.firstName} {shift.driverName.lastName}'
         shift.deficit = False
         tripObjs = DriverShiftTrip.objects.filter(shiftId=shift.id)
         for tripObj in tripObjs:
@@ -3417,7 +3422,9 @@ def  ShiftDetails(request,id):
         'shifts': shifts,
         'startDate': startDate,
         'endDate': endDate,
-        'id_': id_,
+        'id_' : id,
+        'driverId' : driverId,
+        'driverAll' : driverAll,
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
     

@@ -78,16 +78,27 @@
                     <div  class="x_panel">
                         <div class="row">
                             <div class="col-md-3">
-                            </div>
-                            <div class="col-md-4">
                                 <label for="startDate">Start Date</label>
                                 <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate }}">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="endDate">End Date</label>
                                 <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate }}">
                             </div>
-                            <div class="col-md-1 mt-4">
+                            <div class="col-md-3">
+                                <label for="clientName">Client Name: </label>
+                                <select class="form-control" id="clientName" name="clientName">
+                                    <option value="">All</option>
+                                    {% for client in clientAll %}
+                                    <option {% if client.clientId == clientId %}selected{%endif%} value="{{ client.clientId }}">{{ client.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-9">
+                            </div>
+                            <div class="col-md-3 text-right">
                                 <button type="submit" class="btn btn-default">Submit</button>
                             </div>
                         </div>
@@ -145,6 +156,7 @@
                                             <tr>
                                                 <th>Expense Date</th>
                                                 <th>Truck No</th>
+                                                <th>Client</th> 
                                                 <th>Yard</th>
                                                 <th>Invoice Quantity</th>
                                                 <th>Unit</th>
@@ -157,6 +169,7 @@
                                                 <tr>
                                                     <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.docketDate }}</a></td>
                                                     <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.truckNo }}</a></td>
+                                                    <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.clientName }}</a></td>
                                                     <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.docketYard }}</a></td>
                                                     <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.invoiceQuantity }}</a></td>
                                                     <td><a href="{% url 'Account:expanseView' id=expensesObj.id %}" target="_blank">{{ expensesObj.unit }}</a></td>
