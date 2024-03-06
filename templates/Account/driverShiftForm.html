@@ -85,7 +85,85 @@
                             {%endif%}
                             <div class="clearfix"></div>
                         </div>
-                        <div class="row">
+                        <div class="x_content">
+                            <div class="cuatom-continer">
+                                {% csrf_token %}
+                                <div class="col-md-3 col-sm-3 " >
+                                    <label for="today">Today:<span class="required">*</span></label>
+                                    <input type="radio" class="float-center" id="today" name="setDateRange" value="today"
+                                            onchange="setDateRangeFun(this)" required>
+                                    <div class="field item form-group">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 " >
+                                    <label for="yesterday">Yesterday:<span class="required">*</span></label>
+                                    <input type="radio" class="float-center" id="yesterday" name="setDateRange" value="yesterday"
+                                            onchange="setDateRangeFun(this)" required>
+                                    <div class="field item form-group">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 " >
+                                    <label for="lastWeek">Last Week:<span class="required">*</span></label>
+                                    <input type="radio" class="float-center" id="lastWeek" name="setDateRange" value="lastWeek"
+                                            onchange="setDateRangeFun(this)" required>
+                                    <div class="field item form-group">
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-3 " >
+                                    <label for="custom">custom:<span class="required">*</span></label>
+                                    <input type="radio" class="float-center" id="custom" name="setDateRange" value="custom"
+                                            onchange="setDateRangeFun(this)" required>
+                                    <div class="field item form-group">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 d-none" id="startDateDiv">
+                                    <label for="startDate">Start Date:</label>
+                                    <div class="field item form-group">
+                                        <input class="form-control date" type="date" name="startDate" id="startDate"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 d-none" id="endDateDiv">
+                                    <label for="endDate">End Date:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <input class="form-control date" type="date" name="endDate" id="endDate"
+                                            readonly required>
+                                    </div>
+                                </div>
+                                 <div class="col-md-4 col-sm-4 d-none">
+
+                                    <label for="dateDropDown">Date Range  :<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <select onchange="setDateRange(this)" class="form-control"   id="dateDropDown" name="dateDropDown">
+                                            <option selected value="today"  >Today</option>
+                                            <option selected value="yesterday"  >Yesterday</option>
+                                            {% comment %} <option  value="lastMonth"  >Last Month</option>
+                                            <option value="lastQuarter"  >Last Quarter</option>
+                                            <option value="lastYear"  >Last Year</option> {% endcomment %}
+                                            <option selected value="lastWeek"  >Last Week</option>
+                                            <option selected value="custom"  >Custom</option>
+                                            
+                                        </select>
+                                    </div>
+                                </div> 
+                                {% comment %} <div class="col-md-4 col-sm-4">
+                                    <label for="clientId">Client Name</label>
+                                    <div class="field item form-group">
+                                        <select class="form-control" id="clients" name="clients">
+                                            <option value="" >All</option>
+                                            {% for client in clients %}
+                                            <option value="{{ client.clientId }}">{{ client.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>  {% endcomment %}
+                                <div class="col-md-12 text-right">
+                                    <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% comment %} <div class="row">
                             <div class="col-md-3 col-sm-6">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"  name="setDateRange" id="lastMonth" value="lastMonth" required onchange="setDateRangeFun(this)">
@@ -138,7 +216,7 @@
                         </div>
                         <div class="col-md-12 text-right">
                             <button type='submit' class="btn btn-sm btn-default px-3">Submit</button>
-                        </div>
+                        </div> {% endcomment %}
                     </form>
 
                 </div>
