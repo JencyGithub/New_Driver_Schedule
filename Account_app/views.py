@@ -30,7 +30,7 @@ from scripts.PastDataSave import *
 import numpy as np
 from PIL import Image
 import pytesseract
-
+from django.core.mail import send_mail
 
 
 def index(request):
@@ -706,11 +706,12 @@ def checkQuestionRequired(request):
     return JsonResponse({'status': status})
     
 @csrf_protect
-def DriverPreStartSave(request, tripId):
+def DriverPreStartSave(request, tripId , endShift = None):
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))    
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    tripObj.startDateTime = currentDateTime
-    tripObj.save()
+    if not  endShift:
+        tripObj.startDateTime = currentDateTime
+        tripObj.save()
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
     preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
@@ -723,8 +724,8 @@ def DriverPreStartSave(request, tripId):
         trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
 
     driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
-   
     msg = None
+    questionIdList = []
     if not driverPreStartObj:
         driverPreStartObj = DriverPreStart()
         driverPreStartObj.shiftId = shiftObj
@@ -768,8 +769,40 @@ def DriverPreStartSave(request, tripId):
                 answerObj.answerFile = f'{path}/{newFileName}'
                 answerObj.comment = queComment        
             answerObj.save()
-         
-          
+
+            if answerObj.answerFile and endShift:
+                questionIdList.append(answerObj.id)
+                
+        if endShift:
+            shiftObj.endTime = currentDateTime
+            shiftObj.save()
+        
+            questions_with_answer = DriverPreStartQuestion.objects.filter(pk__in = questionIdList)
+            if  len(questions_with_answer)>0:
+                clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+                truckNo = clientTruckConnectionObj.truckNumber.adminTruckNumber
+                clientName = clientTruckConnectionObj.clientId.name
+                latitude = driverPreStartObj.shiftId.latitude
+                longitude = driverPreStartObj.shiftId.longitude
+                startTime = driverPreStartObj.shiftId.startDateTime
+                
+                subject = f'Error : Pre-start Failure for  {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
+                bodyMessage = 'Hi Agi Hire,\n\nFollowing driver has failed a pre-start for truck'
+                driverMessage = f'Driver Name : {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
+                truckNoMessage = f'Truck No: {truckNo}'
+                clientMessage = f'Client Name : {clientName}'
+                locationMessage = f'Location : Latitude - {latitude} , Longitude = {longitude} '
+                startTime = f'Start Time : {startTime} '
+                questionMessage = '\n'.join([f'{obj.questionId.questionText}: {obj.answer}' for obj in questions_with_answer])
+                
+                
+                message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
+                from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
+                mailSendList = ['jaymangukiya1614@gmail.com' , 'siddhantkhannamailbox@gmail.com','agihire@pnrgroup.com.au'] 
+                # agihire@pnrgroup.com.au
+                send_mail(subject, message, from_email, recipient_list=mailSendList)
+                messages.error(request,'You have failed the Pre-start please contact office for more details.')
+                return redirect('index')
     return redirect('Account:driverShiftView', shiftObj.id)
     
     

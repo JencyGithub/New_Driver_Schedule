@@ -57,6 +57,7 @@ urlpatterns = [
 
     path('checkQuestion/requirement/', views.checkQuestionRequired, name='checkQuestionRequired'),
     path('DriverPreStart/save/<int:tripId>/', views.DriverPreStartSave, name='DriverPreStartSave'),
+    path('DriverPreStart/save/<int:tripId>/<int:endShift>/', views.DriverPreStartSave, name='DriverPreStartSaveWithEndShift'),
 
     path('Driver/break/add/view/<int:shiftId>/', views.addDriverBreak, name='addDriverBreak'),
     path('Driver/break/add/view/<int:shiftId>/<int:breakId>/', views.addDriverBreak, name='editDriverBreak'),
