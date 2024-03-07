@@ -191,13 +191,13 @@ def dateTimeObj(date=None, time=None, dateTimeObj=None):
     elif date and time:
         year, month, day = map(int, date.split('-'))
         hours, minutes, seconds = map(int, time.split(':'))
-        return datetime(year, month, day, hours, minutes, seconds)
+        return datetime(int(year), int(month), int(day), int(hours), int(minutes), int(seconds))
     elif date:
-        year, month, day = map(int, date.split('-'))
-        return date(year, month, day)
+        year, month, day = map(int, date.split('-'))        
+        return date(int(year), int(month), int(day))
     elif time:
         hours, minutes, seconds = map(int, time.split(':'))
-        return time(hours, minutes, seconds)
+        return time(int(hours), int(minutes), int(seconds))
     else:
         return None
 

@@ -112,7 +112,7 @@ class PreStartQuestion(models.Model):
         ('Driver related','Driver related'),
         ('Vehicle related','Vehicle related'),
         ('Other','Other')        
-    }
+    }    
     questionText = models.CharField(max_length=1024, default='', null=True)
     questionType = models.CharField(max_length=20, choices=QUESTION_TYPE)
     questionNo = models.FloatField(default=0)

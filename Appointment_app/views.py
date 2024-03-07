@@ -359,15 +359,10 @@ def preStartForm(request, id=None, edit=None):
 
 @csrf_protect
 def preStartSave(request, id=None):
-    # currentTimezone = pytz.timezone('Asia/Kolkata')
-    # currentDateTime = datetime.now(tz=currentTimezone)
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
-    if id:
-        questionIds = PreStartQuestion.objects.filter(preStartId=preStartObj).values('id')
-        
     msg = "Pre-start updated successfully."
    
     if id:
@@ -394,6 +389,7 @@ def preStartSave(request, id=None):
         questionObj.questionText = request.POST.get(f'q{count}txt')
         questionObj.questionType = request.POST.get(f'q{count}type')
         questionObj.questionNo = question + 1
+        questionObj.archive = True if request.POST.get(f'remove{count}') == 'remove' else False
         
         queTxt1 = request.POST.get(f'q{count}o1')
         queTxt2 = request.POST.get(f'q{count}o2')
@@ -521,6 +517,18 @@ def driverPreStartForm(request, preStartId):
     }
 
     return render(request, 'Appointment/driverPreStartForm.html', params)
+
+
+def driverPreStartTable(request, startDate, endDate):
+    year, month, day = map(int, startDate.split('-'))
+    startDate = date(int(year), int(month), int(day))
+    year, month, day = map(int, endDate.split('-'))
+    endDate = date(int(year), int(month), int(day))
+    preStarts = DriverPreStart.objects.filter(curDateTime__date__range=(startDate, endDate))
+    params = {
+        'preStarts' : preStarts
+    }
+    return render(request, 'Appointment/driverPreStartTable.html', params) 
 
 @csrf_protect
 @api_view(['POST'])

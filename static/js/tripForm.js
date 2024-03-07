@@ -32,6 +32,8 @@ $('.ocrBtn').on('click', function(){
   });
 })
 
+
+
 function hideshow() {
   var password = document.getElementById("password1");
   var slash = document.getElementById("slash");

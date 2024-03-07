@@ -57,5 +57,6 @@ urlpatterns = [
     path('question/add/view/<int:id>/', views.questionAddView ,name="questionAddView"),
     path('question/add/save/<int:id>/', views.questionAddSave ,name="questionAddSave"),
 
+    path('driver/pre-start/table/<str:startDate>/<str:endDate>/', views.driverPreStartTable ,name="driverPreStartTable"),
     path('driver/pre-start/view/<int:preStartId>/', views.driverPreStartForm ,name="driverPreStartView"),
 ]

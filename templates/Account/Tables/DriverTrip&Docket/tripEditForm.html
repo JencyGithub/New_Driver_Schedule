@@ -20,10 +20,15 @@
         border-radius: 7px !important;
     }
 
-    b.ocrBtn{
+    b.ocrBtn, #location{
         cursor: pointer;
     }
 
+    #locationModal #map{
+        height: 85vh;
+        width: 74.1vw;
+    }
+    
     @media (max-width: 576px) {
         .cuatom-continer {
             margin: 0;
@@ -56,12 +61,13 @@
                     {% csrf_token %}                    
                     <div class="x_title">
                         <h2>Shift Details</h2> 
-                        <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right" style="margin-top: .5rem;" onclick="showBreaks({{shiftObj.id}})">Breaks </label>
+                        <b class="d-inline-block m-1 mt-2 text-secondary">(started from <span id="location" class="text-info">location</span> at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
+                        <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right" style="margin-top: .5rem;" onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified and shiftObj.endDateTime %}
                         
                             <label for="verified" class="float-right ml-2" style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
                             <input type="checkbox" id="verified" name="verified" value = 'True' {% if shiftObj.verified %}checked{% endif %}  class="float-right" style="margin-top: .8rem;"> 
-                            {% comment %} onclick="checkDeficitFun({{shiftObj.id}})" {% endcomment %}
+                            {% comment %} onclick="checkDeficitFun('{{shiftObj.id}}')" {% endcomment %}
                         {% endif %}
 
                         <div class="clearfix"></div>
@@ -193,15 +199,15 @@
                                 <a {% if docket.reconciliationObj %} href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" target="_blank" {% endif %}><h2 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h2></a>
                                 <div class="float-right">
                                     <input type="radio" id="tippingToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="tippingToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard({{docket.id}},this)" {% if item.tippingToYard %} checked {% endif %}>
+                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if item.tippingToYard %} checked {% endif %}>
                                     <label for="tippingToYard{{docket.id}}" class="ml-2"
                                     style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
                                     <input type="radio" id="returnToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="returnToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard({{docket.id}},this)" {% if item.returnToYard %} checked {% endif %}>
+                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if item.returnToYard %} checked {% endif %}>
                                     <label for="returnToYard{{docket.id}}" class="ml-2"
                                         style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
                                 
-                                    <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{docket.id}}" onclick="resetRadio({{docket.id}})"></i>
+                                    <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{docket.id}}" onclick="resetRadio('{{docket.id}}')"></i>
                                 </div>
                                 
                                 <div class="clearfix"></div>
@@ -244,7 +250,7 @@
                                                         </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                <button type="button" onclick="docketUpdate({{docket.id}})" class="btn btn-primary">Save </button>
+                                                <button type="button" onclick="docketUpdate('{{docket.id}}')" class="btn btn-primary">Save </button>
                                                 </div>
 
                                         </div>
@@ -302,10 +308,10 @@
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
                                     <div class="col-md-4 col-sm-4">
                                         <input type="checkbox" class="float-right" id="waitingCheck{{docket.id}}" name="waitingCheck{{docket.id}}" value="waitingCheck{{docket.id}}"
-                                            onclick="waitingCheck({{docket.id}},this)" {% if docket.waitingTimeStart %} checked {% endif %}>
+                                            onclick="waitingCheck('{{docket.id}}',this)" {% if docket.waitingTimeStart %} checked {% endif %}>
                                         <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,{{docket.id}})">
+                                            <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,'{{docket.id}}')">
                                         </div>
                                     </div>
 
@@ -314,7 +320,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,'{{docket.id}}','{{docket.tripId}}')">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -349,17 +355,17 @@
 
                                     <div class="col-md-4 col-sm-4">
                                         <input type="checkbox" class="float-right" id="standByCheck{{docket.id}}" name="standByCheck{{docket.id}}" value="standByCheck{{docket.id}}"
-                                        onclick="standByCheck({{docket.id}},this)" {% if docket.standByStartTime %} checked {% endif %}>
+                                        onclick="standByCheck('{{docket.id}}',this)" {% if docket.standByStartTime %} checked {% endif %}>
                                         <label for="standByStartTime{{docket.id}}">StandBy start Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByStartTime}}" {% if docket.standByStartTime is None %} readonly {% endif %} type="time" name="standByStartTime{{docket.id}}"   style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,{{docket.id}})">
+                                            <input class="form-control" value="{{docket.standByStartTime}}" {% if docket.standByStartTime is None %} readonly {% endif %} type="time" name="standByStartTime{{docket.id}}"   style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,'{{docket.id}}')">
                                         </div>
                                     </div>
                                     <!--     standByEndTime   others  comment-->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standByEndTime{{docket.id}}">StandBy End Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% endif %} name="standByEndTime{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,{{docket.id}},{{docket.tripId}})">
+                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% endif %} name="standByEndTime{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,'{{docket.id}}','{{docket.tripId}}')">
                                         </div>
                                     </div>
 
@@ -402,13 +408,13 @@
                         <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
                     </div>
                     {% endif%}
-
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Break modal -->
 <div class="modal fade bd-example-modal-lg" id="driverBreaks" tabindex="-1" role="dialog" aria-labelledby="driverBreaksLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
@@ -434,6 +440,23 @@
     </div>
 </div>
 
+<!-- Location modal -->
+<div class="modal fade bd-example-modal-xl" tabindex="-1" id="locationModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h5 class="modal-title">Location</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body p-0">
+            <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <!-- /page content -->
 {% endblock %}
@@ -444,5 +467,43 @@
 <script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script src="{% static 'js/tripForm.js' %}"></script>
+<script>
+    function showMap() {
+        var cityName = document.getElementById('city').value;
+        var latitude = parseFloat(document.getElementById('latitude').value);
+        var longitude = parseFloat(document.getElementById('longitude').value);
 
+        var cityLatLng = new google.maps.LatLng(latitude, longitude);
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: cityLatLng,
+            zoom: 12
+        });
+
+        var marker = new google.maps.Marker({
+            position: cityLatLng,
+            map: map,
+            title: cityName
+        });
+    }
+    $('#location').on('click', function(){
+        let latitude = "{{ shiftObj.latitude }}"
+        let longitude = "{{ shiftObj.longitude }}"
+        var cityLatLng = new google.maps.LatLng(latitude, longitude);
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: cityLatLng,
+            zoom: 12
+        });
+
+        var marker = new google.maps.Marker({
+            position: cityLatLng,
+            map: map,
+            title: "Location"
+        });
+
+        $('#locationModal').modal('show')
+        console.log(latitude, longitude)
+    });
+</script>
 {% endblock %}

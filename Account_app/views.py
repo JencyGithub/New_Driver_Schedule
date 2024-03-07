@@ -648,7 +648,7 @@ def showPreStartForm(request, shiftId, tripId):
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
     preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id)
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False)
     
     params = {
         'preStartQuestions':preStartQuestions,
@@ -3525,6 +3525,9 @@ def ShiftDetails(request,id):
     driverId = request.POST.get('driverId')
     driverAll = Driver.objects.all()
 
+    if id == 4: # Driver pre-start
+        url_name = reverse('Appointment:driverPreStartTable', kwargs={'startDate' :  startDate ,'endDate' : endDate})
+        return redirect(url_name)
     if id == 3: # pre-start not filled
         if driverId:
             shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate), driverId=driverId)
@@ -3560,7 +3563,8 @@ def ShiftDetails(request,id):
         'driverAll' : driverAll,
     }
     return render(request, 'Account/Tables/driverTripsTable.html', params)
-    
+
+
 @csrf_protect
 def driverShiftCsv(request):
     data_list = []

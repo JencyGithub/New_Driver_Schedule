@@ -3,7 +3,12 @@
 {% block title %} | Pre-start form{% endblock %}
 
 {% block headStyle %}
-
+<style>
+    .form-check-label{
+        margin-top: 0.15em;
+        cursor: pointer;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -81,23 +86,33 @@
             </div>
             <div id="questionsContainer">
                 {% for question in questions %}
-                    <div class="x_panel mt-2">
+                    <!-- <div class="float-right">
+                        <input type="checkbox" name="remove" id="remove">
+                        <label for="remove">Remove this Question?</label>
+                    </div> -->
+                    <div class="form-check float-right">
+                        <input class="form-check-input" type="checkbox" id="remove{{question.id}}" value="remove" name="remove{{question.id}}" {% if question.archive %}disabled checked{% endif %}>
+                        <label class="form-check-label" for="remove{{question.id}}">
+                            Remove this Question
+                        </label>
+                      </div>
+                    <div class="x_panel mt-2 {% if question.archive %}bg-light{% endif %}">
                         <div class="container">
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="form-group">
                                         <label for="q{{question.id}}txt" class="label-align">Question {{question.questionNo}}:<span class="required">*</span></label>
-                                        {% if  edit %}
-                                        <a href="#"  onclick="questionNoFun({{question.questionNo}},{{question.id}})" class="text-primary " data-toggle="modal" data-target="#editQuetModel">Swap Question Number</a>
+                                        {% if not question.archive and edit %}
+                                        <a href="#" onclick="questionNoFun({{question.questionNo}},{{question.id}})" class="text-primary " data-toggle="modal" data-target="#editQuetModel">Swap Question Number</a>
                                         {% endif %}
-                                        <input class="form-control" name="q{{question.id}}txt" required="required" id="q{{question.id}}txt" value="{{question.questionText}}" type="text" {% if not edit %}readonly{% endif %}/>
+                                        <input class="form-control" name="q{{question.id}}txt" required="required" id="q{{question.id}}txt" value="{{question.questionText}}" type="text" {% if not edit or question.archive %}readonly{% endif %}/>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="q{{question.id}}type" class="label-align">Question Type:<span class="required">*</span></label>
-                                        <select name="q{{question.id}}type" id="q{{question.id}}type" class="form-control" required="required" {% if not edit %}disabled{% endif %}>
+                                        <select name="q{{question.id}}type" id="q{{question.id}}type" class="form-control" required="required" {% if not edit or question.archive %}disabled{% endif %}>
                                             <option value="Driver related" {% if question.questionType == 'Driver related' %}selected{% endif %}>Driver related</option>
                                             <option value="Vehicle related" {% if question.questionType == 'Vehicle related' %}selected{% endif %}>Vehicle related</option>
                                             <option value="Other" {% if question.questionType == 'Other' %}selected{% endif %}>Other</option>                                                
@@ -108,49 +123,49 @@
                                     <div class="form-group">
                                         <label for="q{{question.id}}o1" class="label-align">Option 1:<span class="required">*</span></label>
                                         <div class="form-check float-right">
-                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o1wantFile" id="q{{question.id}}o1wantFile" name="wantFile{{question.id}}" {% if question.wantFile1 %}checked{% endif %} {% if not edit %}disabled{% endif %}>
+                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o1wantFile" id="q{{question.id}}o1wantFile" name="wantFile{{question.id}}" {% if question.wantFile1 %}checked{% endif %} {% if not edit or question.archive %}disabled{% endif %}>
                                             <label class="form-check-label {% if question.wantFile1 %}text-info{% endif %}" for="q{{question.id}}o1wantFile">
                                                 Want file
                                             </label>
                                         </div>
-                                        <input class="form-control" name="q{{question.id}}o1" required="required" id="q{{question.id}}o1" type="text" autocomplete="off" {% if not edit %}readonly{% endif %} value="{{question.optionTxt1}}"/>
+                                        <input class="form-control" name="q{{question.id}}o1" required="required" id="q{{question.id}}o1" type="text" autocomplete="off" {% if not edit or question.archive %}readonly{% endif %} value="{{question.optionTxt1}}"/>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="q{{question.id}}o2" class="label-align">Option 2:</label>
                                         <div class="form-check float-right">
-                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o2wantFile" id="q{{question.id}}o2wantFile" name="wantFile{{question.id}}" {% if question.wantFile2 %}checked{% endif %} {% if not edit %}disabled{% endif %}>
+                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o2wantFile" id="q{{question.id}}o2wantFile" name="wantFile{{question.id}}" {% if question.wantFile2 %}checked{% endif %} {% if not edit or question.archive %}disabled{% endif %}>
                                             <label class="form-check-label {% if question.wantFile2 %}text-info{% endif %}" for="q{{question.id}}o2wantFile">
                                                 Want file
                                             </label>
                                         </div>
-                                        <input class="form-control" name="q{{question.id}}o2" id="q{{question.id}}o2" type="text" autocomplete="off" value="{% if question.optionTxt2 %}{{question.optionTxt2}}{% endif %}" {% if not edit %}readonly{% endif %} {% if question.optionTxt2 %}required{% endif %}/>
+                                        <input class="form-control" name="q{{question.id}}o2" id="q{{question.id}}o2" type="text" autocomplete="off" value="{% if question.optionTxt2 %}{{question.optionTxt2}}{% endif %}" {% if not edit or question.archive %}readonly{% endif %} {% if question.optionTxt2 %}required{% endif %}/>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="q{{question.id}}o3" class="label-align">Option 3:</label>
                                         <div class="form-check float-right">
-                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o3wantFile" id="q{{question.id}}o3wantFile" name="wantFile{{question.id}}" {% if question.wantFile3 %}checked{% endif %} {% if not edit %}disabled{% endif %}>
+                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o3wantFile" id="q{{question.id}}o3wantFile" name="wantFile{{question.id}}" {% if question.wantFile3 %}checked{% endif %} {% if not edit or question.archive %}disabled{% endif %}>
 
                                             <label class="form-check-label {% if question.wantFile3 %}text-info{% endif %}" for="q{{question.id}}o3wantFile">
                                                 Want file
                                             </label>
                                         </div>
-                                        <input class="form-control" name="q{{question.id}}o3" id="q{{question.id}}o3" type="text" autocomplete="off" value="{% if question.optionTxt3 %}{{question.optionTxt3}}{% endif %}" {% if not edit %}readonly{% endif %} {% if question.optionTxt3 %}required{% endif %}/>
+                                        <input class="form-control" name="q{{question.id}}o3" id="q{{question.id}}o3" type="text" autocomplete="off" value="{% if question.optionTxt3 %}{{question.optionTxt3}}{% endif %}" {% if not edit or question.archive %}readonly{% endif %} {% if question.optionTxt3 %}required{% endif %}/>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="q{{question.id}}o4" class="label-align">Option 4:</label>
                                         <div class="form-check float-right">
-                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o4wantFile" id="q{{question.id}}o4wantFile" name="wantFile{{question.id}}" {% if question.wantFile4 %}checked{% endif %} {% if not edit %}disabled{% endif %}>
+                                            <input class="form-check-input" type="checkbox" value="q{{question.id}}o4wantFile" id="q{{question.id}}o4wantFile" name="wantFile{{question.id}}" {% if question.wantFile4 %}checked{% endif %} {% if not edit or question.archive %}disabled{% endif %}>
                                             <label class="form-check-label {% if question.wantFile4 %}text-info{% endif %}" for="q{{question.id}}o4wantFile">
                                                 Want file
                                             </label>
                                         </div>
-                                        <input class="form-control" name="q{{question.id}}o4" id="q{{question.id}}o4" type="text" autocomplete="off" value="{% if question.optionTxt4 %}{{question.optionTxt4}}{% endif %}" {% if not edit %}readonly{% endif %} {% if question.optionTxt4 %}required{% endif %}/>
+                                        <input class="form-control" name="q{{question.id}}o4" id="q{{question.id}}o4" type="text" autocomplete="off" value="{% if question.optionTxt4 %}{{question.optionTxt4}}{% endif %}" {% if not edit or question.archive %}readonly{% endif %} {% if question.optionTxt4 %}required{% endif %}/>
                                     </div>
                                 </div>
                             </div>
