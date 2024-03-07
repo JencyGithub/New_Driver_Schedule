@@ -297,7 +297,20 @@ class RctiAdjustment(models.Model):
     unitPrice= models.FloatField(default=0)
     totalExGST = models.FloatField(default=0)
     GSTPayable = models.FloatField(default=0)
-    Total = models.FloatField(default=0)
+    Total = models.FloatField(default=0)    
+    loadAndKmCost = models.FloatField(default=0)
+    surchargeCost = models.FloatField(default=0)
+    waitingTimeCost = models.FloatField(default=0)
+    transferKmCost = models.FloatField(default=0)
+    returnKmCost = models.FloatField(default=0)
+    otherCost = models.FloatField(default=0)
+    standByCost = models.FloatField(default=0)
+    loadDeficit = models.FloatField(default=0)
+    blowBack = models.FloatField(default=0)
+    callOut = models.FloatField(default=0)
+    cancellationCost = models.FloatField(default=0)
+    demurageCost = models.FloatField(default=0)
+
     
     def __str__(self) -> str:
         return str(self.docketNumber)
