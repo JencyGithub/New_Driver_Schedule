@@ -360,7 +360,7 @@ def preStartForm(request, id=None, edit=None):
 @csrf_protect
 def preStartSave(request, id=None):
     currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDateTime = datetime.now(tz=currentTimezone)
+    currentDateTime = datetime.now()
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
