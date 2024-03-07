@@ -206,11 +206,10 @@
             }
         });
         if(isValid){
-            if($('#driverQues input[type="file"]').length > 0){
+            if($('#driverQues textarea').length > 0){
                 if(confirm('It appears you might not have the necessary authorization. Please reach out to our management team for further assistance.') == true){
                     $("#validateBtn").remove()
                     $("#preStartForm .card-body").append('<span id="endShiftBtn" class="btn btn-sm btn-outline-danger float-end" onclick="endShiftFun()">End shift</span>')
-
                 }                
             }else{
                 $('#otherQues').removeClass('d-none')
@@ -292,10 +291,14 @@
                 $(`#requiredSection${questionId}`).empty()
                 if(data.status){
                     let elementText = ''
-                    elementText += `<div class="col-md-4 col-lg-3 col-sm-6 d-flex align-items-center p-0">`
-                    elementText += `<input type="file" name="f${questionId}o${optionNumber}" id="f${questionId}o${optionNumber}">`
-                    elementText += `</div>`
-                    elementText += `<div class="col-md-8 col-lg-9 col-sm-6 p-0">`
+                    if(data.queType != "Driver related"){
+                        elementText += `<div class="col-md-4 col-lg-3 col-sm-6 d-flex align-items-center p-0">`
+                        elementText += `<input type="file" name="f${questionId}o${optionNumber}" id="f${questionId}o${optionNumber}">`
+                        elementText += `</div>`
+                        elementText += `<div class="col-md-8 col-lg-9 col-sm-6 p-0">`
+                    }else{
+                        elementText += `<div class="col-12 p-0">`
+                    }
                     elementText += `<textarea name="c${questionId}o${optionNumber}" id="c${questionId}o${optionNumber}" class="form-control mt-2 required-field w-100" placeholder="Add comment" rows="1"></textarea>`
                     elementText += `</div>`
                     $(`#requiredSection${questionId}`).append(elementText).addClass('p-2');
