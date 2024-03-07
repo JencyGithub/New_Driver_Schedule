@@ -142,6 +142,7 @@ class PreStartQuestion(models.Model):
     # optionFile4 = models.FileField(null=True, blank=True)
     # optionComment4 = models.CharField(max_length=1024, default='', null=True)
     
+    archive = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.questionText) + '------' + str(self.preStartId)
