@@ -359,8 +359,9 @@ def preStartForm(request, id=None, edit=None):
 
 @csrf_protect
 def preStartSave(request, id=None):
-    currentTimezone = pytz.timezone('Asia/Kolkata')
-    currentDateTime = datetime.now(tz=currentTimezone)
+    # currentTimezone = pytz.timezone('Asia/Kolkata')
+    # currentDateTime = datetime.now(tz=currentTimezone)
+    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
     preStartName = request.POST.get('preStartName')
     questionCount = request.POST.get('queCount')
     preStartObj = PreStart() if not id else PreStart.objects.filter(pk=id).first()
@@ -389,12 +390,10 @@ def preStartSave(request, id=None):
             questionObj.preStartId = preStartObj
             msg = "Pre-start added successfully."
             
-        print(questionObj,count)
 
         questionObj.questionText = request.POST.get(f'q{count}txt')
         questionObj.questionType = request.POST.get(f'q{count}type')
         questionObj.questionNo = question + 1
-        print(count,request.POST.get(f'q{count}type'))
         
         queTxt1 = request.POST.get(f'q{count}o1')
         queTxt2 = request.POST.get(f'q{count}o2')
@@ -506,6 +505,22 @@ def questionAddSave(request, id):
     messages.success(request, "Question added.")
     return redirect('Appointment:preStartTableView')
 
+
+def driverPreStartForm(request, preStartId):
+    driverPreStartObj = DriverPreStart.objects.filter(pk=preStartId).first()
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=driverPreStartObj.preStartId).order_by('questionNo')
+    for obj in preStartQuestions:
+        question = DriverPreStartQuestion.objects.filter(questionId=obj).first()
+        obj.selectedText = question.answer
+        obj.selectedFile = question.answerFile
+        obj.selectedComment = question.comment
+            
+    params = {
+        'preStartObj' : driverPreStartObj,
+        'preStartQuestions' : preStartQuestions,
+    }
+
+    return render(request, 'Appointment/driverPreStartForm.html', params)
 
 @csrf_protect
 @api_view(['POST'])

@@ -93,3 +93,21 @@ function questionNoFun(questionNo,queId){
     $('#questionNo').val(questionNo);
     $('#preQueId').val(queId);
 }
+
+$('#questionsContainer input[type="checkbox"]').on('change', function(){
+    let elementName = $(this).attr('name') 
+    let prevSelected = $(`input[name=${elementName}][checked]`)
+    console.log(prevSelected)
+
+    if($(this).attr('id') == prevSelected.attr('id')){
+        $(this).removeAttr('checked')
+    }else{
+        $(`input[name=${elementName}]`).removeAttr('checked');
+        $(this).attr('checked', true).prop('checked', true);
+    }
+
+})
+
+$('#preStartForm').submit(function(e){
+    setDateTime("dateTime")
+})

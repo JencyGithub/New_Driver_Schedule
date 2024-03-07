@@ -1,0 +1,192 @@
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Driver Pre-start form{% endblock %}
+
+{% block headStyle %}
+<style>
+    .form-check-label{
+        margin-top: 0.15em;
+    }
+    .optionSection label{
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <form action="#" method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>{% if preStartObj %}View{% else %}Add{% endif %} Pre-start</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label for="preStartName" class="label-align">Pre-start name:<span class="required">*</span></label>
+                                        <input class="form-control" name="preStartName" required="required" id="preStartName" type="text" value="{% if preStartObj %}{{preStartObj.preStartId.preStartName}}{% endif %}" {% if preStartObj and not edit%}readonly{% endif %} />
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="queCount" class="label-align">Question count:<span class="required">*</span></label>
+                                        <input class="form-control" name="queCount" required="required" id="queCount" type="number" autocomplete="off" value="{% if preStartObj %}{{preStartQuestions|length}}{% endif %}" {% if preStartObj %}readonly{% endif %}/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="questionsContainer">
+            {% for question in preStartQuestions %}
+                <div class="x_panel mt-2">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="q{{question.id}}txt" class="label-align">Question {{question.questionNo}}:<span class="required">*</span></label>
+                                    <input class="form-control" name="q{{question.id}}txt" required="required" id="q{{question.id}}txt" value="{{question.questionText}}" type="text" {% if not edit %}readonly{% endif %}/>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="q{{question.id}}type" class="label-align">Question Type:<span class="required">*</span></label>
+                                    <select name="q{{question.id}}type" id="q{{question.id}}type" class="form-control" required="required" {% if not edit %}disabled{% endif %}>
+                                        <option value="Driver related" {% if question.questionType == 'Driver related' %}selected{% endif %}>Driver related</option>
+                                        <option value="Vehicle related" {% if question.questionType == 'Vehicle related' %}selected{% endif %}>Vehicle related</option>
+                                        <option value="Other" {% if question.questionType == 'Other' %}selected{% endif %}>Other</option>                                                
+                                    </select>
+                                </div>
+                            </div>
+    
+                            <div class="col-md-8 col-sm-8 d-flex justify-content-between align-items-center flex-wrap optionSection"> 
+                                {% if question.optionTxt1 %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="q{{ question.id }}option" id="q{{ question.id }}o1" value="{{question.optionTxt1}}" {% if preStartObj %}disabled{% endif %} {% if question.selectedText == question.optionTxt1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="q{{ question.id }}o1">
+                                      {{question.optionTxt1}}
+                                    </label>
+                                </div>
+                                {% endif %}
+                                {% if question.optionTxt2 %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="q{{ question.id }}option" id="q{{ question.id }}o2" value="{{question.optionTxt2}}" {% if preStartObj %}disabled{% endif %} {% if question.selectedText == question.optionTxt2 %}checked{% endif %}>
+                                    <label class="form-check-label" for="q{{ question.id }}o2">
+                                      {{question.optionTxt2}}
+                                    </label>
+                                </div>
+                                {% endif %}
+                                {% if question.optionTxt3 %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="q{{ question.id }}option" id="q{{ question.id }}o3" value="{{question.optionTxt3}}" {% if preStartObj %}disabled{% endif %} {% if question.selectedText == question.optionTxt3 %}checked{% endif %}>
+                                    <label class="form-check-label" for="q{{ question.id }}o3">
+                                        {{question.optionTxt3}}
+                                    </label>
+                                </div>
+                                {% endif %}
+                                {% if question.optionTxt4 %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="q{{ question.id }}option" id="q{{ question.id }}o4" value="{{question.optionTxt4}}" {% if preStartObj %}disabled{% endif %} {% if question.selectedText == question.optionTxt4 %}checked{% endif %}>
+                                    <label class="form-check-label" for="q{{ question.id }}o4">
+                                      {{question.optionTxt4}}
+                                    </label>
+                                </div>
+                                {% endif %}
+                                
+                                <span>
+                                    {% if question.selectedFile %}
+                                    Uploaded file: <a href="/{{question.selectedFile}}" target="_blank" class="text-info">View</a>
+                                    {% else %}
+                                    No File Uploaded.
+                                    {% endif %} 
+                                </span>
+                            </div>
+                            
+                            <div class="col-md-4 col-sm-4">
+                                <textarea name="q{{ question.id }}cmt" id="q{{ question.id }}cmt" rows="1" class="form-control" placeholder="Comment" {% if preStartObj %}readonly{% endif %}>{% if preStartObj %}{{ question.selectedComment }}{% endif %}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- <div>
+            <div class="x_panel mt-2">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="q{{question.id}}txt" class="label-align">Question {{question.questionNo}}:<span class="required">*</span></label>
+                                <input class="form-control" name="q{{question.id}}txt" required="required" id="q{{question.id}}txt" value="{{question.questionText}}" type="text" {% if not edit %}readonly{% endif %}/>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="q{{question.id}}type" class="label-align">Question Type:<span class="required">*</span></label>
+                                <select name="q{{question.id}}type" id="q{{question.id}}type" class="form-control" required="required" {% if not edit %}disabled{% endif %}>
+                                    <option value="Driver related" {% if question.questionType == 'Driver related' %}selected{% endif %}>Driver related</option>
+                                    <option value="Vehicle related" {% if question.questionType == 'Vehicle related' %}selected{% endif %}>Vehicle related</option>
+                                    <option value="Other" {% if question.questionType == 'Other' %}selected{% endif %}>Other</option>                                                
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 col-sm-8 d-flex justify-content-between align-items-center flex-wrap"> 
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1option" id="q1o1" value="option1">
+                                <label class="form-check-label" for="q1o1">
+                                  Default radio
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1option" id="q2o2" value="option1">
+                                <label class="form-check-label" for="q2o2">
+                                  Default radio
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1option" id="q3o3" value="option1">
+                                <label class="form-check-label" for="q3o3">
+                                  Default radio
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="q1option" id="q4o4" value="option1">
+                                <label class="form-check-label" for="q4o4">
+                                  Default radio
+                                </label>
+                            </div>
+                            <span>
+                                Uploaded file: <a href="#" class="text-info">View</a>
+                            </span>
+                        </div>
+                        
+                        <div class="col-md-4 col-sm-4">
+                            <textarea name="q1cmt" id="q1cmt" rows="1" class="form-control" placeholder="Comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <input type="{% if edit %}submit{% else %}hidden{% endif %}" class="btn btn-sm btn-default float-right" value="Submit" id="submit">
+    </form>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script src="{% static 'js/preStartForm.js' %}"></script>
+
+{% endblock %}

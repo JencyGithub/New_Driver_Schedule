@@ -54,8 +54,8 @@ urlpatterns = [
     path('pre-start/form/view/', views.preStartForm ,name="preStartForm"),
     path('pre-start/form/save/', views.preStartSave ,name="preStartSave"),
 
-
-    
     path('question/add/view/<int:id>/', views.questionAddView ,name="questionAddView"),
     path('question/add/save/<int:id>/', views.questionAddSave ,name="questionAddSave"),
+
+    path('driver/pre-start/view/<int:preStartId>/', views.driverPreStartForm ,name="driverPreStartView"),
 ]
