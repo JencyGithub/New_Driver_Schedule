@@ -68,8 +68,8 @@
                     </div>
                     {% for trip in driverTrip %}
                         <div class="x_panel">
-                            <div class="x_title ">
-                                <h2 class="text-primary">  Trip  {{forloop.counter}}</h2>
+                            <div class="x_title">
+                                <h2 class="text-primary">Trip {{forloop.counter}}</h2>{% if trip.preStartObj %}<b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b>{% endif %}
                                 {% if trip.revenueDeficit > 0 %}
                                 <i class="text-danger float-right" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
                                 {% endif %}
