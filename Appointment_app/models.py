@@ -157,6 +157,7 @@ class DriverPreStart(models.Model):
     driverId =  models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
     curDateTime = models.DateTimeField(null=True)
     comment = models.CharField(max_length=2048, default='', null=True)
+    archive = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.curDateTime)

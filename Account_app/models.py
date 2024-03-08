@@ -68,6 +68,9 @@ class DriverShift(models.Model):
     endDateTime = models.DateTimeField(null=True, blank=True)
     driverId = models.IntegerField(null=True, blank=True)
     locationImg = models.FileField(null=True)
+    startTimeUTC = models.DateTimeField(null=True)
+    endTimeUTC = models.DateTimeField(null=True)
+    archive = models.BooleanField(default=False)
     
     def __str__(self) -> str:
         return str(self.shiftDate) + '-' + str(self.id)
@@ -85,7 +88,9 @@ class DriverShiftTrip(models.Model):
     revenueDeficit = models.FloatField(default=0)
     loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
-    
+    startTimeUTC = models.DateTimeField(null=True)
+    endTimeUTC = models.DateTimeField(null=True)
+    archive = models.BooleanField(default=False)
     startOdometerKms = models.FloatField(default=0, null=True)
     endOdometerKms = models.FloatField(default=0, null=True)
     startEngineHours = models.FloatField(default=0, null=True)
