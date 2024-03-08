@@ -1,6 +1,4 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator,RegexValidator
-from datetime import date
 from django.utils import timezone
 from GearBox_app.models import *
 from django.contrib.auth.models import User

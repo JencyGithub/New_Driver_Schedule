@@ -22,17 +22,7 @@
                         <div class="x_panel">
                             <div class="x_title">
                                 <h2> {% if rcti %} View RCTI {% elif docketData%} View Holcim {% else %} Add RCTI {% endif  %}:-</h2>
-                                {% comment %} {% if not rcti%}
-                                <div class="float-right">
-                                    <form action="{% url 'Account:rctiFormSave' %}" method="post" id="rctiForm">
-                                        <select class="form-control" id="clientName" name="clientName">
-                                            {% for clientName in clientNames %}
-                                            <option value="{{ clientName.name }}">{{ clientName.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </form>
-                                </div>
-                                {%endif%} {% endcomment %}
+
                                 <div class="clearfix"></div>
                             </div>
                             </div>
@@ -64,7 +54,7 @@
                                                 <a class="nav-link  " id="v-pills-returnKm-tab" data-toggle="pill" href="#v-pills-returnKm"
                                                 role="tab" aria-controls="v-pills-returnKm" aria-selected="false">Return KM</a>
                                             {% endif %}
-                                            {% if  rcti.waitingTimeSCHEDTotal != 0 %}
+                                            {% if  rcti.waitingTimeSCHEDTotal != 0 and 'boral' in clientName.name %}
                                                 <a class="nav-link  " id="v-pills-waitingTimeSCHED-tab" data-toggle="pill" href="#v-pills-waitingTimeSCHED"
                                                 role="tab" aria-controls="v-pills-waitingTimeSCHED" aria-selected="false">Waiting time SCHED</a>
                                             {% endif %}
@@ -76,15 +66,16 @@
                                                 <a class="nav-link   " id="v-pills-standByNoSlot-tab" data-toggle="pill" href="#v-pills-standByNoSlot"
                                                 role="tab" aria-controls="v-pills-standByNoSlot" aria-selected="false">Stand by per half hour cost</a>
                                             {% endif %}
-                                            {% if  rcti.minimumLoadTotal != 0 %}
+                                            {% if  rcti.minimumLoadTotal != 0 and 'boral' in clientName.name %}
                                                 <a class="nav-link  " id="v-pills-minimumLoad-tab" data-toggle="pill" href="#v-pills-minimumLoad"
                                                 role="tab" aria-controls="v-pills-minimumLoad" aria-selected="false">Minimum load</a>
                                             {% endif %}
-                                            {% if  rcti.blowBackTotal != 0 %}
+                                            
+                                            {% if  rcti.blowBackTotal != 0 and 'holcim' in clientName.name %}
                                                 <a class="nav-link  " id="v-pills-blow_back-tab" data-toggle="pill" href="#v-pills-blow_back"
                                                 role="tab" aria-controls="v-pills-blow_back" aria-selected="false">Blow Back</a>
                                             {% endif %}
-                                            {% if  rcti.callOutTotal != 0 %}
+                                            {% if  rcti.callOutTotal != 0 and 'holcim' in clientName.name %}
                                                 <a class="nav-link  " id="v-pills-call_out-tab" data-toggle="pill" href="#v-pills-call_out"
                                                 role="tab" aria-controls="v-pills-call_out" aria-selected="false">Call Out</a>
                                             {% endif %}
@@ -615,39 +606,35 @@
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="truckNo">Truck No:<span class="required">*</span></label>
-                                                                <input class="form-control" type="number" name="truckNo"  {% if rcti %} value="{{ rcti.truckNo }}" {% else %} value="0"  {% endif %}
-                                                                
-                                                                id="truckNo" {% if rcti %} readonly {% endif %}>
+                                                                <select class="form-control" {% if rcti  %} disabled {% endif %} required id="truckNo" name="truckNo">
+                                                                    <option value="" disabled selected>Select File Name</option>
+                                                                    {% for truckNo in truckConnectionObj %}
+                                                                    {% if rcti %}
+                                                                    <option value="{{ truckNo.id }}" {% if truckNo.clientTruckId == rcti.truckNo %} selected {% endif %}>{{ truckNo.clientTruckId }}</option>
+                                                                    {% else %}
+                                                                    <option value="{{ truckNo.id }}">{{ truckNo.clientTruckId }}</option>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+                                                                </select>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label for="clientName"><span class="required"><a href="{% if rcti%}{% url 'gearBox:clientEdit' id=rcti.clientName.clientId %}{% else %}#{% endif %}" target="blank">clientName*</a></span></label>
-                                                                <select class="form-control" {% if rcti or errorObj%} disabled {% endif %} required id="clientName" name="clientName">
-                                                                    <option value="" disabled selected>Select Client Name</option>
-                                                                    {% for clientName in clientNames %}
-                                                                    {% if rcti %}
-                                                                    <option value="{{ clientName.clientId }}" {% if clientName.name == rcti.clientName.name %} selected {% endif %}>{{ clientName.name }}</option>
-                                                                    {% elif errorObj %}
-                                                                    <option value="{{ clientName.clientId }}" {% if clientName.name == errorObj.clientName %} selected {% endif %}>{{ clientName.name }}</option>
-                                                                    {% else %}
-                                                                    <option value="{{ clientName.clientId }}">{{ clientName.name }}</option>
-                                                                    {% endif %}
-                                                                    {% endfor %}
+                                                                <input class="form-control" name="errorIdRcti" value="{{errorObj.id}}" hidden readonly required="required" id="errorIdRcti" type="text" />
 
-                                                                </select>
+                                                                <label for="clientName"><span class="required"><a href="{% if rcti%}{% url 'gearBox:clientEdit' id=rcti.clientName.clientId %}{% else %}#{% endif %}" target="blank">clientName*</a></span></label>
+                                                                <input class="form-control" type="text" name="clientName"   value="{{clientName.name}}"  id="clientName"  readonly >
+                                                                
                                                             </div>
                                                         </div> 
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
                                                                 <label for="rctiReport"><span class="required">Rcti Report*</span></label>
-                                                                <select class="form-control" {% if rcti or errorObj %} disabled {% endif %} required id="rctiReport" name="rctiReport">
+                                                                <select class="form-control" {% if rcti  %} disabled {% endif %} required id="rctiReport" name="rctiReport">
                                                                     <option value="" disabled selected>Select File Name</option>
                                                                     {% for report in rctiReports %}
                                                                     {% if rcti %}
                                                                     <option value="{{ report.id }}" {% if report.fileName == rcti.rctiReport.fileName %} selected {% endif %}>{{ report.fileName }}</option>
-                                                                    {% elif errorObj %}
-                                                                    <option value="{{ report.id }}" {% if report.id == reportId %} selected {% endif %}>{{ report.fileName }}</option>
                                                                     {% else %}
                                                                     <option value="{{ report.id }}">{{ report.fileName }}</option>
                                                                     {% endif %}
@@ -672,7 +659,7 @@
                                                             <div class="form-group">
                                                                 <label for="docketYard">Docket yard:<span class="required">*</span></label>
                                                                 
-                                                                <select class="form-control" {% if rcti or errorObj.docketNumber != None %} disabled {% endif %} required id="docketYard" name="docketYard">
+                                                                <select class="form-control" {% if rcti  %} disabled {% endif %} required id="docketYard" name="docketYard">
                                                                 <option value="" disabled selected>Select Docket Yard</option>
                                                                 {% for name in basePlants %}
                                                                 {% if rcti %}
@@ -1150,15 +1137,13 @@
 
 <script>
     $(document).ready(function(){
-        var truckNo = $('#truckNo').val()
-        console.log(truckNo)
+        var docketNumber = $('#docketNumber').val()
         // Check if rcti.truckNo is greater than 0
-        if (truckNo <= 0 ) {
+        if (docketNumber <= 0 ) {
             // Reset the values of input fields to 0
             var inputsToReset = $('.form-group input[type="number"]');
             inputsToReset.val(0);
         }
-
 
         //var inputsToReset = $('.form-group input[type="number"]');
         
