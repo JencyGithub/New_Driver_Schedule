@@ -4,15 +4,17 @@
 {% block headStyle %}
 
 <!-- Datatables -->
-<link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+<!-- <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"
     rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"
     rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
-    rel="stylesheet">
-
+    rel="stylesheet"> -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link type="text/css"
+    href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css" rel="stylesheet" />
 <style>
     .dt-buttons.btn-group {
         float: right ! important;
@@ -21,6 +23,10 @@
     /* Hide all buttons (copy,csv,excel,pdf,print) */
     .dt-buttons.btn-group>a {
         display: none !important;
+    }
+    .fa-regular.fa-square-caret-down{
+        font-size: 1.5rem;
+        cursor: pointer;
     }
 </style>
 {% endblock %}
@@ -32,18 +38,46 @@
         <div class="row">
             <div class="col-md-12 col-sm-12 ">
                 <div class="x_panel">
+                    <form action="{% if failed %}{% url 'Appointment:driverPreStartTable1' failed=1 %}{% else %}{% url 'Appointment:driverPreStartTable1' failed=0 %}{% endif %}" id="preStartFilterForm" method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <label for="startDate">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate|date:'Y-m-d' }}">
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <label for="endDate">End Date</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate|date:'Y-m-d' }}">
+                            </div>
+                            <div class="col-md-4 col-sm-4 d-flex justify-content-end align-items-end">
+                                <button type="submit" id="filterBtn" class="btn btn-sm btn-default pull-right">Filter</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% if failed %}
+                <span class="float-right"><i class="fa-regular fa-square-caret-down text-default m-2 archive"></i></span>
+                {% endif %}
+                <div class="x_panel">
                     <div class="x_title">
-                        <h2>Driver Pre-starts</h2>
+                        <h2>{% if failed %}Failed{% else %}Driver{% endif %} Pre-starts</h2>
+                        <div class="float-right mt-1">
+                            <a href="{% if not failed %}{% url 'Appointment:driverFailedPreStartTable' startDate=startDate endDate=endDate failed=1 %}{% else %}{% url 'Appointment:driverPreStartTable' startDate=startDate endDate=endDate %}{% endif %}">
+                                {% if not failed %}Failed Pre-starts{% else %}Driver Pre-starts{% endif %}
+                            </a>
+                        </div>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card-box table-responsive">
-                                    <table id="datatable-buttons" class="table table-striped table-bordered"
-                                        style="width:100%">
+                                    <table id="preStartTable" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
+                                                {% if failed %}
+                                                <th></th>
+                                                {% endif %}
                                                 <th>Pre start</th>
                                                 <th>Truck no.</th>
                                                 <th>Client</th>
@@ -54,6 +88,9 @@
                                         <tbody>
                                             {% for preStart in preStarts %}
                                                 <tr>
+                                                    {% if failed %}
+                                                    <td>{{preStart.id}}</td>
+                                                    {% endif %}
                                                     <td><a href="{% url 'Appointment:driverPreStartView' preStartId=preStart.id %}">{{preStart.preStartId.preStartName}}</a></td>
                                                     <td><a href="{% url 'Appointment:driverPreStartView' preStartId=preStart.id %}">{{preStart.truckConnectionId.truckNumber.adminTruckNumber}}</a></td>
                                                     <td><a href="{% url 'Appointment:driverPreStartView' preStartId=preStart.id %}">{{preStart.clientId.name}}</a></td>
@@ -75,22 +112,71 @@
 </div>
 {% endblock %}
 {% block footerStyleEnd %}
-<script>
-    const redirectButton = document.getElementById('redirectButton');
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    redirectButton.addEventListener('click', function () {
-        const djangoURL = redirectButton.getAttribute('data-url');
-
-        window.location.href = djangoURL;
-    });
-</script>
 <script>
+    const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
     $(document).ready(function () {
-        $('#datatable-buttons').DataTable();
+        if('{{failed}}' == '1'){
+            var table = $("#preStartTable").DataTable({
+                'columnDefs': [{
+                    'targets': 0,
+                    'checkboxes': {
+                        'selectRow': true
+                    }
+                }]
+            });
+        }else{
+            var table = $("#preStartTable").DataTable({
+                'columnDefs': [{
+                    'targets': 0
+                }]
+            });
+        }
+        function getSelectedPreStarts(){
+            var selectedRows = table.column(0).checkboxes.selected();
+            var selectedPreStarts = [];
+            $.each(selectedRows, function(key,docket){
+                selectedPreStarts.push(docket)
+            })
+            if(selectedPreStarts.length > 0){
+                return selectedPreStarts
+            }else{
+                alert("Please select at least one docket");
+                return false
+            }
+        }
+
+        $('.archive').on('click', function(){
+            let selected = getSelectedPreStarts();
+            console.log(selected)
+            if(selected){ 
+                if(confirm("Do you really want to archive all selected pre-Starts?") == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/appointment/driver/pre-start/archive/",
+                        data: {
+                            selectedPreStarts: selected,
+                        },
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                            alert('Selected Dockets Marked As Completed Successfully.');
+                        }
+                    });
+                }
+            }           
+        })
+
     });
 </script>
+<script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
+
 <!-- Datatables -->
-<script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<!-- <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
@@ -104,6 +190,6 @@
 <script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script> -->
 
 {% endblock %}

@@ -116,7 +116,7 @@
                         data.trucks.forEach(function (item) {
                             $("#truckNum").append(
                                 // `<option value="${item}"  >${item}</option>`
-                                `<option value="${item}" ${item.includes('Occupied') ? 'disabled' : ''}>${item}</option>`
+                                `<option value="${item}" ${item.includes('Already in use') ? 'disabled' : ''}>${item}</option>`
                             );
                         });
                         $("#truckNum").trigger("change.select2");

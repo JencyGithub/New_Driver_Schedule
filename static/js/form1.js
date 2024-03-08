@@ -130,7 +130,7 @@ function checkData() {
   var fileExtension = loadSheetValue.split(".").pop().toLowerCase();
 
   if (loadSheetValue === "") {
-    setError(loadSheet, "Please upload a Load Sheet.");
+    setError(loadSheet, "Please upload a Log Sheet.");
     isValid = false;
   } else if (allowedExtensions.indexOf(fileExtension) === -1) {
     setError(loadSheet, "Please select a JPG, JPEG, or PDF file.");

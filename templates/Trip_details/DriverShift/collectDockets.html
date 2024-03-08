@@ -46,7 +46,7 @@
                             <div class="col-md-8 col-sm-8">
                                 <div class="row">
                                     <div class="col-md-6 col-12 my-1">
-                                        <label for="loadSheet">Load sheet:</label>
+                                        <label for="loadSheet">Log sheet:</label>
                                         <input type="file" name="loadSheet" id="loadSheet" class="form-control" required>
                                     </div>
                                     <div class="col-md-6 col-12 my-1">
@@ -102,11 +102,12 @@
                                 <input type="datetime-local" name="standByTimeEnd1" id="standByTimeEnd1" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-4 col-12 my-1">
-                                    <div class="d-flex justify-content-between">
-                                        <label for="transferKm1">Transfer km:</label>
-                                        <input type="checkbox" name="waitingTimeActive" id="waitingTimeActive" onclick="changeStatus('transferKm1',null)">
-                                    </div>
-                                    <input type="number" name="transferKm1" id="transferKm1" class="form-control" readonly>
+                                    <label for="surcharge${i}">Select Surcharge</label>
+                                    <select name="surcharge${i}" id="surcharge${i}" class="form-control text-capitalize">
+                                        {% for surcharge in surcharges %}
+                                            <option value="{{surcharge.id}}" class="text-capitalize">{{surcharge.surcharge_Name}}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-md-8 col-12 my-1">
                                     <label for="comment1">Comment 1:</label>
@@ -176,6 +177,8 @@
             alert(msg);
         } else {
             this.submit();
+            //event.preventDefault();
+
         }
     });
 
@@ -218,18 +221,53 @@
         let docketContent = ''
         for (let i = 1; i <= count.val(); i++) {
             docketContent += `<div class="row border rounded-2 py-2 bg-light my-2">`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
+
+            docketContent += `<div class="col-md-3 col-12 my-1">`
             docketContent += `<label for="docketNumber${i}">Docket number:</label>`
             docketContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`
             docketContent += `</div>`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
+
+            docketContent += `<div class="col-md-3 col-12 my-1">`
             docketContent += `<label for="docketFile${i}">Docket File:</label>`
             docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required>`
             docketContent += `</div>`
-            docketContent += `<div class="col-md-4 col-12 my-1">`
+
+            // Stand By Time Start
+            docketContent += `<div class="col-md-3 col-12 my-1">`;
+            docketContent += `<div class="d-flex justify-content-between">`;
+            docketContent += `<label for="standByTimeStart${i}">Stand by start:</label>`;
+            docketContent += `<input type="checkbox" name="standByTimeActive${i}" id="standByTimeActive${i}" onclick="changeStatus('standByTimeStart${i}','standByTimeEnd${i}')">`;
+            docketContent += `</div>`;
+            docketContent += `<input type="datetime-local" name="standByTimeStart${i}" id="standByTimeStart${i}" class="form-control" readonly>`;
+            docketContent += `</div>`;
+
+            // Stand By Time End
+            docketContent += `<div class="col-md-3 col-12 my-1">`;
+            docketContent += `<label for="standByTimeEnd${i}">Stand by end:</label>`;
+            docketContent += `<input type="datetime-local" name="standByTimeEnd${i}" id="standByTimeEnd${i}" class="form-control" readonly>`;
+            docketContent += `</div>`;
+
+            // Transfer Km
+            docketContent += `<div class="col-md-3 col-12 my-1">`;
+            docketContent += `<label for="transferKm${i}">Transfer km:</label>`;
+            docketContent += `<input type="number" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
+            docketContent += `</div>`;
+
+            // Surcharge
+            docketContent += `<div class="col-md-3 col-12 my-1">`
+            docketContent += `<label for="surcharge${i}">Select Surcharge</label>`
+            docketContent += `<select name="surcharge${i}" id="surcharge${i}" class="form-control text-capitalize">`
+            docketContent += `{% for surcharge in surcharges %}`
+            docketContent += `<option value="{{surcharge.id}}" class="text-capitalize">{{surcharge.surcharge_Name}}</option>`
+            docketContent += `{% endfor %}`
+            docketContent += `</select>`
+            docketContent += `</div>`
+
+            docketContent += `<div class="col-md-6 col-12 my-1">`
             docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
             docketContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`
             docketContent += `</div>`
+
             docketContent += `</div>`
         }
         return docketContent
@@ -257,7 +295,7 @@
             detailsContent += `</div>`;
             */
 
-            // Transfer Km
+            // Docket Number
             detailsContent += `<div class="col-md-3 col-12 my-1">`;
             detailsContent += `<label for="docketNumber${i}">Docket Number:</label>`;
             detailsContent += `<input type="number" name="docketNumber${i}" id="docketNumber${i}" class="form-control" required>`;
@@ -280,15 +318,25 @@
 
             // Transfer Km
             detailsContent += `<div class="col-md-3 col-12 my-1">`;
-            detailsContent += `<div class="d-flex justify-content-between">`;
+            // detailsContent += `<div class="d-flex justify-content-between">`;
             detailsContent += `<label for="transferKm${i}">Transfer km:</label>`;
-            detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
-            detailsContent += `</div>`;
-            detailsContent += `<input type="number" name="transferKm${i}" id="transferKm${i}" class="form-control" readonly>`;
+            // detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
+            // detailsContent += `</div>`;
+            detailsContent += `<input type="number" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
             detailsContent += `</div>`;
 
+            // Surcharge
+            detailsContent += `<div class="col-md-3 col-12 my-1">`
+            detailsContent += `<label for="surcharge${i}">Select Surcharge</label>`
+            detailsContent += `<select name="surcharge${i}" id="surcharge${i}" class="form-control text-capitalize">`
+            detailsContent += `{% for surcharge in surcharges %}`
+            detailsContent += `<option value="{{surcharge.id}}" class="text-capitalize">{{surcharge.surcharge_Name}}</option>`
+            detailsContent += `{% endfor %}`
+            detailsContent += `</select>`
+            detailsContent += `</div>`
+
             // Comment
-            detailsContent += `<div class="col-12 my-1">`;
+            detailsContent += `<div class="col-md-9 col-12 my-1">`;
             detailsContent += `<label for="comment${i}">Comment ${i}:</label>`;
             detailsContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`;
             detailsContent += `</div>`;
@@ -321,9 +369,7 @@
             $("#docketsForm").attr('action', url)
             $(noOfLoads).attr('readonly', true)
         }
-    }
-
-    
+    }  
 
 </script>
 {% endblock %}

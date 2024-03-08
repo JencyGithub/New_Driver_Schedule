@@ -576,7 +576,7 @@ def mapFormView(request):
             return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
         currentDate = getCurrentDateTimeObj()
-        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate.date()).first()
+        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate.date(), archive=False).first()
 
         if todayShiftObj:
             messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
@@ -714,6 +714,7 @@ def DriverPreStartSave(request, tripId , endShift = None):
     tripObj.save()
     if not endShift:
         tripObj.endDateTime = currentDateTime
+        
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
     preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
@@ -771,9 +772,13 @@ def DriverPreStartSave(request, tripId , endShift = None):
                 pfs.save(newFileName, queFile)
                 answerObj.answerFile = f'{path}/{newFileName}'
             answerObj.save()
-
-            if answerObj.comment and endShift:
-                questionIdList.append(answerObj.id)
+            
+            if answerObj.comment:
+                driverPreStartObj.failed = True
+                if endShift:
+                    questionIdList.append(answerObj.id)
+                
+        driverPreStartObj.save()
         if endShift:
             shiftObj.endDateTime = currentDateTime
             shiftObj.save()
@@ -795,7 +800,6 @@ def DriverPreStartSave(request, tripId , endShift = None):
                 locationMessage = f'Location : Latitude - {latitude} , Longitude = {longitude} '
                 startTime = f'Start Time : {startTime} '
                 questionMessage = '\n'.join([f'{obj.questionId.questionText}: {obj.answer}' for obj in questions_with_answer])
-                
                 
                 message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
                 from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
@@ -939,9 +943,11 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+    surcharges = Surcharge.objects.all()
     driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
     manualEndTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
     breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    
     for obj in breaks:
         obj.startDateTime = str(obj.startDateTime).split('+')[0]   
         obj.endDateTime = str(obj.endDateTime).split('+')[0]   
@@ -952,44 +958,38 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         
     shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (dateTimeObj(dateTimeObj=request.POST.get('dateTime')) - shiftObj.startDateTime).total_seconds() / 60
 
-
     def checkBreaks(breaksObjs):
-        driverBreaksTimeList = []    
+        driverBreaksTimeList = []
+        totalDriverBreak = 0    
         for breakObj in breaksObjs:
             if breakObj.durationInMinutes >= 15:
+                totalDriverBreak += breakObj.durationInMinutes
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
-        return driverBreaksTimeList
+        return totalDriverBreak
 
-    legalBreakList = checkBreaks(driverBreaks)
+    totalDriverBreak = checkBreaks(driverBreaks)
     breaksIsAllReady = True
-    print(shiftTime, legalBreakList)
     
-    if shiftTime > 315 and shiftTime < 331:
-        if len(legalBreakList) == 0:
-            breaksIsAllReady = False
-            msg = "You need to add a break of 15 minutes before ending the trip."
-    elif shiftTime >= 331 and shiftTime < 481:
-        if len(legalBreakList) < 2:
-            breaksIsAllReady = False
-            msg = f"You need to add {2 - len(legalBreakList)} more break of 15 minutes each before ending the trip."
-    elif shiftTime > 481 and shiftTime < 1440: 
-        if len(legalBreakList) < 4:
-            breaksIsAllReady = False
-            msg = f"You need to add {4 - len(legalBreakList)} more break of 15 minutes each before ending the trip."
-    else:
-        breaksIsAllReady = False
-        msg = "It appears that you forgot to end your shit earlier, please select 'Forgot to end shift earlier' and specify correct time." 
-    
-    if not breaksIsAllReady:
-        messages.error(request, msg)
-        return redirect(request.META.get('HTTP_REFERER'))      
+    # if shiftTime < 315:
+    #     pass
+    # elif shiftTime >= 315 and shiftTime <= 480:
+    #     if totalDriverBreak < 15:
+    #         breaksIsAllReady = False
+    #         msg = "You need to add a break of 15 minutes before ending the trip."
+
+    # breaksIsAllReady = False
+    # msg = f"You need to add more break of 15 minutes each before ending the trip."
+    # if not breaksIsAllReady:
+    #     messages.error(request, msg)
+    #     return redirect(request.META.get('HTTP_REFERER'))      
         
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
         'endShift': endShift,
         'tripObj' : tripObj,
-        'breaks' : breaks
+        'breaks' : breaks,
+        'surcharges' : surcharges
     }
     return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
 
@@ -1036,6 +1036,10 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     
     if not clientObj.docketGiven:
         for load in range(1,noOfLoads+1):
+            transferKm = request.POST.get(f'transferKm{load}')
+            standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+            standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
+            
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
             docketObj.shiftId = shiftId
@@ -1043,6 +1047,10 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.clientId = clientObj.clientId
             docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+            docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
+            docketObj.transferKM = transferKm if transferKm else 0
+            docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+            docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
             docketObj.comment = request.POST.get(f'comment{load}')
             docketFile = request.FILES.get(f'docketFile{load}')
             if docketFile:
@@ -1054,10 +1062,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.save()
     else:
         for load in range(1,noOfLoads+1):
-            noOfKm = request.POST.get(f'noOfKm{load}')
             transferKm = request.POST.get(f'transferKm{load}')
-            standByTimeStart = formatDateTimeForDBSave(request.POST.get(f'standByTimeStart{load}'))
-            standByTimeEnd = formatDateTimeForDBSave(request.POST.get(f'standByTimeEnd{load}'))
+            standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+            standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
             
             docketObj = DriverShiftDocket()
             docketObj.tripId = tripObj.id
@@ -1066,8 +1073,8 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             docketObj.clientId = clientObj.clientId
             docketObj.truckConnectionId = tripObj.truckConnectionId
             docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+            docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
 
-            docketObj.noOfKm = noOfKm if noOfKm else 0
             docketObj.transferKM = transferKm if transferKm else 0
             docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
             docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
@@ -1176,7 +1183,7 @@ def getTrucks(request):
 
     for truck_connection in truck_connections:
         if truck_connection.id in connections:
-            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId) + ' Occupied')
+            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId) + ' Already in use')
         else:
             truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
             
@@ -3540,9 +3547,9 @@ def ShiftDetails(request,id):
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
     else: # completed and charged
         if driverId:
-            shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, verified= True if id==1 else False)
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId))
         else:
-            shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), verified= True if id==1 else False)
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None))
 
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first()

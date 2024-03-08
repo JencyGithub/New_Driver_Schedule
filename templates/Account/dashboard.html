@@ -7,6 +7,9 @@
   .count{
     cursor: pointer;
   }
+  form strong{
+    cursor: pointer;
+  }
 </style>
 
 {% endblock %}
@@ -107,6 +110,22 @@
               </td>
             </tr>
           </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <form action="{% url 'Appointment:driverPreStartTable1' failed=1 %}" id="last3DaysFailedPreStarts" method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="last3DaysFailedPreStartsStartDate" name="startDate">
+            <input type="hidden" id="last3DaysFailedPreStartsEndDate" name="endDate">
+            <strong><i class="fa-solid fa-right-long"></i> Drivers have not filled their pre-starts in the past 3 days</strong>
+          </form>
+          <form action="{% url 'Account:ShiftDetails' id=2 %}" id="driverShiftNotEndedForm" method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="driverShiftNotEndedFormStartDate" name="startDate">
+            <input type="hidden" id="driverShiftNotEndedFormEndDate" name="endDate">
+            <strong><i class="fa-solid fa-right-long"></i> Drivers have not ended their shifts in the past week</strong>
+          </form>
         </div>
       </div>
     </div>
@@ -228,5 +247,32 @@
       });
     }
   }
+
+  $('#last3DaysFailedPreStarts strong').on('click', function(){
+    var today = new Date();
+
+    var todayFormatted = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+    $('#last3DaysFailedPreStartsEndDate').val(todayFormatted);
+
+    var threeDaysAgo = new Date(today);
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    var threeDaysAgoFormatted = threeDaysAgo.getFullYear() + '-' + ('0' + (threeDaysAgo.getMonth() + 1)).slice(-2) + '-' + ('0' + threeDaysAgo.getDate()).slice(-2);
+    $('#last3DaysFailedPreStartsStartDate').val(threeDaysAgoFormatted);
+    $('#last3DaysFailedPreStarts').submit()
+  })
+
+  $('#driverShiftNotEndedForm strong').on('click', function(){
+    var currentDate = new Date();
+    var sevenDaysBefore = new Date();
+    sevenDaysBefore.setDate(sevenDaysBefore.getDate() - 7);
+    
+    var formattedCurrentDate = currentDate.toISOString().substr(0, 10);
+    var formattedSevenDaysBefore = sevenDaysBefore.toISOString().substr(0, 10);
+    
+    $('#driverShiftNotEndedFormEndDate').val(formattedCurrentDate);
+    $('#driverShiftNotEndedFormStartDate').val(formattedSevenDaysBefore);
+    $('#driverShiftNotEndedForm').submit()
+  })
 </script>
 {% endblock %}

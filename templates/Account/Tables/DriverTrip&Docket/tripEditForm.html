@@ -61,7 +61,7 @@
                     {% csrf_token %}                    
                     <div class="x_title">
                         <h2>Shift Details</h2> 
-                        <b class="d-inline-block m-1 mt-2 text-secondary">(started from <span id="location" class="text-info">location</span> at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
+                        <b class="d-inline-block m-1 mt-2 text-secondary">(started from {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">location</span>{% else %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right" style="margin-top: .5rem;" onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified and shiftObj.endDateTime %}
                         
@@ -168,11 +168,11 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
-                                        <label for="loadSheet{{trip.id}}">loadSheet :<span class="required">*</span></label>
+                                        <label for="loadSheet{{trip.id}}">LogSheet :<span class="required">*</span></label>
                                         {% if trip.loadSheet is None %}
                                         
                                         <a href="/{{trip.loadSheet}}" class="text-primary"
-                                            target="_blank">loadSheet_file</a>
+                                            target="_blank">LogSheet_file</a>
                                         {% endif %}
                                         <div  class="field item form-group">
                                             <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet{{trip.id}}"

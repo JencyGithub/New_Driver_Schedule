@@ -518,17 +518,37 @@ def driverPreStartForm(request, preStartId):
 
     return render(request, 'Appointment/driverPreStartForm.html', params)
 
-
-def driverPreStartTable(request, startDate, endDate):
+@csrf_protect
+def driverPreStartTable(request, startDate=None, endDate=None, failed=None):    
+    if request.POST.get('startDate'):
+        startDate = request.POST.get('startDate')
+    if request.POST.get('endDate'):
+        endDate = request.POST.get('endDate')
     year, month, day = map(int, startDate.split('-'))
     startDate = date(int(year), int(month), int(day))
     year, month, day = map(int, endDate.split('-'))
     endDate = date(int(year), int(month), int(day))
-    preStarts = DriverPreStart.objects.filter(curDateTime__date__range=(startDate, endDate))
+    preStarts = DriverPreStart.objects.filter(curDateTime__date__range=(startDate, endDate), failed=True if failed else False, archive=False)
+
     params = {
-        'preStarts' : preStarts
+        'preStarts' : preStarts,
+        'startDate' : startDate,
+        'endDate' : endDate,
+        'failed' : failed
     }
     return render(request, 'Appointment/driverPreStartTable.html', params) 
+
+@csrf_protect
+@api_view(['POST'])
+def driverPreStartArchive(request):
+    preStarts = request.POST.getlist('selectedPreStarts[]')
+    print(type(preStarts))
+    objs = DriverPreStart.objects.filter(id__in=preStarts)
+    print(objs)
+    for obj in objs:
+        obj.archive = True
+        obj.save()
+    return JsonResponse({'status': True})
 
 @csrf_protect
 @api_view(['POST'])

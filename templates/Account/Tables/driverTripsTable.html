@@ -107,7 +107,7 @@
                         <th>ShiftType</th>
                         <th>driverName</th>
                         <th>shiftDate</th>
-                        <th>Verified By</th>
+                        <th>{% if id_ != 2 %}Verified By{% else %}Start time{% endif %}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -116,8 +116,11 @@
                       <tr class="{% if shift.deficit %}bg-danger-light{% endif %}">
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
-                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate }}</a></td>
-                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.verifiedBy }}</a></td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate|date:'Y-m-d' }}</a></td>
+                        <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">
+                          
+                          {% if id_ != 2 %}{{ shift.verifiedBy }}{% else %}{{ shift.startDateTime|date:'Y-m-d H:i' }}{% endif %}
+                        </a></td>
                       </tr>
                       {% endfor %}
                       {% endif %}
