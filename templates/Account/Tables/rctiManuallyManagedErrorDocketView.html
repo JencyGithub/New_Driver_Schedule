@@ -1,0 +1,267 @@
+{% extends "main/main.html" %} {% load static %} {% block title %} | Error Docket View{% endblock %} {% block headStyle %}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+
+<style>
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #435f7b !important;
+    }
+
+    .select2-container .select2-selection--multiple{
+        min-height: 38px!important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice,
+    .select2-container .select2-search--inline .select2-search__field {
+        margin-top: 8px !important;
+        cursor: pointer;
+    }
+    
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #435f7b !important;
+        border: 1px solid #435f7b !important;
+        color: white;
+    }
+    
+    .select2-container--default .select2-selection--multiple {
+        cursor: pointer !important;
+    }
+    label{
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+
+    }
+    .fa-solid.fa-circle-plus{
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #151f2a;
+    }
+
+    .fa-solid.fa-minus{
+        cursor: pointer;
+        font-size: 1.3rem;
+        color: #c83333;
+        padding: 0.15rem 0.5rem;
+    }
+    .modal-body {
+        max-height: calc(102vh - 202px);    
+        overflow-y: auto;
+    }
+    .dt-buttons.btn-group {
+        float: right ! important;
+    }
+
+    .dt-buttons.btn-group>a {
+    display: none !important;
+    }
+
+    table button{
+    border: 0!important;
+    background-color: transparent;
+    }
+</style>
+
+{% endblock %} 
+
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <form action="{% url 'Account:rctiManuallyManagedErrorDocketSave' %}" method="POST" >
+                    {{errorObj.data}}
+                    {% csrf_token %}
+                    <input class="form-control" name="errorId" value="{{errorObj.id}}" hidden readonly required="required" id="errorId" type="text" />
+                    <input class="form-control" name="docketIds" value="{{docketIds}}" hidden readonly required="required" id="errorId" type="text" />
+                    <input type="text" value="{{checkBox_}} " name="passedCheckBox" hidden readonly/>
+
+                    {% for obj in objs %}
+                        <div class="x_panel docketContainer{{obj.id}}">
+                            <div class="x_title">
+                                <h2> Docket # {{forloop.counter}}</h2>
+                                    
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div class="cuatom-continer">
+                                    <div class="col-md-9 col-sm-9">
+                                        <div class="row mb-2">
+                                            <div class="col-md-4 col-sm-4 field">
+                                                <label for="docketNumber{{obj.id}}">Docket Number :</label>
+                                                <input class="form-control" readonly type="text"  id="docketNumber{{obj.id}}"name='docketNumber{{obj.id}}' value="{{obj.docketNumber}}">
+                                            </div>                                  
+                                            <div class="col-md-4 col-sm-4 field">
+                                                <label for="docketDate{{obj.id}}">Docket Date :</label>
+                                                    <input class="form-control" readonly type="date" id="docketDate{{obj.id}}" name='docketDate{{obj.id}}' value="{{obj.docketDate|date:'Y-m-d'}}">
+                                            </div>                                  
+                                            <div class="col-md-4 col-sm-4 field">
+                                                <label for="clientName{{obj.id}}">Client name :</label>
+                                                    <input class="form-control" readonly type="text" id="clientName{{obj.id}}" name='clientName{{obj.id}}' value="{{clientNames}}">
+                                            </div>  
+                                            <div class="col-md-4 col-sm-4 field">
+                                                <label for="docketYard{{obj.id}}">BasePlant :</label>
+                                                <select name="docketYard{{obj.id}}" id="docketYard{{obj.id}}" required class="form-control">
+                                                    <option value="" disabled selected> Select BasePlant</option>
+                                                    {% for plant in basePlantObj %}
+                                                    <option value="{{plant.basePlant}}" {% if plant.basePlant == obj.docketYard %}selected{% endif %}>{{plant.basePlant}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>  
+                                            <div class="col-md-4 col-sm-4 field transferKmCost{{obj.id}}  d-none">
+                                                <label for="transferKmCost{{obj.id}}">Truck Transfer Km :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="transferKmCost{{obj.id}}" name='transferKmCost{{obj.id}}' >
+                                            </div> 
+                                            <div class="col-md-4 col-sm-4 field waitingTimeCost{{obj.id}} d-none">
+                                                <label for="waitingTimeCost{{obj.id}}">Waiting Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="waitingTimeCost{{obj.id}}" name='waitingTimeCost{{obj.id}}' >
+                                            </div> 
+                                            
+                                            <div class="col-md-4 col-sm-4 field surchargeCost{{obj.id}} d-none">
+                                                <label for="surchargeCost{{obj.id}}">Surcharge Cost :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="surchargeCost{{obj.id}}" name='surchargeCost{{obj.id}}' >
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 field returnKmCost{{obj.id}} d-none">
+                                                <label for="returnKmCost{{obj.id}}">Return Km Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="returnKmCost{{obj.id}}" name='returnKmCost{{obj.id}}' >
+                                            </div>
+                                            <div class="col-md-4 col-sm-4 field otherCost{{obj.id}} d-none">
+                                                <label for="otherCost{{obj.id}}">Other Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="otherCost{{obj.id}}" name='otherCost{{obj.id}}' >
+                                            </div> 
+                                            <div class="col-md-4 col-sm-4 field standByCost{{obj.id}} d-none">
+                                                <label for="standByCost{{obj.id}}">Stand By Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="standByCost{{obj.id}}" name='standByCost{{obj.id}}' >
+                                                </div> 
+                                                <div class="col-md-4 col-sm-4 field loadDeficit{{obj.id}} d-none">
+                                                    <label for="loadDeficit{{obj.id}}">Load Deficit :<span class="required">*</span></label>
+                                                        <input class="form-control"  type="number" id="loadDeficit{{obj.id}}" name='loadDeficit{{obj.id}}' >
+                                                </div> 
+                                                <div class="col-md-4 col-sm-4 field totalExGST{{obj.id}} d-none">
+                                                    <label for="totalExGST{{obj.id}}">Load & Km Cost :<span class="required">*</span></label>
+                                                        <input class="form-control"  type="number" id="totalExGST{{obj.id}}" name='totalExGST{{obj.id}}' >
+                                                </div> 
+                                            <div class="col-md-4 col-sm-4 field blowBack{{obj.id}} d-none">
+                                                <label for="blowBack{{obj.id}}">Blow Back  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="blowBack{{obj.id}}" name='blowBack{{obj.id}}' >
+                                            </div> 
+                                            <div class="col-md-4 col-sm-4 field callOut{{obj.id}} d-none">
+                                                <label for="callOut{{obj.id}}">Call Out :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="callOut{{obj.id}}" name='callOut{{obj.id}}' >
+                                            </div> 
+                                            <div class="col-md-4 col-sm-4 field cancellationCost{{obj.id}} d-none">
+                                                <label for="cancellationCost{{obj.id}}">Cancellation Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="cancellationCost{{obj.id}}" name='cancellationCost{{obj.id}}' >
+                                            </div> 
+                                            <div class="col-md-4 col-sm-4 field demurageCost{{obj.id}} d-none">
+                                                <label for="demurageCost{{obj.id}}">Demurage Cost  :<span class="required">*</span></label>
+                                                    <input class="form-control"  type="number" id="demurageCost{{obj.id}}" name='demurageCost{{obj.id}}' >
+                                            </div> 
+                                            
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-3 col-sm-3">
+                                        
+                                        <div class="row">
+                                            <div class="col-md-12  field">
+                                                <label for="rctiReport{{obj.id}}">Select rctiReport:<span class="required">*</span></label>
+                                                <select name="rctiReport{{obj.id}}" id="rctiReport{{obj.id}}" required class="form-control">
+                                                    <option value="" disabled selected >Select Report File</option>
+
+                                                    {% for i in rctiReportObj %}
+                                                    <option value="{{i.id}}"> {{i.fileName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div> 
+                                            <div class="col-md-12  field">
+                                                <label for="components{{obj.id}}">Select Components:<span class="required">*</span></label>
+                                                <select name="components{{obj.id}}" id="components{{obj.id}}" required multiple="multiple">
+                                                    <option value="transferKmCost{{obj.id}}" >Truck Transfer</option>
+                                                    <option value="waitingTimeCost{{obj.id}}" >Waiting Time</option>
+                                                    <option value="standByCost{{obj.id}}" > Stand By Cost</option>
+                                                    <option value="surchargeCost{{obj.id}}" > Surcharge Cost</option>
+                                                    <option value="returnKmCost{{obj.id}}" > Return KM Cost</option>
+                                                    <option value="otherCost{{obj.id}}" > Other Cost</option>
+                                                    <option value="totalExGST{{obj.id}}" > Load & Km Cost</option>
+                                                    <option value="loadDeficit{{obj.id}}" > Load Deficit</option>
+                                                    <option value="blowBack{{obj.id}}" > Blow Back</option>
+                                                    <option value="callOut{{obj.id}}" > Call Out</option>
+                                                    <option value="cancellationCost{{obj.id}}" > Cancellation Cost</option>
+                                                    <option value="demurageCost{{obj.id}}" > Demurage Cost</option>
+                                                </select>
+                                            </div>        
+                                                   
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    {% endfor %}
+                    <div class="col-md-12 text-right pb-2 position-sticky px-0 submitSection" style ="bottom:3%;">
+                        <input type='submit' style="margin: 0px;" class="btn btn-sm btn-default px-3" value="Save" id="finalSubmit">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footerStyle %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="{% static 'Dashboard/vendors/validator/multifield.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+    integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+    $("[id^='components']").select2({
+        placeholder: "Select options",
+        width: "100%",
+    });
+    $("[id^='components']").on("change", function (e) {
+        var id = this.id.replace('components','');
+        $(`.transferKmCost${id}`).addClass('d-none')
+        $(`.waitingTimeCost${id}`).addClass('d-none')
+        $(`.standByCost${id}`).addClass('d-none')
+        $(`.surchargeCost${id}`).addClass('d-none')
+        $(`.returnKmCost${id}`).addClass('d-none')
+        $(`.otherCost${id}`).addClass('d-none')
+        $(`.loadDeficit${id}`).addClass('d-none')
+        $(`.blowBack${id}`).addClass('d-none')
+        $(`.callOut${id}`).addClass('d-none')
+        $(`.cancellationCost${id}`).addClass('d-none')
+        $(`.demurageCost${id}`).addClass('d-none')
+        $(`.totalExGST${id}`).addClass('d-none')
+        $(`.transferKmCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.waitingTimeCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.standByCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.surchargeCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.returnKmCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.otherCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.loadDeficit${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.blowBack${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.callOut${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.cancellationCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.demurageCost${id} input`).attr('disabled',true).removeAttr('required')
+        $(`.totalExGST${id} input`).attr('disabled',true).removeAttr('required')
+        console.log(id)
+        var selected = ($(this).val())
+        selected.forEach((data) => {
+            $('.' + data ).removeClass('d-none');
+            $(`.${data} input` ).attr('required', true).removeAttr('disabled'); 
+        });
+
+    });
+</script>
+{% endblock %} 

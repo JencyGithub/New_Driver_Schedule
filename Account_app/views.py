@@ -613,7 +613,9 @@ def mapDataSave(request, recurring=None):
         shiftObj.shiftDate = date
         shiftObj.shiftType = result
         shiftObj.verifiedBy = request.user
-        shiftObj.startDateTime = datetime_object
+        shiftObj.startDateTime = datetime_object    
+        currentUTCDateTime = datetime.utcnow()
+        shiftObj.startTimeUTC = currentUTCDateTime
         shiftObj.driverId = driverObj.driverId
         
         if locationImg:
@@ -709,12 +711,15 @@ def checkQuestionRequired(request):
 @csrf_protect
 def DriverPreStartSave(request, tripId , endShift = None):
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))    
+    currentUTCDateTime = datetime.utcnow()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    tripObj.startTimeUTC = currentUTCDateTime
     tripObj.startDateTime = currentDateTime
     tripObj.save()
     if not endShift:
         tripObj.endDateTime = currentDateTime
-        
+        currentUTCDateTime = datetime.utcnow()
+        tripObj.endTimeUTC = currentUTCDateTime
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
     preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
@@ -781,6 +786,8 @@ def DriverPreStartSave(request, tripId , endShift = None):
         driverPreStartObj.save()
         if endShift:
             shiftObj.endDateTime = currentDateTime
+            currentUTCDateTime = datetime.utcnow()
+            shiftObj.endTimeUTC = currentUTCDateTime
             shiftObj.save()
         
             questions_with_answer = DriverPreStartQuestion.objects.filter(pk__in = questionIdList)
@@ -868,6 +875,15 @@ def saveDriverBreak(request, shiftId, breakId=None):
     breakObj = DriverBreak() if not breakId else DriverBreak.objects.filter(pk=breakId).first()
     startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime')) 
     endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
+    lastBreakObj  = DriverBreak.objects.filter(shiftId=shiftObj).order_by('-startDateTime').first()
+    if lastBreakObj:
+        timeDifference = (startDateTime - lastBreakObj.startDateTime ).total_seconds()//60
+    else:
+        timeDifference = (startDateTime - shiftObj.startDateTime ).total_seconds()//60
+        
+    if timeDifference >315:
+        messages.error(request,'are kuch bhi dedo')
+        return redirect(request.META.get('HTTP_REFERER'))
     
     if startDateTime < shiftObj.startDateTime or startDateTime > endDateTime:
         messages.error(request, "Break time is not valid.")
@@ -961,27 +977,40 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     def checkBreaks(breaksObjs):
         driverBreaksTimeList = []
         totalDriverBreak = 0    
+        driverBreaksTimeList = []
+        totalDriverBreak = 0    
         for breakObj in breaksObjs:
             if breakObj.durationInMinutes >= 15:
                 totalDriverBreak += breakObj.durationInMinutes
+                totalDriverBreak += breakObj.durationInMinutes
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
-        return totalDriverBreak
+        return totalDriverBreak , driverBreaksTimeList
 
-    totalDriverBreak = checkBreaks(driverBreaks)
+    totalDriverBreak , breakCount = checkBreaks(driverBreaks)
     breaksIsAllReady = True
     
-    # if shiftTime < 315:
-    #     pass
-    # elif shiftTime >= 315 and shiftTime <= 480:
-    #     if totalDriverBreak < 15:
-    #         breaksIsAllReady = False
-    #         msg = "You need to add a break of 15 minutes before ending the trip."
-
-    # breaksIsAllReady = False
-    # msg = f"You need to add more break of 15 minutes each before ending the trip."
-    # if not breaksIsAllReady:
-    #     messages.error(request, msg)
-    #     return redirect(request.META.get('HTTP_REFERER'))      
+    totalTime = shiftTime-totalDriverBreak
+    
+    if totalTime < 315:
+        pass
+    elif totalTime >= 315 and totalTime < 450:
+        if totalDriverBreak < 15:
+            breaksIsAllReady = False
+            msg = "You need to add a break of 15 minutes before ending the trip."
+    elif totalTime >= 450 and totalTime <660:
+        if totalDriverBreak < 30: 
+            breaksIsAllReady = False
+            msg = f"You need to add {2-len(breakCount)} breaks of 15 minutes each before ending the trip."
+    elif totalTime >= 660 :
+        if totalDriverBreak < 60: 
+            breaksIsAllReady = False
+            msg = f"You need to add {4-len(breakCount)} breaks of 15 minutes each before ending the trip."
+    elif shiftTime > 1440:
+        breaksIsAllReady = False
+        msg = f"It appears you have forgotten to end you shift earlier. Please select the checkbox and supply the time manually."
+    if not breaksIsAllReady:
+        messages.error(request, msg)
+        return redirect(request.META.get('HTTP_REFERER'))      
         
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
@@ -1024,6 +1053,8 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     tripObj.numberOfLoads = noOfLoads
     tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
     tripObj.endDateTime = currentDateTime
+    currentUTCDateTime = datetime.utcnow()
+    tripObj.endTimeUTC = currentUTCDateTime
     tripObj.endOdometerKms = endOdometers
     tripObj.endEngineHours = endEngineHours
     
@@ -1083,6 +1114,8 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     tripObj.save()  
     if endShift == 1:
         shiftObj.endDateTime = currentDateTime
+        currentUTCDateTime = datetime.utcnow()
+        shiftObj.endTimeUTC = currentUTCDateTime
         shiftObj.save()  
         messages.success(request, "Shift completed successfully.")
         return redirect('index')
@@ -1217,23 +1250,36 @@ def rcti(request):
 #     return redirect(request.META.get('HTTP_REFERER'))
     
 
-def rctiForm(request, id= None):
+def rctiForm(request, id= None , clientId = None , errorId = None , date = None):
     rcti = None
-
-    clientName = Client.objects.all()
+    clientObj = None
+    errorObj = None
+    truckConnectionObj = None
+    if request.POST.get('clientId'):
+        clientObj = Client.objects.filter(pk=request.POST.get('clientId')).first()
+        truckConnectionObj = ClientTruckConnection.objects.filter(clientId = clientObj ,startDate__lte = request.POST.get('startDate') , endDate__gte = request.POST.get('startDate'))
+        
+    elif clientId and   errorId:
+        clientObj = Client.objects.filter(pk=clientId).first()
+        errorObj = RctiErrors.objects.filter(pk=errorId).first()
+        truckConnectionObj = ClientTruckConnection.objects.filter(clientId = clientObj ,startDate__lte = date , endDate__gte = date)
+        
+    elif id:
+        rcti = RCTI.objects.filter(pk=id).first()
+        clientObj = Client.objects.filter(pk=rcti.clientName.clientId).first()
+        truckConnectionObj = ClientTruckConnection.objects.all()
+        
     rctiReport = RctiReport.objects.all()
     basePlant = BasePlant.objects.all()
-    if id:
-        rcti = RCTI.objects.filter(pk=id).first()
-        # rcti.docketDate = rcti.docketDate.strftime("%d-%m-%Y")
-        
+    
     params = {
         'rcti': rcti,
-        'clientNames':clientName,
         'rctiReports':rctiReport,
-        'basePlants':basePlant
+        'clientName':clientObj,
+        'errorObj':errorObj,
+        'basePlants':basePlant,
+        'truckConnectionObj':truckConnectionObj,
     }
-    # return HttpResponse(params['basePlants'])
     return render(request, 'Account/Tables/rctiForm.html', params)
 def rctiErrorSolveView(request,solveId):
     rcti = None
@@ -1250,6 +1296,174 @@ def rctiErrorSolveView(request,solveId):
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
 
+def rctiManuallyManagedError(request,errorId):
+    errorObj = RctiErrors.objects.filter(pk=errorId).first()
+    clientName = Client.objects.all()
+    
+    params = {
+        'errorObj': errorObj,
+        'clientNames':clientName,
+        }
+    return render(request, 'Account/Tables/rctiManuallyManagedErrorForm.html', params)
+
+def rctiManuallyManagedErrorDocketTable(request):
+    clientObj = Client.objects.filter(pk=request.POST.get('clientName')).first()
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    checkBox = request.POST.get('adjustment')
+    errorObj = RctiErrors.objects.filter(pk=request.POST.get('errorId')).first()
+    if checkBox == 'escalationAdjustment':
+        escalationStep_ = [1,2,3,4]
+        objs = EscalationDocket.objects.filter(escalationId__clientName=clientObj , docketDate__range=(startDate,endDate),escalationId__escalationStep__in=escalationStep_)
+    else:
+        objs = RCTI.objects.filter(clientName = clientObj.clientId , docketDate__range=(startDate,endDate))
+    clientName = Client.objects.all()
+    params = {
+        'errorObj': errorObj,
+        'clientObj':clientObj,
+        'startDate' :startDate,
+        'endDate' :endDate,
+        'objs' : objs,
+        'clientNames':clientName,
+        'checkBox':checkBox
+        }
+    return render(request, 'Account/Tables/rctiManuallyManagedErrorForm.html', params)
+
+@csrf_protect
+def rctiManuallyManagedErrorDocketView(request):
+    checkBox_ = request.POST.get('passedCheckBox')
+    docketIds = request.POST.get('docketIds')
+    docketId = docketIds.split(',')
+    errorObj = RctiErrors.objects.filter(pk=request.POST.get('errorId')).first()
+    clientObj = Client.objects.filter(pk=request.POST.get('clientId')).first()
+    objs = None
+    basePlantObj = BasePlant.objects.all()
+    if checkBox_.strip() == 'rctiAdjustment' :
+        objs = RCTI.objects.filter(pk__in=docketId)
+
+    else :
+        objs = EscalationDocket.objects.filter(pk__in=docketId)
+        
+        
+    rctiReportObj = RctiReport.objects.all()
+    params = {
+        'objs' : objs,
+        'errorObj':errorObj,
+        'clientNames':clientObj.name,
+        'rctiReportObj':rctiReportObj,
+        'docketIds':docketIds,
+        'basePlantObj':basePlantObj,
+        'checkBox_':checkBox_
+        
+    }
+    return render(request,'Account/Tables/rctiManuallyManagedErrorDocketView.html',params)
+    # return JsonResponse({'status':True , 'objs':list(params['objs'])}) 
+    # return HttpResponse(checkBoxVal)
+    
+@csrf_protect
+def rctiManuallyManagedErrorDocketSave(request):
+    checkBox_ = request.POST.get('passedCheckBox')
+    errorObj = RctiErrors.objects.filter(pk=request.POST.get('errorId')).first()
+    docketIds = request.POST.get('docketIds')
+    docketId = docketIds.split(',')
+    if checkBox_.strip() == 'rctiAdjustment' :
+        for dId in docketId:
+            objs = RCTI.objects.filter(pk=dId).first()
+            rctiAdjustmentObj = RctiAdjustment()
+            rctiAdjustmentObj.truckNo = objs.truckNo
+            rctiAdjustmentObj.docketNumber = objs.docketNumber
+            rctiAdjustmentObj.docketDate =  objs.docketDate
+            rctiAdjustmentObj.docketYard = objs.docketYard
+            rctiAdjustmentObj.clientName = objs.clientName
+            rctiAdjustmentObj.rctiReport = RctiReport.objects.filter(pk = request.POST.get(f'rctiReport{objs.id}')).first()
+            rctiAdjustmentObj.totalExGST = 0 if not request.POST.get(f'totalExGST{objs.id}')  else int(request.POST.get(f'totalExGST{objs.id}'))
+            rctiAdjustmentObj.surchargeCost = 0 if not request.POST.get(f'surchargeCost{objs.id}')  else int(request.POST.get(f'surchargeCost{objs.id}'))
+            rctiAdjustmentObj.waitingTimeCost = 0 if not request.POST.get(f'waitingTimeCost{objs.id}')  else int(request.POST.get(f'waitingTimeCost{objs.id}'))
+            rctiAdjustmentObj.transferKmCost = 0 if not request.POST.get(f'transferKmCost{objs.id}')  else int(request.POST.get(f'transferKmCost{objs.id}'))
+            rctiAdjustmentObj.returnKmCost = 0 if not request.POST.get(f'returnKmCost{objs.id}')  else int(request.POST.get(f'returnKmCost{objs.id}'))
+            rctiAdjustmentObj.otherCost = 0 if not request.POST.get(f'otherCost{objs.id}')  else int(request.POST.get(f'otherCost{objs.id}'))
+            rctiAdjustmentObj.standByCost = 0 if not request.POST.get(f'standByCost{objs.id}')  else int(request.POST.get(f'standByCost{objs.id}'))
+            rctiAdjustmentObj.loadDeficit = 0 if not request.POST.get(f'loadDeficit{objs.id}')  else int(request.POST.get(f'loadDeficit{objs.id}'))
+            rctiAdjustmentObj.blowBack = 0 if not request.POST.get(f'blowBack{objs.id}')  else int(request.POST.get(f'blowBack{objs.id}'))
+            rctiAdjustmentObj.callOut = 0 if not request.POST.get(f'callOut{objs.id}')  else int(request.POST.get(f'callOut{objs.id}'))
+            rctiAdjustmentObj.cancellationCost = 0 if not request.POST.get(f'cancellationCost{objs.id}')  else int(request.POST.get(f'cancellationCost{objs.id}'))
+            rctiAdjustmentObj.demurageCost = 0 if not request.POST.get(f'demurageCost{objs.id}')  else int(request.POST.get(f'demurageCost{objs.id}'))
+            rctiAdjustmentObj.Total =  int(rctiAdjustmentObj.totalExGST)  + int(rctiAdjustmentObj.surchargeCost) + int(rctiAdjustmentObj.waitingTimeCost) + int(rctiAdjustmentObj.transferKmCost) + int(rctiAdjustmentObj.returnKmCost) + int(rctiAdjustmentObj.otherCost) + int(rctiAdjustmentObj.standByCost) + int(rctiAdjustmentObj.loadDeficit) + int(rctiAdjustmentObj.blowBack) + int(rctiAdjustmentObj.callOut) + int(rctiAdjustmentObj.cancellationCost) + int(rctiAdjustmentObj.demurageCost)
+            truckConnectionObj = ClientTruckConnection.objects.filter(clientId = objs.clientName,clientTruckId = int(objs.truckNo) , startDate__lte = objs.docketDate , endDate__gte = objs.docketDate).first()
+            reconciliationObj = ReconciliationReport.objects.filter(docketNumber = objs.docketNumber , docketDate = objs.docketDate,clientId=objs.clientName.clientId , truckConnectionId = truckConnectionObj.id).first()
+            reconciliationObj.rctiLoadAndKmCost +=  0 if not request.POST.get(f'totalExGST{objs.id}')  else int(request.POST.get(f'totalExGST{objs.id}'))
+            reconciliationObj.rctiSurchargeCost +=  0 if not request.POST.get(f'surchargeCost{objs.id}')  else int(request.POST.get(f'surchargeCost{objs.id}'))
+            reconciliationObj.rctiWaitingTimeCost +=  0 if not request.POST.get(f'waitingTimeCost{objs.id}')  else int(request.POST.get(f'waitingTimeCost{objs.id}'))
+            reconciliationObj.rctiTransferKmCost +=  0 if not request.POST.get(f'transferKmCost{objs.id}')  else int(request.POST.get(f'transferKmCost{objs.id}'))
+            reconciliationObj.rctiReturnKmCost +=  0 if not request.POST.get(f'returnKmCost{objs.id}')  else int(request.POST.get(f'returnKmCost{objs.id}'))
+            reconciliationObj.rctiOtherCost +=  0 if not request.POST.get(f'otherCost{objs.id}')  else int(request.POST.get(f'otherCost{objs.id}'))
+            reconciliationObj.rctiStandByCost +=  0 if not request.POST.get(f'standByCost{objs.id}')  else int(request.POST.get(f'standByCost{objs.id}'))
+            reconciliationObj.rctiLoadDeficit +=  0 if not request.POST.get(f'loadDeficit{objs.id}')  else int(request.POST.get(f'loadDeficit{objs.id}'))
+            reconciliationObj.rctiBlowBack +=  0 if not request.POST.get(f'blowBack{objs.id}')  else int(request.POST.get(f'blowBack{objs.id}'))
+            reconciliationObj.rctiCallOut +=  0 if not request.POST.get(f'callOut{objs.id}')  else int(request.POST.get(f'callOut{objs.id}'))
+            reconciliationObj.rctiCancellatioCost +=  0 if not request.POST.get(f'cancellationCost{objs.id}')  else int(request.POST.get(f'cancellationCost{objs.id}'))
+            reconciliationObj.rctiDemurageCost +=  0 if not request.POST.get(f'demurageCost{objs.id}')  else int(request.POST.get(f'demurageCost{objs.id}'))
+            reconciliationObj.rctiTotalCost = round(int(reconciliationObj.rctiLoadAndKmCost)  + int(reconciliationObj.rctiSurchargeCost) + int(reconciliationObj.rctiWaitingTimeCost) + int(reconciliationObj.rctiTransferKmCost) + int(reconciliationObj.rctiReturnKmCost) + int(reconciliationObj.rctiOtherCost) + int(reconciliationObj.rctiStandByCost) + int(reconciliationObj.rctiLoadDeficit) + int(reconciliationObj.rctiBlowBack) + int(reconciliationObj.rctiCallOut) + int(reconciliationObj.rctiCancellatioCost) + int(reconciliationObj.rctiDemurageCost),2)
+            reconciliationObj.save()
+            rctiAdjustmentObj.save()
+
+    else :
+        for dId in docketId:
+            
+            objs = EscalationDocket.objects.filter(pk=dId).first()
+            rctiAdjustmentObj = RctiAdjustment()
+            rctiAdjustmentObj.truckNo = objs.truckNo.clientTruckId
+            rctiAdjustmentObj.docketNumber = objs.docketNumber
+            rctiAdjustmentObj.docketDate =  objs.docketDate
+            rctiAdjustmentObj.docketYard = '' if request.POST.get(f'docketYard{objs.id}') is None else request.POST.get(f'docketYard{objs.id}')
+            rctiAdjustmentObj.clientName = objs.escalationId.clientName
+            rctiAdjustmentObj.rctiReport = RctiReport.objects.filter(pk = request.POST.get(f'rctiReport{objs.id}')).first()
+            rctiAdjustmentObj.totalExGST = 0 if not request.POST.get(f'totalExGST{objs.id}')  else request.POST.get(f'totalExGST{objs.id}')
+            rctiAdjustmentObj.surchargeCost = 0 if not request.POST.get(f'surchargeCost{objs.id}')  else request.POST.get(f'surchargeCost{objs.id}')
+            rctiAdjustmentObj.waitingTimeCost = 0 if not request.POST.get(f'waitingTimeCost{objs.id}')  else request.POST.get(f'waitingTimeCost{objs.id}')
+            rctiAdjustmentObj.transferKmCost = 0 if not request.POST.get(f'transferKmCost{objs.id}')  else request.POST.get(f'transferKmCost{objs.id}')
+            rctiAdjustmentObj.returnKmCost = 0 if not request.POST.get(f'returnKmCost{objs.id}')  else request.POST.get(f'returnKmCost{objs.id}')
+            rctiAdjustmentObj.otherCost = 0 if not request.POST.get(f'otherCost{objs.id}')  else request.POST.get(f'otherCost{objs.id}')
+            rctiAdjustmentObj.standByCost = 0 if not request.POST.get(f'standByCost{objs.id}')  else request.POST.get(f'standByCost{objs.id}')
+            rctiAdjustmentObj.loadDeficit = 0 if not request.POST.get(f'loadDeficit{objs.id}')  else request.POST.get(f'loadDeficit{objs.id}')
+            rctiAdjustmentObj.blowBack = 0 if not request.POST.get(f'blowBack{objs.id}')  else request.POST.get(f'blowBack{objs.id}')
+            rctiAdjustmentObj.callOut = 0 if not request.POST.get(f'callOut{objs.id}')  else request.POST.get(f'callOut{objs.id}')
+            rctiAdjustmentObj.cancellationCost = 0 if not request.POST.get(f'cancellationCost{objs.id}')  else request.POST.get(f'cancellationCost{objs.id}')
+            rctiAdjustmentObj.demurageCost = 0 if not request.POST.get(f'demurageCost{objs.id}')  else request.POST.get(f'demurageCost{objs.id}')
+            rctiAdjustmentObj.Total =  int(rctiAdjustmentObj.totalExGST)  + int(rctiAdjustmentObj.surchargeCost) + int(rctiAdjustmentObj.waitingTimeCost) + int(rctiAdjustmentObj.transferKmCost) + int(rctiAdjustmentObj.returnKmCost) + int(rctiAdjustmentObj.otherCost) + int(rctiAdjustmentObj.standByCost) + int(rctiAdjustmentObj.loadDeficit) + int(rctiAdjustmentObj.blowBack) + int(rctiAdjustmentObj.callOut) + int(rctiAdjustmentObj.cancellationCost) + int(rctiAdjustmentObj.demurageCost)
+            truckConnectionObj = ClientTruckConnection.objects.filter(clientId =objs.escalationId.clientName , clientTruckId = int(objs.truckNo.clientTruckId) , startDate__lte = objs.docketDate , endDate__gte = objs.docketDate).first()
+            reconciliationObj = ReconciliationReport.objects.filter(docketNumber = objs.docketNumber , docketDate = objs.docketDate,clientId=objs.escalationId.clientName.clientId , truckConnectionId = truckConnectionObj.id).first()
+            if reconciliationObj:
+                reconciliationObj.rctiLoadAndKmCost +=  0 if not request.POST.get(f'totalExGST{objs.id}')  else int(request.POST.get(f'totalExGST{objs.id}'))
+                reconciliationObj.rctiSurchargeCost +=  0 if not request.POST.get(f'surchargeCost{objs.id}')  else int(request.POST.get(f'surchargeCost{objs.id}'))
+                reconciliationObj.rctiWaitingTimeCost +=  0 if not request.POST.get(f'waitingTimeCost{objs.id}')  else int(request.POST.get(f'waitingTimeCost{objs.id}'))
+                reconciliationObj.rctiTransferKmCost +=  0 if not request.POST.get(f'transferKmCost{objs.id}')  else int(request.POST.get(f'transferKmCost{objs.id}'))
+                reconciliationObj.rctiReturnKmCost +=  0 if not request.POST.get(f'returnKmCost{objs.id}')  else int(request.POST.get(f'returnKmCost{objs.id}'))
+                reconciliationObj.rctiOtherCost +=  0 if not request.POST.get(f'otherCost{objs.id}')  else int(request.POST.get(f'otherCost{objs.id}'))
+                reconciliationObj.rctiStandByCost +=  0 if not request.POST.get(f'standByCost{objs.id}')  else int(request.POST.get(f'standByCost{objs.id}'))
+                reconciliationObj.rctiLoadDeficit +=  0 if not request.POST.get(f'loadDeficit{objs.id}')  else int(request.POST.get(f'loadDeficit{objs.id}'))
+                reconciliationObj.rctiBlowBack +=  0 if not request.POST.get(f'blowBack{objs.id}')  else int(request.POST.get(f'blowBack{objs.id}'))
+                reconciliationObj.rctiCallOut +=  0 if not request.POST.get(f'callOut{objs.id}')  else int(request.POST.get(f'callOut{objs.id}'))
+                reconciliationObj.rctiCancellatioCost +=  0 if not request.POST.get(f'cancellationCost{objs.id}')  else int(request.POST.get(f'cancellationCost{objs.id}'))
+                reconciliationObj.rctiDemurageCost +=  0 if not request.POST.get(f'demurageCost{objs.id}')  else int(request.POST.get(f'demurageCost{objs.id}'))
+                reconciliationObj.rctiTotalCost = round(int(reconciliationObj.rctiLoadAndKmCost)  + int(reconciliationObj.rctiSurchargeCost) + int(reconciliationObj.rctiWaitingTimeCost) + int(reconciliationObj.rctiTransferKmCost) + int(reconciliationObj.rctiReturnKmCost) + int(reconciliationObj.rctiOtherCost) + int(reconciliationObj.rctiStandByCost) + int(reconciliationObj.rctiLoadDeficit) + int(reconciliationObj.rctiBlowBack) + int(reconciliationObj.rctiCallOut) + int(reconciliationObj.rctiCancellatioCost) + int(reconciliationObj.rctiDemurageCost),2)
+                reconciliationObj.save()
+            rctiAdjustmentObj.save()
+            objs.escalationId.escalationStep = 5
+            objs.escalationId.save()
+            objs.save()
+    errorObj.status = True
+    errorObj.save()
+    messages.success(request,'Error solve successfully.')
+    return redirect('Account:rcti')
+
+
+@csrf_protect
+def newRctiWithErrorResolve(request):
+    errorId = request.POST.get('errorIdRcti')
+    clientId = request.POST.get('clientId')
+    date = request.POST.get('startDate')
+    return redirect('Account:rctiFormViewWithErrorId',errorId,clientId,date)
 def rctiErrorForm(request ,errorId ):
     errorObj = RctiErrors.objects.filter(pk=errorId).first()
     clientName = Client.objects.all()
@@ -1275,27 +1489,29 @@ def convertIntoFloat(str):
 @csrf_protect
 def rctiFormSave(request , errorId = None):
     # return HttpResponse(request.POST.get('clientName'))
-    RCTIobj = None
-    RCTIobj = RCTI.objects.filter(docketNumber = request.POST.get('docketNumber'), docketDate = request.POST.get('docketDate')).first()
-    if RCTIobj is None:
-        RCTIobj = RCTI()
+    docketDate = request.POST.get('docketDate')
+    clientObj= Client.objects.filter(name = request.POST.get('clientName')).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=request.POST.get('truckNo')).first()
+    
+    reconciliationDocketObj = ReconciliationReport.objects.filter(truckConnectionId = truckConnectionObj.id, clientId = clientObj.clientId , docketNumber = request.POST.get('docketNumber'), docketDate = request.POST.get('docketDate') , fromDriver = True).first()
+    RCTIobj = RCTI()
+    if not truckConnectionObj:
+        messages.error(request,"Truck Connection doesn't exit ." )
+        return redirect(request.META.get('HTTP_REFERER'))
+    if not reconciliationDocketObj:
+        messages.error(request,"In PastTrip this data entry doesn't exit ." )
+        return redirect(request.META.get('HTTP_REFERER'))
+        
     rctiErrorObj = RctiErrors.objects.filter(pk=errorId).first()
     
-    if rctiErrorObj:
-        reportId = int(rctiErrorObj.data.split('@_!')[1])
-        clientObj= Client.objects.filter(name = rctiErrorObj.clientName).first()
-        RCTIobj.clientName =clientObj
-        RCTIobj.rctiReport = RctiReport.objects.filter(pk=reportId).first()
-        
-    else:
-        clientObj = Client.objects.filter(pk = request.POST.get('clientName')).first()
-        RCTIobj.clientName =clientObj
-        RCTIobj.rctiReport = RctiReport.objects.filter(pk=request.POST.get('rctiReport')).first()
+
+    RCTIobj.clientName =clientObj
+    RCTIobj.rctiReport = RctiReport.objects.filter(pk=request.POST.get('rctiReport')).first()
         
     
-    RCTIobj.truckNo = request.POST.get('truckNo')
+    RCTIobj.truckNo = truckConnectionObj.clientTruckId
     RCTIobj.docketNumber = request.POST.get('docketNumber')
-    RCTIobj.docketDate = request.POST.get('docketDate')
+    RCTIobj.docketDate = docketDate
     RCTIobj.docketYard = request.POST.get('docketYard')
     RCTIobj.noOfKm = request.POST.get('noOfKm')
     RCTIobj.unit = request.POST.get('unit')
@@ -1372,12 +1588,10 @@ def rctiFormSave(request , errorId = None):
     
     RCTIobj.save()
     
-    reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = RCTIobj.docketNumber , docketDate = RCTIobj.docketDate ).first()
 
     rctiTotalCost =   convertIntoFloat(RCTIobj.cartageTotal) + convertIntoFloat(RCTIobj.waitingTimeTotal) + convertIntoFloat(RCTIobj.transferKMTotal)  +  convertIntoFloat(RCTIobj.returnKmTotal) + convertIntoFloat(RCTIobj.standByTotal) + convertIntoFloat(RCTIobj.minimumLoadTotal) + convertIntoFloat(RCTIobj.surchargeTotalExGST)+convertIntoFloat(RCTIobj.othersTotalExGST) + convertIntoFloat(RCTIobj.blowBackTotal) +convertIntoFloat(RCTIobj.callOutTotal) 
     
-    if not reconciliationDocketObj :
-        reconciliationDocketObj = ReconciliationReport()
+
     
     reconciliationDocketObj.docketNumber =  RCTIobj.docketNumber
     reconciliationDocketObj.docketDate =  RCTIobj.docketDate

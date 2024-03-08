@@ -651,6 +651,10 @@ def truckConnectionForm(request, id):
 
 @csrf_protect
 def truckConnectionSave(request,id):
+    truckConnectionObj = ClientTruckConnection.objects.filter(clientTruckId = request.POST.get('clientTruckNumber')).first()
+    if truckConnectionObj:
+        messages.error(request,'This clientTruck No already exists.')
+        return redirect(request.META.get('HTTP_REFERER'))
     adminTruck = AdminTruck.objects.get(id=id)
     rateCard = RateCard.objects.get(pk=request.POST.get('rate_card_name'))
     client = Client.objects.get(pk=request.POST.get('clientId'))

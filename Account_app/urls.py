@@ -93,6 +93,7 @@ urlpatterns = [
     # path('Rcti/Error/Solve/<int:id>', views.rctiErrorSolve, name='rctiErrorSolve'), 
     # Add RCTI manually
     path('rctiForm/', views.rctiForm, name='rctiFormAdd'), 
+    path('rctiForm/<int:errorId>/<int:clientId>/<str:date>', views.rctiForm, name='rctiFormViewWithErrorId'), 
     path('rctiForm/save/', views.rctiFormSave, name='rctiFormSave'), 
     path('rctiForm/save/<int:errorId>', views.rctiFormSave, name='rctiErrorFormSave'), 
     path('rctiForm/<int:id>/', views.rctiForm, name='rctiForm'), 
@@ -101,6 +102,11 @@ urlpatterns = [
     path('rcti/error/get/', views.getRctiError, name='getRctiError'), 
     path('rcti/Error/Form/<int:errorId>/', views.rctiErrorForm, name='rctiErrorForm'), 
     path('rcti/Error/Solve/View/<int:solveId>/', views.rctiErrorSolveView, name='rctiErrorSolveView'), 
+    path('rcti/manually/managed/error/<int:errorId>/', views.rctiManuallyManagedError, name='rctiManuallyManagedError'), 
+    path('rcti/manually/managed/error/docket/table/', views.rctiManuallyManagedErrorDocketTable, name='rctiManuallyManagedErrorDocketTable'), 
+    path('rcti/manually/managed/error/docket/view/', views.rctiManuallyManagedErrorDocketView, name='rctiManuallyManagedErrorDocketView'), 
+    path('rcti/manually/managed/error/docket/save/', views.rctiManuallyManagedErrorDocketSave, name='rctiManuallyManagedErrorDocketSave'), 
+    path('rcti/error/resolve/', views.newRctiWithErrorResolve, name='newRctiWithErrorResolve'), 
     
     path('rcti/archive/', views.archiveRCTI, name='archiveRCTI'),
     path('rcti/archive/reset/', views.archiveResetRCTI, name='archiveResetRCTI'),

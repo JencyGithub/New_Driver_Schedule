@@ -36,7 +36,7 @@ request {% endblock %} {% block headStyle %}
                                     <div class="field item form-group">
                                         {% comment %} <select name="clientId" onchange="rateCard(this)" class="form-control" required="required"> {% endcomment %}
                                         <select name="clientId" onchange="clientOfficeFun(this)" class="form-control" required="required">
-                                            <option disabled selected >Select Client Name</option>
+                                            <option value="" disabled selected >Select Client Name</option>
                                             {% for client in clientIds%}
                                             <option value="{{client.clientId}}">{{client.name}}</option>
                                             {% endfor %}
@@ -64,8 +64,8 @@ request {% endblock %} {% block headStyle %}
                                     <label  for="pre_start_name" class="required">Pre-start :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select name="pre_start_name"  class="form-control" id="pre_start_name" required="required" >
+                                            <option value="" selected disabled>Select Pre Start</option>
                                             {% for preStart in preStarts%}
-                                                <option value="">Select Pre Start</option>
                                                 <option value="{{preStart.id}}">{{preStart.preStartName}}</option>
                                             {% endfor %}
                                             </select>
@@ -74,8 +74,8 @@ request {% endblock %} {% block headStyle %}
                                 <div class="col-md-4 col-sm-4">
                                     <label for="truckType" class="required">Truck type:<span class="required">*</span></label>
                                     <div class="field item form-group">
-                                        <select name="truckType" class="form-control" id="truckType" onchange="truckTypeFun()" {% if data %}disabled{% endif %}>
-                                            <option value=""  >Select Truck Type</option>
+                                        <select name="truckType" class="form-control" required="required" id="truckType" onchange="truckTypeFun()" {% if data %}disabled{% endif %}>
+                                            <option value="" selected disabled >Select Truck Type</option>
                                             <option value="Embedded" {% if data.truckType == 'Embedded' %} selected {% endif %} >Embedded</option>
                                             <option value="Casual" {% if data.truckType == 'Casual' %} selected {% endif %}>Casual</option>
                                         </select>

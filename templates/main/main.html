@@ -89,14 +89,8 @@
         {% block content %}{% endblock %} {% include "main/footer.html"%}
       </div>
     </div>
-     {% comment %} <script type = "text/javascript" >
-      function preventBack() { window.history.forward(); }
-      setTimeout("preventBack()", 0);
-      window.onunload = function () { null };
-    </script>  {% endcomment %}
+    
     <script>
-
-
       function setTime(elementId) {
         var now = new Date();
         var hours = now.getHours();
