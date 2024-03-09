@@ -60,9 +60,20 @@
                 <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" novalidate enctype="multipart/form-data">
                     {% csrf_token %}                    
                     <div class="x_title">
+
                         <h2>Shift Details</h2> 
                         <b class="d-inline-block m-1 mt-2 text-secondary">(started from {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">location</span>{% else %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
-                        <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right" style="margin-top: .5rem;" onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
+                        {% comment %} {% if id_ == 0 or id_ == 2 %} {% endcomment %}
+                            {% if shiftObj.archive %}
+                                <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="btn btn-sm btn-success float-right ml-2"> Restore</a>
+                            {% else %}
+                                <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="btn btn-sm btn-default float-right ml-2"><i class="fa-solid fa-box-archive"></i></a>
+                            {% endif %}
+                        {% comment %} {% endif %} {% endcomment %}
+                    
+                        <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
+
+
                         {% if not shiftObj.verified and shiftObj.endDateTime %}
                         
                             <label for="verified" class="float-right ml-2" style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
@@ -502,5 +513,35 @@
         $('#locationModal').modal('show')
         console.log(latitude, longitude)
     });
+
+    $(document).ready(function () {
+        // Include CSRF token in all AJAX requests
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                }
+            }
+        });
+    
+        // Function to check if HTTP method is safe
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        }
+    
+        $('#archiveButton').on('click', function () {
+            let driverIds = getSelectedDockets(activeTable);
+            if (driverIds) { 
+                setArchive(driverIds);
+            }
+        });
+    });
+    
+    
+    
+    
+    
+
 </script>
 {% endblock %}

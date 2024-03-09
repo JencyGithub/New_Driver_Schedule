@@ -2419,6 +2419,22 @@ def dateRangeFilter(request):
     foreignKeySet(dataList)
     return JsonResponse({'status': True, 'data': list(dataList)})
 
+def DriverShiftArchive(request, shiftId):
+    driverShiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    if driverShiftObj:
+        driverShiftObj.archive = True
+        driverShiftObj.save()
+    messages.success(request, "Driver shift archive successfully")
+    return redirect('Account:index')
+
+def RestoreDriverShift(request, shiftId):
+    driverShiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    if driverShiftObj:
+        driverShiftObj.archive = False
+        driverShiftObj.save()
+    messages.success(request, "Driver shift restored successfully")
+    return redirect('Account:index')
+
 
 @csrf_protect
 def DriverTripEditForm(request, id):
