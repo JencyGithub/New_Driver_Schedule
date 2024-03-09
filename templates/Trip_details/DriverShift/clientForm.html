@@ -95,6 +95,8 @@
         $('#truckNum').select2();
         
         $("#clientId").on("change", function () {
+            let currentDate = new Date();    
+            let formattedDate = currentDate.toISOString().split('T')[0];
             let clientId = $(this).val();
             let shiftId = "{{ shiftObj.id }}"
             
@@ -106,7 +108,8 @@
                     url: "/account/getTrucks/",
                     data: {
                         clientName: $(this).val(),
-                        shiftId: shiftId
+                        shiftId: shiftId,
+                        curDate : formattedDate
                     },
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);

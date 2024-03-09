@@ -64,12 +64,18 @@
     {% block content %}{% endblock %} 
 
     {% include "Trip_details/main/footer.html"%}
+
     <script type = "text/javascript" >
-      function preventBack() { window.history.forward(); }
+      {% comment %} function preventBack() { window.history.forward(); }
       setTimeout("preventBack()", 0);
-      window.onunload = function () { null };
-    </script>
-    <script>
+      window.onunload = function () { null }; {% endcomment %}
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0]
+        document.querySelector('nav #startShiftBtn').setAttribute('href', `/account/mapForm/view/${formattedDate}`);
+      });
+    
       function setTime(elementId) {
         var now = new Date();
         var hours = now.getHours();
@@ -104,9 +110,7 @@
         
         var dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
         document.getElementById(elementId).value = dateTimeString;
-      }
-
-    
+      }    
     </script>
     <!-- footer start scripts  -->
     {% block footerStyle %} {% endblock %}
@@ -142,10 +146,8 @@
       {% elif message.tags == 'warning' %}
         alertify.warning('{{ message|escapejs }}').delay(15);
       {% endif %}
-
     </script>
     {% endfor %}
-
     <!-- footer end scripts  -->
     {% block footerStyleEnd %} {% endblock %}
   </body>

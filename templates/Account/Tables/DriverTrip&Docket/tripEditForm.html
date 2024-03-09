@@ -63,15 +63,16 @@
 
                         <h2>Shift Details</h2> 
                         <b class="d-inline-block m-1 mt-2 text-secondary">(started from {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">location</span>{% else %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
-                        {% comment %} {% if id_ == 0 or id_ == 2 %} {% endcomment %}
-                            {% if shiftObj.archive %}
-                                <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="btn btn-sm btn-success float-right ml-2"> Restore</a>
-                            {% else %}
-                                <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="btn btn-sm btn-default float-right ml-2"><i class="fa-solid fa-box-archive"></i></a>
-                            {% endif %}
-                        {% comment %} {% endif %} {% endcomment %}
-                    
+                        
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
+                        {% if not shiftObj.verified %}
+                            {% comment %} {% if shiftObj.archive %}
+                                <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Restore"><i class="fa-solid fa-arrow-rotate-left text-success" style="font-size: 1.5rem;"></i></a>
+                            {% else %} {% endcomment %}
+                                <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Archive"><i class="fa-solid fa-box-archive text-default" style="font-size: 1.5rem;"></i></a>
+                            {% comment %} {% endif %} {% endcomment %}
+                        {% endif %}
+                    
 
 
                         {% if not shiftObj.verified and shiftObj.endDateTime %}
@@ -261,7 +262,7 @@
                                                         </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                <button type="button" onclick="docketUpdate('{{docket.id}}')" class="btn btn-primary">Save </button>
+                                                <button type="button" onclick="docketUpdate('{{docket.id}}')" class="btn btn-sm btn-primary">Save </button>
                                                 </div>
 
                                         </div>
@@ -415,8 +416,8 @@
                     {% endfor %}
 
                     {% if shiftObj.verified is  False  %}
-                    <div class="col-md-12 text-right py-2 position-sticky" style ="bottom:3%;">
-                        <button type='submit' style="margin: 0px;" class="btn btn-default px-4">Save</button>
+                    <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
+                        <button type='submit' class="btn btn-sm btn-default px-3">Save</button>
                     </div>
                     {% endif%}
                 </form>
@@ -513,35 +514,5 @@
         $('#locationModal').modal('show')
         console.log(latitude, longitude)
     });
-
-    $(document).ready(function () {
-        // Include CSRF token in all AJAX requests
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                }
-            }
-        });
-    
-        // Function to check if HTTP method is safe
-        function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-        }
-    
-        $('#archiveButton').on('click', function () {
-            let driverIds = getSelectedDockets(activeTable);
-            if (driverIds) { 
-                setArchive(driverIds);
-            }
-        });
-    });
-    
-    
-    
-    
-    
-
 </script>
 {% endblock %}

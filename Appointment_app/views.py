@@ -504,7 +504,7 @@ def questionAddSave(request, id):
 
 def driverPreStartForm(request, preStartId):
     driverPreStartObj = DriverPreStart.objects.filter(pk=preStartId).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=driverPreStartObj.preStartId).order_by('questionNo')
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=driverPreStartObj.preStartId, archive=False).order_by('questionNo')
     for obj in preStartQuestions:
         question = DriverPreStartQuestion.objects.filter(questionId=obj).first()
         obj.selectedText = question.answer

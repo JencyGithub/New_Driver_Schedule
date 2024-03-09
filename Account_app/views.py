@@ -35,9 +35,9 @@ from django.core.mail import send_mail
 
 def index(request):
     curDate = getCurrentDateTimeObj().date()
-    totalShiftsCount = DriverShift.objects.filter(shiftDate=curDate)
-    continueShiftsCount = DriverShift.objects.filter(shiftDate=curDate, endDateTime=None).count()
-    completedShiftsCount = DriverShift.objects.filter(shiftDate=curDate, endDateTime__isnull=False).count()
+    totalShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate)
+    continueShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime=None).count()
+    completedShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime__isnull=False).count()
     reimbursementCount = DriverReimbursement.objects.filter(raiseDate__date=curDate).count()
     preStartPendingCount = 0
     disputeCount = 0
@@ -557,13 +557,13 @@ def timeOfStartSave(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     
-def mapFormView(request):
+def mapFormView(request, startDate=None):
     driverObj = Driver.objects.filter(name=request.user.username).first()
     if not driverObj:
         messages.error(request, "Only driver can access this.")
         return redirect(request.META.get('HTTP_REFERER'))
     
-    shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
+    shiftObj = DriverShift.objects.filter(archive=False, endDateTime=None, driverId=driverObj.driverId).first()
     if shiftObj:
         existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
         if existingTrip:
@@ -575,8 +575,9 @@ def mapFormView(request):
         else:
             return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
-        currentDate = getCurrentDateTimeObj()
-        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate.date(), archive=False).first()
+        year, month, day = map(int, startDate.split('-')) 
+        currentDate = date(int(year), int(month), int(day))
+        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate, archive=False).first()
 
         if todayShiftObj:
             messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
@@ -590,7 +591,7 @@ def mapFormView(request):
 @csrf_protect
 def mapDataSave(request, recurring=None):
     driverObj = Driver.objects.filter(name=request.user.username).first()
-    shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverObj.driverId).first()
+    shiftObj = DriverShift.objects.filter(archive=False, endDateTime=None, driverId=driverObj.driverId).first()
     result = None
     if not recurring:
         lat = request.POST.get('latitude')
@@ -1202,16 +1203,19 @@ def getTrucks(request):
     client = Client.objects.get(name=clientName)
     shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
     
-    currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+    year, month, day = map(int, request.POST.get('curDate').split('-'))        
+    currentDate = date(int(year), int(month), int(day))
+    
+    currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
     for trip in currentTripObjs:
         connections.append(trip.truckConnectionId)
     
-    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime=None)
+    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
     for trip in allCurrentTrips:
         connections.append(trip.truckConnectionId)
     
     truckList = []
-    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte =getCurrentDateTimeObj().date() , endDate__gte =getCurrentDateTimeObj().date())
+    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDate , endDate__gte=currentDate)
     docket = client.docketGiven
 
     for truck_connection in truck_connections:
@@ -1747,7 +1751,7 @@ def rctiSave(request):
             # date_object = datetime.strptime(fileDetails[1], '%y/%m/%d').strftime('%Y-%m-%d')
             original_date = datetime.strptime(fileDetails[1], '%d/%m/%y')
             date_object = original_date.strftime('%Y-%m-%d')
-            # shiftObj = DriverShift.objects.filter(shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
+            # shiftObj = DriverShift.objects.filter(archive=False, shiftDate__month = date_object.split('-')[1] , shiftDate__year = date_object.split('-')[0] , verified = True)
             # # print('shiftObj',shiftObj)
             # pastTripErrorObj = PastTripError.objects.filter(tripDate__contains = f'{date_object.split("-")[0]}-{date_object.split("-")[1]}-__' ,status = False)
             # # print('pastTripErrorObj',pastTripErrorObj)
@@ -2424,6 +2428,12 @@ def DriverShiftArchive(request, shiftId):
     if driverShiftObj:
         driverShiftObj.archive = True
         driverShiftObj.save()
+        
+    driverTrips = DriverShiftTrip.objects.filter(shiftId=driverShiftObj.id)
+    for trip in driverTrips:
+        trip.archive = True
+        trip.save()
+        
     messages.success(request, "Driver shift archive successfully")
     return redirect('Account:index')
 
@@ -2432,6 +2442,10 @@ def RestoreDriverShift(request, shiftId):
     if driverShiftObj:
         driverShiftObj.archive = False
         driverShiftObj.save()
+    driverTrips = DriverShiftTrip.objects.filter(shiftId=driverShiftObj.id)
+    for trip in driverTrips:
+        trip.archive = False
+        trip.save()
     messages.success(request, "Driver shift restored successfully")
     return redirect('Account:index')
 
@@ -3777,15 +3791,19 @@ def ShiftDetails(request,id):
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
     else: # completed and charged
         if driverId:
-            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId))
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) & Q(archive=False))
         else:
-            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None))
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(archive=False))
 
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first()
         if shift.driverName:
             shift.driverName = f'{shift.driverName.firstName} {shift.driverName.lastName}'
         shift.deficit = False
+
+        if shift.startTimeUTC:
+            shift.timeDiff = str(datetime.utcnow() - shift.startTimeUTC).split('.')[0]
+        
         tripObjs = DriverShiftTrip.objects.filter(shiftId=shift.id)
         for tripObj in tripObjs:
             if tripObj.revenueDeficit > 0:
