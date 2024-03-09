@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'Appointment_app',
     'Gss_app',
     'pwa',
+    'simple_history',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -145,13 +147,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'siddhantethansrec@gmail.com'
-EMAIL_HOST_PASSWORD = 'iwyeacbkgtoubbny'
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+# EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'siddhantethansrec@gmail.com'
+# EMAIL_HOST_PASSWORD = 'iwyeacbkgtoubbny'
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
 
 MODEL_TO_CSV_FILE_NAME = '' 
 
@@ -187,3 +189,12 @@ PWA_APP_SPLASH_SCREEN = [
 ]
 PWA_APP_DIR = 'ltr'
 PWA_APP_LANG = 'en-US'
+
+
+AWS_ACCESS_KEY_ID = 'AKIAZI2LFPXXDN7K6A7E'
+AWS_SECRET_ACCESS_KEY = '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'
+
+# Email Configuration Settings for sending email alerts to users when they are
+EMAIL_BACKEND ='django_ses.SESBackend'
+AWS_SES_REGION_NAME = 'ap-southeast-2'
+AWS_SES_REGION_ENDPOINT = 'email.ap-southeast-2.amazonaws.com'

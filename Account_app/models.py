@@ -24,6 +24,7 @@ class BasePlant(models.Model):
     depotCode = models.CharField(max_length=100, null=True , default='')
     email = models.CharField(max_length=100, null=True , default='')
     clientOfficeId = models.ForeignKey(ClientOffice, null=True, on_delete=models.CASCADE)
+    history = HistoricalRecords()
     
     class Meta:
         unique_together = (('lat', 'long'),)
@@ -65,10 +66,12 @@ class DriverShift(models.Model):
     startDateTime = models.DateTimeField(null=True, blank=True)
     endDateTime = models.DateTimeField(null=True, blank=True)
     driverId = models.IntegerField(null=True, blank=True)
-    locationImg = models.FileField(null=True)
+    locationImg = models.FileField(upload_to='static/Account/driverLocationFiles', null=True)
     startTimeUTC = models.DateTimeField(null=True)
     endTimeUTC = models.DateTimeField(null=True)
     archive = models.BooleanField(default=False)
+    lastEmailTime = models.DateTimeField(null=True)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.shiftDate) + '-' + str(self.id)
@@ -93,6 +96,8 @@ class DriverShiftTrip(models.Model):
     endOdometerKms = models.FloatField(default=0, null=True)
     startEngineHours = models.FloatField(default=0, null=True)
     endEngineHours = models.FloatField(default=0, null=True)
+    lastEmailTime = models.DateTimeField(null=True)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.clientId) + str(self.startDateTime) + str(self.endDateTime) 
@@ -126,8 +131,8 @@ class DriverShiftDocket(models.Model):
     callOut = models.CharField(max_length=2048, default='', null=True)
     minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
-    
     comment = models.CharField(max_length=255, null=True, default='')
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.docketNumber) + str(self.tripId)
@@ -150,10 +155,11 @@ class DriverBreak(models.Model):
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None)  
     startDateTime = models.DateTimeField(default='', null=True)
     endDateTime = models.DateTimeField(default='', null=True)
-    breakFile = models.FileField(default='', null=True)
+    breakFile = models.FileField(upload_to='static/img/breakFiles', null=True)
     durationInMinutes = models.FloatField(default=0, null=True) 
     location = models.CharField(max_length=2048, default='', null=True)
     description = models.CharField(max_length=2048, default='', null=True)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.driverId.name)
@@ -173,7 +179,8 @@ class DriverReimbursement(models.Model):
     raiseDate = models.DateTimeField(default=None, null=True, blank=True)
     notes = models.CharField(max_length=2048, default='', null=True, blank=True)
     amount = models.FloatField(default=0)
-    reimbursementFile = models.FileField(default=None, null=True, blank=True)
+    reimbursementFile = models.FileField(upload_to='static/img/reimbursementFiles', null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.shiftId.id) + '-' + str(self.driverId.driverId)
@@ -279,6 +286,7 @@ class RctiReport(models.Model):
     totalExGST = models.FloatField(default=0)
     total = models.FloatField(default=0)
     fileName = models.CharField(max_length=255 , default='')
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.id)
@@ -313,6 +321,7 @@ class RctiAdjustment(models.Model):
     callOut = models.FloatField(default=0)
     cancellationCost = models.FloatField(default=0)
     demurageCost = models.FloatField(default=0)
+    history = HistoricalRecords()
 
     
     def __str__(self) -> str:
@@ -411,6 +420,7 @@ class RCTI(models.Model):
     othersGSTPayable = models.FloatField(default=0)
     othersTotalExGST = models.FloatField(default=0)
     othersTotal = models.FloatField(default=0)
+    history = HistoricalRecords()
     
     def _str_(self) -> str:
         return str(self.docketNumber) + str(self.truckNo)
@@ -424,6 +434,7 @@ class PublicHoliday(models.Model):
     date = models.DateField()
     stateName = models.CharField(max_length=100)
     description = models.CharField(max_length=255)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.description)
@@ -446,6 +457,7 @@ class PastTripError(models.Model):
     # 0 : pastTrip error  1: Report Error  2: pastTrip archive
     errorType = models.FloatField(default=0) 
     data = models.CharField(max_length=2048, default=' ')
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.docketNumber)
@@ -527,6 +539,7 @@ class ReconciliationReport(models.Model):
     # Total 
     driverTotalCost = models.FloatField(default=0)
     rctiTotalCost = models.FloatField(default=0)
+    history = HistoricalRecords()
         
     def __str__(self):
         return str(self.docketNumber)
@@ -547,6 +560,7 @@ class Escalation(models.Model):
    
     escalationAmount = models.FloatField(default=0)
     errorId = models.PositiveIntegerField(default=None, null=True)
+    history = HistoricalRecords()
     
     
     def __str__(self) -> str:
@@ -558,7 +572,7 @@ class EscalationDocket(models.Model):
     escalationId = models.ForeignKey(Escalation, on_delete=models.CASCADE, default=None)
     amount = models.FloatField(default=0)
     remark = models.CharField(max_length=1024, default='')
-    invoiceFile = models.FileField(default=None, null=True, blank=True)
+    invoiceFile = models.FileField(upload_to='static/Account/manuallyEscalation', null=True, blank=True)
     
     
     truckNo = models.ForeignKey(ClientTruckConnection, on_delete=models.CASCADE, default=None)
@@ -597,6 +611,7 @@ class EscalationDocket(models.Model):
         
     custom = models.BooleanField(default=False)
     customCharge = models.FloatField(default=0, null=True, blank=True)
+    history = HistoricalRecords()
     
     
     def save(self, *args, **kwargs):
@@ -633,10 +648,11 @@ class EscalationMail(models.Model):
     mailFrom = models.CharField(default=None, max_length=50)
     mailSubject = models.CharField(default=None, max_length=255)
     mailDescription = models.CharField(default=None, max_length=1024)    
-    mailAttachment = models.FileField(default=None, null=True, blank=True)    
+    mailAttachment = models.FileField(upload_to='static/img/mailAttachment', null=True, blank=True)    
     mailType = models.CharField(max_length=20, choices=mailType, default='Send')
     mailDate = models.DateField(default=None, null=True)
     mailCount = models.PositiveBigIntegerField(default=1)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.escalationId) + ' ' + str(self.mailDate)
@@ -657,6 +673,7 @@ class RctiErrors(models.Model):
     data = models.CharField(max_length=2048,default='')
     # 0:Earning, 1 : earning top up manually managed error
     errorType = models.PositiveIntegerField(default=0)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.docketNumber) +' '+ str(self.errorDescription)
@@ -678,6 +695,7 @@ class RctiExpense(models.Model):
     gstPayable = models.FloatField(default=0)
     totalExGST = models.FloatField(default=0)
     total = models.FloatField(default=0)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.docketNumber)
@@ -687,6 +705,7 @@ class HolcimTrip(models.Model):
     truckNo = models.PositiveBigIntegerField(default=0)
     shiftDate = models.DateField(null=True, default=None)
     numberOfLoads = models.FloatField(default=0)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.id)
@@ -739,8 +758,8 @@ class HolcimDocket(models.Model):
     dischargeLocation = models.CharField(max_length= 255 , default=None, null= True, blank=True)
     additionalKm = models.CharField(max_length= 255 , default=None, null= True, blank=True)
     status = models.CharField(max_length= 255 , default=None, null= True, blank=True)
+    history = HistoricalRecords()
     
-
     
     def __str__(self):
         return str(self.jobNo)
