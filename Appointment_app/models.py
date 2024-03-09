@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from GearBox_app.models import *
 from Account_app.models import *
 
+
 class Appointment(models.Model):
     TRIP_STATUS = [
         ('Unassigned', 'Unassigned'),
@@ -48,6 +49,7 @@ class Appointment(models.Model):
     thursday = models.BooleanField(default=False)
     friday = models.BooleanField(default=False)
     saturday = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def is_driver_available(self):
         leave_requests = self.driver.leaverequest_set.filter(
@@ -64,6 +66,7 @@ class Appointment(models.Model):
 class AppointmentTruck(models.Model):
     appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE)
     truckNo = models.ForeignKey(AdminTruck,on_delete=models.CASCADE)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.truckNo.adminTruckNumber)
@@ -72,6 +75,7 @@ class AppointmentTruck(models.Model):
 class AppointmentDriver(models.Model):
     appointmentId = models.ForeignKey(Appointment,on_delete=models.CASCADE)
     driverName = models.ForeignKey(Driver,on_delete=models.CASCADE)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.driverName.name)
@@ -84,6 +88,7 @@ class AppointmentStop(models.Model):
     arrivalTime = models.TimeField(null=True, blank=True)
     duration = models.PositiveBigIntegerField(default=0)
     notes = models.CharField(default='', null=True, max_length=2048)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.stopName.basePlant)
@@ -93,6 +98,7 @@ class PreStart(models.Model):
     preStartName = models.CharField(max_length=50, default='', null=True)
     createdDate = models.DateTimeField(default=None, null=True)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.preStartName)    
@@ -143,6 +149,7 @@ class PreStartQuestion(models.Model):
     # optionComment4 = models.CharField(max_length=1024, default='', null=True)
     
     archive = models.BooleanField(default=False)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.questionText) + '------' + str(self.preStartId)
@@ -159,6 +166,7 @@ class DriverPreStart(models.Model):
     comment = models.CharField(max_length=2048, default='', null=True)
     archive = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.curDateTime)
@@ -168,20 +176,9 @@ class DriverPreStartQuestion(models.Model):
     preStartId =  models.ForeignKey(DriverPreStart, on_delete=models.CASCADE, default=None, null=True)
     questionId =  models.ForeignKey(PreStartQuestion, on_delete=models.CASCADE, default=None, null=True)
     answer = models.CharField(max_length=255, default='', null=True)
-    answerFile = models.FileField(default=None, null=True)
+    answerFile = models.FileField(upload_to='static/img/preStartImages', null=True)
     comment = models.CharField(max_length=2048, default='', null=True)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.questionId.questionText) + '-->' + str(self.answer)
-
-    
-    
-   
-    
-    
-    
-    
-    
-    
-
-    

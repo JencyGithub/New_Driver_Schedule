@@ -811,7 +811,7 @@ def DriverPreStartSave(request, tripId , endShift = None):
                 
                 message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
                 from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
-                mailSendList = [ 'siddhantkhannamailbox@gmail.com','agihire@pnrgroup.com.au'] 
+                mailSendList = [ 'siddhantkhannamailbox@gmail.com'] 
                 # agihire@pnrgroup.com.au
                 send_mail(subject, message, from_email, recipient_list=mailSendList)
                 messages.error(request,'You have failed the Pre-start please contact office for more details.')

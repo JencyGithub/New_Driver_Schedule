@@ -1,11 +1,12 @@
 from Account_app.models import *
 import datetime 
-import variables 
 from django.core.mail import send_mail
+import time
+
 
 def run():
     
-    with open('scripts/sendEmailOnPreStartAndShiftEndNotFilled.txt','r')as f:
+    with open('C:/Users/Administrator/Desktop/New_Driver_Schedule/New_Driver_Schedule/scripts/sendEmailOnPreStartAndShiftEndNotFilled.txt','r')as f:
         data = f.read().strip()
         if  data != '':
             sendEmailOnPreStartAndShiftEndNotFilled_last_UTC_runtime = datetime.datetime.strptime(data, '%Y-%m-%d %H:%M:%S')
@@ -26,7 +27,7 @@ def run():
             
             message = f'{bodyMessage}\n{driverMessage}\n{locationMessage}\n{startTime}'
             from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
-            mailSendList = ['jencykachhadiya51@gmail.com']
+            mailSendList = [ 'agihire@pnrgroup.com.au']
             # agihire@pnrgroup.com.au
             send_mail(subject, message, from_email, recipient_list=mailSendList)
     
@@ -44,10 +45,11 @@ def run():
                 
                 message = f'{bodyMessage}\n{driverMessage}\n{locationMessage}\n{startTime}'
                 from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
-                mailSendList = ['jaymangukiya1614@gmail.com']
+                mailSendList = ['agihire@pnrgroup.com.au']
                 # agihire@pnrgroup.com.au
+                time.sleep(1)
                 send_mail(subject, message, from_email, recipient_list=mailSendList)
     sendEmailOnPreStartAndShiftEndNotFilled_last_UTC_runtime = currentUTC
     
-    with open('scripts/sendEmailOnPreStartAndShiftEndNotFilled.txt','w')as f:
+    with open('C:/Users/Administrator/Desktop/New_Driver_Schedule/New_Driver_Schedule/scripts/sendEmailOnPreStartAndShiftEndNotFilled.txt','w')as f:
         f.write(currentUTC.strftime('%Y-%m-%d %H:%M:%S'))
