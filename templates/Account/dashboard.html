@@ -118,13 +118,13 @@
             {% csrf_token %}
             <input type="hidden" id="last3DaysFailedPreStartsStartDate" name="startDate">
             <input type="hidden" id="last3DaysFailedPreStartsEndDate" name="endDate">
-            <strong><i class="fa-solid fa-right-long"></i> Drivers have not filled their pre-starts in the past 3 days</strong>
+            <strong><i class="fa-solid fa-right-long"></i> View drivers who have not filled their pre-starts in the past 3 days</strong>
           </form>
           <form action="{% url 'Account:ShiftDetails' id=2 %}" id="driverShiftNotEndedForm" method="POST">
             {% csrf_token %}
             <input type="hidden" id="driverShiftNotEndedFormStartDate" name="startDate">
             <input type="hidden" id="driverShiftNotEndedFormEndDate" name="endDate">
-            <strong><i class="fa-solid fa-right-long"></i> Drivers have not ended their shifts in the past week</strong>
+            <strong><i class="fa-solid fa-right-long"></i> View drivers who have not ended their shifts in the past week</strong>
           </form>
         </div>
       </div>

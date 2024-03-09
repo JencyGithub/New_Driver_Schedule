@@ -882,7 +882,7 @@ def saveDriverBreak(request, shiftId, breakId=None):
         timeDifference = (startDateTime - shiftObj.startDateTime ).total_seconds()//60
         
     if timeDifference >315:
-        messages.error(request,'are kuch bhi dedo')
+        messages.error(request,'You cannot driver for more then five hours and fifteen minutes in one go ')
         return redirect(request.META.get('HTTP_REFERER'))
     
     if startDateTime < shiftObj.startDateTime or startDateTime > endDateTime:
