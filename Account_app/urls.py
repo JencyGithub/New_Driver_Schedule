@@ -50,6 +50,7 @@ urlpatterns = [
     
     
     path('mapForm/view/', views.mapFormView, name='mapFormView'),
+    path('mapForm/view/<str:startDate>', views.mapFormView, name='mapFormViewWithDate'),
     path('mapForm/save/', views.mapDataSave, name='mapDataSave'),
     path('recurring/trip/<int:recurring>/', views.mapDataSave, name='recurringTrip'),
     
