@@ -165,7 +165,6 @@ def driverForm(request, id=None):
     }
     return render(request, 'GearBox/driverForm.html',params)
 
-
 @csrf_protect
 def driverFormSave(request, id= None):
     users = User.objects.all()
@@ -175,50 +174,35 @@ def driverFormSave(request, id= None):
     email_addresses = [user.email for user in users]
     # driver_Id = [driver.driverId for driver in drivers]
     driverName = request.POST.get('name').strip().replace(' ','').lower()
-    firstName = request.POST.get('firstName').strip().replace(' ','').lower()
-    middleName = request.POST.get('middleName').strip().replace(' ','').lower()
-    lastName = request.POST.get('lastName').strip().replace(' ','').lower()
-    password = request.POST.get('password')
+    firstName = request.POST.get('firstName').strip()
+    middleName = request.POST.get('middleName').strip()
+    lastName = request.POST.get('lastName').strip()
+    password = request.POST.get('password').strip()
     # Update 
-    if id :
+    if id:
         driverObj = Driver.objects.get(pk=id)
-        user = User.objects.get(email = driverObj.email)
-        if driverObj.name != driverName:
-            if driverName in usernames:
-                messages.error( request, "Driver Name already Exist")
-                return redirect(request.META.get('HTTP_REFERER'))
-            else:
-                driverObj.name = driverName
-                driverObj.firstName = firstName
-                driverObj.middleName = middleName
-                driverObj.lastName = lastName
-                user.username = driverObj.name
-                user.first_name = driverObj.firstName
-                user.last_name = driverObj.LastName
-                
-                
-            
-        if driverObj.email != request.POST.get('email'):
-            if request.POST.get('email') in email_addresses:
-                messages.error( request, "Email Address already Exist")
-                return redirect(request.META.get('HTTP_REFERER'))
-            else:
-                driverObj.email = request.POST.get('email')
-                user.email = driverObj.email        
-        
-        if driverObj.phone != request.POST.get('phone'):
-            driverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone'))  
-        
+        user = User.objects.filter(email = driverObj.email).first()
+        existUser = User.objects.filter(email=user.email).exclude(pk=user.id).first()
+        if existUser:
+            messages.error( request, "Email Address already Exist")
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            driverObj.email = request.POST.get('email')
+    
+        driverObj.firstName = firstName
+        driverObj.middleName = middleName
+        driverObj.lastName = lastName
+        user.username = driverObj.name
+        driverObj.phone = str(request.POST.get('countryCode')) + str(request.POST.get('phone'))  
         driverObj.password = password
+
+        user.first_name = driverObj.firstName
+        user.last_name = driverObj.lastName
         user.set_password(password)
-        # return HttpResponse( driverObj.password)
         user.save()
         driverObj.save()
         messages.success(request,'Updating successfully')
     else:
-        # if int(request.POST.get('driverId')) in driver_Id :
-        #     messages.error( request, "Driver ID already Exist")
-        #     return redirect(request.META.get('HTTP_REFERER'))
         if driverName in usernames:
             messages.error( request, "Driver Name  already Exist")
             return redirect(request.META.get('HTTP_REFERER'))
@@ -252,9 +236,8 @@ def driverFormSave(request, id= None):
             DriverObj.save()
             messages.success(request,'Driver Entry successfully')
             
-            
             with open("scripts/addPastTripForMissingDriver.txt", 'w') as f:
-                f.write(DriverObj.driverId)
+                f.write(str(DriverObj.driverId))
             # colorama.AnsiToWin32.stream = None
             # os.environ["DJANGO_SETTINGS_MODULE"] = "Driver_Schedule.settings"
             # cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error']
@@ -264,15 +247,11 @@ def driverFormSave(request, id= None):
             cmd = ["python", "manage.py", "runscript", 'addPastTripForMissingDriver','--continue-on-error']
             subprocess.Popen(cmd, stdout=subprocess.PIPE)
             
-            
-
     return redirect('gearBox:driversTable')
 
 
 # ````````````````````````````````````````
-
 # Compliance Section 
-
 # ````````````````````````````````````````````````
 
 def medicalsTable(request):
@@ -283,9 +262,7 @@ def trainingTable(request):
 
 
 # ````````````````````````````````````````
-
 # Safety
-
 # ````````````````````````````````````````````````
 
 
@@ -296,18 +273,14 @@ def equipmentIssueTable(request):
     return render(request, 'GearBox/Safety/equipmentIssueTable.html')
 
 # ````````````````````````````````````````
-
 # Reminder
-
 # ````````````````````````````````````````````````
 
 def reminderTable(request):
     return render(request, 'GearBox/reminderTable.html')
 
 # ````````````````````````````````````````
-
 # Truck Section 
-
 # ````````````````````````````````````````````````
 
 def truckTable(request):
@@ -778,7 +751,8 @@ def clientForm(request, id=None):
 @csrf_protect
 def clientChange(request, id=None):
     clientObj = Client()
-    
+    count = int(request.POST.get('additionalInfoForClientCount'))
+
     if id:
         clientObj = Client.objects.filter(pk=id).first()
 
@@ -793,16 +767,20 @@ def clientChange(request, id=None):
     clientOfcObj.locationType = request.POST.get('addType')
     clientOfcObj.description = request.POST.get('addDescription')
     clientOfcObj.address1 = request.POST.get('address1')
-    clientOfcObj.address2 =request.POST.get('address2')
-    clientOfcObj.personName = request.POST.get('personName')   
+    clientOfcObj.address2 =request.POST.get('address2')  
     clientOfcObj.city = request.POST.get('addCity')
     clientOfcObj.state = request.POST.get('addState')
     clientOfcObj.country = request.POST.get('addCountry') 
     clientOfcObj.postalCode =  request.POST.get('addPostalCode')
-    clientOfcObj.primaryContact = str(request.POST.get('countryCode')) + str(request.POST.get('primaryContact')) 
-    clientOfcObj.alternativeContact = request.POST.get('alternateContact') if request.POST.get('alternateContact') else None
     clientOfcObj.save()
-
+    for i in range(1, count+1):
+        additionalInfoObj = ClientOfficeAdditionalInformation()    
+        additionalInfoObj.clientOfficeId = clientOfcObj
+        additionalInfoObj.personName = request.POST.get(f'personName{i}') 
+        additionalInfoObj.primaryContact = str(request.POST.get(f'countryCode{i}')) + str(request.POST.get(f'primaryContact{i}')) 
+        additionalInfoObj.alternativeContact = request.POST.get(f'alternateContact{i}') if request.POST.get(f'alternateContact{i}') else None
+        additionalInfoObj.email = request.POST.get(f'personEmail{i}')
+        additionalInfoObj.save()
     
     return redirect('gearBox:clientTable')
 

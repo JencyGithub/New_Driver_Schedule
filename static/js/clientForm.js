@@ -1,8 +1,10 @@
+const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 $("#rateCards").select2({
   placeholder: "Select options",
   width: "100%",
 });
-const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+setCountryCode("countryCode1")
+setCountryCode("addCountry")
 
 var validator = new FormValidator(
   {
@@ -14,8 +16,9 @@ var validator = new FormValidator(
 document.forms[0].onsubmit = function (e) {
   var submit = true,
     validatorResult = validator.checkAll(this);
-
-  // validatorResult.valid = checkPhone($("#primaryContact"));
+  if ( validatorResult.valid ) {
+    validatorResult.valid = checkPhone($("#primaryContact1"));
+  }
 
   return !!validatorResult.valid;
 };
@@ -354,7 +357,11 @@ function addContact(){
   $('#additionalContactSection').append(contactDetails);
 }
 
-
 function removeContact(element) {
   $(element).closest('.col-12.my-1').remove();
 }
+
+
+// $('#additionalInfoForClient .fa-circle-plus').on('click', function(){
+
+// })
