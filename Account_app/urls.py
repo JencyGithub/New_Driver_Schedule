@@ -170,6 +170,8 @@ urlpatterns = [
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
+    path('driverShift/archive/<int:shiftId>/', views.DriverShiftArchive, name='DriverShiftArchive'), 
+    path('driverShift/restore/<int:shiftId>/', views.RestoreDriverShift, name='RestoreDriverShift'),
     path('driverTrip/update/<int:shiftId>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
     path('driverTrip/docket/update/', views.driverDocketUpdate, name='driverDocketUpdate'), 
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 

@@ -18,6 +18,15 @@
     float: right! important;
   }
 
+  {% comment %} /* Hide extra fields in pagination controls */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next,
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    display: none;
+} {% endcomment %}
+
+
   /* Hide all buttons (copy,csv,excel,pdf,print) */
   .dt-buttons.btn-group>a {
     display: none !important;
@@ -90,10 +99,16 @@
               {% csrf_token %}
               <input hidden name="startDate" value="{{startDate}}">
               <input hidden name="endDate" value="{{endDate}}">
-              <input hidden name="id_" value="{{id_}}">              
+              <input hidden name="id_" value="{{id_}}">   
               <button type="submit" class="btn btn-app float-right mr-1 d-inline">
                 <i class="fa fa-download" style="font-size:1rem"></i>
               </button>
+              {% if id_ == 0 or id_ == 2 %}
+              <div class="btn-group float-right mr-4" role="group">
+                <button type="button" class="btn btn-sm btn-dark" id="activeBtn">Active</button>
+                <button type="button" class="btn btn-sm btn-dark" id="archiveBtn">Archive</button>
+              </div>
+              {% endif %}
             </form>
             <div class="clearfix"></div>
           </div>
@@ -113,7 +128,7 @@
                     <tbody>
                       {% if shifts %}
                       {% for shift in shifts %}
-                      <tr class="{% if shift.deficit %}bg-danger-light{% endif %}">
+                      <tr class="{% if shift.deficit %}bg-danger-light{% endif %} {% if shift.archive %}archive{% else %}active{% endif %}">
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
                         <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate|date:'Y-m-d' }}</a></td>
@@ -155,5 +170,32 @@
 <script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
 <script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#activeBtn').click(function() {
+      filterShifts('active');
+    });
+
+    $('#archiveBtn').click(function() {
+      filterShifts('archive');
+    });
+
+    function filterShifts(status) {
+      $('table tbody tr').hide();
+      $('table tbody tr').each(function() {
+        if ($(this).hasClass(status)) {
+          $(this).show();
+        }
+      });
+
+      var visibleRowCount = $('table tbody tr:visible').length;
+      $('.dataTables_info').text('Showing 1 to ' + visibleRowCount + ' of ' + visibleRowCount + ' entries');
+
+    }
+  });
+</script> 
+
+
 
 {% endblock %}
