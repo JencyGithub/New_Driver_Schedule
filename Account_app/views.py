@@ -970,6 +970,7 @@ def addReimbursementSave(request, shiftId):
 
 @csrf_protect
 def collectDockets(request, shiftId, tripId, endShift=None):
+    
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
@@ -985,7 +986,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         if manualEndTime < shiftObj.startDateTime:
             messages.error(request, "End shift date-time is not valid.")
             return redirect(request.META.get('HTTP_REFERER')) 
-        
+    
     shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (dateTimeObj(dateTimeObj=request.POST.get('dateTime')) - shiftObj.startDateTime).total_seconds() / 60
 
     def checkBreaks(breaksObjs):
@@ -1052,7 +1053,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
     
     if driver_break_object and driver_break_object.endDateTime > currentDateTime:
         messages.error(request, "Entered breaks is not valid, please  enter the correct break details.")
+        return redirect('Account:driverShiftView',shiftId=shiftId)
         return redirect(request.META.get('HTTP_REFERER'))
+        # return HttpResponse(driver_break_object)
     
     truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
     truckInfoObj = truckConnectionObj.truckNumber.truckInformation
@@ -1235,9 +1238,9 @@ def getTrucks(request):
     currentDate = None
     
     if not request.POST.get('shiftId'):
-        curDateTime = request.POST.get('curDate')
-        datetime_object = datetime.strptime(curDateTime,'%Y-%m-%d %H:%M:%S')
+        datetime_object = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
         currentDate = datetime_object.date()
+        
 
     if request.POST.get('shiftId'):
         shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
@@ -1249,15 +1252,9 @@ def getTrucks(request):
         for trip in currentTripObjs:
             connections.append(trip.truckConnectionId)
         
-        allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
-        for trip in allCurrentTrips:
-            connections.append(trip.truckConnectionId)
-    else:
-        print(datetime_object)
-        allCurrentTrips = DriverShiftTrip.objects.filter(startDateTime__lte=datetime_object,endDateTime__isnull=True, archive=False)
-        for trip in allCurrentTrips:
-            connections.append(trip.truckConnectionId)
-            print(trip.truckConnectionId)
+    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
+    for trip in allCurrentTrips:
+        connections.append(trip.truckConnectionId)
     
     truckList = []
     truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDate , endDate__gte=currentDate)
@@ -2157,6 +2154,7 @@ def driverDocketEntrySave(request, tripId, errorId=None):
         docketObj = DriverShiftDocket(
             shiftDate=shiftObj.shiftDate,
             tripId=tripId,
+            shiftId = shiftObj.id,
             clientId = tripObj.clientId,
             docketNumber=docketNumber_,
             docketFile=docketFileSave(docketFile, docketNumber_),
@@ -2497,6 +2495,7 @@ def RestoreDriverShift(request, shiftId):
 
 @csrf_protect
 def DriverTripEditForm(request, id):
+    numberOfLoadsCount= 0
     superUser = False
     if request.user.is_superuser:
         superUser = True
@@ -2511,7 +2510,7 @@ def DriverTripEditForm(request, id):
         # return HttpResponse(i.clientTruckConnectionObj)
         i.tripDockets = DriverShiftDocket.objects.filter(tripId = i.id)
         i.preStartObj = DriverPreStart.objects.filter(tripId=i).first()
-        
+        numberOfLoadsCount = i.tripDockets.count()
         for docket in i.tripDockets:
             # clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = clientObj).first()
             clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=i.truckConnectionId).first()
@@ -2540,11 +2539,14 @@ def DriverTripEditForm(request, id):
         'Client': clientName,
         'surcharges' : surcharges,
         'superUser':superUser,
+        'numberOfLoadsCount':numberOfLoadsCount
     }
     # return HttpResponse(params['driverTrip'])
     return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
 
-
+@csrf_protect
+def ongoingShiftEnd(request,tripId):
+    return HttpResponse('End')
 @csrf_protect
 def driverDocketUpdate(request):
     docketId = request.POST.get('docketId')
@@ -2563,20 +2565,62 @@ def driverDocketUpdate(request):
 
 @csrf_protect
 def driverEntryUpdate(request, shiftId):
+    verified = request.POST.get('veriFied')
+    shiftEndTime = dateTimeObj(dateTimeObj=request.POST.get('shiftEndTime'))
+    
     # Update Trip Save
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
+    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('currentDateTime'))
+    cur_UTC = datetime.utcnow()
+    
+    # set to shiftEnd Time
+    if shiftEndTime:
+        timeDiff = (shiftEndTime - currentDateTime).total_seconds()/60
+        if timeDiff > 0:
+            shiftObj.endDateTime = shiftEndTime
+            shiftObj.endTimeUTC = cur_UTC + timedelta(minutes=timeDiff)
+            shiftObj.save()
+            
+            
     for trip in tripObjs:
-        trip.truckConnectionId = request.POST.get(f'truckNo{trip.id}')
+        endDateTime = dateTimeObj(dateTimeObj=request.POST.get(f'endDateTime{trip.id}'))
+        startDateTime = dateTimeObj(dateTimeObj=request.POST.get(f'startDateTime{trip.id}'))
+        if endDateTime:
+            if startDateTime >= endDateTime:
+                messages.error(request,'End time should be greater then start time') 
+                return redirect(request.META.get( 'HTTP_REFERER' ))
+            else:
+                checkTruckAndDriver = checkTruckAndDriverAvailability(shiftObj=shiftObj,tripObj=trip ,endDateTime=endDateTime ,startDateTime=startDateTime)
+                if not checkTruckAndDriver:
+                    messages.error(request, 'This trip cannot be ended at this time because the truck and driver are already assigned to another task.')
+                    return redirect(request.META.get( 'HTTP_REFERER' ))
+                else :
+                    timeDiff = (endDateTime - currentDateTime).total_seconds()/60
+                    
+                    if timeDiff > 0:
+                        updated_UTC = cur_UTC + timedelta(minutes=timeDiff)
+                    else:
+                        updated_UTC = cur_UTC - timedelta(minutes=abs(timeDiff))
+                    trip.endDateTime = endDateTime
+                    trip.endTimeUTC = updated_UTC
+        
         if request.FILES.get(f'loadSheet{trip.id}'):
             loadSheet = request.FILES.get(f'loadSheet{trip.id}')
             trip.loadSheet = loadFileSave(loadSheet)
 
-        trip.comment = request.POST.get(f'comment{trip.id}')
-        trip.save()
+        trip.comment = ' ' if not request.POST.get(f'comment{trip.id}') else ' '
+        if startDateTime:
+            timeDiff = (startDateTime - currentDateTime).total_seconds()/60
+            if timeDiff > 0:
+                updated_UTC = cur_UTC + timedelta(minutes=timeDiff)
+            else:
+                updated_UTC = cur_UTC - timedelta(minutes=abs(timeDiff))
+            trip.startDateTime = startDateTime
+            trip.startTimeUTC = updated_UTC
         
-        # print(trip.id,trip.truckConnectionId)
-        # return HttpResponse(trip)
+        trip.save()
+
         docketObj = DriverShiftDocket.objects.filter(shiftId=shiftId,tripId = trip.id)
         
         for docket in docketObj:
@@ -2600,7 +2644,6 @@ def driverEntryUpdate(request, shiftId):
             if request.POST.get(f'waitingCheck{docket.id}'):
                 docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')
                 docket.waitingTimeEnd = request.POST.get(f'waitingTimeEnd{docket.id}')
-                # return HttpResponse(docket.waitingTimeEnd)
             else:
                 docket.waitingTimeStart = None
                 docket.waitingTimeEnd = None
@@ -2620,10 +2663,8 @@ def driverEntryUpdate(request, shiftId):
             docket.others = request.POST.get(f'others{docket.id}')
             docket.comment = request.POST.get(f'comment{docket.id}')
             docket.truckConnectionId = trip.truckConnectionId
-            
             docket.save()
 
-            verified = request.POST.get('verified')
             
             if verified == 'True' :
                 trip.verified = True
@@ -2678,12 +2719,16 @@ def driverEntryUpdate(request, shiftId):
                 reconciliationTotalCheck(reconciliationDocketObj)
                 shiftObj.verified = True
                 shiftObj.verifiedBy = request.user
+                timeDiff = (shiftEndTime - currentDateTime).total_seconds()/60
+                shiftObj.endDateTime = shiftEndTime
+                shiftObj.endTimeUTC = cur_UTC + timedelta(minutes=timeDiff)
                 shiftObj.save()
+
+                checkShiftRevenueDifference(tripObjs)
     
-    # return HttpResponse(tripObjsSet)
-    checkShiftRevenueDifference(tripObjs)
     
-    messages.success(request, "Docket Updated successfully")
+    
+    messages.success(request, "Shift end successfully" if verified == 'True' else "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
     return redirect(request.META.get('HTTP_REFERER'))
 
@@ -2743,7 +2788,19 @@ def checkTripDeficit(request):
             count_+=1
     print(getDeficit)
     return JsonResponse({'status':True if 'True' in getTrueOrFalse else False, 'getDeficit':getDeficit}) 
-    return JsonResponse({'status':True }) 
+ 
+    
+    
+@csrf_protect
+def getLastTrip(request):
+    shiftId = request.POST.get('shiftId')  # Provide the key 'shiftId'
+    tripObj = None
+
+    if shiftId:
+        tripObj = DriverShiftTrip.objects.filter(shiftId=shiftId).order_by('-id').first()
+
+    if tripObj:
+        return JsonResponse({'status': True, 'tripId': tripObj.id})
     
 # ````````````````````````````````````
 # Reconciliation
