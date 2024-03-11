@@ -1201,18 +1201,32 @@ def getTrucks(request):
     connections = []
     clientName = request.POST.get('clientName')
     client = Client.objects.get(name=clientName)
-    shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
+    currentDate = None
     
-    year, month, day = map(int, request.POST.get('curDate').split('-'))        
-    currentDate = date(int(year), int(month), int(day))
+    if not request.POST.get('shiftId'):
+        curDateTime = request.POST.get('curDate')
+        datetime_object = datetime.strptime(curDateTime,'%Y-%m-%d %H:%M:%S')
+        currentDate = datetime_object.date()
+
+    if request.POST.get('shiftId'):
+        shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
     
-    currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
-    for trip in currentTripObjs:
-        connections.append(trip.truckConnectionId)
-    
-    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
-    for trip in allCurrentTrips:
-        connections.append(trip.truckConnectionId)
+        year, month, day = map(int, request.POST.get('curDate').split('-'))        
+        currentDate = date(int(year), int(month), int(day))
+        
+        currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
+        for trip in currentTripObjs:
+            connections.append(trip.truckConnectionId)
+        
+        allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
+        for trip in allCurrentTrips:
+            connections.append(trip.truckConnectionId)
+    else:
+        print(datetime_object)
+        allCurrentTrips = DriverShiftTrip.objects.filter(startDateTime__lte=datetime_object,endDateTime__isnull=True, archive=False)
+        for trip in allCurrentTrips:
+            connections.append(trip.truckConnectionId)
+            print(trip.truckConnectionId)
     
     truckList = []
     truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDate , endDate__gte=currentDate)
