@@ -21,6 +21,13 @@ from . import views
 app_name = 'Appointment'
 
 urlpatterns = [
+
+    # shifts
+    path('create/shift/', views.createShift,name="createShift"),
+    path('create/shift/<int:shiftId>/', views.createShift,name="createTrip"),
+    path('create/shift/save/', views.createShiftSave,name="createShiftSave"),
+    # path('start/shift/<str:startDate>/', views.startShift,name="startShiftWithDate"),
+
     # Appointment
     path('appointmentForm/', views.appointmentForm,name="appointmentForm"),
     path('appointmentForm/view/<int:id>/', views.appointmentForm,name="appointmentFormView"),

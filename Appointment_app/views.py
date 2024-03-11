@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 import shutil, os, subprocess, csv, pytz
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from django.contrib import messages
@@ -15,6 +15,79 @@ from CRUD import *
 from Account_app.reconciliationUtils import *
 from django.db.models import Q
 import itertools
+
+# ````````````````````````````````````
+# Driver Shifts
+
+# ```````````````````````````````````
+
+def createShift(request,shiftId=None):
+    client_ids = Client.objects.all()
+    driver_ids = Driver.objects.all()
+    shiftObj = None
+    if shiftId:
+        shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+
+    params = {
+        'client_ids' : client_ids,
+        'driver_ids' : driver_ids,
+        'shiftObj' : shiftObj,
+    }
+
+    return render(request,'Appointment/shifts/createShift.html',params)
+
+def createShiftSave(request):
+    longitude = request.POST.get('longitude')
+    latitude = request.POST.get('latitude')
+    driverId = request.POST.get('driverId')
+    startDateTime = request.POST.get('startDateTime')
+    startDateTime = startDateTime.replace('T',' ')
+    
+    shiftType = request.POST.get('shiftType')
+    minute_ = int(request.POST.get('minute'))
+    startOdometerKms = request.POST.get('startOdometerKms')
+    startEngineHours = request.POST.get('startEngineHours')
+    truckNum = request.POST.get('truckNum')
+    
+    clientName = request.POST.get('clientId')
+    truckNum = request.POST.get('truckNum').split('-')
+    adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
+    clientTruckNum = truckNum[1]
+    clientObj = Client.objects.filter(name=clientName).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
+
+
+    datetime_object = dateTimeObj(dateTimeObj=startDateTime)
+    cur_UTC = datetime.utcnow()
+
+    if minute_ > 0:
+        cur_UTC = cur_UTC + timedelta(minutes=minute_)
+    else:
+        cur_UTC = cur_UTC - timedelta(minutes=abs(minute_))
+
+    existShitObj =  DriverShift.objects.filter(driverId = driverId,startDateTime__lte=datetime_object,endDateTime__isnull=True, archive=False).first()
+    if existShitObj:
+        messages.error(request,'This shift already exists!')
+        return redirect(request.META.get( 'HTTP_REFERER' ))
+    shiftObj = DriverShift()
+    shiftObj.longitude = longitude
+    shiftObj.latitude = latitude
+    shiftObj.driverId = driverId
+    shiftObj.shiftType = shiftType
+    shiftObj.startDateTime = datetime_object
+    shiftObj.shiftDate = datetime_object.date()
+    shiftObj.startTimeUTC = cur_UTC
+    shiftObj.save()
+
+    tripObj = DriverShiftTrip()
+    tripObj.shiftId = shiftObj.id
+    tripObj.clientId = clientObj.clientId
+    tripObj.truckConnectionId = truckConnectionObj.id
+    tripObj.startOdometerKms = 0 if not startOdometerKms else startOdometerKms 
+    tripObj.startEngineHours = 0 if not startEngineHours else startEngineHours
+    tripObj.save()   
+    messages.success(request,"Driver Shift has been added successfully")  
+    return redirect('Account:index')
 
 # ````````````````````````````````````
 # Appointment
