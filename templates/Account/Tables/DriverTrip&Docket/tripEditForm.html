@@ -73,7 +73,7 @@
 
                     <div class="x_title">
                         <h2>Shift Details</h2> 
-                        <b class="d-inline-block m-1 mt-2 text-secondary">(started from {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">location</span>{% else %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
+                        <b class="d-inline-block m-1 mt-2 text-secondary">(started  {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">from location</span>{% elif shiftObj.locationImg %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">from location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified %}
                             {% comment %} {% if shiftObj.archive %}
@@ -90,7 +90,7 @@
                         <div class="x_panel">
                             <div class="x_title mb-0">
                                 <h2 class="text-primary">Trip {{forloop.counter}}</h2>
-                                {% if trip.preStartObj %}<b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b>{% endif %}
+                                {% if trip.preStartObj %} <b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b> {% else %} <b class="d-inline-block m-1 mt-2"> Pre-start not available as this shift was not started by driver </b> {% endif %}
                                 {% if trip.revenueDeficit > 0 %}
                                 <i class="text-danger float-right" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
                                 {% endif %}
@@ -100,7 +100,7 @@
                                 
                             </div>
                             <div class="x_content ">
-                                {% if shiftObj.verified is False %}
+                                {% if not trip.startDateTime %}
                                 <div class="alert alert-warning col-12">
                                 <small > Trip timings not available as driver has not filled pre start.  </small> 
                                     <div class="float-right">

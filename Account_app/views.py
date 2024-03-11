@@ -36,7 +36,7 @@ from django.core.mail import send_mail
 def index(request):
     curDate = getCurrentDateTimeObj().date()
     totalShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate)
-    continueShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime=None).count()
+    continueShiftsCount = DriverShift.objects.filter(archive=False,  endDateTime=None).count()
     completedShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime__isnull=False).count()
     reimbursementCount = DriverReimbursement.objects.filter(raiseDate__date=curDate).count()
     preStartPendingCount = 0
