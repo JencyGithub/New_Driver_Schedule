@@ -55,6 +55,7 @@ urlpatterns = [
     path('recurring/trip/<int:recurring>/', views.mapDataSave, name='recurringTrip'),
     
     path('clientAndTruck/save/<int:id>/', views.clientAndTruckDataSave, name='clientAndTruckDataSave'),
+    path('check/trip/', views.checkTrip, name='checkTrip'),
 
     path('checkQuestion/requirement/', views.checkQuestionRequired, name='checkQuestionRequired'),
     path('DriverPreStart/save/<int:tripId>/', views.DriverPreStartSave, name='DriverPreStartSave'),
@@ -67,6 +68,8 @@ urlpatterns = [
 
     path('Driver/reimbursement/view/<int:shiftId>/', views.addReimbursementView, name='addReimbursementView'),
     path('Driver/reimbursement/save/<int:shiftId>/', views.addReimbursementSave, name='addReimbursementSave'),
+
+    path('endShift/<int:shiftId>/', views.endShift, name='endShift'),
 
     path('collect/dockets/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectDockets, name='collectDockets'),
     path('collect/dockets/save/<int:shiftId>/<int:tripId>/<int:endShift>/', views.collectedDocketSave, name='collectedDocketSave'),
@@ -278,5 +281,12 @@ urlpatterns = [
     # Find job filters
     path('job/selectedStatus/', views.jobSelectedStatus, name='jobSelectedStatus'),
     
+    # History URLs
+    
+    path('history/cost-parameter/<int:id>/', views.costParameterHistory, name='costParameterHistory'), 
+    path('history/threshHoldDay/<int:id>/', views.threshHoldDayHistoryHistory, name='threshHoldDayHistoryHistory'), 
+    path('history/threshHoldNight/<int:id>/', views.threshHoldNightHistoryHistory, name='threshHoldNightHistoryHistory'), 
+    path('history/grace/<int:id>/', views.graceHistory, name='graceHistory'), 
 
+    path('history/base-plant/<int:id>/', views.basePlantHistory, name='basePlantHistory'), 
 ]

@@ -49,7 +49,7 @@
                         <div class="ms-auto d-flex justify-content-between flex-wrap">
                             <h5 class="card-title text-uppercase text-default">Current Status</h5>
                             <div class="p-1 ms-auto">
-                                <form id="changeTruckForm" action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=0 %}" class="btn btn-sm btn-default" method="post">
+                                <form id="changeTruckForm" action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=0 %}" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="dateTime" id="dateTime">
                                     <button type="submit" id="changeClientBtn" class="btn btn-sm btn-default">Change Client/Truck</button>
@@ -117,7 +117,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4 d-flex justify-content-end mt-auto my-2">
-                                            <button type="submit" class="btn btn-sm btn-default w-auto float-end px-3" id="endShift">End Shift</button>
+                                            <button type="submit" class="btn btn-sm btn-default w-auto float-end px-2" id="endShift">End Shift</button>
                                         </div>
                                     </div>
                                 </div>   
