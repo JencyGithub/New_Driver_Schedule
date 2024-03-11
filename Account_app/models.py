@@ -71,6 +71,8 @@ class DriverShift(models.Model):
     endTimeUTC = models.DateTimeField(null=True)
     archive = models.BooleanField(default=False)
     lastEmailTime = models.DateTimeField(null=True)
+    endShiftImg = models.FileField(upload_to='static/img/shiftImg', null=True)
+    comment = models.CharField(max_length=2048, null=True) 
     history = HistoricalRecords()
     
     def __str__(self) -> str:
