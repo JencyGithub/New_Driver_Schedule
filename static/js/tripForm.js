@@ -30,7 +30,7 @@ function verifiedBtnFun(shiftId){
             }
         });
         if (endDateTimeValue == ''){
-          alert('You have to not add endtime')
+          alert('Please add end time for the trip')
           return false;
         }
         if (emptyField !== ''){
@@ -60,7 +60,7 @@ function shiftEndTimeFun() {
   var oldDate = new Date(oldDateTime);
 
   if (newDate < oldDate) {
-      alert("New end date and time cannot be earlier than the old end date and time.");
+      alert("Shift end time value cannot be lower then trip end time.");
       $('#oldShiftEndTime').val(oldDate);
       $('#shiftEndTime').val(oldDate);
       newShiftEndTimeInput.value = oldDateTime;

@@ -2110,7 +2110,6 @@ def driverDocketEntrySave(request, tripId, errorId=None):
     # return HttpResponse(errorId)
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
     shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
-
     docketNumber_ = int(float(request.POST.get('docketNumber')))
     surchargeId = Surcharge.objects.filter(pk=request.POST.get('surcharge_type')).first().id
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
@@ -2119,6 +2118,7 @@ def driverDocketEntrySave(request, tripId, errorId=None):
         messages.error(request, "This docket number  already exists!")
         return redirect(request.META.get('HTTP_REFERER'))
     else:
+        
         docketFile = request.FILES.get('docketFile')
         docketObj = DriverShiftDocket(
             shiftDate=shiftObj.shiftDate,
@@ -2169,7 +2169,6 @@ def driverDocketEntrySave(request, tripId, errorId=None):
 
         # Count the number of objects in the queryset
         tripObj.numberOfLoads = driver_dockets.count()
-
         tripObj.save()
         if errorId:
             reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
