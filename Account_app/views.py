@@ -811,7 +811,7 @@ def DriverPreStartSave(request, tripId , endShift = None):
                 
                 message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
                 from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
-                mailSendList = [ 'siddhantkhannamailbox@gmail.com','agihire@pnrgroup.com.au'] 
+                mailSendList = [ 'siddhantkhannamailbox@gmail.com'] 
                 # agihire@pnrgroup.com.au
                 send_mail(subject, message, from_email, recipient_list=mailSendList)
                 messages.error(request,'You have failed the Pre-start please contact office for more details.')
@@ -883,7 +883,7 @@ def saveDriverBreak(request, shiftId, breakId=None):
         timeDifference = (startDateTime - shiftObj.startDateTime ).total_seconds()//60
         
     if timeDifference >315:
-        messages.error(request,'You must have to add a break to end shift')
+        messages.error(request,'You cannot driver for more then five hours and fifteen minutes in one go ')
         return redirect(request.META.get('HTTP_REFERER'))
     
     if startDateTime < shiftObj.startDateTime or startDateTime > endDateTime:

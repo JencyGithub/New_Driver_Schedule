@@ -3,6 +3,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator,RegexVal
 from datetime import date
 from django.utils import timezone
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
+
 
 
 TRUCK_TYPE_CHOICES = (
@@ -20,6 +22,7 @@ class Client(models.Model):
     email = models.CharField(max_length=255,default=None, null=True, blank=True)
     docketGiven = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.name) 
@@ -34,7 +37,7 @@ class ClientOffice(models.Model):
     state = models.CharField(max_length=100, null=True, default='')
     country = models.CharField(max_length=100, null=True, default='')
     postalCode = models.IntegerField(null=True, default=0)
-
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.description) + str(self.clientId) + str(self.locationType)
@@ -46,6 +49,7 @@ class ClientOfficeAdditionalInformation(models.Model):
     primaryContact = models.IntegerField(null=True, default=0)
     alternativeContact = models.IntegerField(null=True, default=0)
     email = models.CharField(max_length = 255 , null = True , default='')
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.personName) + str(self.email)
@@ -76,6 +80,7 @@ class RateCard(models.Model):
     tds = models.FloatField(default=0)
     clientName = models.ForeignKey(Client,on_delete=models.CASCADE , null=True)
     # clientOfc = models.ForeignKey(ClientOffice,on_delete=models.CASCADE , null=True)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -83,6 +88,7 @@ class RateCard(models.Model):
 class Surcharge(models.Model):
     surcharge_Name = models.CharField(max_length=255)
     # createdBy = models.ForeignKey('auth.user', on_delete=models.CASCADE, default=None)
+    history = HistoricalRecords()
 
     
     def __str__(self) -> str:
@@ -107,6 +113,7 @@ class CostParameters(models.Model):
     clientPayableGst = models.FloatField(default=10.0)
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
 
 class RateCardSurchargeValue(models.Model):
     # createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
@@ -115,6 +122,7 @@ class RateCardSurchargeValue(models.Model):
     surchargeValue = models.FloatField(default=0)
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.rate_card_name)
@@ -148,6 +156,7 @@ class ThresholdDayShift(models.Model):
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
 
 
 class ThresholdNightShift(models.Model):
@@ -170,6 +179,7 @@ class ThresholdNightShift(models.Model):
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
 
 
 class Grace(models.Model):
@@ -187,6 +197,7 @@ class Grace(models.Model):
 
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
 
 class OnLease(models.Model):
     rate_card_name = models.ForeignKey(RateCard, on_delete=models.CASCADE)
@@ -203,13 +214,13 @@ class OnLease(models.Model):
     call_out_fees_applicable = models.BooleanField(default=True)
     start_date = models.DateField(default=timezone.now())
     end_date = models.DateField(default=timezone.now() + timezone.timedelta(days=365*10), null=True, blank=True)
+    history = HistoricalRecords()
     
-
-
 
 class ClientOfcWithRateCardConnection(models.Model):
     clientOfc = models.ForeignKey(ClientOffice, on_delete=models.CASCADE , null=True)
     rateCard = models.ForeignKey(RateCard, on_delete=models.CASCADE , null=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.clientOfc ) +'-'+ str(self.rateCard)
@@ -234,9 +245,9 @@ class TruckInformation(models.Model):
     subGroup = models.PositiveSmallIntegerField(default=0)
     vehicleType = models.CharField(max_length=100, default='', null=True, blank=True)
     serviceGroup = models.CharField(max_length=100, default='', null=True, blank=True)
-    truckImg1 = models.FileField(null=True, blank=True)
-    truckImg2 = models.FileField(null=True, blank=True)
-    truckImg3 = models.FileField(null=True, blank=True)
+    truckImg1 = models.FileField(upload_to='static/TruckFiles',null=True, blank=True)
+    truckImg2 = models.FileField(upload_to='static/TruckFiles',null=True, blank=True)
+    truckImg3 = models.FileField(upload_to='static/TruckFiles',null=True, blank=True)
     informationMake = models.CharField(max_length=100, default='', null=True, blank=True)
     informationModel = models.CharField(max_length=100, default='', null=True, blank=True)
     informationConfiguration = models.CharField(max_length=100, default='', null=True, blank=True)
@@ -272,6 +283,7 @@ class TruckInformation(models.Model):
     engineModel = models.CharField(max_length=100, default='', null=True, blank=True)
     engineCapacity = models.CharField(max_length=100, default='', null=True, blank=True)
     engineGearBox = models.CharField(max_length=100, default='', null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.fleet)
@@ -279,6 +291,7 @@ class TruckInformation(models.Model):
 class TruckInformationCustom(models.Model):
     customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
     active = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.id)
@@ -363,6 +376,7 @@ class Axles(models.Model):
     axle_brakes8 =models.CharField(max_length=100, default='', null=True, blank=True)
     axle_slack_adjusters8 =models.CharField(max_length=100, default='', null=True, blank=True)
     axle_differential8 =models.CharField(max_length=100, default='', null=True, blank=True)
+    history = HistoricalRecords()
 
     
     def _str_(self):
@@ -438,6 +452,7 @@ class TruckSetting(models.Model):
     
     customText16 = models.CharField(max_length=1024, null=True, blank=True)
     customValue16 = models.CharField(max_length=2048, null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.id)
@@ -446,6 +461,7 @@ class TruckSetting(models.Model):
 class TruckSettingCustom(models.Model):
     customFieldLabel = models.CharField(max_length=100, default='', null=True, blank=True)
     active = models.BooleanField(default=True)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.customFieldLabel) + str(self.active)
@@ -460,6 +476,7 @@ class AdminTruck(models.Model):
     truckSetting = models.ForeignKey(TruckSetting, on_delete = models.CASCADE , null = True)
     truckActive = models.BooleanField(default=False)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.adminTruckNumber)
@@ -475,6 +492,7 @@ class Driver(models.Model):
     firstName = models.CharField(max_length=100, default='', null=True)
     middleName = models.CharField(max_length=100, default='', null=True)
     lastName = models.CharField(max_length=100, default='', null=True)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
         return str(self.driverId) + str(self.name)
@@ -494,6 +512,7 @@ class ClientTruckConnection(models.Model):
     startDate = models.DateField(default=timezone.now())  
     endDate = models.DateField(null=True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    history = HistoricalRecords()
 
 
     def __str__(self):
@@ -505,6 +524,7 @@ class ClientTruckConnection(models.Model):
 
 class NatureOfLeave(models.Model):
     reason = models.CharField(max_length=200)
+    history = HistoricalRecords()
     
     def __str__(self) -> str:
             return str(self.reason)
@@ -519,6 +539,7 @@ class LeaveRequest(models.Model):
 
     comment = models.CharField(max_length=2048, default='', null=True, blank=True)
     closedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"{self.employee} - {self.start_date} to {self.end_date}"
@@ -529,6 +550,7 @@ class LeaveRequest(models.Model):
     
 class TruckGroup(models.Model):
     name = models.CharField(max_length=100, default=None)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -536,6 +558,7 @@ class TruckGroup(models.Model):
 class TruckSubGroup(models.Model):
     truckGroup = models.ForeignKey(TruckGroup, on_delete=models.CASCADE , null=True)
     name = models.CharField(max_length=100, default=None)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -543,8 +566,9 @@ class TruckSubGroup(models.Model):
 # DOCUMENTS TAB
 class TruckDocument(models.Model):
     tags = models.CharField(max_length=300)
-    filePath = models.FileField(upload_to='static/GearBox/document')
+    filePath = models.FileField(upload_to='static/GearBox/document', null=True)
     description = models.TextField()
+    history = HistoricalRecords()
     
     def __str__(self):
         return str(self.tags)
@@ -557,6 +581,7 @@ class TruckEntryError(models.Model):
     status = models.BooleanField(default=False)
     errorType = models.FloatField(default=0) 
     data = models.CharField(max_length=2048, default=' ')
+    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.truckNo)
