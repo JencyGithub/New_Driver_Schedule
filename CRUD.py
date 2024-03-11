@@ -208,3 +208,41 @@ def dateTimeConvertIntoDate(data):
     datetime_object = datetime.fromisoformat(formatted_string)
     date_only = datetime_object.date()
     return date_only
+
+
+from django.db.models import Q
+
+def checkTruckAndDriverAvailability(shiftObj, tripObj, endDateTime, startDateTime):
+    driverId = shiftObj.driverId
+    truckConnectionId = tripObj.truckConnectionId
+
+    existing_trips = DriverShiftTrip.objects.filter(
+        ~Q(shiftId=shiftObj.id), 
+        Q(truckConnectionId = truckConnectionId) , 
+        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+    )
+    
+    existing_shifts = DriverShift.objects.filter(
+        ~Q(pk=shiftObj.id), 
+        Q(driverId = driverId) , 
+        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+    )
+    print(existing_shifts,existing_trips)
+    if existing_shifts or existing_trips:
+        return False
+    else:
+        return True
+        
+    existing_trips = DriverShiftTrip.objects.filter(
+        Q(startDateTime__lt=endDateTime, endDateTime__gt=startDateTime) &
+        ~Q(id=tripObj.id)  # Exclude the current trip
+    ).exists()
+
+    # If either shifts or trips exist within the given time range
+    if existing_shifts or existing_trips:
+        return True
+    else:
+        return False
+
+
+

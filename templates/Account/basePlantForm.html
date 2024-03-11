@@ -46,94 +46,108 @@
 
     <div class="row">
         <div class="col-md-12 col-sm-12">
-            <form class="" action="{% if basePlant %} {% url 'Account:basePlantEditSave' id=basePlant.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" method="POST">
+            {% if basePlant %}
+            <div class="float-right">
+                <a href="{% url 'Account:basePlantHistory' id=basePlant.id %}" class="btn btn-sm btn-history">History</a>
+            </div>
+            {% endif %}
+            <form class="" action="{% if basePlant %} {% url 'Account:basePlantEditSave' id=basePlant.id %} {% else %} {% url 'Account:basePlantAddSave' %} {% endif %}" novalidate method="POST">
                 {% csrf_token %}
             <div class="x_panel">
                 <div class="x_title">
                     <h2>{% if basePlant %}Edit{% else %}Add{% endif %} Depot / Location</h2>
-                    <div class="float-right">
+                    <!-- <div class="float-right">
                         <input type="checkbox"  id="clientDepot" onclick="clientDepotFun()"value="clientDepot" name="clientDepot" style="margin-top: .8rem;" {% if basePlant.clientDepot is True %} checked {% endif %}>
                         <label for="clientDepot" class=" ml-2"style="margin-right: 1rem;">Depot</label>
                         <input type="checkbox" id="clientBasePlant" onclick="clientBasePlantFun()" value="clientBasePlant" name="clientBasePlant"style="margin-top: .8rem;" {% if basePlant.clientBasePlant is True %} checked {% endif %}>
                         <label for="clientBasePlant" class="ml-2"style="margin-right: 1rem;">BasePlant</label>
+                    </div> -->
+                    <div class="float-right">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="clientDepot" onclick="clientDepotFun()" value="clientDepot" name="clientDepot" {% if basePlant.clientDepot is True %} checked {% endif %}>
+                            <label class="form-check-label" for="clientDepot">Depot</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="clientBasePlant" onclick="clientBasePlantFun()" value="clientBasePlant" name="clientBasePlant" {% if basePlant.clientBasePlant is True %} checked {% endif %}>
+                            <label class="form-check-label" for="clientBasePlant">BasePlant</label>
+                        </div>
                     </div>
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content">
-                    <div class="cuatom-continer">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="basePlant">Deport Name:<span class="required">*</span></label>
-                                    <input class="form-control" type="text" name="basePlant" required  value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" id="city">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="address">Address:<span class="required">*</span></label>
-                                    <input class="form-control" type="text" name="address" required  value="{% if basePlant %}{{ basePlant.address }}{% endif %}" id="address">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="phone">Phone:<span class="required">*</span></label>
-                                    <input class="form-control" type="number" name="phone" required  value="{% if basePlant %}{{ basePlant.phone }}{% endif %}" id="phone">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="personOnName">Person Name:<span class="required">*</span></label>
-                                    <input class="form-control" type="text" name="personOnName" required  value="{% if basePlant %}{{ basePlant.personOnName }}{% endif %}" id="personOnName">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="managerName">Manager Name:<span class="required">*</span></label>
-                                    <input class="form-control" type="text" name="managerName" required  value="{% if basePlant %}{{ basePlant.managerName }}{% endif %}" id="managerName">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="lat">Latitude:<span class="required">*</span></label>
-                                    <input class="form-control" type="number" name="lat" required  value="{% if basePlant %}{{ basePlant.lat }}{% endif %}" id="latitude">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="long">Longitude:<span class="required">*</span></label> <a href="#" class="text-danger" onclick="showMap()"> Map</a>
-                                    <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="longitude">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="depotCode">Depot Code:</label> 
-                                    <input class="form-control" type="number" name="depotCode"   value="{% if basePlant %}{{ basePlant.depotCode }}{% endif %}" id="depotCode">
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="email">Email :<span class="required">*</span></label> 
-                                    <input class="form-control" type="email" name="email" required  value="{% if basePlant %}{{ basePlant.email }}{% endif %}" id="email">
-                                </div>
-                            </div>
-                            <!-- <div class="col-sm-12 clientOfficeId {% if  basePlant.clientDepot is False  and basePlant.clientBasePlant is False %}d-none{% endif %} "> -->
-                            <div class="col-sm-12 clientOfficeId {% if  basePlant is None or basePlant.clientBasePlant is False %}d-none{% endif %} ">
-                                <div class="form-group">
-                                    <label for="clientOfficeId">Client Office  :<span class="required">*</span></label> 
-                                    <select class="form-control" {% if  basePlant.clientDepot and  basePlant.clientBasePlant or  basePlant %}required{% endif %} name="clientOfficeId" id="clientOfficeId">
-                                        <option value="" disabled selected> Select Client Office</option>
-                                        {% for clientOffice in clientOfficeObj %}
-                                        <option value="{{clientOffice.id}}" {% if clientOffice.id == basePlant.clientOfficeId.id %}selected{% endif %} > {{clientOffice.clientId.name}} - {{clientOffice.description}}</option>
-                                        
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="basePlant">Deport Name:<span class="required">*</span></label>
+                                <input class="form-control" type="text" name="basePlant" required  value="{% if basePlant %}{{ basePlant.basePlant }}{% endif %}" id="city">
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 col-sm-12 text-right">
-                                <button type='submit' class="btn btn-default btn sm px-4">Submit</button>
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="address">Address:<span class="required">*</span></label>
+                                <input class="form-control" type="text" name="address" required  value="{% if basePlant %}{{ basePlant.address }}{% endif %}" id="address">
                             </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="phone">Phone:<span class="required">*</span></label>
+                                <input class="form-control" type="number" name="phone" required  value="{% if basePlant %}{{ basePlant.phone }}{% endif %}" id="phone">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="personOnName">Person Name:<span class="required">*</span></label>
+                                <input class="form-control" type="text" name="personOnName" required  value="{% if basePlant %}{{ basePlant.personOnName }}{% endif %}" id="personOnName">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="managerName">Manager Name:<span class="required">*</span></label>
+                                <input class="form-control" type="text" name="managerName" required  value="{% if basePlant %}{{ basePlant.managerName }}{% endif %}" id="managerName">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group field">
+                                <label for="depotCode">Depot Code:</label> 
+                                <input class="form-control" type="number" name="depotCode"   value="{% if basePlant %}{{ basePlant.depotCode }}{% endif %}" id="depotCode">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group field">
+                                <label for="email">Email :<span class="required">*</span></label> 
+                                <input class="form-control" type="email" name="email" required  value="{% if basePlant %}{{ basePlant.email }}{% endif %}" id="email">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group field">
+                                <label for="lat">Latitude:<span class="required">*</span></label>
+                                <input class="form-control" type="number" name="lat" required  value="{% if basePlant %}{{ basePlant.lat }}{% endif %}" id="latitude">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group field">
+                                <label for="long">Longitude:<span class="required">*</span></label> <a href="#" class="text-danger" onclick="showMap()"> Map</a>
+                                <input class="form-control" type="number" name="long" required  value="{% if basePlant %}{{ basePlant.long }}{% endif %}" id="longitude">
+                            </div>
+                        </div>
+                       
+                        <!-- <div class="col-sm-12 clientOfficeId {% if  basePlant.clientDepot is False  and basePlant.clientBasePlant is False %}d-none{% endif %} "> -->
+                        <div class="col-sm-12 clientOfficeId {% if  basePlant is None or basePlant.clientBasePlant is False %}d-none{% endif %} ">
+                            <div class="form-group field">
+                                <label for="clientOfficeId">Client Office  :<span class="required">*</span></label> 
+                                <select class="form-control" {% if  basePlant.clientDepot and  basePlant.clientBasePlant or  basePlant %}required{% endif %} name="clientOfficeId" id="clientOfficeId">
+                                    <option value="" disabled selected> Select Client Office</option>
+                                    {% for clientOffice in clientOfficeObj %}
+                                    <option value="{{clientOffice.id}}" {% if clientOffice.id == basePlant.clientOfficeId.id %}selected{% endif %} > {{clientOffice.clientId.name}} - {{clientOffice.description}}</option>
+                                    
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 text-right">
+                            <button type='submit' class="btn btn-sm btn-default btn sm px-3 mr-0">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -155,6 +169,8 @@
     </div>
 </div>
 <!-- /page content -->
+{% endblock %}
+
 
 {% block footerStyle %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -167,6 +183,28 @@
     integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+    // A "<form>" element is optionally passed as an argument, but is not a must
+    var validator = new FormValidator({
+        "events": ['blur', 'input', 'change']
+    }, document.forms[0]);
+    // on form "submit" event
+    document.forms[0].onsubmit = function (e) {
+        var submit = true,
+            validatorResult = validator.checkAll(this);
+        console.log(validatorResult);
+        return !!validatorResult.valid;
+    };
+    // on form "reset" event
+    document.forms[0].onreset = function (e) {
+        validator.reset();
+    };
+    // stuff related ONLY for this demo page:
+    $('.toggleValidationTooltips').change(function () {
+        validator.settings.alerts = !this.checked;
+        if (this.checked)
+            $('form .alert').remove();
+    }).prop('checked', false);
+
     function clientDepotFun() {
         var clientDepot = document.getElementById("clientDepot").checked;
         var clientBasePlant = document.getElementById("clientBasePlant").checked;
@@ -236,5 +274,4 @@
         });
     }
 </script>
-{% endblock %}
 {% endblock %}

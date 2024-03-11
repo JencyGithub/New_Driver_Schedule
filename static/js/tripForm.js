@@ -1,12 +1,103 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 $(document).ready(function () {
-  if (!$("#verified").val()) {
-    $(":input , select").prop("disabled", true);
+  // Retrieve the value of #veriFied
+  var veriFiedValue = $("#veriFied").val();
+  if (veriFiedValue === "True") {
+    $("#tripForm :input , #tripForm select").prop("disabled", true);
     $("#verified").css("display", "none");
   }
 });
 
+function verifiedBtnFun(shiftId){
+  $.ajax({
+    type: "POST",
+    url: "/account/get/last/trip/",
+    data: {
+        shiftId: shiftId
+    },
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    },
+    success: function (data) {
+      if (data.tripId) {
+        var endDateTimeValue = $('#endDateTime' + data.tripId).val();
+        var emptyField = '';
+        $('#tripForm input[required]').each(function() {
+            if ($(this).val() === '') {
+                emptyField = $(this).attr('name') || $(this).attr('id') || 'an input field';
+                return false; // Exit the loop early if an empty required field is found
+            }
+        });
+        if (endDateTimeValue == ''){
+          alert('You have to not add endtime')
+          return false;
+        }
+        if (emptyField !== ''){
+          alert('Please fill the ' + emptyField + '.');
+          return false;
+        }
+
+        else{
+          $('#shiftEndTimeModel').modal('show');
+          $('#oldShiftEndTime').val(endDateTimeValue);
+          $('#shiftEndTime').val(endDateTimeValue);
+        }
+
+        
+      }
+    },
+  });
+}
+
+function shiftEndTimeFun() {
+  var newShiftEndTimeInput = document.getElementById("shiftEndTime");
+  var oldShiftEndTimeInput = document.getElementById("oldShiftEndTime");
+  var newDateTime = newShiftEndTimeInput.value;
+  var oldDateTime = oldShiftEndTimeInput.value;
+
+  var newDate = new Date(newDateTime);
+  var oldDate = new Date(oldDateTime);
+
+  if (newDate < oldDate) {
+      alert("New end date and time cannot be earlier than the old end date and time.");
+      $('#oldShiftEndTime').val(oldDate);
+      $('#shiftEndTime').val(oldDate);
+      newShiftEndTimeInput.value = oldDateTime;
+  }
+  else {
+    $('#veriFied').val('True');
+    setDateTime('currentDateTime')
+    $('#tripForm input[name="shiftEndTime"]').val(newDateTime);
+    var emptyField = '';
+    $('#tripForm input[required]').each(function() {
+        if ($(this).val() === '') {
+            emptyField = $(this).attr('name') || $(this).attr('id') || 'an input field';
+            return false; // Exit the loop early if an empty required field is found
+        }
+    });
+
+    if (emptyField !== '') {
+        alert('Please fill the ' + emptyField + '.');
+        return false;
+    } else {
+        $('#tripForm').submit();
+    }
+  }
+}
+
+function byPassPreStartFun(tripId){
+  var checkbox = document.getElementById(`byPassPreStart${tripId}`);
+  var isChecked = checkbox.checked;
+  if (isChecked){
+    $(`.startDateTime${tripId}`).removeClass('d-none')
+    $(`#startDateTime${tripId}`).attr('required',true)
+  }
+  else{
+    $(`.startDateTime${tripId}`).addClass('d-none')
+    $(`#startDateTime${tripId}`).removeAttr('required',false)
+  }
+}
 $('.ocrBtn').on('click', function(){
   let element = $(this)
   let elementId = $(this).attr('id').replace('ocr', '')
@@ -32,7 +123,12 @@ $('.ocrBtn').on('click', function(){
   });
 })
 
+function endTripFun(tripId){
+  $(`#endDateTime`+tripId).prop('readonly',false);
+  $(`#endDateTime`+tripId).prop('disabled',false);
+  $(`#subBtn`).prop('disabled',false);
 
+}
 
 function hideshow() {
   var password = document.getElementById("password1");
@@ -58,11 +154,13 @@ var validator = new FormValidator(
 );
 // on form "submit" event
 document.forms[0].onsubmit = function (e) {
+  setDateTime('currentDateTime')
+  $('input[name="csrfmiddlewaretoken"], #currentDateTime').removeAttr('disabled')
   var submit = true,
     validatorResult = validator.checkAll(this);
-  console.log(validatorResult);
-  return !!validatorResult.valid;
+  // return !!validatorResult.valid;
 };
+
 // on form "reset" event
 document.forms[0].onreset = function (e) {
   validator.reset();
@@ -74,6 +172,7 @@ $(".toggleValidationTooltips")
     if (this.checked) $("form .alert").remove();
   })
   .prop("checked", false);
+
 
   function showBreaks(shiftId){
       $("#driverBreaks").modal("show");
@@ -200,9 +299,14 @@ function openStandByEnd(lineData, count_) {
     $(`#standByEndTime${count_}`).removeAttr("readonly");
   }
 }
+function setDocketNumberFun(docketNumber,docketId){
+  docketNumber_ = $(`#docketNumber_`).val(docketNumber)
+  $('#editDocketModel #docketSubBtn').attr('onclick' ,`docketUpdate(${docketId})`)
+
+}
 function docketUpdate(docketId) {
   let docketId_ = docketId;
-  let docketNumber_ = $(`#docketNumber_${docketId_}`).val();
+  let docketNumber_ = $(`#editDocketModel #docketNumber_`).val();
   console.log(docketNumber_);
   if (docketId) {
     $.ajax({

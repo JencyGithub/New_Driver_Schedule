@@ -1,4 +1,4 @@
-{% extends "main/main.html" %} {% load static %} {% block title %} | Driver change{% endblock %} {% block headStyle %}
+ {% extends "main/main.html" %} {% load static %} {% block title %} | Driver change{% endblock %} {% block headStyle %}
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
@@ -7,9 +7,13 @@
 <div class="right_col" role="main">
     <div class="">
         <div class="clearfix"></div>
-
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                {% if data %}
+                    <div class="float-right">
+                        <a href="{% url 'gearBox:driverHistory' driverId=data.driverId %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                {% endif %}
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>{% if data %}Edit{% else %}Add{% endif %} driver</h2>
