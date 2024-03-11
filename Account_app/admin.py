@@ -537,7 +537,7 @@ class DriverShift_(admin.ModelAdmin):
 admin.site.register(DriverShift,DriverShift_)
 
 class DriverShiftTrip_(admin.ModelAdmin):
-    list_display = ['verified','shiftId','truckConnectionId','revenueDeficit','numberOfLoads']
+    list_display = ['verified','shiftId','truckConnectionId','startDateTime','numberOfLoads']
     search_fields = ["truckConnectionId","shiftId"]
 admin.site.register(DriverShiftTrip,DriverShiftTrip_)
 

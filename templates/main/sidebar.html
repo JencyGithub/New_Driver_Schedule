@@ -30,7 +30,7 @@
 
           <li class=""><a href="{% url 'Account:index'%}"><i class="fa fa-desktop"></i> Dashboard</a></li>
           {% endif %}
-          <li class=""><a href="{% url 'Account:mapFormView' %}"><i class="fa fa-truck"></i> DriverTrip</a></li>
+          <li class=""><a href="{% url 'Appointment:createShift' %}"><i class="fa fa-truck"></i> Create Driver Shift</a></li>
         </ul>
         {% if request.session.user_type == 'Accounts' or request.session.user_type == 'SuperUser' or request.session.user_type == 'HR' %}
         <ul class="nav side-menu">
@@ -168,7 +168,7 @@
                   {% comment %} Driver Trip form data {% endcomment %}
                   <li><a href="{% url 'Account:DriverShiftForm' id=2 %}">Ongoing Jobs</a></li>
                   <li><a href="{% url 'Account:DriverShiftForm' id=0 %}">Completed Jobs</a></li>
-                  <li><a href="{% url 'Appointment:createShift' %}">Create shift</a></li>
+                  {% comment %} <li><a href="{% url 'Appointment:createShift' %}">Create shift</a></li> {% endcomment %}
                 </ul>
               </li>
               <li><a>Invoicing<span class="fa fa-chevron-down"></span></a>

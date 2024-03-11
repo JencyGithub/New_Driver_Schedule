@@ -49,7 +49,11 @@
                         <div class="ms-auto d-flex justify-content-between flex-wrap">
                             <h5 class="card-title text-uppercase text-default">Current Status</h5>
                             <div class="p-1 ms-auto">
-                                <a href="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=0 %}" class="btn btn-sm btn-default">Change Client/Truck</a>
+                                <form id="changeTruckForm" action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=0 %}" class="btn btn-sm btn-default" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="dateTime" id="dateTime">
+                                    <button type="submit" id="changeClientBtn" class="btn btn-sm btn-default">Change Client/Truck</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -101,7 +105,7 @@
                             {% endfor %} 
                             <form action="{% url 'Account:collectDockets' shiftId=shiftObj.id tripId=tripObj.id endShift=1 %}" method="post">
                                 {% csrf_token %}
-                                <input type="hidden" name="dateTime" id="dateTime">
+                                <input type="hidden" name="dateTime" id="endShiftDateTime">
                                 <div class="col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col-md-8 col-sm-8 my-2">
@@ -206,6 +210,10 @@
 
 {% block footerStyleEnd %}
 <script>
+    $(`#changeClientBtn`).on('click',function(){
+        setDateTime('dateTime')
+        $('#changeTruckForm').submit()
+    })
     $(document).ready(function(){
         $('#forgetEnd').on('change', function(){
             if($(this).is(':checked')){
@@ -218,7 +226,7 @@
         })
 
         $('#endShift').on('click', function(event) {
-            setDateTime("dateTime");            
+            setDateTime("endShiftDateTime");            
             if ($('#forgetEnd').is(':checked')) {
                 if(!$('#endDateTime').val()){
                     console.log($('#endDateTime').val())

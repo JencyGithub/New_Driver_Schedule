@@ -171,6 +171,7 @@ urlpatterns = [
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
+    path('ongoing/shift/end/<int:tripId>/', views.ongoingShiftEnd, name='ongoingShiftEnd'), 
     path('driverShift/archive/<int:shiftId>/', views.DriverShiftArchive, name='DriverShiftArchive'), 
     path('driverShift/restore/<int:shiftId>/', views.RestoreDriverShift, name='RestoreDriverShift'),
     path('driverTrip/update/<int:shiftId>/', views.driverEntryUpdate, name='driverEntryUpdate'), 
@@ -178,6 +179,7 @@ urlpatterns = [
     path('driverTrip/entry/<int:shiftId>/', views.tripEntry, name='tripEntry'), 
     path('get/driver/break/', views.getDriverBreak, name='getDriverBreak'), 
     path('check/trip/deficit', views.checkTripDeficit, name='checkTripDeficit'), 
+    path('get/last/trip/', views.getLastTrip, name='getLastTrip'), 
     
     path('ocr/read/', views.ocrRead, name='ocrRead'), 
     
