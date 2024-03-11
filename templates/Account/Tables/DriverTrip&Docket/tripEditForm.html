@@ -47,7 +47,13 @@
         }
     }
 
-    
+    .alert-warning{
+        background-color: rgb(243 156 18 / 60%)!important;
+        border:  rgb(243 156 18 / 60%)!important;
+        color:#111!important;
+        padding: 0.5rem 1rem!important;
+        margin-bottom:0!important;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -56,14 +62,18 @@
     <div class="">
         <div class="clearfix"></div>
         <div class="row">
+            
             <div class="col-md-12 col-sm-12">
-                <form class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" novalidate enctype="multipart/form-data">
-                    {% csrf_token %}                    
-                    <div class="x_title">
+                
+                <form id="tripForm" class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}"    enctype="multipart/form-data">
+                    {% csrf_token %}   
+                    <input type="hidden" name="currentDateTime"  id="currentDateTime">
+                    <input class="form-control" id="veriFied" value="{{shiftObj.verified}}" type="hidden"   name="veriFied">
+                    <input class="form-control"   type="hidden" name="shiftEndTime" style="padding: 0.25rem 0.2rem;"  >
 
+                    <div class="x_title">
                         <h2>Shift Details</h2> 
                         <b class="d-inline-block m-1 mt-2 text-secondary">(started from {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">location</span>{% else %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
-                        
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified %}
                             {% comment %} {% if shiftObj.archive %}
@@ -72,33 +82,36 @@
                                 <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Archive"><i class="fa-solid fa-box-archive text-default" style="font-size: 1.5rem;"></i></a>
                             {% comment %} {% endif %} {% endcomment %}
                         {% endif %}
-                    
-
-
-                        {% if not shiftObj.verified and shiftObj.endDateTime %}
-                        
-                            <label for="verified" class="float-right ml-2" style="margin-right: 1rem; padding-top:0.7rem;">Verified</label>
-                            <input type="checkbox" id="verified" name="verified" value = 'True' {% if shiftObj.verified %}checked{% endif %}  class="float-right" style="margin-top: .8rem;"> 
-                            {% comment %} onclick="checkDeficitFun('{{shiftObj.id}}')" {% endcomment %}
-                        {% endif %}
-
                         <div class="clearfix"></div>
                     </div>
+
                     {% for trip in driverTrip %}
+                    
                         <div class="x_panel">
-                            <div class="x_title">
-                                <h2 class="text-primary">Trip {{forloop.counter}}</h2>{% if trip.preStartObj %}<b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b>{% endif %}
+                            <div class="x_title mb-0">
+                                <h2 class="text-primary">Trip {{forloop.counter}}</h2>
+                                {% if trip.preStartObj %}<b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b>{% endif %}
                                 {% if trip.revenueDeficit > 0 %}
                                 <i class="text-danger float-right" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
                                 {% endif %}
-                                {% if shiftObj.verified is False %}
-                                <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}"
-                                class="float-right btn btn-dark btn-sm">Add Docket</a>
-                                {% endif %}
+                                {% if shiftObj.verified is False and trip.startDateTime %}
+                                <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}" class="float-right btn btn-dark btn-sm">Add Docket</a> {% endif %}
                                 <div class="clearfix"></div>
+                                
                             </div>
-
                             <div class="x_content ">
+                                {% if shiftObj.verified is False %}
+                                <div class="alert alert-warning col-12">
+                                <small > Trip timings not available as driver has not filled pre start.  </small> 
+                                    <div class="float-right">
+                                        <input  type="checkbox"
+                                            name="byPassPreStart{{trip.id}}"   style="padding: 0.25rem 0.2rem;"
+                                            id="byPassPreStart{{trip.id}}" onchange="byPassPreStartFun('{{trip.id}}')">
+                                        <label for="byPassPreStart{{trip.id}}">By pass pre start end edit trip timing:</label>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <br>
                                 <div class="custom-continer">
                                     <!-- driver-id client-name shift-type  -->
                                     <div class="col-md-4 col-sm-4">
@@ -116,7 +129,6 @@
                                         <div class="field item form-group">
                                             <select readonly required name="clientName{{trip.id}}" class="form-control">
                                                 <option value=""disabled selected>Select Client Name</option>
-
                                                 {% for C_id in Client %}
                                                 <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
                                                 {% endfor %}
@@ -145,7 +157,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="truckNo{{trip.id}}">Truck No:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select {% if not superUser %}disabled{% endif %} class="form-control" required id="truckNo{{trip.id}}" name="truckNo{{trip.id}}">
+                                            <select disabled class="form-control" required id="truckNo{{trip.id}}" name="truckNo{{trip.id}}">
                                                 <option value="" disabled selected>Select Truck No</option>
                                                 {% for truck in trip.clientTruckConnectionObj %}
                                                 <option value="{{ truck.id }}" {% if trip.truckConnectionId == truck.id %}selected="selected"{% endif %}>{{ truck.clientTruckId }} - {{truck.truckNumber.adminTruckNumber}}
@@ -154,31 +166,15 @@
                                             </select>
                                         </div>
                                     </div> 
-                                    <div class="col-md-4 col-sm-4">
+                                    <!-- <div class="col-md-4 col-sm-4">
                                         <label for="shiftDate">Shift Date:<span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <input disabled class="form-control" value="{{shiftObj.shiftDate}}" type="date"
                                                 name="shiftDate" required='required' style="padding: 0.25rem 0.2rem;"
                                                 id="shiftDate">
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <!-- startTime    endTime    loadSheet -->
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="startDateTime{{trip.id}}">Start Time :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input readonly class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                                name="startDateTime{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
-                                                id="startDateTime{{trip.id}}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="endDateTime{{trip.id}}">End Time :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                            readonly  name="endDateTime{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
-                                                id="endDateTime{{trip.id}}">
-                                        </div>
-                                    </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="loadSheet{{trip.id}}">LogSheet :<span class="required">*</span></label>
                                         {% if trip.loadSheet is None %}
@@ -191,6 +187,28 @@
                                                 style="padding: 0.25rem 0.2rem;" id="loadSheet{{trip.id}}">
                                         </div>
                                     </div>
+
+                                    <div class="col-md-4 col-sm-4  startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
+                                        <label for="startDateTime{{trip.id}}">Start Time : <span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input  class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                            name="startDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
+                                            id="startDateTime{{trip.id}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4 startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
+                                        <!-- {% if numberOfLoadsCount != 0 and shiftObj.startDateTime   %}
+                                        <label class="float-right" for="endDateTime"> <a  onclick="endTripFun('{{trip.id}}')">End Shift :</a></label>
+                                        {% endif %} -->
+                                        <label for="endDateTime{{trip.id}}">End Time :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                            name="endDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
+                                                id="endDateTime{{trip.id}}">
+                                        </div>
+                                    </div>
+                                    
+                                    
                                     <!-- comment  -->
                                     <div class="col-md-12 col-sm-12">
                                         <label for="comment{{trip.id}}">Comment :<span class="required">*</span></label>
@@ -232,7 +250,7 @@
                                         <label for="docketNumber{{docket.id}}">Docket Number :<span class="required">*</span></label>
                                         {% if shiftObj.verified != True%}
                                         
-                                        <a href="" class="text-primary" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
+                                        <a href="" class="text-primary" onclick="setDocketNumberFun('{{docket.docketNumber}}','{{docket.id}}')" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
                                         {% endif %}
                                         <div class="field item form-group">
                                             <input class="form-control" readonly value="{{docket.docketNumber}}" type="text"
@@ -240,34 +258,7 @@
                                                 style="padding: 0.25rem 0.2rem;" id="docketNumber{{docket.id}}">
                                         </div>
                                     </div>
-                                    <!-- docket Edit Model  -->
-
-                                    <div class="modal fade" id="editDocketModel" tabindex="-1" role="dialog" aria-labelledby="editDocketModelLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 class="modal-title" id="editDocketModelLabel">Docket Edit</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                            </button>
-                                            </div>
-                                                {% csrf_token %}
-                                                <div class="modal-body">
-                                                        <div class="modal-body">
-                                                            <label for="docketNumber_{{docket.id}}">Docket Number :<span class="required">*</span></label>
-                                                            <div class="field item form-group">
-                                                            <input class="form-control" type="text" name="docketNumber_{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;"
-                                                                id="docketNumber_{{docket.id}}">
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                <button type="button" onclick="docketUpdate('{{docket.id}}')" class="btn btn-sm btn-primary">Save </button>
-                                                </div>
-
-                                        </div>
-                                        </div>
-                                    </div>
+                                    
                                     <div class="col-md-4 col-sm-4">
                                         <label for="docketFile{{docket.id}}">Docket File :<span class="required">*</span></label>
                                         {% if docket.docketFile %}
@@ -415,56 +406,117 @@
                         {% endfor %}
                     {% endfor %}
 
-                    {% if shiftObj.verified is  False  %}
+                    
+                    {% if not shiftObj.verified  and shiftObj.startDateTime  %}
                     <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
-                        <button type='submit' class="btn btn-sm btn-default px-3">Save</button>
+                        <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
+                        {% if numberOfLoadsCount != 0 %}
+                        <button id = "verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">End shift & reconcile</button>
+                        {% endif %}
                     </div>
                     {% endif%}
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+<!-- docket Edit Model  -->
+
+<div class="modal fade" id="editDocketModel" tabindex="-1" role="dialog" aria-labelledby="editDocketModelLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDocketModelLabel">Docket Edit</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% csrf_token %}
+            <div class="modal-body">
+                    <div class="modal-body">
+                        <label for="docketNumber_">Docket Number :<span class="required">*</span></label>
+                        <div class="field item form-group">
+                        <input class="form-control" type="text" name="docketNumber_" required='required' style="padding: 0.25rem 0.2rem;"
+                            id="docketNumber_">
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" id="docketSubBtn"  class="btn btn-sm btn-primary">Save </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- exit trip and reconcile model  -->
+<div class="modal fade" id="shiftEndTimeModel" tabindex="-1" role="dialog" aria-labelledby="shiftEndTimeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shiftEndTimeLabel">Shift End Time</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 col-sm-12">
+                    <label for="shiftEndTime"> Shift End Date :</label>
+                    <div class="field item form-group">
+                        <input class="form-control"   type="datetime-local" name="shiftEndTime" style="padding: 0.25rem 0.2rem;" required="required" id="shiftEndTime">
+                    </div>
+                </div>
+            </div>
+            <input class="form-control"   type="hidden" name="oldShiftEndTime" style="padding: 0.25rem 0.2rem;" required="required" id="oldShiftEndTime">
+            <div class="modal-footer">
+                <button onclick="shiftEndTimeFun()"  class="btn btn-default btn-sm">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Break modal -->
 <div class="modal fade bd-example-modal-lg" id="driverBreaks" tabindex="-1" role="dialog" aria-labelledby="driverBreaksLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
+    <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="driverBreaksLabel">DriverBreaks</h5>
-          <span type="button" class="close">&times;</span>
+        <h5 class="modal-title" id="driverBreaksLabel">DriverBreaks</h5>
+        <span type="button" class="close">&times;</span>
         </div>
         <div class="modal-body">
             <table class="table">
                 <thead class="thead-dark">
-                  <tr>
+                <tr>
                     <th scope="col">Start</th>
                     <th scope="col">End</th>
                     <th scope="col" class='w-50'>Description</th>
-                  </tr>
+                </tr>
                 </thead>
                 <tbody>
                     
                 </tbody>
             </table>
         </div>
-      </div>
+    </div>
     </div>
 </div>
 
 <!-- Location modal -->
 <div class="modal fade bd-example-modal-xl" tabindex="-1" id="locationModal">
     <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header py-2">
-          <h5 class="modal-title">Location</h5>
-        </div>
-        <div class="modal-body p-0">
-            <div id="map"></div>
-        </div>
-      </div>
+    <div class="modal-content">
+    <div class="modal-header py-2">
+        <h5 class="modal-title">Location</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-  </div>
+    <div class="modal-body p-0">
+        <div id="map"></div>
+    </div>
+    </div>
+    </div>
+</div>
 
 
 <!-- /page content -->
@@ -477,6 +529,7 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script src="{% static 'js/tripForm.js' %}"></script>
 <script>
+    
     function showMap() {
         var cityName = document.getElementById('city').value;
         var latitude = parseFloat(document.getElementById('latitude').value);

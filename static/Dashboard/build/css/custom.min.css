@@ -8,6 +8,23 @@
 	color: white;
 }
 
+.btn-history{
+	color: #212529;
+    background-color: #dae0e5;
+    border-color: #d3d9df;
+	font-size: 0.9em;
+    padding: 0.1em 0.4em;
+}
+
+.btn-history:hover{
+	border: 1px solid #bdbdbd;
+    background: transparent;
+}
+
+.btn-history:focus {
+    box-shadow: 0 0 0 0.2rem rgb(136 136 136 / 25%);
+}
+
 @font-face {
 	font-family: 'Glyphicons Halflings';
 	src: url("https://netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.eot");

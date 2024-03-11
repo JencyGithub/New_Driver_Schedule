@@ -19,13 +19,18 @@
             top: 1.15em!important;
             right: 0.8em!important;
         }
+        .btn-outline-danger{
+            font-size: 0.75em;
+            padding: 0.3em 0.5em;
+        }
     </style>
 {% endblock %}
 {% block content %}
 <div class="container mt-2" id="container">
     <div class="card border-0">
         <div class="card-body">
-            <h5 class="card-title text-uppercase text-default">Select client and truck number</h5>
+            <h6 class="card-title text-uppercase text-default d-inline-block">Select client and truck number</h6>
+            <span class="btn btn-sm btn-outline-danger float-end" id="endShift">End Shift</span>
             <hr>  
             <form action="{% url 'Account:clientAndTruckDataSave' id=shiftObj.id %}" method="POST" id="clientForm">
                 {% csrf_token %}
@@ -78,6 +83,36 @@
     </div>
 </div>
 
+<div class="modal fade bd-example-modal-lg" role="dialog" id="endShiftModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <form action="{% url 'Account:endShift' shiftId=shiftObj.id %}" novalidate method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="curDateTime" id="curDateTime">
+            <div class="modal-header py-2">
+                <h6>End Shift</h6>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-5 col-sm-5">
+                        <label for="endShiftImg">Upload image:</label>
+                        <input type="file" class="form-control" id="endShiftImg" name="endShiftImg" capture="camera" required> 
+                    </div>
+                    <div class="col-md-7 col-sm-7">
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="1" required placeholder="Add your reason to end shift."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="cancelBtn" data-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-sm btn-default">End shift</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
 {% block footerStyleEnd %}
 <!-- select2 for searching dropdown -->
@@ -93,6 +128,26 @@
         );
         $('#clientId').select2();
         $('#truckNum').select2();
+        $('#endShiftModal #cancelBtn').on('click', function(){
+          $('#endShiftModal').modal('hide')  
+        })
+
+        $('#endShiftModal form').submit(function (e) {
+            setDateTime("curDateTime")
+            let isValid = true
+            $('#endShiftModal form input[required], #endShiftModal form textarea[required]').each(function(){
+                if($(this).val() == ''){
+                    $(this).addClass('is-invalid')
+                    isValid = false
+                    return
+                }else{
+                    $(this).removeClass('is-invalid')
+                }
+            })
+            if(!isValid){
+                e.preventDefault();
+            }
+        });
         
         $("#clientId").on("change", function () {
             let currentDate = new Date();    
@@ -133,6 +188,39 @@
                 });
             }
         });
+        
+
+        $("#endShift").on('click', function(){
+            var shiftId = "{{ shiftObj.id }}"
+            $.ajax({
+                type: "POST",
+                url: "/account/check/trip/",
+                data: {
+                    shiftId: shiftId
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    if(data.status){
+                        if(data.oldTrips){
+                            if(confirm("Are you really want to  end this shift?") == true) { 
+
+                                $('#endShiftModal #endShiftImg').removeAttr('required').parent('.col-md-5').addClass('d-none')
+                                $('#endShiftModal #comment').val('')
+
+                                $('#endShiftModal').modal('show')
+                            }
+                        }else{
+                            if(confirm("It seems like you want to end your shift without driving a truck. Do you really want to end your shift?") == true) { 
+                                $('#endShiftModal').modal('show')
+                            }
+                        }
+                    }
+                },
+            });
+
+        })
     });
 </script>
-{% endblock  %}
+{% endblock %}

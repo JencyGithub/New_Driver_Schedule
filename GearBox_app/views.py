@@ -17,6 +17,8 @@ from django.contrib.auth.hashers import make_password
 from django.core.serializers import serialize
 from django.http import FileResponse
 import pandas as pd
+from django.urls import reverse
+
 
 # Create your views here.
 def leaveReq(request):
@@ -1063,3 +1065,51 @@ def uploadBulkData(request):
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+
+# ---------------------------
+# History Functions
+# ---------------------------
+
+def driverHistory(request, driverId):
+    data = Driver.history.filter(driverId=driverId).values('history_type','history_date','history_user_id','driverId','name','phone','email','password','firstName','middleName','lastName').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Driver HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def clientHistory(request, clientId):
+    data = Client.history.filter(clientId=clientId).values('history_type','history_date','history_user_id','name','email','docketGiven').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    
+    params = {
+        'data' : data,
+        'title' : 'Client HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+    
+def clientOfficeHistory(request, clientOfcId):
+    data = ClientOffice.history.filter(id=clientOfcId).values('history_type','history_date','history_user_id','locationType','description','address1','address2','city','state','country','postalCode').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+            
+    except:
+        pass
+    
+    params = {
+        'data' : data,
+        'title' : 'Client Office HIstory'
+    }
+    return render(request, 'historyTable.html', params)

@@ -50,6 +50,7 @@
     .col-4{
         padding-left: 10px;
     }
+
 </style>
 
 {% endblock %} 
@@ -62,6 +63,11 @@
 
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                {% if data %}
+                    <div class="float-right">
+                        <a href="{% url 'gearBox:clientHistory' clientId=data.clientId %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                {% endif %}
                 <form action="{% if data %}{% url 'gearBox:clientEditSave' id=data.clientId %} {% else %}{% url 'gearBox:clientAddSave' %}{% endif %}" method="POST" novalidate>
                     {% csrf_token %}
                     <div class="x_panel">
@@ -128,7 +134,6 @@
                             <div class="col-sm-3 col-md-3 field">
                                 <label for="addCountry">Country:<span class="required">*</span></label>
                                 <select name="addCountry" id="addCountry" class="form-control" required>
-
                                 </select>
                                 <!-- <input type="text" name="addCountry" id="addCountry" class="form-control" required> -->
                             </div>
@@ -179,7 +184,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     {% else %}
                         <div class="row">
@@ -207,7 +211,10 @@
                                             <p class="m-0">{{ ofc.address1 }}</p>
                                             <p class="mb-1"><span>{{ ofc.city }}</span>, <span>{{ ofc.state }}</span>, <span>{{ ofc.postalCode }}</span></p>
                                             <br>
-                                            <a href="{% url 'Account:rateCardTableClientOfc' clientId=data.clientId clientOfcId=ofc.id %}" title="Rate cards"><i class="fa-solid fa-clipboard float-right" style="font-size: 1.2rem;"></i></a>
+                                            <div class="float-right">
+                                                <a href="{% url 'gearBox:clientOfficeHistory' clientOfcId=ofc.id %}" class="btn btn-sm btn-history">History</a>
+                                                <a href="{% url 'Account:rateCardTableClientOfc' clientId=data.clientId clientOfcId=ofc.id %}" title="Rate cards"><i class="fa-solid fa-clipboard" style="font-size: 1.2rem;"></i></a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

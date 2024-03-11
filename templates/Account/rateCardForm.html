@@ -7,7 +7,10 @@
     .cuatom-continer {
         margin: 0 5rem;
     }
-
+    .btn-history{
+        margin-right:1px!important;
+        margin-bottom:0!important;
+    }
     .errorMsg {
         font-size: 0.7rem;
         color: rgb(255, 0, 0);
@@ -126,6 +129,11 @@
                     <!-- End Rate Card Form  -->
 
                     <!-- Start CostParameters  -->
+                    {% if costParameters %}
+                    <div class="float-right">
+                        <a href="{% url 'Account:costParameterHistory' id=costParameters.id %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                    {% endif %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Cost Parameters Form :-</h2>
@@ -298,6 +306,11 @@
                     <!-- End CostParameters -->
 
                     <!-- Start ThresholdDayShift -->
+                    {% if thresholdDayShift %}
+                    <div class="float-right">
+                        <a href="{% url 'Account:threshHoldDayHistoryHistory' id=thresholdDayShift.id %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                    {% endif %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Threshold Day Shift Form :-</h2>
@@ -444,6 +457,11 @@
                     <!-- End ThresholdDayShift -->
 
                     <!--Start Threshold Night Shift  -->
+                    {% if thresholdNightShift %}
+                    <div class="float-right">
+                        <a href="{% url 'Account:threshHoldNightHistoryHistory' id=thresholdNightShift.id %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                    {% endif %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Threshold  Night Form :-</h2>
@@ -581,22 +599,24 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-
                             </div>
                         </div>
-
                     </div>
                     <!-- End Threshold Night Shift  -->
 
                     <!--Start Grace  -->
+                    {% if thresholdNightShift %}
+                    <div class="float-right">
+                        <a href="{% url 'Account:graceHistory' id=grace.id %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                    {% endif %}
                     <div class="x_panel">
                         <div class="x_title">
                             <h2> Grace Form :-</h2>
                             <div class="float-right">
-                                <input   type="checkbox" name="grace_waiting_load_calculated_on_load_size"
-                                {% if grace.waiting_load_calculated_on_load_size   %}checked{% endif %} {% if grace %}disabled{% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
-                                                <label for="waiting_load_calculated_on_load_size" >Waiting Load Calculated On Load Size</label>
+                                <input type="checkbox" name="grace_waiting_load_calculated_on_load_size"
+                                {% if grace.waiting_load_calculated_on_load_size %}checked{% endif %} {% if grace %}disabled{% endif %}  id="waiting_load_calculated_on_load_size"  onchange="waiting_load_calculated_on_load_sizeFun()">
+                                <label for="waiting_load_calculated_on_load_size" >Waiting Load Calculated On Load Size</label>
                             </div>
                             <div class="clearfix"></div>
                         </div>
@@ -845,9 +865,9 @@
                     </div>
                     <!-- End Surcharge -->
 
-                    <div class="col-md-12 text-right" id="submitBtn">
+                    <div class="col-md-12 text-right pr-0" id="submitBtn">
                         {% if not rateCard %}
-                            <button type='submit' class="btn btn-primary px-4">Submit</button>
+                            <button type='submit' class="btn btn-sm btn-default px-3 mr-0">Submit</button>
                         {% endif %}
                         
                     </div>

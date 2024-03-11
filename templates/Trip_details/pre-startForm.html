@@ -224,7 +224,7 @@
 
     function endShiftFun(){
         if(confirm('Are you sure you want to complete this shift?') == true){
-            setDateTime("dateTime");            
+            setDateTime("dateTime");  
             $('#preStartForm').attr('action',"{% url 'Account:DriverPreStartSaveWithEndShift' tripId=tripObj.id endShift=1 %}").removeAttr('onsubmit').submit()
 
         }else{

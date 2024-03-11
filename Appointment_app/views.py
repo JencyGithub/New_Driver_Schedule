@@ -41,10 +41,10 @@ def createShiftSave(request):
     latitude = request.POST.get('latitude')
     driverId = request.POST.get('driverId')
     startDateTime = request.POST.get('startDateTime')
-    startDateTime = startDateTime.replace('T',' ')
+    startDateTime = startDateTime
     
     shiftType = request.POST.get('shiftType')
-    minute_ = int(request.POST.get('minute'))
+    minute_ = int(request.POST.get('number'))
     startOdometerKms = request.POST.get('startOdometerKms')
     startEngineHours = request.POST.get('startEngineHours')
     truckNum = request.POST.get('truckNum')
@@ -65,9 +65,9 @@ def createShiftSave(request):
     else:
         cur_UTC = cur_UTC - timedelta(minutes=abs(minute_))
 
-    existShitObj =  DriverShift.objects.filter(driverId = driverId,startDateTime__lte=datetime_object,endDateTime__isnull=True, archive=False).first()
+    existShitObj =  DriverShift.objects.filter(driverId = driverId,endDateTime__isnull=True, archive=False).first()
     if existShitObj:
-        messages.error(request,'This shift already exists!')
+        messages.error(request,'Driver is not available for this shift.')
         return redirect(request.META.get( 'HTTP_REFERER' ))
     shiftObj = DriverShift()
     shiftObj.longitude = longitude
