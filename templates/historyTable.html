@@ -1,0 +1,75 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | {{title}} {% endblock %}
+{% block headStyle %}
+<style>
+table thead{
+    top: 0;
+}
+table i{
+    font-size:1.3em!important;
+}
+</style>
+{% endblock %}
+{% block content %}
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="row">
+        <div class="x_panel">
+            <div class="x_title">
+                <h6>{{title}}</h6>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                {% if data|length > 0 %}
+                    <table class="table table-responsive table-striped border" style="max-height: 34rem;">
+                        <thead class="position-sticky bg-secondary text-white">
+                            <tr>
+                                {% for key in data.0.keys %}
+                                    {% if key == 'history_user_id' %}
+                                        <th>Change_By</th>
+                                    {% elif key == 'history_type' %}
+                                        <th style="min-width:7%">Type</th>
+                                    {% elif key == 'history_date' %}
+                                        <th style="min-width:15%">Change_Date</th>
+                                    {% else %}
+                                        <th>{{ key|capfirst }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in data %}
+                            <tr>
+                                {% for value in item.values %}
+                                <td class="{% if forloop.counter == 1 or value == True or value == False %}text-center{% endif %}">
+                                    {% if value == '~' %} 
+                                        <i class="fa fa-exchange text-info"></i>
+                                    {% elif value == '+' %}
+                                        <i class="fa-regular fa-square-plus text-success"></i>
+                                    {% elif value == '-' %}
+                                        <i class="fa-regular fa-square-minus text-danger"></i>
+                                    {% elif forloop.counter == 2 %}
+                                        {{ value|date:"Y-m-d h:i:s" }} 
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <b>No history found.</b>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+{% endblock %}
+
+{% block footerStyle %}
+
+{% endblock %}

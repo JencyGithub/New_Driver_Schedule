@@ -32,7 +32,7 @@
 {% block content %}
 
 <div class="right_col" role="main">
-  <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-dark float-right">Add</a>
+  <a href="{% url 'Account:basePlantAdd'%}" class="btn btn-sm btn-dark float-right">Add</a>
 
 
   <div class="clearfix"></div>
@@ -52,20 +52,26 @@
                 <table id="baseplantTable" class="table table-striped table-bordered" style="width:100%">
                   <thead>
                     <tr>
-                      <th class="w-50">Depots</th>
-                      <th class="w-50">Action</th>
+                      <th>Depots</th>
+                      <th class="w-50">Address</th>
+                      <th>Phone</th>
+                      <th>Person Name</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for basePlant in basePlants %}
                     <tr>
-                      <td>{{ basePlant.basePlant }}</td>
+                      <td> 
+                        <a href="{% url 'Account:basePlantEdit' id=basePlant.id %}" title="update">{{ basePlant.basePlant }}</a>
+                      </td>
                       <td>
-                        <label type="button" class="btn" id="redirectButton">
-                          <a href="{% url 'Account:basePlantEdit' id=basePlant.id %}" title="update">
-                            <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                          </a>
-                        </label>
+                        <a href="{% url 'Account:basePlantEdit' id=basePlant.id %}" title="update">{{ basePlant.address }}</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'Account:basePlantEdit' id=basePlant.id %}" title="update">{{ basePlant.phone }}</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'Account:basePlantEdit' id=basePlant.id %}" title="update">{{ basePlant.personOnName }}</a>
                       </td>
                     </tr>
                     {% endfor %}

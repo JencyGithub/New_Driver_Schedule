@@ -4,14 +4,6 @@
 {% block headStyle %}
 
 <!-- Datatables -->
-{% comment %} <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
-<link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}"
-    rel="stylesheet">
-<link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}"
-    rel="stylesheet">
-<link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
-    rel="stylesheet"> {% endcomment %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link type="text/css"
     href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
@@ -65,84 +57,70 @@
     }
 </style>
 {% endblock %}
+
 {% block content %}
-
 <div class="right_col" role="main">
-    <div class="">
-        <div class="clearfix"></div>
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <form action="{% url 'Account:ShiftDetails' id=id%}" method="POST"
-                        id="reconciliationForm">
-                        {%csrf_token%}
-                        <div class="x_title">
-                            <h2>{% if id == 0 %}Completed Jobs {% elif id == 1 %} Charged Jobs {% elif id == 2 %} Ongoing Jobs {% elif id == 3 %}Pre-start not field {% elif id == 4 %}Driver Pre-start{% endif %}</h2>
-                            {% if id == 1 %}
-                            <div class="float-right">
-                                <a class="btn btn-sm btn-default" href="{% url 'Account:uplodedPastTrip'%}">Existing Files</a>
-                            </div>                        
-                            {%endif%}
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content">
-                            <div class="cuatom-continer">
-                                {% csrf_token %}
-                                <div class="col-md-3 col-sm-3 " >
-                                    <label for="today">Today:<span class="required">*</span></label>
-                                    <input type="radio" class="float-center" id="today" name="setDateRange" value="today"
-                                            onchange="setDateRangeFun(this)" required>
-                                    <div class="field item form-group">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="x_panel">
+                <form action="{% url 'Account:ShiftDetails' id=id%}" method="POST" novalidate id="reconciliationForm">
+                    {%csrf_token%}
+                    <div class="x_title">
+                        <h2>{% if id == 0 %}Completed Jobs {% elif id == 1 %} Charged Jobs {% elif id == 2 %} Ongoing Jobs {% elif id == 3 %}Pre-start not field {% elif id == 4 %}Driver Pre-start{% endif %}</h2>
+                        {% if id == 1 %}
+                        <div class="float-right">
+                            <a class="btn btn-sm btn-default" href="{% url 'Account:uplodedPastTrip'%}">Existing Files</a>
+                        </div>                        
+                        {%endif%}
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="cuatom-continer">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="today" name="setDateRange" value="today" onchange="setDateRangeFun(this)" required>
+                                        <label class="form-check-label" for="today">Today:</label>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3 " >
-                                    <label for="yesterday">Yesterday:<span class="required">*</span></label>
-                                    <input type="radio" class="float-center" id="yesterday" name="setDateRange" value="yesterday"
-                                            onchange="setDateRangeFun(this)" required>
-                                    <div class="field item form-group">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="yesterday" name="setDateRange" value="yesterday" onchange="setDateRangeFun(this)" required>
+                                        <label class="form-check-label" for="yesterday">Yesterday:</label>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3 " >
-                                    <label for="lastWeek">Last Week:<span class="required">*</span></label>
-                                    <input type="radio" class="float-center" id="lastWeek" name="setDateRange" value="lastWeek"
-                                            onchange="setDateRangeFun(this)" required>
-                                    <div class="field item form-group">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="lastWeek" name="setDateRange" value="lastWeek" onchange="setDateRangeFun(this)" required>
+                                        <label class="form-check-label" for="lastWeek">Last Week:</label>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3 " >
-                                    <label for="custom">custom:<span class="required">*</span></label>
-                                    <input type="radio" class="float-center" id="custom" name="setDateRange" value="custom"
-                                            onchange="setDateRangeFun(this)" required>
-                                    <div class="field item form-group">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" id="custom" name="setDateRange" value="custom" onchange="setDateRangeFun(this)" required checked>
+                                        <label class="form-check-label" for="custom">Custom:</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-sm-6 d-none" id="startDateDiv">
-                                    <label for="startDate">Start Date:</label>
-                                    <div class="field item form-group">
-                                        <input class="form-control date" type="date" name="startDate" id="startDate"
-                                            required>
-                                    </div>
+                                <div class="col-md-6 col-sm-6 mb-3" id="startDateDiv">
+                                    <label for="startDate" class="form-label">Start Date:</label>
+                                    <input class="form-control date" type="date" name="startDate" id="startDate" required>
                                 </div>
-                                <div class="col-md-6 col-sm-6 d-none" id="endDateDiv">
-                                    <label for="endDate">End Date:<span class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control date" type="date" name="endDate" id="endDate"
-                                            readonly required>
-                                    </div>
-                                </div>
-                                 <div class="col-md-4 col-sm-4 d-none">
-
-                                    <label for="dateDropDown">Date Range  :<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 mb-3" id="endDateDiv">
+                                    <label for="endDate" class="form-label">End Date:</label>
+                                    <input class="form-control date" type="date" name="endDate" id="endDate" readonly required>
+                                </div>                                    
+                                <div class="col-md-4 col-sm-4 d-none">
+                                    <label for="dateDropDown">Date Range:<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         <select onchange="setDateRange(this)" class="form-control"   id="dateDropDown" name="dateDropDown">
-                                            <option selected value="today"  >Today</option>
-                                            <option selected value="yesterday"  >Yesterday</option>
-                                            {% comment %} <option  value="lastMonth"  >Last Month</option>
-                                            <option value="lastQuarter"  >Last Quarter</option>
-                                            <option value="lastYear"  >Last Year</option> {% endcomment %}
-                                            <option selected value="lastWeek"  >Last Week</option>
-                                            <option selected value="custom"  >Custom</option>
-                                            
+                                            <option selected value="today">Today</option>
+                                            <option selected value="yesterday">Yesterday</option>
+                                            {% comment %} <option  value="lastMonth">Last Month</option>
+                                            <option value="lastQuarter">Last Quarter</option>
+                                            <option value="lastYear">Last Year</option> {% endcomment %}
+                                            <option selected value="lastWeek">Last Week</option>
+                                            <option selected value="custom">Custom</option>                                            
                                         </select>
                                     </div>
                                 </div> 
@@ -158,550 +136,546 @@
                                     </div>
                                 </div>  {% endcomment %}
                                 <div class="col-md-12 text-right">
-                                    <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
+                                    <button type='submit' class="btn btn-sm btn-default">Submit</button>
                                 </div>
                             </div>
-                        </div>
 
-                        {% comment %} <div class="row">
-                            <div class="col-md-3 col-sm-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio"  name="setDateRange" id="lastMonth" value="lastMonth" required onchange="setDateRangeFun(this)">
-                                    <label class="form-check-label" for="lastMonth">
-                                    Last Month:
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio"  name="setDateRange" id="lastQuarter" value="lastQuarter" required onchange="setDateRangeFun(this)">
-                                    <label class="form-check-label" for="lastQuarter">
-                                        Last Quarter:
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio"  name="setDateRange" id="lastYear" value="lastYear" required onchange="setDateRangeFun(this)">
-                                    <label class="form-check-label" for="lastYear">
-                                        Last Financial Year:
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="setDateRange" id="custom" value="custom" checked required onchange="setDateRangeFun(this)">
-                                    <label class="form-check-label" for="custom">
-                                        Custom:
-                                    </label>
-                                </div>
-                            </div>
                         </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6 col-sm-6" id="startDateDiv">
-                                <label for="startDate">Start Date:<span class="required">*</span></label>
-                                <div class="field item form-group">
-                                    <input class="form-control date" type="date" name="startDate" id="startDate"
-                                        required="required">
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-sm-6" id="endDateDiv">
-                                <label for="endDate">End Date:<span class="required">*</span></label>
-                                <div class="field item form-group">
-                                    <input class="form-control date" readonly type="date" name="endDate" id="endDate"
-                                        required="required" >
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 text-right">
-                            <button type='submit' class="btn btn-sm btn-default px-3">Submit</button>
-                        </div> {% endcomment %}
-                    </form>
+                    </div>
 
+                    {% comment %} <div class="row">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"  name="setDateRange" id="lastMonth" value="lastMonth" required onchange="setDateRangeFun(this)">
+                                <label class="form-check-label" for="lastMonth">
+                                Last Month:
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"  name="setDateRange" id="lastQuarter" value="lastQuarter" required onchange="setDateRangeFun(this)">
+                                <label class="form-check-label" for="lastQuarter">
+                                    Last Quarter:
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"  name="setDateRange" id="lastYear" value="lastYear" required onchange="setDateRangeFun(this)">
+                                <label class="form-check-label" for="lastYear">
+                                    Last Financial Year:
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="setDateRange" id="custom" value="custom" checked required onchange="setDateRangeFun(this)">
+                                <label class="form-check-label" for="custom">
+                                    Custom:
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6" id="startDateDiv">
+                            <label for="startDate">Start Date:<span class="required">*</span></label>
+                            <div class="field item form-group">
+                                <input class="form-control date" type="date" name="startDate" id="startDate"
+                                    required="required">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6" id="endDateDiv">
+                            <label for="endDate">End Date:<span class="required">*</span></label>
+                            <div class="field item form-group">
+                                <input class="form-control date" readonly type="date" name="endDate" id="endDate"
+                                    required="required" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <button type='submit' class="btn btn-sm btn-default px-3">Submit</button>
+                    </div> {% endcomment %}
+                </form>
+            </div>
+        </div>
+        {% if id == 1 %}
+        <div class="col-md-12 col-sm-12 ">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Charged Jobs</h2>
+                    <div class="float-right">
+                        <a class="btn btn-sm btn-default" href=" {% static 'Account/samplePastTripFile.csv' %}" download>Get Sample File</a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <div class="cuatom-continer">
+                        <form method="POST" action="{% url 'Account:pastTripSave'%}" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="col-md-3 col-sm-3">
+                                <label for="pastTripFile">Upload past trip Csv:<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" type="file" name="pastTripFile" required
+                                        style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".csv">
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="monthAndYear">Month & Year:<span
+                                        class="required">*</span></label>
+                                <div class="field item form-group">
+                                    <input class="form-control" type="month" name="monthAndYear" required
+                                        style="padding: 0.25rem 0.2rem;" id="monthAndYear" >
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <label for="clientId">Client Name</label>
+                                <div class="field item form-group">
+                                    <select class="form-control" id="clients" name="clientName">
+                                        <option value="" disabled selected>Select Client Name</option>
+                                        {% for client in clients %}
+                                        <option value="{{ client.name }}">{{ client.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-3">
+                                <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" required {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
+                                </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 text-right">
+                                <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
+                            </div>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="warningModalTitle">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                    There are still unresolved errors. Do you want to continue?
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" id="no" data-dismiss="modal">No</button>
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-            {% if id == 1 %}
-            <div class="col-md-12 col-sm-12 ">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2>Charged Jobs</h2>
-                        <div class="float-right">
-                            <a class="btn btn-sm btn-default" href=" {% static 'Account/samplePastTripFile.csv' %}" download>Get Sample File</a>
+        </div>
+            <!-- Errors -->
+        <div class="col-md-12 col-sm-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2><i class="fa fa-bars"></i> Charged Jobs <small>Errors</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
+                            role="tab" aria-controls="home" aria-selected="true">Active</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile"
+                            role="tab" aria-controls="profile" aria-selected="false">Closed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="archive-tab" data-toggle="tab" href="#archive"
+                                role="tab" aria-controls="profile" aria-selected="false">Archive</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel"
+                            aria-labelledby="home-tab">
+                            <!-- Error Table  -->
+
+
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Error</h2>
+                                    <button id="archiveButton" class="btn btn-sm btn-success float-right" >Archive</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="card-box table-responsive">
+                                                <table id="activeTable"
+                                                    class="table table-striped table-bordered "
+                                                    style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>Id</th>
+                                                            <th>Docket Date</th>
+                                                            <th>Truck No</th>
+                                                            <th>Line number</th>
+                                                            <th>Docket Number</th>
+                                                            <th>Error Description</th>
+                                                            <th>File name</th>
+                                                            <th style="width:12%">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for error in pastTripErrors %}
+                                                        <tr>
+                                                            <td>{{ error.id }}</td>
+                                                            <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                            <td>{{ error.tripDate }}</td>
+                                                            <td>{{ error.truckNo }}</td>
+                                                            <td>{{ error.lineNumber }}</td>
+                                                            <td>{{ error.docketNumber }}</td>
+                                                            <td>{{ error.errorFromPastTrip }}</td>
+                                                            <td>{{ error.fileName }}</td>
+                                                            <td>
+                                                                {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
+
+                                                                {% comment %} {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
+                                                                <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a> {% endcomment %}
+
+                                                                {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
+                                                                {% if 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                <a href="{% url 'gearBox:truckTable' %}" style="font-size:0.6rem;" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
+
+                                                                {% elif   'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" style="font-size:0.6rem;" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                                                {% elif   error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}"style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
+                                                                {% comment %} HOLCIM  {% endcomment %}
+                                                                
+                                                                {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
+                                                                <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
+
+                                                                {% elif error.clientName == 'holcim' and 'Client truck connection object does not exist' in error.errorFromPastTrip %}
+                                                                <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-primary">  Add truck  </a>
+
+                                                                {% elif error.clientName == 'holcim' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
+                                                                <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
+
+                                                                {% elif error.clientName == 'holcim' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
+                                                                <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Resolve  </a> {% endcomment %}
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                    
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- End Error Table  -->
                         </div>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="cuatom-continer">
-                            <form method="POST" action="{% url 'Account:pastTripSave'%}" enctype="multipart/form-data">
-                                {% csrf_token %}
+                        
+                        {% comment %} solved Start  {% endcomment %}
+                        <div class="tab-pane fade" id="profile" role="tabpanel"
+                            aria-labelledby="profile-tab">
+                            <!-- Solve Table  -->
 
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="pastTripFile">Upload past trip Csv:<span
-                                            class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="file" name="pastTripFile" required
-                                            style="padding: 0.25rem 0.2rem;" id="pastTripFile" accept=".csv">
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Solved</h2>
+                                    <button id="solveButton" class="btn btn-sm btn-success float-right" >Archive</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="card-box table-responsive">
+                                                <table id="solveTable" class="table table-striped table-bordered" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>Id</th>
+                                                            <th>Status</th>
+                                                            <th>Docket Date</th>
+                                                            <th>Line number</th>
+                                                            <th>Docket Number</th>
+                                                            <th>Error Description</th>
+                                                            <th>File name</th>
+                                                            <th style="width:13%;">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for solve in pastTripSolved %}
+                                                        <tr>
+                                                            <td>{{ solve.id }}</td>
+                                                            <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                            <td><i class="fa fa-check text-success "></td>
+                                                            <td>{{ solve.tripDate }}</td>
+                                                            <td>{{ solve.lineNumber }}</td>
+                                                            <td>{{ solve.docketNumber }}</td>
+                                                            <td>{{ solve.errorFromPastTrip }}</td>
+                                                            <td>{{ solve.fileName }}</td>
+                                                            <td>
+                                                                {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}" style="font-size:0.7rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
+                                                                <a class="btn btn-success btn-sm text-light" style="font-size:0.7rem;" type="button" onclick="showSolveErrorModel({{solve.id}})" id="solveDocket{{solve.id}}"> Docket</a>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="monthAndYear">Month & Year:<span
-                                            class="required">*</span></label>
-                                    <div class="field item form-group">
-                                        <input class="form-control" type="month" name="monthAndYear" required
-                                            style="padding: 0.25rem 0.2rem;" id="monthAndYear" >
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <label for="clientId">Client Name</label>
-                                    <div class="field item form-group">
-                                        <select class="form-control" id="clients" name="clientName">
-                                            <option value="" disabled selected>Select Client Name</option>
-                                            {% for client in clients %}
-                                            <option value="{{ client.name }}">{{ client.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 col-sm-3">
-                                    <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" required {% if pastTripErrors %}data-toggle="modal" data-target="#warningModal" {%endif%} name="save" style="margin-top: 2.5rem;" id="save_" value="1"> Save Data In Database
-                                    </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 text-right">
-                                    <button type='submit' class="btn btn-sm btn-primary px-4">Submit</button>
-                                </div>
+                            </div>
+                            <!-- End Solve Table  -->
+                        </div>
+                        {% comment %} solved End  {% endcomment %}
 
-                                <!-- Modal -->
-                                <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+
+                        {% comment %} Archive Start {% endcomment %}
+                        <div class="tab-pane fade" id="archive" role="tabpanel"
+                            aria-labelledby="archive-tab">
+                            <!-- Solve Table  -->
+
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <h2>Archive</h2>
+                                    <button id="restoreButton" class="btn btn-sm btn-default float-right" >Restore</button>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="card-box table-responsive">
+                                                <table id="archiveTable" class="table table-striped table-bordered" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>Id</th>
+                                                            <th>Status</th>
+                                                            <th>Docket Date</th>
+                                                            <th>Line number</th>
+                                                            <th>Docket Number</th>
+                                                            <th>Error Description</th>
+                                                            <th>File name</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for archive in pastTripArchive %}
+                                                        <tr>
+                                                            <td>{{archive.id}}</td>
+                                                            <td><button type="button" onclick="showModel(this)" id="{{archive.id}}"><i class="fa-solid fa-eye"></i></button></td>
+                                                            <td><i class="fa fa-check text-success "></td>
+                                                            <td>{{ archive.tripDate }}</td>
+                                                            <td>{{ archive.lineNumber }}</td>
+                                                            <td>{{ archive.docketNumber }}</td>
+                                                            <td>{{ archive.errorFromPastTrip }}</td>
+                                                            <td>{{ archive.fileName }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Solve Table  -->
+                        </div>
+                        {% comment %} Archive End  {% endcomment %}
+                            {% comment %} View error Model start {% endcomment %}
+                            <div class="modal fade" id="errorModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
+                        
                                         <div class="modal-header">
-                                        <h5 class="modal-title" id="warningModalTitle">Modal title</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                                            <h5 class="modal-title">Error details</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
                                         </div>
+                        
                                         <div class="modal-body">
-                                        There are still unresolved errors. Do you want to continue?
-                                        </div>
-                                        <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" id="no" data-dismiss="modal">No</button>
-                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-                <!-- Errors -->
-            <div class="col-md-12 col-sm-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2><i class="fa fa-bars"></i> Charged Jobs <small>Errors</small></h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                            </li>
-
-                            </li>
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-
-
-                    <div class="x_content">
-
-                        <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
-                                role="tab" aria-controls="home" aria-selected="true">Active</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile"
-                                role="tab" aria-controls="profile" aria-selected="false">Closed</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="archive-tab" data-toggle="tab" href="#archive"
-                                    role="tab" aria-controls="profile" aria-selected="false">Archive</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="home" role="tabpanel"
-                                aria-labelledby="home-tab">
-                                <!-- Error Table  -->
-
-
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Error</h2>
-                                        <button id="archiveButton" class="btn btn-sm btn-success float-right" >Archive</button>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="card-box table-responsive">
-                                                    <table id="activeTable"
-                                                        class="table table-striped table-bordered "
-                                                        style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th>Id</th>
-                                                                <th>Docket Date</th>
-                                                                <th>Truck No</th>
-                                                                <th>Line number</th>
-                                                                <th>Docket Number</th>
-                                                                <th>Error Description</th>
-                                                                <th>File name</th>
-                                                                <th style="width:12%">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for error in pastTripErrors %}
-                                                            <tr>
-                                                                <td>{{ error.id }}</td>
-                                                                <td><button type="button" onclick="showModel(this)" id="{{error.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                                                <td>{{ error.tripDate }}</td>
-                                                                <td>{{ error.truckNo }}</td>
-                                                                <td>{{ error.lineNumber }}</td>
-                                                                <td>{{ error.docketNumber }}</td>
-                                                                <td>{{ error.errorFromPastTrip }}</td>
-                                                                <td>{{ error.fileName }}</td>
-                                                                <td>
-                                                                    {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=error.id %}" style="font-size:0.6rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
-
-                                                                    {% comment %} {% if 'Driver matching query does not exist' in error.errorFromPastTrip   %}
-                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a> {% endcomment %}
-
-                                                                    {% comment %} {% elif 'Client truck connection object does not exist' in error.errorFromPastTrip  %} {% endcomment %}
-                                                                    {% if 'Client truck connection object does not exist' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'gearBox:truckTable' %}" style="font-size:0.6rem;" target="_blank" title="solved" class="btn btn-sm btn-success">  Add truck  </a>
-
-                                                                    {% elif   'BasePlant does not exist.' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" style="font-size:0.6rem;" class="btn btn-sm btn-primary">  Add depot  </a>
-
-                                                                    {% elif   error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}"style="font-size:0.6rem;"  target="_blank"  title="solved" class="btn btn-sm btn-success btn-sm">  Resolve  </a>
-                                                                    {% comment %} HOLCIM  {% endcomment %}
-                                                                    
-                                                                    {% comment %} {% elif 'Driver matching query does not exist' in error.errorFromPastTrip and error.clientName == 'holcim' %}
-                                                                    <a href="{% url 'gearBox:driverFormAdd' %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Add driver  </a>
-
-                                                                    {% elif error.clientName == 'holcim' and 'Client truck connection object does not exist' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'gearBox:truckTable' %}" target="_blank" title="solved" class="btn btn-sm btn-primary">  Add truck  </a>
-
-                                                                    {% elif error.clientName == 'holcim' and 'BasePlant does not exist.' in error.errorFromPastTrip %}
-                                                                    <a href="{% url 'Account:basePlantAdd' %}"  target="_blank" title="solved" class="btn btn-sm btn-primary">  Add depot  </a>
-
-                                                                    {% elif error.clientName == 'holcim' and not error.docketNumber|default:''|lower == 'nan' or error.tripDate|default:''|lower == 'nan' %}
-                                                                    <a href="{% url 'Account:pastTripErrorSolve' id=error.id %}" target="_blank"  title="solved" class="btn btn-sm btn-primary">  Resolve  </a> {% endcomment %}
-                                                                    {% endif %}
-                                                                </td>
-                                                            </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                        
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- End Error Table  -->
-                            </div>
-                            
-                            {% comment %} solved Start  {% endcomment %}
-                            <div class="tab-pane fade" id="profile" role="tabpanel"
-                                aria-labelledby="profile-tab">
-                                <!-- Solve Table  -->
-
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Solved</h2>
-                                        <button id="solveButton" class="btn btn-sm btn-success float-right" >Archive</button>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="card-box table-responsive">
-                                                    <table id="solveTable" class="table table-striped table-bordered" style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th>Id</th>
-                                                                <th>Status</th>
-                                                                <th>Docket Date</th>
-                                                                <th>Line number</th>
-                                                                <th>Docket Number</th>
-                                                                <th>Error Description</th>
-                                                                <th>File name</th>
-                                                                <th style="width:13%;">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for solve in pastTripSolved %}
-                                                            <tr>
-                                                                <td>{{ solve.id }}</td>
-                                                                <td><button type="button" onclick="showModel(this)" id="{{solve.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                                                <td><i class="fa fa-check text-success "></td>
-                                                                <td>{{ solve.tripDate }}</td>
-                                                                <td>{{ solve.lineNumber }}</td>
-                                                                <td>{{ solve.docketNumber }}</td>
-                                                                <td>{{ solve.errorFromPastTrip }}</td>
-                                                                <td>{{ solve.fileName }}</td>
-                                                                <td>
-                                                                    {% comment %} <a href="{% url 'Account:archivePastTrip' errorId=solve.id %}" style="font-size:0.7rem;"  title="archive" class="btn btn-sm btn-success float-right">  <i class="fa-solid fa-box-archive"></i>  </a> {% endcomment %}
-                                                                    <a class="btn btn-success btn-sm text-light" style="font-size:0.7rem;" type="button" onclick="showSolveErrorModel({{solve.id}})" id="solveDocket{{solve.id}}"> Docket</a>
-                                                                </td>
-                                                            </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End Solve Table  -->
-                            </div>
-                            {% comment %} solved End  {% endcomment %}
-
-
-                            {% comment %} Archive Start {% endcomment %}
-                            <div class="tab-pane fade" id="archive" role="tabpanel"
-                                aria-labelledby="archive-tab">
-                                <!-- Solve Table  -->
-
-                                <div class="x_panel">
-                                    <div class="x_title">
-                                        <h2>Archive</h2>
-                                        <button id="restoreButton" class="btn btn-sm btn-default float-right" >Restore</button>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content" style="max-height: 120vh; overflow-y: auto;">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="card-box table-responsive">
-                                                    <table id="archiveTable" class="table table-striped table-bordered" style="width:100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th>Id</th>
-                                                                <th>Status</th>
-                                                                <th>Docket Date</th>
-                                                                <th>Line number</th>
-                                                                <th>Docket Number</th>
-                                                                <th>Error Description</th>
-                                                                <th>File name</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for archive in pastTripArchive %}
-                                                            <tr>
-                                                                <td>{{archive.id}}</td>
-                                                                <td><button type="button" onclick="showModel(this)" id="{{archive.id}}"><i class="fa-solid fa-eye"></i></button></td>
-                                                                <td><i class="fa fa-check text-success "></td>
-                                                                <td>{{ archive.tripDate }}</td>
-                                                                <td>{{ archive.lineNumber }}</td>
-                                                                <td>{{ archive.docketNumber }}</td>
-                                                                <td>{{ archive.errorFromPastTrip }}</td>
-                                                                <td>{{ archive.fileName }}</td>
-                                                            </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End Solve Table  -->
-                            </div>
-                            {% comment %} Archive End  {% endcomment %}
-                                {% comment %} View error Model start {% endcomment %}
-                                <div class="modal fade" id="errorModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                            
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Error details</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                            
-                                            <div class="modal-body">
-                                                <div class="container-fluid">
-                                                    <div class="row mt-2">
-                                                        <div class="col-md-12">
-                                                            <ul>
-                                                                <li class="mt-1">
-                                                                    <b>Trip Date:-</b>
-                                                                    <span class="d-inline-block" id="tripDate"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Truck Number:-</b>
-                                                                    <span class="d-inline-block" id="truckNo"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Docket Number:-</b>
-                                                                    <span class="d-inline-block" id="docketNumber"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>File Name :-</b>    
-                                                                    <span class="d-inline-block" id="fileName"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Line Number Of File :-</b>    
-                                                                    <span class="d-inline-block" id="lineNumber"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Error :-</b>    
-                                                                    <span class="d-inline-block" id="error"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Status :-</b>    
-                                                                    <span class="d-inline-block" id="status"></span>
-                                                                </li>
-                                                                <li class="mt-1">
-                                                                    <b>Data of entry :-</b>    
-                                                                    <span class="d-inline-block" id="data"></span>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
+                                            <div class="container-fluid">
+                                                <div class="row mt-2">
+                                                    <div class="col-md-12">
+                                                        <ul>
+                                                            <li class="mt-1">
+                                                                <b>Trip Date:-</b>
+                                                                <span class="d-inline-block" id="tripDate"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Truck Number:-</b>
+                                                                <span class="d-inline-block" id="truckNo"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Docket Number:-</b>
+                                                                <span class="d-inline-block" id="docketNumber"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>File Name :-</b>    
+                                                                <span class="d-inline-block" id="fileName"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Line Number Of File :-</b>    
+                                                                <span class="d-inline-block" id="lineNumber"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Error :-</b>    
+                                                                <span class="d-inline-block" id="error"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Status :-</b>    
+                                                                <span class="d-inline-block" id="status"></span>
+                                                            </li>
+                                                            <li class="mt-1">
+                                                                <b>Data of entry :-</b>    
+                                                                <span class="d-inline-block" id="data"></span>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                {% comment %} View error Model end {% endcomment %}
+                            </div>
+                            {% comment %} View error Model end {% endcomment %}
 
-                                {% comment %} View Solve error Model Start {% endcomment %}
+                            {% comment %} View Solve error Model Start {% endcomment %}
 
-                                <div class="modal fade bd-example-modal-lg" id="errorSolve" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                        <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalScrollableTitle">Docket View</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                            <div class="modal fade bd-example-modal-lg" id="errorSolve" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalScrollableTitle">Docket View</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="col-md-6">
+                                            <ul>
+                                                <li class="mt-1">
+                                                    <b>Shift Date:-</b>
+                                                    <span class="d-inline-block" id="shiftDate"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Docket Number:-</b>
+                                                    <span class="d-inline-block" id="docketNumber1"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>TippingTo Yard:-</b>
+                                                    <span class="d-inline-block" id="tippingToYard"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Return To Yard :-</b>    
+                                                    <span class="d-inline-block" id="returnToYard"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>BasePlant :-</b>    
+                                                    <span class="d-inline-block" id="basePlant"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Number Of Km :-</b>    
+                                                    <span class="d-inline-block" id="noOfKm"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Transfer Km :-</b>    
+                                                    <span class="d-inline-block" id="transferKM"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Return Qty :-</b>    
+                                                    <span class="d-inline-block" id="returnQty"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Return Km :-</b>    
+                                                    <span class="d-inline-block" id="returnKm"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Waiting Time Start :-</b>    
+                                                    <span class="d-inline-block" id="waitingTimeStart"></span>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <div class="modal-body">
-                                            <div class="col-md-6">
-                                                <ul>
-                                                    <li class="mt-1">
-                                                        <b>Shift Date:-</b>
-                                                        <span class="d-inline-block" id="shiftDate"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Docket Number:-</b>
-                                                        <span class="d-inline-block" id="docketNumber1"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>TippingTo Yard:-</b>
-                                                        <span class="d-inline-block" id="tippingToYard"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Return To Yard :-</b>    
-                                                        <span class="d-inline-block" id="returnToYard"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>BasePlant :-</b>    
-                                                        <span class="d-inline-block" id="basePlant"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Number Of Km :-</b>    
-                                                        <span class="d-inline-block" id="noOfKm"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Transfer Km :-</b>    
-                                                        <span class="d-inline-block" id="transferKM"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Return Qty :-</b>    
-                                                        <span class="d-inline-block" id="returnQty"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Return Km :-</b>    
-                                                        <span class="d-inline-block" id="returnKm"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Waiting Time Start :-</b>    
-                                                        <span class="d-inline-block" id="waitingTimeStart"></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <ul>
-                                                    <li class="mt-1">
-                                                        <b>Waiting Time End:-</b>
-                                                        <span class="d-inline-block" id="waitingTimeEnd"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Total Waiting Minute:-</b>
-                                                        <span class="d-inline-block" id="totalWaitingInMinute"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Surcharge Type:-</b>
-                                                        <span class="d-inline-block" id="surcharge_type"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Surcharge Duration :-</b>    
-                                                        <span class="d-inline-block" id="surcharge_duration"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Cubic M :-</b>    
-                                                        <span class="d-inline-block" id="cubicMl"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Stand By Start Time :-</b>    
-                                                        <span class="d-inline-block" id="standByStartTime"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Stand By End Time :-</b>    
-                                                        <span class="d-inline-block" id="standByEndTime"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Stand By Slot :-</b>    
-                                                        <span class="d-inline-block" id="standBySlot"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Others:-</b>    
-                                                        <span class="d-inline-block" id="others"></span>
-                                                    </li>
-                                                    <li class="mt-1">
-                                                        <b>Comment :-</b>    
-                                                        <span class="d-inline-block" id="comment"></span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                                        <div class="col-md-6">
+                                            <ul>
+                                                <li class="mt-1">
+                                                    <b>Waiting Time End:-</b>
+                                                    <span class="d-inline-block" id="waitingTimeEnd"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Total Waiting Minute:-</b>
+                                                    <span class="d-inline-block" id="totalWaitingInMinute"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Surcharge Type:-</b>
+                                                    <span class="d-inline-block" id="surcharge_type"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Surcharge Duration :-</b>    
+                                                    <span class="d-inline-block" id="surcharge_duration"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Cubic M :-</b>    
+                                                    <span class="d-inline-block" id="cubicMl"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Stand By Start Time :-</b>    
+                                                    <span class="d-inline-block" id="standByStartTime"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Stand By End Time :-</b>    
+                                                    <span class="d-inline-block" id="standByEndTime"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Stand By Slot :-</b>    
+                                                    <span class="d-inline-block" id="standBySlot"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Others:-</b>    
+                                                    <span class="d-inline-block" id="others"></span>
+                                                </li>
+                                                <li class="mt-1">
+                                                    <b>Comment :-</b>    
+                                                    <span class="d-inline-block" id="comment"></span>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                                     </div>
                                 </div>
-                                {% comment %} View Solve error Model End {% endcomment %}
-
+                                </div>
                             </div>
-                        </div>
+                            {% comment %} View Solve error Model End {% endcomment %}
+
                     </div>
                 </div>
             </div>
-            {%endif%}
         </div>
+        {%endif%}
     </div>
 </div>
 {% endblock %}
@@ -714,6 +688,23 @@
     // const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
     $(document).ready(function () {
+
+        $('#reconciliationForm').submit(function(e){
+            let startDate = $('#startDate').val()
+            let endDate = $('#endDate').val()
+            if (!startDate){
+                $('#startDate').addClass('is-invalid')
+                e.preventDefault();
+            }else{
+                $('#startDate').removeClass('is-invalid')
+            }
+            if (!endDate){
+                $('#endDate').addClass('is-invalid')
+                e.preventDefault();
+            }else{
+                $('#endDate').removeClass('is-invalid')
+            }
+        })
 
         var activeTable = $("#activeTable").DataTable({
             'columnDefs': [{
@@ -892,21 +883,6 @@
 </script>
 
 <!-- Datatables -->
-{% comment %} <script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script> {% endcomment %}
 <script type="text/javascript"
     src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
 

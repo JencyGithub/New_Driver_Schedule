@@ -692,6 +692,19 @@ def clientAndTruckDataSave(request, id):
     
     return redirect('Account:showPreStartForm', shiftId=tripObj.shiftId, tripId=tripObj.id)
 
+@csrf_protect
+@api_view(['POST'])
+def checkTrip(request):
+    shiftId = request.POST.get('shiftId')
+    print(shiftId)
+    tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftId)
+    print(tripObjs)
+    if len(tripObjs) > 0:
+        return JsonResponse({'status': True, 'oldTrips' : True})
+    else:
+        return JsonResponse({'status': True, 'oldTrips' : False})
+    
+
 def checkQuestionRequired(request):
     status = False
     questionId = request.GET.get('questionId')
@@ -1122,7 +1135,29 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         return redirect('index')
     else:
         return redirect('Account:recurringTrip', 1)
+  
+@csrf_protect
+def endShift(request, shiftId):
+    comment = request.POST.get('comment')
+    endShiftImg = request.FILES.get('endShiftImg')
+    curDateTime = request.POST.get('curDateTime')
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    filePath = 'static/img/shiftImg'
+    if endShiftImg:
+        fileName = endShiftImg.name
+        newFileName = 'load-sheet' + getCurrentTimeInString() + '!_@' + fileName
+        pfs = FileSystemStorage(location=filePath)
+        pfs.save(newFileName, endShiftImg)
+        shiftObj.endShiftImg = f'{filePath}/{newFileName}'
+        
+    shiftObj.comment = comment
+    shiftObj.endDateTime = curDateTime
+    shiftObj.endTimeUTC = datetime.utcnow()
+    shiftObj.save()
     
+    messages.success(request,'Your Shift is ended successfully.')
+    return redirect('index')
+  
 @api_view(['POST'])
 def ocrRead(request):
     try:
@@ -1131,10 +1166,7 @@ def ocrRead(request):
             return JsonResponse({'status': False,'e' : str("Docket image not exist.")})
             
         input_image = Image.open(str(docketObj.docketFile))
-        # docketImg = "static/img/docketFiles/12.jpeg"
-        # input_image = Image.open(docketImg)
         input_array = np.array(input_image)
-        # output_array = remove(input_array)
         output_image = Image.fromarray(input_array  )
         pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
         docketData = str(pytesseract.image_to_string(output_image)).replace("-", "").replace("=", "")
@@ -1144,7 +1176,6 @@ def ocrRead(request):
         return JsonResponse({'status': False, 'e' : str(e)})
 
     
-
 def driverLeaveRequestShow(request):
     reasons = NatureOfLeave.objects.all()
     params = {
@@ -4194,3 +4225,71 @@ def jobSelectedStatus(request):
         obj['End_Date_Time'] = str(obj['End_Date_Time']).split('+')[0]
     
     return JsonResponse({'status': True, 'data':data})
+
+
+# History
+
+def costParameterHistory(request, id):
+    data = CostParameters.history.filter(id=id).values('history_type','history_date','history_user_id','loading_cost_per_cubic_meter','km_cost','transfer_cost','return_load_cost','return_km_cost','standby_time_slot_size','standby_cost_per_slot','waiting_cost_per_minute','call_out_fees','demurrage_fees','cancellation_fees','clientPayableGst','start_date','end_date').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Cost-parameter HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def threshHoldDayHistoryHistory(request, id):
+    data = ThresholdDayShift.history.filter(id=id).values('history_type','history_date','history_user_id','threshold_amount_per_day_shift','loading_cost_per_cubic_meter_included','km_cost_included','surcharge_included','transfer_cost_included','return_cost_included','standby_cost_included','waiting_cost_included','call_out_fees_included','min_load_in_cubic_meters','min_load_in_cubic_meters_return_to_yard','return_to_yard_grace','return_to_tipping_grace','start_date','end_date').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Thresh Hold Day HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def threshHoldNightHistoryHistory(request, id):
+    data = ThresholdNightShift.history.filter(id=id).values('history_type','history_date','history_user_id','threshold_amount_per_night_shift','loading_cost_per_cubic_meter_included','km_cost_included','surcharge_included','transfer_cost_included','return_cost_included','standby_cost_included','waiting_cost_included','call_out_fees_included','min_load_in_cubic_meters','min_load_in_cubic_meters_return_to_yard','return_to_yard_grace','return_to_tipping_grace','start_date','end_date').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Thresh Hold Night HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def graceHistory(request, id):
+    data = Grace.history.filter(id=id).values('history_type','history_date','history_user_id','load_km_grace','transfer_km_grace','return_km_grace','standby_time_grace_in_minutes','chargeable_standby_time_starts_after','waiting_time_grace_in_minutes','chargeable_waiting_time_starts_after','waiting_load_calculated_on_load_size','waiting_time_grace_per_cubic_meter','minimum_load_size_for_waiting_time_grace','start_date','end_date').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Grace HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def basePlantHistory(request, id):
+    data = BasePlant.history.filter(id=id).values('history_type','history_date','history_user_id','basePlant','address','phone','personOnName','managerName','lat','long','clientDepot','clientBasePlant','depotCode','email').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Depot HIstory'
+    }
+    return render(request, 'historyTable.html', params)

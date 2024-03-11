@@ -161,4 +161,10 @@ urlpatterns = [
     path('Bulk/Truck/Entry/', views.bulkTruckEntryForm, name='bulkTruckEntryForm'), 
     path('Bulk/Truck/Entry/Save', views.uploadBulkData, name='uploadBulkData'), 
     
+    # History URLs
+    
+    path('history/driver/<int:driverId>/', views.driverHistory, name='driverHistory'), 
+    path('history/employee/<int:clientId>/', views.clientHistory, name='clientHistory'), 
+    path('history/client-office/<int:clientOfcId>/', views.clientOfficeHistory, name='clientOfficeHistory'), 
+    
 ]

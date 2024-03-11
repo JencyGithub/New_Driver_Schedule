@@ -7,9 +7,13 @@
 <div class="right_col" role="main">
     <div class="">
         <div class="clearfix"></div>
-
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                {% comment %} {% if userObj %}
+                    <div class="float-right">
+                        <a href="{% url 'gearBox:employeeHistory' userId=userObj.id %}" class="btn btn-sm btn-history">History</a>
+                    </div>
+                {% endif %} {% endcomment %}
                 <div class="x_panel">
                     <div class="x_title">
                         <h2>{% if data %}Edit{% else %}Add{% endif %} admin staff</h2>
