@@ -76,3 +76,20 @@ $('#mapForm').submit(function(e){
 getLocation();
 setTime("time");
 setDate("date");
+
+
+function locationGetFun(){
+  event.preventDefault();
+  getLocation()
+  var endLon= $("#longitude").val();
+  var endLat= $("#latitude").val();
+  if (!endLon || !endLat) {
+    $('.endLocationImg').removeClass('d-none');
+    $('#endLocationImg').attr('required', true);
+    alert('We can not get location  information please add location image');
+    return false
+  }
+  else{
+    $('#docketsForm').submit()
+  }
+}

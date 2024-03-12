@@ -1039,105 +1039,121 @@ def collectDockets(request, shiftId, tripId, endShift=None):
 
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
-    endOdometers = request.POST.get('endOdometers')
-    endEngineHours = request.POST.get('endEngineHours')
-    curTimeStr = getCurrentTimeInString()
-    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
-    docketPath = 'static/img/docketFiles'
-    loadPath = 'static/img/finalloadSheet'
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    
-    largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
-    driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
-    
-    if driver_break_object and driver_break_object.endDateTime > currentDateTime:
-        messages.error(request, "Entered breaks is not valid, please  enter the correct break details.")
-        return redirect('Account:driverShiftView',shiftId=shiftId)
-        return redirect(request.META.get('HTTP_REFERER'))
-        # return HttpResponse(driver_break_object)
-    
-    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
-    truckInfoObj = truckConnectionObj.truckNumber.truckInformation
-    truckInfoObj.odometerKms = endOdometers
-    truckInfoObj.engineHours = endEngineHours
-    truckInfoObj.save()    
-    
-    clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+    try:
+        endOdometers = request.POST.get('endOdometers')
+        endEngineHours = request.POST.get('endEngineHours')
+        curTimeStr = getCurrentTimeInString()
+        currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
+        docketPath = 'static/img/docketFiles'
+        loadPath = 'static/img/finalloadSheet'
+        shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+        tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+        
+        largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
+        driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
+        
+        if driver_break_object and driver_break_object.endDateTime > currentDateTime:
+            messages.error(request, "Entered breaks is not valid, please  enter the correct break details.")
+            return redirect('Account:driverShiftView',shiftId=shiftId)
+            return redirect(request.META.get('HTTP_REFERER'))
+            # return HttpResponse(driver_break_object)
+        
+        truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+        truckInfoObj = truckConnectionObj.truckNumber.truckInformation
+        truckInfoObj.odometerKms = endOdometers
+        truckInfoObj.engineHours = endEngineHours
+        truckInfoObj.save()    
+        
+        clientObj = Client.objects.filter(pk=tripObj.clientId).first()
 
-    loadSheetFile = request.FILES.get('loadSheet')
-    noOfLoads = int(request.POST.get('noOfLoads'))
-    tripObj.numberOfLoads = noOfLoads
-    tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
-    tripObj.endDateTime = currentDateTime
-    currentUTCDateTime = datetime.utcnow()
-    tripObj.endTimeUTC = currentUTCDateTime
-    tripObj.endOdometerKms = endOdometers
-    tripObj.endEngineHours = endEngineHours
-    
-    if loadSheetFile:
-        fileName = loadSheetFile.name
-        newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
-        pfs = FileSystemStorage(location=loadPath)
-        pfs.save(newFileName, loadSheetFile)
-        tripObj.loadSheet = f'{loadPath}/{newFileName}'
-    
-    if not clientObj.docketGiven:
-        for load in range(1,noOfLoads+1):
-            transferKm = request.POST.get(f'transferKm{load}')
-            standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
-            standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-            
-            docketObj = DriverShiftDocket()
-            docketObj.tripId = tripObj.id
-            docketObj.shiftId = shiftId
-            docketObj.shiftDate = tripObj.startDateTime.date()
-            docketObj.clientId = clientObj.clientId
-            docketObj.truckConnectionId = tripObj.truckConnectionId
-            docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-            docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-            docketObj.transferKM = transferKm if transferKm else 0
-            docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
-            docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
-            docketObj.comment = request.POST.get(f'comment{load}')
-            docketFile = request.FILES.get(f'docketFile{load}')
-            if docketFile:
-                docketFileName = docketFile.name
-                newFileName = 'load-sheet' + curTimeStr + '!_@' + docketFileName
-                docketPfs = FileSystemStorage(location=docketPath)
-                docketPfs.save(newFileName, docketFile)
-                docketObj.docketFile = f'{docketPath}/{newFileName}'
-            docketObj.save()
-    else:
-        for load in range(1,noOfLoads+1):
-            transferKm = request.POST.get(f'transferKm{load}')
-            standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
-            standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-            
-            docketObj = DriverShiftDocket()
-            docketObj.tripId = tripObj.id
-            docketObj.shiftId = shiftId
-            docketObj.shiftDate = tripObj.startDateTime.date()
-            docketObj.clientId = clientObj.clientId
-            docketObj.truckConnectionId = tripObj.truckConnectionId
-            docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-            docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-
-            docketObj.transferKM = transferKm if transferKm else 0
-            docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
-            docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
-            docketObj.save()
-    
-    tripObj.save()  
-    if endShift == 1:
-        shiftObj.endDateTime = currentDateTime
+        loadSheetFile = request.FILES.get('loadSheet')
+        noOfLoads = int(request.POST.get('noOfLoads'))
+        tripObj.numberOfLoads = noOfLoads
+        tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
+        tripObj.endDateTime = currentDateTime
         currentUTCDateTime = datetime.utcnow()
-        shiftObj.endTimeUTC = currentUTCDateTime
-        shiftObj.save()  
-        messages.success(request, "Shift completed successfully.")
-        return redirect('index')
-    else:
-        return redirect('Account:recurringTrip', 1)
+        tripObj.endTimeUTC = currentUTCDateTime
+        tripObj.endOdometerKms = endOdometers
+        tripObj.endEngineHours = endEngineHours
+        
+        if loadSheetFile:
+            fileName = loadSheetFile.name
+            newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
+            pfs = FileSystemStorage(location=loadPath)
+            pfs.save(newFileName, loadSheetFile)
+            tripObj.loadSheet = f'{loadPath}/{newFileName}'
+        
+        if not clientObj.docketGiven:
+            for load in range(1,noOfLoads+1):
+                transferKm = request.POST.get(f'transferKm{load}')
+                standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+                standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
+                
+                docketObj = DriverShiftDocket()
+                docketObj.tripId = tripObj.id
+                docketObj.shiftId = shiftId
+                docketObj.shiftDate = tripObj.startDateTime.date()
+                docketObj.clientId = clientObj.clientId
+                docketObj.truckConnectionId = tripObj.truckConnectionId
+                docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
+                docketObj.transferKM = transferKm if transferKm else 0
+                docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+                docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
+                docketObj.comment = request.POST.get(f'comment{load}')
+                docketFile = request.FILES.get(f'docketFile{load}')
+                if docketFile:
+                    docketFileName = docketFile.name
+                    newFileName = 'load-sheet' + curTimeStr + '!_@' + docketFileName
+                    docketPfs = FileSystemStorage(location=docketPath)
+                    docketPfs.save(newFileName, docketFile)
+                    docketObj.docketFile = f'{docketPath}/{newFileName}'
+                docketObj.save()
+        else:
+            for load in range(1,noOfLoads+1):
+                transferKm = request.POST.get(f'transferKm{load}')
+                standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+                standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
+                
+                docketObj = DriverShiftDocket()
+                docketObj.tripId = tripObj.id
+                docketObj.shiftId = shiftId
+                docketObj.shiftDate = tripObj.startDateTime.date()
+                docketObj.clientId = clientObj.clientId
+                docketObj.truckConnectionId = tripObj.truckConnectionId
+                docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
+                return HttpResponse(standByTimeStart)
+                docketObj.transferKM = transferKm if transferKm else 0
+                docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+                docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
+                docketObj.save()
+        
+        tripObj.save()  
+        if endShift == 1:
+            shiftObj.endDateTime = currentDateTime
+            currentUTCDateTime = datetime.utcnow()
+            shiftObj.endTimeUTC = currentUTCDateTime
+            endLocationImg =request.FILES.get('endLocationImg')
+            if request.FILES.get('endLocationImg'):
+                path = 'static/Account/driverLocationFiles'
+                fileName = endLocationImg.name
+                newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
+                pfs = FileSystemStorage(location=path)
+                pfs.save(newFileName, endLocationImg)            
+                shiftObj.endLocationImg = f'{path}/{newFileName}'
+            shiftObj.endLatitude = 0 if not request.FILES.get('endLatitude') else request.FILES.get('endLatitude')
+            shiftObj.endLongitude = 0 if not request.FILES.get('endLongitude') else request.FILES.get('endLongitude')
+            
+            
+            shiftObj.save()  
+            messages.success(request, "Shift completed successfully.")
+            return redirect('index')
+        else:
+            return redirect('Account:recurringTrip', 1)
+    except Exception as e:
+        return HttpResponse(e)
+        
   
 @csrf_protect
 def endShift(request, shiftId):

@@ -411,7 +411,7 @@
                     <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
                         <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
                         {% if numberOfLoadsCount != 0 %}
-                        <button id = "verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">End shift & reconcile</button>
+                        <button id = "verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">{% if not shiftObj.endDateTime %} End shift & reconcile {% else %} Verify & reconcile {% endif %}</button>
                         {% endif %}
                     </div>
                     {% endif%}
