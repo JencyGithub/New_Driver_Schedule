@@ -76,11 +76,11 @@
                         <b class="d-inline-block m-1 mt-2 text-secondary">(started  {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">from location</span>{% elif shiftObj.locationImg %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">from location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified %}
-                            {% comment %} {% if shiftObj.archive %}
-                                <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Restore"><i class="fa-solid fa-arrow-rotate-left text-success" style="font-size: 1.5rem;"></i></a>
-                            {% else %} {% endcomment %}
+                            {% if not shiftObj.archive %}
+                                {% comment %} <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Restore"><i class="fa-solid fa-arrow-rotate-left text-success" style="font-size: 1.5rem;"></i></a> {% endcomment %}
+                            {% comment %} {% else %} {% endcomment %}
                                 <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Archive"><i class="fa-solid fa-box-archive text-default" style="font-size: 1.5rem;"></i></a>
-                            {% comment %} {% endif %} {% endcomment %}
+                             {% endif %} 
                         {% endif %}
                         <div class="clearfix"></div>
                     </div>
@@ -94,7 +94,7 @@
                                 {% if trip.revenueDeficit > 0 %}
                                 <i class="text-danger float-right" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
                                 {% endif %}
-                                {% if shiftObj.verified is False and trip.startDateTime %}
+                                {% if shiftObj.verified is False and trip.startDateTime and not shiftObj.archive%}
                                 <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}" class="float-right btn btn-dark btn-sm">Add Docket</a> {% endif %}
                                 <div class="clearfix"></div>
                                 
@@ -407,7 +407,7 @@
                     {% endfor %}
 
                     
-                    {% if not shiftObj.verified  and shiftObj.startDateTime  %}
+                    {% if not shiftObj.verified  and shiftObj.startDateTime and not shiftObj.archive %}
                     <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
                         <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
                         {% if numberOfLoadsCount != 0 %}
@@ -529,6 +529,10 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script src="{% static 'js/tripForm.js' %}"></script>
 <script>
+
+    if ('{{shiftObj.archive}}'  == "True"){
+        $('input,select,textarea').prop( "disabled", true );
+    }
     
     function showMap() {
         var cityName = document.getElementById('city').value;
