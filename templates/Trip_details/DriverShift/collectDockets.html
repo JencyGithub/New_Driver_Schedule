@@ -188,13 +188,13 @@
         if (startInput.prop("readonly")) {
             startInput.removeAttr("readonly").attr('required', true);
             if (endId) {
-                endInput.removeAttr("readonly");
+                endInput.removeAttr("readonly").attr('required', true);;
             }
         } else {
             startInput.prop("readonly", true).removeAttr('required');
             startInput.val('');
             if (endId) {
-                endInput.prop("readonly", true);
+                endInput.prop("readonly", true).removeAttr('required');
                 endInput.val('');
             }
         }
