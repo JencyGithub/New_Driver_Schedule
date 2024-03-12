@@ -3906,7 +3906,12 @@ def ShiftDetails(request,id):
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, endDateTime=None)
         else:
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
-    else: # completed and charged
+    elif id == 0: # completed
+        if driverId:
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) )
+        else:
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) )
+    else: # charged
         if driverId:
             shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) & Q(archive=False))
         else:
