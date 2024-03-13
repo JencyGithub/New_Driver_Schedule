@@ -68,7 +68,7 @@
     <script type = "text/javascript" >
       {% comment %} function preventBack() { window.history.forward(); }
       setTimeout("preventBack()", 0);
-      window.onunload = function () { null }; {% endcomment %}
+      window.onunload = function () { null };  {% endcomment %}
 
       document.addEventListener('DOMContentLoaded', function () {
         var currentDate = new Date();
