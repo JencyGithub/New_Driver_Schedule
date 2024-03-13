@@ -177,8 +177,7 @@
                                     <!-- startTime    endTime    loadSheet -->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="loadSheet{{trip.id}}">LogSheet :<span class="required">*</span></label>
-                                        {% if trip.loadSheet is None %}
-                                        
+                                        {% if trip.loadSheet %}                                        
                                         <a href="/{{trip.loadSheet}}" class="text-primary"
                                             target="_blank">LogSheet_file</a>
                                         {% endif %}

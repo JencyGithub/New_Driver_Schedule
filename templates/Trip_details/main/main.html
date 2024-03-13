@@ -66,9 +66,9 @@
     {% include "Trip_details/main/footer.html"%}
 
     <script type = "text/javascript" >
-      {% comment %} function preventBack() { window.history.forward(); }
+      function preventBack() { window.history.forward(); }
       setTimeout("preventBack()", 0);
-      window.onunload = function () { null }; {% endcomment %}
+      window.onunload = function () { null }; 
 
       document.addEventListener('DOMContentLoaded', function () {
         var currentDate = new Date();
