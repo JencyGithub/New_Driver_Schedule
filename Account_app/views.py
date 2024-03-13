@@ -997,23 +997,22 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     
     shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (dateTimeObj(dateTimeObj=request.POST.get('dateTime')) - shiftObj.startDateTime).total_seconds() / 60
 
-    def checkBreaks(breaksObjs):
-        driverBreaksTimeList = []
-        totalDriverBreak = 0    
+    def checkBreaks(breaksObjs):  
         driverBreaksTimeList = []
         totalDriverBreak = 0    
         for breakObj in breaksObjs:
+            print('break:',breakObj)
             if breakObj.durationInMinutes >= 15:
                 totalDriverBreak += breakObj.durationInMinutes
-                totalDriverBreak += breakObj.durationInMinutes
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
-        return totalDriverBreak , driverBreaksTimeList
+        return totalDriverBreak, driverBreaksTimeList
 
     totalDriverBreak , breakCount = checkBreaks(driverBreaks)
     breaksIsAllReady = True
     
     totalTime = shiftTime-totalDriverBreak
-    
+    print(totalDriverBreak, breakCount)
+    # return HttpResponse(totalTime)
     if totalTime < 315:
         pass
     elif totalTime >= 315 and totalTime < 450:
@@ -1023,11 +1022,11 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     elif totalTime >= 450 and totalTime <660:
         if totalDriverBreak < 30: 
             breaksIsAllReady = False
-            msg = f"You need to add {2-len(breakCount)} breaks of 15 minutes each before ending the trip."
-    elif totalTime >= 660 :
+            msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 30 minutes."
+    elif totalTime >= 660 and totalTime < 1440:
         if totalDriverBreak < 60: 
             breaksIsAllReady = False
-            msg = f"You need to add {4-len(breakCount)} breaks of 15 minutes each before ending the trip."
+            msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 60 minutes.."
     elif shiftTime > 1440:
         breaksIsAllReady = False
         msg = f"It appears you have forgotten to end you shift earlier. Please select the checkbox and supply the time manually."
