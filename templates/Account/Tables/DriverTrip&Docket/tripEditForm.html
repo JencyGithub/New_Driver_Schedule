@@ -28,6 +28,14 @@
         height: 85vh;
         width: 74.1vw;
     }
+    b.ocrBtn, #endLocation{
+        cursor: pointer;
+    }
+
+    #endLocationModal #map{
+        height: 85vh;
+        width: 74.1vw;
+    }
     
     @media (max-width: 576px) {
         .cuatom-continer {
@@ -73,7 +81,9 @@
 
                     <div class="x_title">
                         <h2>Shift Details</h2> 
-                        <b class="d-inline-block m-1 mt-2 text-secondary">(started  {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">from location</span>{% elif shiftObj.locationImg %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">from location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>)</b>
+                        <b class="d-inline-block m-1 mt-2 text-secondary">
+                            (started  {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">from location</span>{% elif shiftObj.locationImg %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">from location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>
+                             {%if shiftObj.endDateTime %} ended  {% if shiftObj.endLatitude and shiftObj.endLongitude %}<span id="endLocation" class="text-info">at location</span>{% elif shiftObj.endLocationImg %}<a href="/{{ shiftObj.endLocationImg }}" target="_blank" class="text-info">at location</a>{% endif %} at <span class="text-success">{{ shiftObj.endDateTime|date:'Y-m-d/H:i' }} {% endif %}</span>)</b>
                         <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
                         {% if not shiftObj.verified %}
                             {% if not shiftObj.archive %}
@@ -297,6 +307,12 @@
                                     </div>
                                     <!--    returnQty  returnKm  waitingTimeStart      -->
                                     <div class="col-md-4 col-sm-4">
+                                        <label for="cubicMl{{docket.id}}">Load Qty :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <input class="form-control" value="{{docket.cubicMl}}" type="number" name="cubicMl{{docket.id}}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
                                         <label for="returnQty{{docket.id}}">Return Qty:<span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <input class="form-control" value="{{docket.returnQty}}" type="number"name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
@@ -349,12 +365,7 @@
                                             <input class="form-control" value="{{docket.surcharge_duration}}" type="number"name="surcharge_duration{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="surcharge_duration{{docket.id}}">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="cubicMl{{docket.id}}">Load Qty :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.cubicMl}}" type="number" name="cubicMl{{docket.id}}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
-                                        </div>
-                                    </div>
+                                    
 
                                     <div class="col-md-4 col-sm-4">
                                         <input type="checkbox" class="float-right" id="standByCheck{{docket.id}}" name="standByCheck{{docket.id}}" value="standByCheck{{docket.id}}"
@@ -519,6 +530,9 @@
 </div>
 
 
+
+
+
 <!-- /page content -->
 {% endblock %}
 
@@ -569,7 +583,26 @@
         });
 
         $('#locationModal').modal('show')
-        console.log(latitude, longitude)
+
+    });
+    $('#endLocation').on('click', function(){
+        let latitude = "{{ shiftObj.endLatitude }}"
+        let longitude = "{{ shiftObj.endLongitude }}"
+        var cityLatLng = new google.maps.LatLng(latitude, longitude);
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: cityLatLng,
+            zoom: 12
+        });
+
+        var marker = new google.maps.Marker({
+            position: cityLatLng,
+            map: map,
+            title: "endLocation"
+        });
+
+        $('#locationModal').modal('show')
+
     });
 </script>
 {% endblock %}

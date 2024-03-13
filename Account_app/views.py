@@ -1082,10 +1082,12 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
             pfs = FileSystemStorage(location=loadPath)
             pfs.save(newFileName, loadSheetFile)
             tripObj.loadSheet = f'{loadPath}/{newFileName}'
+        tripObj.save()  
         
         if not clientObj.docketGiven:
             for load in range(1,noOfLoads+1):
                 transferKm = request.POST.get(f'transferKm{load}')
+                
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
                 
@@ -1123,13 +1125,11 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
                 docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-                return HttpResponse(standByTimeStart)
                 docketObj.transferKM = transferKm if transferKm else 0
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                 docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
                 docketObj.save()
         
-        tripObj.save()  
         if endShift == 1:
             shiftObj.endDateTime = currentDateTime
             currentUTCDateTime = datetime.utcnow()
@@ -1142,8 +1142,8 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 pfs = FileSystemStorage(location=path)
                 pfs.save(newFileName, endLocationImg)            
                 shiftObj.endLocationImg = f'{path}/{newFileName}'
-            shiftObj.endLatitude = 0 if not request.FILES.get('endLatitude') else request.FILES.get('endLatitude')
-            shiftObj.endLongitude = 0 if not request.FILES.get('endLongitude') else request.FILES.get('endLongitude')
+            shiftObj.endLatitude = 0 if not request.POST.get('endLatitude') else request.POST.get('endLatitude')
+            shiftObj.endLongitude = 0 if not request.POST.get('endLongitude') else request.POST.get('endLongitude')
             
             
             shiftObj.save()  
