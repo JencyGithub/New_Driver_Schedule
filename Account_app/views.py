@@ -1128,7 +1128,6 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                     docketObj.truckConnectionId = tripObj.truckConnectionId
                     docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
                     docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-                    return HttpResponse(standByTimeStart)
                     docketObj.transferKM = transferKm if transferKm else 0
                     docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                     docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
@@ -1966,10 +1965,10 @@ def expensesTableView(request):
     return JsonResponse({'status': True,'data': data})
 
 def expanseForm(request, id = None):
-
     rctiExpense = None
     if id:
-        rctiExpense = RctiExpense.objects.filter(id = id).first()
+        rctiExpense = RctiExpense.objects.filter(id=id).first()
+        return HttpResponse(rctiExpense)
         rctiExpense.docketDate = dateConverterFromTableToPageFormate(rctiExpense.docketDate)
     params = {
         'rcti' : rctiExpense
@@ -2295,10 +2294,7 @@ def driverSampleCsv(request):
 
 
 @csrf_protect
-# @api_view(['POST'])
 def rctiTable(request):
-    # return HttpResponse(id)
-    
     startDate_ = request.POST.get('startDate')
     endDate_ = request.POST.get('endDate')
     clientName = request.POST.get('clientName')
@@ -2306,17 +2302,17 @@ def rctiTable(request):
     dataType = request.POST.get('RCTI')
     holcimData =None
     rctiData = None
-    # return HttpResponse(clientNameObj)
-    # print(clientNameObj)
     if clientNameObj:
         if dataType== 'rctiDocket':
-            # return HttpResponse('here')
             rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_), clientName = clientNameObj)
         else:
             rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_), clientName = clientNameObj)
     else:
+        if dataType== 'rctiDocket':
             rctiData = RCTI.objects.filter(docketDate__range=(startDate_, endDate_))
-    
+        else:
+            rctiData = RctiExpense.objects.filter(docketDate__range=(startDate_, endDate_))
+            
     params = {
         'RCTIs': rctiData,
         'dataType':dataType,
@@ -4376,5 +4372,75 @@ def basePlantHistory(request, id):
     params = {
         'data' : data,
         'title' : 'Depot HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+
+def tripHistory(request, tripId):
+    data = DriverShiftTrip.history.filter(id=tripId).values('history_type','history_date','history_user_id','startDateTime','endDateTime','dispute','numberOfLoads','revenueDeficit','loadSheet','comment','archive','startOdometerKms','endOdometerKms','startEngineHours','endEngineHours').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Trip HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+
+def docketHistory(request, docketId):
+    data = DriverShiftDocket.history.filter(id=docketId).values('history_type','history_date','history_user_id','shiftDate','docketNumber','docketFile','basePlant','noOfKm','transferKM','returnToYard','tippingToYard','returnQty','returnKm','waitingTimeStart','waitingTimeEnd','totalWaitingInMinute','surchargeType','surcharge_duration','cubicMl','standByStartTime','standByEndTime','standBySlot','blowBack','callOut','minimumLoad','others','comment').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Docket HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+
+def breakHistory(request, breakId):
+    data = DriverBreak.history.filter(id=breakId).values('history_type','history_date','history_user_id','startDateTime','endDateTime','description').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Break HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def rctiHistory(request, rctiId):
+    data = RCTI.history.filter(id=rctiId).values('history_type','history_date','history_user_id','docketNumber','docketDate','docketYard','clientName','rctiReport','noOfKm','cartageTotal','unit','paidQty','transferKMTotal','returnKmTotal','waitingTimeSCHEDTotal','waitingTimeTotal','standByNoSlot','standByTotal','minimumLoadTotal','blowBackTotal','callOutTotal','surcharge','surchargeCost','surchargeGSTPayable','surchargeTotalExGST','surchargeTotal','otherDescription','others','othersCost','othersGSTPayable','othersTotalExGST','othersTotal').order_by('history_id')
+
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'RCTI HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+
+def escalationHistory(request, escalationId):
+    data = Escalation.history.filter(id=escalationId).values('history_type','history_date','history_user_id','escalationDate','escalationType','remark','escalationAmount').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+    except:
+        pass
+    params = {
+        'data' : data,
+        'title' : 'Escalation HIstory'
     }
     return render(request, 'historyTable.html', params)

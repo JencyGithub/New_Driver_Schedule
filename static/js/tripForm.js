@@ -191,10 +191,12 @@ $(".toggleValidationTooltips")
             tableData = ''
             if(data.driverBreaks.length > 0){
                 data.driverBreaks.forEach(function(breakObj) {
+                    url = `/account/history/break/${breakObj['id']}`
                     tableData += `<tr>`
                     tableData += `<td>${breakObj['startDateTime']}</td>`
                     tableData += `<td>${breakObj['endDateTime']}</td>`
                     tableData += `<td>${breakObj['description']}</td>`
+                    tableData += `<td><a href="${url}" class="btn btn-sm btn-history">History</a></td>`
                     tableData += `</tr>`
                 });
             }else{

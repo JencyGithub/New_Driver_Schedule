@@ -51,6 +51,8 @@ table i{
                                         <i class="fa-regular fa-square-minus text-danger"></i>
                                     {% elif forloop.counter == 2 %}
                                         {{ value|date:"Y-m-d h:i:s" }} 
+                                    {% elif 'static/' in value %}
+                                        <a href='/{{ value }}'>Click here for image</a>
                                     {% else %}
                                         {{ value }}
                                     {% endif %}

@@ -52,31 +52,15 @@
                         <th>Truck No</th>
                         <th>docketNumber</th>
                         <th>docketDate</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for rcti in RCTIs %}
-                      
                         <tr>
-                          <td>{{rcti.clientName}}</td>
-                          <td>{{rcti.truckNo}}</td>
-
-                          <td>{{ rcti.docketNumber }}</td>
-                          <td>{{ rcti.docketDate }}</td>
-                          <td>
-                            <label type="button" class="btn" id="redirectButton">
-                              {% if dataType == 'rctiDocket'%}
-                              <a href="{% url 'Account:rctiForm' id=rcti.id %}">
-                                <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                              </a>
-                              {%else%}
-                              <a href="{% url 'Account:expanseView' id=rcti.id %}">
-                                <i class="fa-solid fa-arrow-right" style="font-size:1.3rem"></i>
-                              </a>
-                              {%endif%}
-                            </label>
-                          </td>                       
+                          <td><a href="{% if dataType == 'rctiDocket'%}{% url 'Account:rctiForm' id=rcti.id %}{% else %}{% url 'Account:expanseView' id=rcti.id %}{% endif %}">{{rcti.clientName}}</a></td>
+                          <td><a href="{% url 'Account:expanseView' id=rcti.id %}">{{rcti.truckNo}}</a></td>
+                          <td><a href="{% url 'Account:expanseView' id=rcti.id %}">{{ rcti.docketNumber }}</a></td>
+                          <td><a href="{% url 'Account:expanseView' id=rcti.id %}">{{ rcti.docketDate }}</a></td>
                         </tr>
                       {% endfor %}
                       {% comment %} Holcim Data  {% endcomment %}

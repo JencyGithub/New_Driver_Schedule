@@ -41,12 +41,10 @@
   <div class="">
     <div class="clearfix"></div>
     <div class="row">
-
-
       {% comment %} RCTI Expense  {% endcomment %}
       <div class="col-md-12 col-sm-12">
         <div class="x_panel">
-            <form action="{% url 'Account:rctiTable' %}" method="POST" id="reconciliationForm">
+          <form action="{% url 'Account:rctiTable' %}" method="POST" id="reconciliationForm">
             <div class="x_title">
                 <h2>RCTI | Expenses  Form</h2>
                 <div class="float-right">
@@ -60,75 +58,74 @@
                 <div class="clearfix"></div>
             </div>
             <div class="x_content">
-                <div class="cuatom-continer">
-                        {% csrf_token %}
-                        <div class="col-md-4 col-sm-4">
-                            <label for="startDate">Start Date:</label>
-                            <div class="field item form-group">
-                                <input class="form-control date" type="date" name="startDate" id="startDate" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-4">
-                            <label for="endDate">End Date:<span class="required">*</span></label>
-                            <div class="field item form-group">
-                                <input class="form-control date" type="date" name="endDate" id="endDate" readonly required>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-sm-4">
-                          <label for="clientId">Client Name</label>
+              <div class="cuatom-continer">
+                      {% csrf_token %}
+                      <div class="col-md-4 col-sm-4">
+                          <label for="startDate">Start Date:</label>
                           <div class="field item form-group">
-                            <select name="clientName" class="form-control"  id="clientName">
-                                  <option value="" >All</option>
-                                  {%for client in client %}
-                                  <option value="{{client.name}}">{{client.name}}</option>
-                                  {% endfor%}
-                              </select>
+                              <input class="form-control date" type="date" name="startDate" id="startDate" required>
                           </div>
                       </div>
-
-                        <div class="col-md-12 text-right">
-                            <button type='submit' class="btn btn-primary px-4">Submit</button>
+                      <div class="col-md-4 col-sm-4">
+                          <label for="endDate">End Date:<span class="required">*</span></label>
+                          <div class="field item form-group">
+                              <input class="form-control date" type="date" name="endDate" id="endDate" readonly required>
+                          </div>
+                      </div>
+                      <div class="col-md-4 col-sm-4">
+                        <label for="clientId">Client Name</label>
+                        <div class="field item form-group">
+                          <select name="clientName" class="form-control"  id="clientName">
+                                <option value="" >All</option>
+                                {%for client in client %}
+                                <option value="{{client.name}}">{{client.name}}</option>
+                                {% endfor%}
+                            </select>
                         </div>
-                </div>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <button type='submit' class="btn btn-sm btn-default px-3">Submit</button>
+                    </div>
+              </div>
             </div>
-            </form>
-            
+          </form>           
         </div>
       </div>
-        <!-- New Rcti Entry Model -->
-    <div class="modal fade" id="rctiModal" tabindex="-1" role="dialog" aria-labelledby="rctiModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-          <h5 class="modal-title" id="rctiModalLabel">Client Name Select</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-          </button>
-          </div>
-          <form action="{% url 'Account:rctiFormAdd' %}" method="POST" >
-              {% csrf_token %}
-              <div class="modal-body">
-                  <div class="col-md-12 col-sm-12 field">
-                      <label for="name">Client name :<span class="required">*</span></label>
-                      <select name="clientId" required {% if objs %}disabled{% endif %} id="clientId" class="form-control">
-                          <option value="" disabled selected >Select Client Name...</option>
-                          {% for client in client %}
-                          <option value="{{client.clientId}}" {% if client.clientId == clientObj.clientId %}selected{% endif%} >{{client.name}}</option>
-                          {% endfor %}
-                      </select>
-                  </div>   
-                  <div class="col-md-12 col-sm-12 field">
-                    <label for="name">Date :<span class="required">*</span></label>
-                    <input class="form-control" type="date" name="startDate" required style="padding: 0.25rem 0.2rem;" id="startDate" >
-                  </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="submit" class="btn btn-default btn-sm">Save </button>
-              </div>
-          </form>
+
+      <!-- New Rcti Entry Model -->
+      <div class="modal fade" id="rctiModal" tabindex="-1" role="dialog" aria-labelledby="rctiModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="rctiModalLabel">Client Name Select</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="{% url 'Account:rctiFormAdd' %}" method="POST" >
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="col-md-12 col-sm-12 field">
+                        <label for="name">Client name :<span class="required">*</span></label>
+                        <select name="clientId" required {% if objs %}disabled{% endif %} id="clientId" class="form-control">
+                            <option value="" disabled selected >Select Client Name...</option>
+                            {% for client in client %}
+                            <option value="{{client.clientId}}" {% if client.clientId == clientObj.clientId %}selected{% endif%} >{{client.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>   
+                    <div class="col-md-12 col-sm-12 field">
+                      <label for="name">Date :<span class="required">*</span></label>
+                      <input class="form-control" type="date" name="startDate" required style="padding: 0.25rem 0.2rem;" id="startDate" >
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-default btn-sm">Save </button>
+                </div>
+            </form>
+        </div>
+        </div>
       </div>
-      </div>
-  </div>
 
       {% comment %} RCTI ENTRY  {% endcomment %}
       <div class="col-md-12 col-sm-12">
@@ -183,10 +180,10 @@
                   </div>
                 </div>
                 <div class="col-md-12 text-right">
-                  <button type="submit" class="btn btn-primary px-4">Submit</button>
+                  <button type="submit" class="btn btn-sm btn-default px-3">Submit</button>
                 </div>
                 <!-- Button trigger modal -->
-                                <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#warningModal">
+                                <!-- <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#warningModal">
                                   Launch demo modal
                                 </button> -->
 
@@ -205,7 +202,7 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" id="no" data-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Yes</button>
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Yes</button>
                       </div>
                     </div>
                   </div>
@@ -229,10 +226,7 @@
             </ul>
             <div class="clearfix"></div>
           </div>
-
-          
           <div class="x_content">
-
             <ul class="nav nav-tabs bar_tabs" id="myTab" role="tablist">
               <li class="nav-item">
                 <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Active</a>
@@ -243,7 +237,6 @@
               <li class="nav-item">
                 <a class="nav-link" id="Archive-tab" data-toggle="tab" href="#Archive" role="tab" aria-controls="Archive" aria-selected="false">Archive</a>
               </li>
-              
             </ul>
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -305,13 +298,10 @@
                     </div>
                   </div>
                 </div>
-
                 <!-- End Error Table  -->
               </div>
-
               <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <!-- Solve Table  -->
-          
+                <!-- Solve Table  -->          
                 <div class="x_panel">
                   <div class="x_title">
                     <h2>Solved</h2>

@@ -86,7 +86,11 @@
                     </div>
 
                     {% for trip in driverTrip %}
-                    
+                        {% if trip %}
+                        <div class="float-right">
+                            <a href="{% url 'Account:tripHistory' tripId=trip.id %}" class="btn btn-sm btn-history">History</a>
+                        </div>
+                        {% endif %}
                         <div class="x_panel">
                             <div class="x_title mb-0">
                                 <h2 class="text-primary">Trip {{forloop.counter}}</h2>
@@ -222,6 +226,11 @@
                         </div>
 
                         {% for docket in trip.tripDockets %}
+                        {% if docket %}
+                        <div class="float-right">
+                            <a href="{% url 'Account:docketHistory' docketId=docket.id %}" class="btn btn-sm btn-history">History</a>
+                        </div>
+                        {% endif %}
                         <div class="x_panel">
                             <div class="x_title">
                                 <!-- {% if docket.reconciliationObj %}<a href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" class="mr-2" style="font-size: 1.2rem;" target="_blank" data-toggle="tooltip" data-placement="top" title="View Reconciliation"><i class="fa-solid fa-paste"></i></a>{% endif %}<h5 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h5> -->
@@ -447,6 +456,7 @@
         </div>
     </div>
 </div>
+
 <!-- exit trip and reconcile model  -->
 <div class="modal fade" id="shiftEndTimeModel" tabindex="-1" role="dialog" aria-labelledby="shiftEndTimeLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -473,7 +483,6 @@
     </div>
 </div>
 
-
 <!-- Break modal -->
 <div class="modal fade bd-example-modal-lg" id="driverBreaks" tabindex="-1" role="dialog" aria-labelledby="driverBreaksLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -489,6 +498,7 @@
                     <th scope="col">Start</th>
                     <th scope="col">End</th>
                     <th scope="col" class='w-50'>Description</th>
+                    <th scope="col">History</th>
                 </tr>
                 </thead>
                 <tbody>

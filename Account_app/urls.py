@@ -289,4 +289,11 @@ urlpatterns = [
     path('history/grace/<int:id>/', views.graceHistory, name='graceHistory'), 
 
     path('history/base-plant/<int:id>/', views.basePlantHistory, name='basePlantHistory'), 
+
+    path('history/trip/<int:tripId>/', views.tripHistory, name='tripHistory'), 
+    path('history/docket/<int:docketId>/', views.docketHistory, name='docketHistory'), 
+    path('history/break/<int:breakId>/', views.breakHistory, name='breakHistory'), 
+
+    path('history/rcti/<int:rctiId>/', views.rctiHistory, name='rctiHistory'), 
+    path('history/escalation/<int:escalationId>/', views.escalationHistory, name='escalationHistory'), 
 ]
