@@ -171,12 +171,13 @@
             var inputValue = $(this).val();
             var fileExt = inputValue.split('.').pop()
             // console.log(inputValue.split('.').pop() == "jpg", inputValue.split('.').pop())
-            if (values.includes(inputValue)) {
-                isUnique = false;
-                msg = "Please ensure you haven't uploaded the same file multiple times."
-                return false;
-            }
-            else if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
+            // if (values.includes(inputValue)) {
+            //     isUnique = false;
+            //     msg = "Please ensure you haven't uploaded the same file multiple times."
+            //     return false;
+            // }
+            // else if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
+            if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
                 isUnique = false;
                 msg = "Please Upload docket file in JPG, JPEG pr PNG formate."
                 return false;

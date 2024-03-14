@@ -187,6 +187,9 @@ class DriverReimbursement(models.Model):
     notes = models.CharField(max_length=2048, default='', null=True, blank=True)
     amount = models.FloatField(default=0)
     reimbursementFile = models.FileField(upload_to='static/img/reimbursementFiles', null=True, blank=True)
+    # 0:Pending, 1:Accepted, 2:Denied, 3:Partial
+    status = models.PositiveBigIntegerField(default=0)
+    actualAmount = models.PositiveBigIntegerField(default=0)
     history = HistoricalRecords()
 
     def __str__(self) -> str:
