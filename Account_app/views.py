@@ -984,35 +984,42 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     clientObj = Client.objects.filter(pk=tripObj.clientId).first()
     surcharges = Surcharge.objects.all()
     driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
+    endDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
     manualEndTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
     breaks = DriverBreak.objects.filter(shiftId=shiftObj)
     
+    if endDateTime <= shiftObj.startDateTime or endDateTime <= tripObj.startDateTime:
+        messages.error(request, "End shift date-time is not valid.")
+        return redirect(request.META.get('HTTP_REFERER')) 
+    
+    if manualEndTime:
+        endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
+        
     for obj in breaks:
         obj.startDateTime = str(obj.startDateTime).split('+')[0]   
         obj.endDateTime = str(obj.endDateTime).split('+')[0]   
-    if manualEndTime:
-        if manualEndTime < shiftObj.startDateTime:
-            messages.error(request, "End shift date-time is not valid.")
-            return redirect(request.META.get('HTTP_REFERER')) 
+        
+    shiftTime = (endDateTime - shiftObj.startDateTime).total_seconds() / 60 
     
-    shiftTime = (manualEndTime - shiftObj.startDateTime).total_seconds() / 60 if manualEndTime else (dateTimeObj(dateTimeObj=request.POST.get('dateTime')) - shiftObj.startDateTime).total_seconds() / 60
-
     def checkBreaks(breaksObjs):  
         driverBreaksTimeList = []
         totalDriverBreak = 0    
         for breakObj in breaksObjs:
             print('break:',breakObj)
+            if breakObj.endDateTime > endDateTime:
+                messages.error(request, "Entered breaks is not valid, please enter the correct break details.")
+                return redirect('Account:driverShiftView',shiftId=shiftId), -1
             if breakObj.durationInMinutes >= 15:
                 totalDriverBreak += breakObj.durationInMinutes
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
         return totalDriverBreak, driverBreaksTimeList
 
     totalDriverBreak , breakCount = checkBreaks(driverBreaks)
+    if breakCount == -1:
+        return totalDriverBreak
     breaksIsAllReady = True
     
     totalTime = shiftTime-totalDriverBreak
-    print(totalDriverBreak, breakCount)
-    # return HttpResponse(totalTime)
     if totalTime < 315:
         pass
     elif totalTime >= 315 and totalTime < 450:
@@ -1033,7 +1040,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
     if not breaksIsAllReady:
         messages.error(request, msg)
         return redirect(request.META.get('HTTP_REFERER'))      
-        
+    
     params = {
         'docket' : 1 if clientObj.docketGiven else 0,
         'shiftId' : shiftId,
@@ -1043,6 +1050,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         'surcharges' : surcharges
     }
     return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
+
 
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
@@ -1055,12 +1063,12 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         loadPath = 'static/img/finalloadSheet'
         shiftObj = DriverShift.objects.filter(pk=shiftId).first()
         tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-        largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
-        driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
+        # largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
+        # driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
         
-        if driver_break_object and driver_break_object.endDateTime > currentDateTime:
-            messages.error(request, "Entered breaks is not valid, please  enter the correct break details.")
-            return redirect('Account:driverShiftView',shiftId=shiftId)
+        # if driver_break_object and driver_break_object.endDateTime > currentDateTime:
+        #     messages.error(request, "Entered breaks is not valid, please enter the correct break details.")
+        #     return redirect('Account:driverShiftView',shiftId=shiftId)
         
         truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
         truckInfoObj = truckConnectionObj.truckNumber.truckInformation
@@ -1248,29 +1256,20 @@ def getTrucks(request):
     connections = []
     clientName = request.POST.get('clientName')
     client = Client.objects.get(name=clientName)
-    currentDate = None
-    
-    if not request.POST.get('shiftId'):
-        datetime_object = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
-        currentDate = datetime_object.date()
+    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
         
-
     if request.POST.get('shiftId'):
         shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
-    
-        year, month, day = map(int, request.POST.get('curDate').split('-'))        
-        currentDate = date(int(year), int(month), int(day))
-        
         currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
         for trip in currentTripObjs:
             connections.append(trip.truckConnectionId)
         
-    allCurrentTrips = DriverShiftTrip.objects.filter(endDateTime__isnull=True, archive=False)
+    allCurrentTrips = DriverShiftTrip.objects.filter(startDateTime__lte=currentDateTime,endDateTime__isnull=True, archive=False)
     for trip in allCurrentTrips:
         connections.append(trip.truckConnectionId)
     
     truckList = []
-    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDate , endDate__gte=currentDate)
+    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDateTime.date() , endDate__gte=currentDateTime.date())
     docket = client.docketGiven
 
     for truck_connection in truck_connections:
