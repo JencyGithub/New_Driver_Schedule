@@ -104,6 +104,8 @@ class DriverShiftTrip(models.Model):
     startEngineHours = models.FloatField(default=0, null=True)
     endEngineHours = models.FloatField(default=0, null=True)
     lastEmailTime = models.DateTimeField(null=True)
+    totalRunTime = models.FloatField(default=0)
+    totalBreakInMinute = models.FloatField(default=0)
     history = HistoricalRecords()
     
     def __str__(self) -> str:
@@ -158,14 +160,19 @@ class DriverShiftDocket(models.Model):
 
 class DriverBreak(models.Model):
     shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None)
+    tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None, null=True)
     # tripId = models.ForeignKey(DriverShiftTrip, on_delete=models.CASCADE, default=None)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None)  
-    startDateTime = models.DateTimeField(default='', null=True)
-    endDateTime = models.DateTimeField(default='', null=True)
+    startDateTime = models.DateTimeField(null=True)
+    endDateTime = models.DateTimeField(null=True)
     breakFile = models.FileField(upload_to='static/img/breakFiles', null=True)
     durationInMinutes = models.FloatField(default=0, null=True) 
     location = models.CharField(max_length=2048, default='', null=True)
     description = models.CharField(max_length=2048, default='', null=True)
+    nextBreakStartTime = models.DateTimeField( null=True )
+
+
+
     history = HistoricalRecords()
     
     def __str__(self) -> str:
@@ -184,7 +191,11 @@ class DriverReimbursement(models.Model):
     shiftId = models.ForeignKey(DriverShift, on_delete=models.CASCADE, default=None, null=True)
     driverId = models.ForeignKey(Driver, on_delete=models.CASCADE, default=None, null=True)
     raiseDate = models.DateTimeField(default=None, null=True, blank=True)
+    # driver notes
     notes = models.CharField(max_length=2048, default='', null=True, blank=True)
+    # staff notes 
+    comments = models.CharField(max_length=2048, default='', null=True, blank=True)
+
     amount = models.FloatField(default=0)
     reimbursementFile = models.FileField(upload_to='static/img/reimbursementFiles', null=True, blank=True)
     # 0:Pending, 1:Accepted, 2:Denied, 3:Partial

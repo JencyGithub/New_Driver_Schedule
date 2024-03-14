@@ -574,6 +574,7 @@ def checkShiftStartedOrNot(request):
     
 def mapFormView(request, startDate=None):
     driverObj = Driver.objects.filter(name=request.user.username).first()
+
     if not driverObj:
         messages.error(request, "Only driver can access this.")
         return redirect(request.META.get('HTTP_REFERER'))
@@ -1099,7 +1100,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 transferKm = request.POST.get(f'transferKm{load}')
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket()
+                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), tripId=tripObj.id, clientId=clientObj.clientId).first()
+                if not docketObj:
+                    docketObj = DriverShiftDocket()
                 docketObj.tripId = tripObj.id
                 docketObj.shiftId = shiftId
                 docketObj.shiftDate = tripObj.startDateTime.date()
@@ -1124,7 +1127,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 transferKm = request.POST.get(f'transferKm{load}')
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket()
+                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), tripId=tripObj.id, clientId=clientObj.clientId).first()
+                if not docketObj:
+                    docketObj = DriverShiftDocket()
                 docketObj.tripId = tripObj.id
                 docketObj.shiftId = shiftId
                 docketObj.shiftDate = tripObj.startDateTime.date()
@@ -1228,6 +1233,9 @@ def driverLeaveRequestSave(request):
     startDate = request.POST.get('from')
     endDate = request.POST.get('to')
     reasonId = request.POST.get('reasonId')
+    if not reasonId:
+        messages.error(request, "Please select reason first.")
+        return redirect(request.META.get('HTTP_REFERER'))
     leaveReason = NatureOfLeave.objects.filter(pk=reasonId).first()
     driverObj =  Driver.objects.filter(name=request.user.username).first()
     
