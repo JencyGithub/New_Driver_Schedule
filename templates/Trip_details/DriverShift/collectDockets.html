@@ -151,7 +151,7 @@
     $('#docketsForm').submit(function(event) {
         event.preventDefault();
         setDateTime("dateTime");            
-        var validExtensions = ['jpg', 'jpeg']
+        var validExtensions = ['jpg', 'jpeg', 'png']
         var values = [];
         var docketNumberInputs = $('input[name^="docketNumber"]');
         var docketFileInputs = $('input[name^="docketFile"]');
