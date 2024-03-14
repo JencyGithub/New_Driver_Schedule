@@ -35,7 +35,7 @@
                                         {% for break in breaks %}
                                             <div class="col-lg-4 col-md col-sm-6">
                                                 <a href="{% url 'Account:editDriverBreak' shiftId=shiftId breakId=break.id %}" class="text-default text-decoration-none">
-                                                    <b>1.</b> <span>{{ break.startDateTime }}</span> to <span>{{ break.endDateTime }}</span>
+                                                    <b>{{ forloop.counter }}.</b> <span>{{ break.startDateTime }}</span> to <span>{{ break.endDateTime }}</span>
                                                 </a>
                                             </div>
                                         {% endfor %}
