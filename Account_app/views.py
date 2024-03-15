@@ -914,7 +914,6 @@ def saveDriverBreak(request, shiftId, breakId=None):
         return redirect(request.META.get('HTTP_REFERER')) 
     
     driverId = Driver.objects.filter(name=request.user.username).first()
-    
     breakObj.shiftId = shiftObj
     breakObj.driverId = driverId
     breakObj.startDateTime = startDateTime 
@@ -931,8 +930,13 @@ def saveDriverBreak(request, shiftId, breakId=None):
         pfs = FileSystemStorage(location=path)
         pfs.save(newFileName, breakFile)
         breakObj.breakFile = f'{path}/{newFileName}'
-    
-    breakObj.save()
+    # breakObj.nextBreakStartTime = breakObj.startDateTime
+    try:
+        print('breakObj',breakObj)
+        breakObj.save()
+    except Exception as e:
+        print(breakObj)
+        return HttpResponse(e)
     return redirect('Account:driverShiftView', shiftId)
     
 

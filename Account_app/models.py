@@ -77,7 +77,8 @@ class DriverShift(models.Model):
     endLatitude = models.CharField(max_length=20, null=True, blank=True)
     endLongitude = models.CharField(max_length=20, null=True, blank=True)
     endLocationImg = models.FileField(upload_to='static/Account/driverLocationFiles', null=True)
-
+    totalRunTime = models.FloatField(default=0)
+    totalBreakInMinute = models.FloatField(default=0)
     history = HistoricalRecords()
     
     def __str__(self) -> str:
@@ -104,8 +105,7 @@ class DriverShiftTrip(models.Model):
     startEngineHours = models.FloatField(default=0, null=True)
     endEngineHours = models.FloatField(default=0, null=True)
     lastEmailTime = models.DateTimeField(null=True)
-    totalRunTime = models.FloatField(default=0)
-    totalBreakInMinute = models.FloatField(default=0)
+
     history = HistoricalRecords()
     
     def __str__(self) -> str:
