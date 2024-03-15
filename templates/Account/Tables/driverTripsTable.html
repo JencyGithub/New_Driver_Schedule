@@ -131,6 +131,7 @@
                         </th>
                         {% if id_ == 2 %}
                           <th>Duration</th>
+                          <th>Next Break</th>
                         {% endif %}
                       </tr>
                     </thead>
@@ -152,6 +153,7 @@
                           </td>
                           {% if id_ == 2 %}
                             <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.timeDiff }}</a></td>
+                            <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.nextBreak|date:'Y-m-d H:i' }}</a></td>
                           {% endif %}
                         </tr>
                         {% endfor %}

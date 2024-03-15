@@ -1113,3 +1113,75 @@ def clientOfficeHistory(request, clientOfcId):
         'title' : 'Client Office HIstory'
     }
     return render(request, 'historyTable.html', params)
+
+def reimbursementTable(request):
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    status = request.POST.get('status')
+    if startDate:
+        if not status:
+            reimbursementObj = DriverReimbursement.objects.filter(raiseDate__range=(startDate, endDate))
+        else:  
+            reimbursementObj = DriverReimbursement.objects.filter(raiseDate__range=(startDate, endDate),status=status)
+    else:
+    
+        startDate = (datetime.now() - timedelta(days=30)).date().strftime('%Y-%m-%d')
+        endDate = datetime.now().date().strftime('%Y-%m-%d')
+
+        # Query to retrieve data for the last one month including today
+        reimbursementObj = DriverReimbursement.objects.filter(raiseDate__range=(startDate, endDate))
+
+    # Prepare parameters for context
+    params = {
+        'startDate': startDate,
+        'endDate': endDate,
+        'status':status,
+        'reimbursementObj': reimbursementObj
+    }
+    return render(request,'GearBox/table/reimbursementTable.html',params)
+
+def reimbursementForm(request,id):
+    reimbursementObj = DriverReimbursement.objects.filter(pk=id).first()
+    driverObj = Driver.objects.all()
+    # Prepare parameters for context
+    params = {
+        'reimbursementObj': reimbursementObj,
+        'driverObj':driverObj
+    }
+    return render(request,'GearBox/reimbursementForm.html',params)
+
+@csrf_protect
+def reimbursementFormSave(request,id):
+    reimbursementObj = DriverReimbursement.objects.filter(pk=id).first()
+    amount = reimbursementObj.amount
+    actualAmount = float(request.POST.get('actualAmount'))
+    status = int(request.POST.get('status'))
+    if status == 1 and   amount > actualAmount:
+        status = 3
+
+    reimbursementObj.actualAmount = actualAmount
+    reimbursementObj.status = status
+    reimbursementObj.comment = request.POST.get('comment')
+    reimbursementObj.save()
+    messages.success(request,'Reimbursement successfully updated.')
+    return redirect('gearBox:reimbursementTable')
+    
+    
+@csrf_protect
+def reimbursementFilter(request):
+    status = int(request.POST.get('status')) 
+    startDate = request.POST.get('startDate')
+    endDate = request.POST.get('endDate')
+    reimbursementObj = DriverReimbursement.objects.filter(raiseDate__range=(startDate, endDate),status=status).values()
+    for obj in reimbursementObj:
+        driverObj = Driver.objects.filter(pk=obj['driverId_id']).first()
+        if driverObj:
+            obj['driverName'] = driverObj.firstName  + " " + driverObj.lastName
+            rowColor  = '#e9bebe' 
+            if  obj['status']==1 :
+                rowColor = '#b5dcb5'
+            elif  obj['status']==2 :
+                rowColor = '#ff8f5a'
+            elif  obj['status']==3 :
+                rowColor = '#bed4e9'
+    return JsonResponse({'status':True,'reimbursementObj':list(reimbursementObj),'rowColor':rowColor})

@@ -167,4 +167,11 @@ urlpatterns = [
     path('history/employee/<int:clientId>/', views.clientHistory, name='clientHistory'), 
     path('history/client-office/<int:clientOfcId>/', views.clientOfficeHistory, name='clientOfficeHistory'), 
     
+    
+    # reimbursementTable
+    path('reimbursement/table/', views.reimbursementTable, name='reimbursementTable'), 
+    path('reimbursement/form/<int:id>/', views.reimbursementForm, name='reimbursementForm'), 
+    path('reimbursement/form/save/<int:id>/', views.reimbursementFormSave, name='reimbursementFormSave'), 
+    path('reimbursement/filter/', views.reimbursementFilter, name='reimbursementFilter'), 
+    
 ]

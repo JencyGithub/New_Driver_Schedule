@@ -896,6 +896,7 @@ def addDriverBreak(request, shiftId, breakId=None):
 @csrf_protect
 def saveDriverBreak(request, shiftId, breakId=None):
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    lastTripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id ,endDateTime = None).first()
     breakObj = DriverBreak() if not breakId else DriverBreak.objects.filter(pk=breakId).first()
     startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime')) 
     endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
@@ -916,11 +917,12 @@ def saveDriverBreak(request, shiftId, breakId=None):
     driverId = Driver.objects.filter(name=request.user.username).first()
     breakObj.shiftId = shiftObj
     breakObj.driverId = driverId
+    breakObj.tripId = lastTripObj
     breakObj.startDateTime = startDateTime 
     breakObj.endDateTime = endDateTime
     breakObj.location = request.POST.get('curLocation')
     breakObj.description = request.POST.get('description')
-
+    shiftObj.totalBreakInMinute += (endDateTime - startDateTime).total_seconds() / 60
     breakFile = request.FILES.get('breakFile')
     if breakFile:
         curTimeStr = getCurrentTimeInString()
@@ -930,13 +932,10 @@ def saveDriverBreak(request, shiftId, breakId=None):
         pfs = FileSystemStorage(location=path)
         pfs.save(newFileName, breakFile)
         breakObj.breakFile = f'{path}/{newFileName}'
-    # breakObj.nextBreakStartTime = breakObj.startDateTime
-    try:
-        print('breakObj',breakObj)
-        breakObj.save()
-    except Exception as e:
-        print(breakObj)
-        return HttpResponse(e)
+
+    breakObj.save()
+    shiftObj.save()
+    
     return redirect('Account:driverShiftView', shiftId)
     
 
@@ -980,7 +979,7 @@ def addReimbursementSave(request, shiftId):
         reimbursementObj.reimbursementFile = f'{path}/{newFileName}'
     
     reimbursementObj.save()
-    return redirect('Account:DriverPreStartSave', tripObj.id)
+    return redirect('Account:driverShiftView', shiftObj.id)
 
 @csrf_protect
 def collectDockets(request, shiftId, tripId, endShift=None):
@@ -3911,6 +3910,7 @@ def ShiftDetails(request,id):
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, endDateTime=None)
         else:
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
+            
     elif id == 0: # completed
         if driverId:
             shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) )
@@ -3927,7 +3927,10 @@ def ShiftDetails(request,id):
         if shift.driverName:
             shift.driverName = f'{shift.driverName.firstName} {shift.driverName.lastName}'
         shift.deficit = False
-
+        if id == 2:
+            breakObj = DriverBreak.objects.filter(shiftId = shift , durationInMinutes__gte = 15).order_by('-id').first()
+            if breakObj:
+                shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
         if shift.startTimeUTC:
             shift.timeDiff = str(datetime.utcnow() - shift.startTimeUTC).split('.')[0]
         

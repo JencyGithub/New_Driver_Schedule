@@ -1,0 +1,141 @@
+{% extends "main/main.html" %}
+{% load static %}
+{% block title %} | Reimbursement Table {% endblock %}
+{% block headStyle %}
+
+<!-- Datatables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link type="text/css"
+    href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<style>
+    .cuatom-continer {
+        margin: 0 5rem;
+    }
+
+    .errorMsg {
+        font-size: 0.7rem;
+        color: rgb(255, 0, 0);
+        margin-top: 0.3rem;
+        list-style-type: none;
+    }
+
+    .isInvalid {
+        border: 1px solid rgb(255, 0, 0) !important;
+        border-radius: 7px !important;
+    }
+    .form-check-label{
+        padding-top:1.5px !important;
+    }
+
+    @media (max-width: 576px) {
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .cuatom-continer {
+            margin: 0;
+        }
+    }
+
+    .dt-buttons.btn-group {
+        float: right ! important;
+    }
+
+    /* Hide all buttons (copy,csv,excel,pdf,print) */
+    .dt-buttons.btn-group>a {
+        display: none !important;
+    }
+    table button{
+        border:0!important;
+        background-color: transparent;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="x_panel">
+                <form action="{% url 'gearBox:reimbursementFormSave' id=reimbursementObj.id%}" method="POST"  id="reimbursementForm">
+                    {%csrf_token%}
+                    <div class="x_title">
+                        <h2>Reimbursement Form</h2>
+                        
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <ul style="list-style-type: disclosure-closed;">
+                                    <li>Raised By : <b class="text-capitalize" >{{reimbursementObj.driverId.firstName}} {{reimbursementObj.driverId.lastName}} </b></li>
+                                    <li>Raised Date : <b>{{reimbursementObj.raiseDate|date:'Y-m-d H:i'}} </b></li>
+                                    <li>Comment By Driver : <b >{{reimbursementObj.notes}} </b></li>
+                                    <li>Raised Amount : <b class="text-danger">{{reimbursementObj.amount}} </b></li>
+                                    <li>Reimbursement File :<a href="{% if not reimbursementObj.reimbursementFile %}#{% else %}/{{reimbursementObj.reimbursementFile}}{% endif %}" target="_blank" class="text-info">Reimbursement File</a> </li>
+                                    <li>Shift Details : <a href=" {% url 'Account:DriverTripEdit' id=reimbursementObj.shiftId.id %}" target="_blank" class="text-info">Click Here</a></li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="status">Approved:<span class="required">*</span></label>
+                                    <input checked {% if reimbursementObj.status != 0 %}disabled{% endif %} {% if   reimbursementObj.status == 1 or reimbursementObj.status == 3 %}checked{% endif %}  type="radio" value="1" onclick="deniedFun(1)"  name="status" id="status">
+                                    
+                                </div> 
+                                <div class="col-md-3 col-sm-3">
+                                    <label for="denied">Denied:<span class="required ">*</span></label>
+                                    <input  {% if reimbursementObj.status != 0 %}disabled{% endif %} {% if  reimbursementObj.status == 2 %}checked{% endif %} type="radio" value="2" onclick="deniedFun(2)"  name="status" id="denied">    
+                                </div>
+                                <div class="col-md-6 col-sm-6 paidAmount ">
+                                    <label for="actualAmount">Paid Amount:<span class="required">*</span></label>
+                                    <input class="form-control" step="0.01" max="{{reimbursementObj.amount}}" {% if reimbursementObj.status != 0 %}readonly{% endif %}  required type="number" value="{{reimbursementObj.actualAmount}}"  name="actualAmount" id="actualAmount">
+                                </div>
+                                <div class="col-md-12 col-sm-12">
+                                    <label for="comment">Comment By Staff:<span class="required">*</span></label>
+                                    <div class="field item form-group">
+                                        <textarea class="form-control " {% if reimbursementObj.status != 0 %}readonly{% endif %}  type="text" name="comment" id="comment">{{reimbursementObj.comment}}</textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% if reimbursementObj.status == 0 %}
+                            <div class="col-md-12 col-sm-12">
+                                <button type="submit" class="float-right btn btn-sm btn-default"> update</button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}
+
+{% block footerStyleEnd %}
+
+<script>
+    function deniedFun(status){
+        if (status == 2){
+            $('.paidAmount').addClass('d-none')
+            $('#actualAmount').removeAttr('required').val(0)
+        }
+        else{
+            $('.paidAmount').removeClass('d-none')
+            $('#actualAmount').prop('required',true).val(0)
+        }
+    }
+</script>
+{% endblock %}
