@@ -1114,6 +1114,21 @@ def clientOfficeHistory(request, clientOfcId):
     }
     return render(request, 'historyTable.html', params)
 
+def reimbursementHistory(request, reimbursementId):
+    data = DriverReimbursement.history.filter(id=reimbursementId).values('history_type','history_date','history_user_id','raiseDate','notes','comments','amount','reimbursementFile','actualAmount').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+            
+    except:
+        pass
+    
+    params = {
+        'data' : data,
+        'title' : 'Client Office HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
 def reimbursementTable(request):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
@@ -1173,6 +1188,7 @@ def reimbursementFilter(request):
     startDate = request.POST.get('startDate')
     endDate = request.POST.get('endDate')
     reimbursementObj = DriverReimbursement.objects.filter(raiseDate__range=(startDate, endDate),status=status).values()
+    rowColor = None
     for obj in reimbursementObj:
         driverObj = Driver.objects.filter(pk=obj['driverId_id']).first()
         if driverObj:

@@ -901,6 +901,17 @@ def saveDriverBreak(request, shiftId, breakId=None):
     startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime')) 
     endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
     lastBreakObj  = DriverBreak.objects.filter(shiftId=shiftObj).order_by('-startDateTime').first()
+    driverId = Driver.objects.filter(name=request.user.username).first()
+    
+    existing_break = DriverBreak.objects.filter(
+        Q(shiftId=shiftObj), 
+        Q(driverId = driverId), 
+        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+    )
+    if existing_break:
+        messages.error(request,'In the given time range , you already added break before ')
+        return redirect(request.META.get('HTTP_REFERER'))
+    
     if lastBreakObj:
         timeDifference = (startDateTime - lastBreakObj.startDateTime ).total_seconds()//60
     else:
@@ -914,7 +925,6 @@ def saveDriverBreak(request, shiftId, breakId=None):
         messages.error(request, "Break time is not valid.")
         return redirect(request.META.get('HTTP_REFERER')) 
     
-    driverId = Driver.objects.filter(name=request.user.username).first()
     breakObj.shiftId = shiftObj
     breakObj.driverId = driverId
     breakObj.tripId = lastTripObj
@@ -3929,8 +3939,11 @@ def ShiftDetails(request,id):
         shift.deficit = False
         if id == 2:
             breakObj = DriverBreak.objects.filter(shiftId = shift , durationInMinutes__gte = 15).order_by('-id').first()
-            if breakObj:
-                shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
+        else:
+            shift.nextBreak = shift.startDateTime + timedelta(hours=5, minutes=15)
+        
+        if breakObj:
+            shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
         if shift.startTimeUTC:
             shift.timeDiff = str(datetime.utcnow() - shift.startTimeUTC).split('.')[0]
         

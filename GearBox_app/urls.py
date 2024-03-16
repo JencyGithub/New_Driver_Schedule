@@ -161,11 +161,6 @@ urlpatterns = [
     path('Bulk/Truck/Entry/', views.bulkTruckEntryForm, name='bulkTruckEntryForm'), 
     path('Bulk/Truck/Entry/Save', views.uploadBulkData, name='uploadBulkData'), 
     
-    # History URLs
-    
-    path('history/driver/<int:driverId>/', views.driverHistory, name='driverHistory'), 
-    path('history/employee/<int:clientId>/', views.clientHistory, name='clientHistory'), 
-    path('history/client-office/<int:clientOfcId>/', views.clientOfficeHistory, name='clientOfficeHistory'), 
     
     
     # reimbursementTable
@@ -173,5 +168,11 @@ urlpatterns = [
     path('reimbursement/form/<int:id>/', views.reimbursementForm, name='reimbursementForm'), 
     path('reimbursement/form/save/<int:id>/', views.reimbursementFormSave, name='reimbursementFormSave'), 
     path('reimbursement/filter/', views.reimbursementFilter, name='reimbursementFilter'), 
+    # History URLs
+    
+    path('history/driver/<int:driverId>/', views.driverHistory, name='driverHistory'), 
+    path('history/employee/<int:clientId>/', views.clientHistory, name='clientHistory'), 
+    path('history/client-office/<int:clientOfcId>/', views.clientOfficeHistory, name='clientOfficeHistory'), 
+    path('history/reimbursement/<int:reimbursementId>/', views.reimbursementHistory, name='reimbursementHistory'), 
     
 ]

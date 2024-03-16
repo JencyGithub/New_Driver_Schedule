@@ -63,6 +63,11 @@
     <div class="clearfix"></div>
     <div class="row">
         <div class="col-md-12 col-sm-12">
+            {% if reimbursementObj %}
+                <div class="float-right">
+                    <a href="{% url 'gearBox:reimbursementHistory' reimbursementId=reimbursementObj.id %}" class="btn btn-sm btn-history">History</a>
+                </div>
+            {% endif %}
             <div class="x_panel">
                 <form action="{% url 'gearBox:reimbursementFormSave' id=reimbursementObj.id%}" method="POST"  id="reimbursementForm">
                     {%csrf_token%}
@@ -75,7 +80,7 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-6">
                                 <ul style="list-style-type: disclosure-closed;">
-                                    <li>Raised By : <b class="text-capitalize" >{{reimbursementObj.driverId.firstName}} {{reimbursementObj.driverId.lastName}} </b></li>
+                                    <li>Raised By : <a href="{% url 'gearBox:driverFormEdit' id=reimbursementObj.driverId.driverId %}" class="text-capitalize" >{{reimbursementObj.driverId.firstName}} {{reimbursementObj.driverId.lastName}} </a></li>
                                     <li>Raised Date : <b>{{reimbursementObj.raiseDate|date:'Y-m-d H:i'}} </b></li>
                                     <li>Comment By Driver : <b >{{reimbursementObj.notes}} </b></li>
                                     <li>Raised Amount : <b class="text-danger">{{reimbursementObj.amount}} </b></li>
