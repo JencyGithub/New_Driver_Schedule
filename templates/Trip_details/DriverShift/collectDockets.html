@@ -7,6 +7,16 @@
         label{
             cursor: pointer;
         }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 9999; /* Ensure it's on top of everything */
+            display: none; /* Initially hidden */
+          }
     </style>
 {% endblock %}
 
@@ -23,7 +33,7 @@
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="card-title text-uppercase text-default">Add Trip Details</h5>
+                                <h5 class="card-title text-uppercase text-default d-inline-block">Add Trip Details</h5>
                                 <hr>
                             </div>
                             <div class="col-12">
@@ -131,7 +141,12 @@
         </div>
     </div>
 </div>
-
+<div class="position-absolute d-none" style="top:49%; left:45%" id="submitSpinner">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<div class="overlay" id="overlay"></div>
 {% endblock %}
 
 {% block footerStyleEnd %}
@@ -189,8 +204,9 @@
             alert(msg);
         } else {
             this.submit();
-            //event.preventDefault();
-
+            // event.preventDefault();
+            $('#submitSpinner').removeClass('d-none')
+            $('#overlay').css('display', 'block')
         }
     });
 

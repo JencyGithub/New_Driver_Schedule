@@ -4,6 +4,16 @@
 
 {% block headStyle %}
 <style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+        z-index: 9999; /* Ensure it's on top of everything */
+        display: none; /* Initially hidden */
+    }
     #formSection .mcq-card {
         padding: 1rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -172,10 +182,27 @@
                 </div>
             </form>
         </div>
-
         <div class="col-md-1"></div>
     </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="errorModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p class="mb-0">Please fill the all required questions.</p>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="position-absolute d-none" style="top:49%; left:45%" id="submitSpinner">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<div class="overlay" id="overlay"></div>
+
 {% endblock %}
 
 {% block footerStyleEnd %}
@@ -189,7 +216,9 @@
                 var name = $(this).attr('name');
                 if ($('input[name=' + name + ']:checked').length == 0) {
                     isValid = false;
-                    alert('Please answer all questions.');
+                    $('#errorModal p').html('Please answer all questions.')
+                    $('#errorModal').modal('show')
+                    // alert('Please answer all questions.');
                     openTabs(this);
                     return false; 
                 }
@@ -197,9 +226,13 @@
                 isValid = false;
                 let tagName = $(this).prop('tagName').toLowerCase()
                 if(tagName == 'textarea'){
-                    alert('Please add the required comment.');
+                    $('#errorModal p').html('Please add the required comment.')
+                    $('#errorModal').modal('show')
+                    // alert('Please add the required comment.');
                 }else{
-                    alert('Please answer all questions.');
+                    $('#errorModal p').html('Please answer all questions.')
+                    $('#errorModal').modal('show')
+                    // alert('Please answer all questions.');
                 }
                 openTabs(this);
                 return false; 
@@ -249,7 +282,9 @@
                     var name = $(this).attr('name');
                     if ($('input[name=' + name + ']:checked').length == 0) {
                         isValid = false;
-                        alert('Please answer all questions.');
+                        $('#errorModal p').html('Please answer all questions.')
+                        $('#errorModal').modal('show')
+                        // alert('Please answer all questions.');
                         openTabs(this);
                         return false; 
                     }
@@ -257,9 +292,13 @@
                     isValid = false;
                     let tagName = $(this).prop('tagName').toLowerCase()
                     if(tagName == 'textarea'){
-                        alert('Please add the required comment.');
+                        $('#errorModal p').html('Please add the required comment.')
+                        $('#errorModal').modal('show')
+                        // alert('Please add the required comment.');
                     }else{
-                        alert('Please answer all questions.');
+                        $('#errorModal p').html('Please answer all questions.')
+                        $('#errorModal').modal('show')
+                        // alert('Please answer all questions.');
                     }
                     openTabs(this);
                     return false; 
@@ -271,11 +310,18 @@
             $('input[type="file"]').each(function() {
                 if ($(this).val() === '') {
                     isValid = false;
-                    alert('Please upload the required file.');
+                    $('#errorModal p').html('Please upload the required file.')
+                    $('#errorModal').modal('show')
+                    // alert('Please upload the required file.');
                     openTabs(this);
                     return false; 
                 }
             });
+        }
+
+        if(isValid){
+            $('#submitSpinner').removeClass('d-none')
+            $('#overlay').css('display', 'block')
         }
         return isValid;
     }

@@ -1077,6 +1077,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         loadPath = 'static/img/finalloadSheet'
         shiftObj = DriverShift.objects.filter(pk=shiftId).first()
         tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+        
         # largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
         # driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
         
@@ -1233,7 +1234,6 @@ def pastLeaveRequestShow(request):
         'leaveObjs' : leaveObjs
     }
     return render(request, 'Trip_details/leaveSection/pastLeaveRequest.html', params)
-
 
 def cancelLeaveRequest(request, id):
     requestObj = LeaveRequest.objects.filter(pk=id).first()
@@ -3937,13 +3937,14 @@ def ShiftDetails(request,id):
         if shift.driverName:
             shift.driverName = f'{shift.driverName.firstName} {shift.driverName.lastName}'
         shift.deficit = False
+        
         if id == 2:
             breakObj = DriverBreak.objects.filter(shiftId = shift , durationInMinutes__gte = 15).order_by('-id').first()
-        else:
-            shift.nextBreak = shift.startDateTime + timedelta(hours=5, minutes=15)
+            if breakObj:
+                shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
+            else:
+                shift.nextBreak = shift.startDateTime + timedelta(hours=5, minutes=15)
         
-        if breakObj:
-            shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
         if shift.startTimeUTC:
             shift.timeDiff = str(datetime.utcnow() - shift.startTimeUTC).split('.')[0]
         
