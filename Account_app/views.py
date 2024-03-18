@@ -903,11 +903,19 @@ def saveDriverBreak(request, shiftId, breakId=None):
     lastBreakObj  = DriverBreak.objects.filter(shiftId=shiftObj).order_by('-startDateTime').first()
     driverId = Driver.objects.filter(name=request.user.username).first()
     
-    existing_break = DriverBreak.objects.filter(
-        Q(shiftId=shiftObj), 
-        Q(driverId = driverId), 
-        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
-    )
+    if breakId:
+        existing_break = DriverBreak.objects.filter(
+            ~Q(pk=breakId), 
+            Q(shiftId=shiftObj), 
+            Q(driverId = driverId), 
+            Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+        )
+    else:
+        existing_break = DriverBreak.objects.filter(
+            Q(shiftId=shiftObj), 
+            Q(driverId = driverId), 
+            Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+        )
     if existing_break:
         messages.error(request,'In the given time range , you already added break before ')
         return redirect(request.META.get('HTTP_REFERER'))
@@ -1114,7 +1122,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 transferKm = request.POST.get(f'transferKm{load}')
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), tripId=tripObj.id, clientId=clientObj.clientId).first()
+                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
                 if not docketObj:
                     docketObj = DriverShiftDocket()
                 docketObj.tripId = tripObj.id
@@ -1141,7 +1149,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 transferKm = request.POST.get(f'transferKm{load}')
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), tripId=tripObj.id, clientId=clientObj.clientId).first()
+                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
                 if not docketObj:
                     docketObj = DriverShiftDocket()
                 docketObj.tripId = tripObj.id
@@ -3916,7 +3924,9 @@ def ShiftDetails(request,id):
         else:
             shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate))
     elif id == 2: # on going
-        if driverId:
+        if not (startDate and endDate):
+            shifts = DriverShift.objects.filter(endDateTime=None)
+        elif driverId:
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, endDateTime=None)
         else:
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
@@ -3938,12 +3948,15 @@ def ShiftDetails(request,id):
             shift.driverName = f'{shift.driverName.firstName} {shift.driverName.lastName}'
         shift.deficit = False
         
+
         if id == 2:
             breakObj = DriverBreak.objects.filter(shiftId = shift , durationInMinutes__gte = 15).order_by('-id').first()
             if breakObj:
                 shift.nextBreak = breakObj.endDateTime + timedelta(hours=5, minutes=15)
             else:
-                shift.nextBreak = shift.startDateTime + timedelta(hours=5, minutes=15)
+                tripObj = DriverShiftTrip.objects.filter(shiftId=shift.id, endDateTime=None).first() 
+                if tripObj and tripObj.startDateTime:
+                    shift.nextBreak = tripObj.startDateTime + timedelta(hours=5, minutes=15)
         
         if shift.startTimeUTC:
             shift.timeDiff = str(datetime.utcnow() - shift.startTimeUTC).split('.')[0]
