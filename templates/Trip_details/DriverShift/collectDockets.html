@@ -57,7 +57,7 @@
                                 <div class="row">
                                     <div class="col-md-6 col-12 my-1">
                                         <label for="loadSheet">Log sheet:</label>
-                                        <input type="file" name="loadSheet" id="loadSheet" class="form-control" required accept=".jpg , .jpeg , .png">
+                                        <input type="file" name="loadSheet" id="loadSheet" class="form-control" required accept=".jpg, .png, .jpeg">
                                     </div>
                                     <div class="col-md-6 col-12 my-1">
                                         <label for="noOfLoads">Number of loads:</label>
@@ -76,7 +76,7 @@
                                     <input type="hidden" name="endLatitude" id="latitude" class="form-control" readonly>
                                     <div class="col-md-4 col-sm-4 my-1 endLocationImg d-none">
                                         <label for="endLocationImg">Location Image:</label>
-                                        <input type="file" name="endLocationImg" id="endLocationImg" class="form-control" accept=".jpg , .jpeg , .png" >
+                                        <input type="file" name="endLocationImg" id="endLocationImg" class="form-control" accept=".jpg, .png, .jpeg" >
                                     </div>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
         </div>
     </div>
 </div>
-<div class="position-absolute d-none" style="top:49%; left:45%" id="submitSpinner">
+<div class="position-fixed d-none" style="top:49%; left:45%" id="submitSpinner">
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>
     </div>
@@ -270,7 +270,7 @@
 
             docketContent += `<div class="col-md-3 col-12 my-1">`
             docketContent += `<label for="docketFile${i}">Docket File:</label>`
-            docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required>`
+            docketContent += `<input type="file" name="docketFile${i}" id="docketFile${i}" class="form-control" required accept=".jpg, .png, .jpeg">`
             docketContent += `</div>`
 
             // Stand By Time Start

@@ -196,7 +196,7 @@
     </div>
 </div>
 
-<div class="position-absolute d-none" style="top:49%; left:45%" id="submitSpinner">
+<div class="position-fixed d-none" style="top:49%; left:45%" id="submitSpinner">
     <div class="spinner-border" role="status">
       <span class="sr-only">Loading...</span>
     </div>
@@ -216,9 +216,9 @@
                 var name = $(this).attr('name');
                 if ($('input[name=' + name + ']:checked').length == 0) {
                     isValid = false;
-                    $('#errorModal p').html('Please answer all questions.')
-                    $('#errorModal').modal('show')
-                    // alert('Please answer all questions.');
+                    // $('#errorModal p').html('Please answer all questions.')
+                    // $('#errorModal').modal('show')
+                    alert('Please answer all questions.');
                     openTabs(this);
                     return false; 
                 }
@@ -226,13 +226,13 @@
                 isValid = false;
                 let tagName = $(this).prop('tagName').toLowerCase()
                 if(tagName == 'textarea'){
-                    $('#errorModal p').html('Please add the required comment.')
-                    $('#errorModal').modal('show')
-                    // alert('Please add the required comment.');
+                    // $('#errorModal p').html('Please add the required comment.')
+                    // $('#errorModal').modal('show')
+                    alert('Please add the required comment.');
                 }else{
-                    $('#errorModal p').html('Please answer all questions.')
-                    $('#errorModal').modal('show')
-                    // alert('Please answer all questions.');
+                    // $('#errorModal p').html('Please answer all questions.')
+                    // $('#errorModal').modal('show')
+                    alert('Please answer all questions.');
                 }
                 openTabs(this);
                 return false; 
@@ -282,9 +282,9 @@
                     var name = $(this).attr('name');
                     if ($('input[name=' + name + ']:checked').length == 0) {
                         isValid = false;
-                        $('#errorModal p').html('Please answer all questions.')
-                        $('#errorModal').modal('show')
-                        // alert('Please answer all questions.');
+                        // $('#errorModal p').html('Please answer all questions.')
+                        // $('#errorModal').modal('show')
+                        alert('Please answer all questions.');
                         openTabs(this);
                         return false; 
                     }
@@ -292,13 +292,13 @@
                     isValid = false;
                     let tagName = $(this).prop('tagName').toLowerCase()
                     if(tagName == 'textarea'){
-                        $('#errorModal p').html('Please add the required comment.')
-                        $('#errorModal').modal('show')
-                        // alert('Please add the required comment.');
+                        // $('#errorModal p').html('Please add the required comment.')
+                        // $('#errorModal').modal('show')
+                        alert('Please add the required comment.');
                     }else{
-                        $('#errorModal p').html('Please answer all questions.')
-                        $('#errorModal').modal('show')
-                        // alert('Please answer all questions.');
+                        // $('#errorModal p').html('Please answer all questions.')
+                        // $('#errorModal').modal('show')
+                        alert('Please answer all questions.');
                     }
                     openTabs(this);
                     return false; 
@@ -310,9 +310,9 @@
             $('input[type="file"]').each(function() {
                 if ($(this).val() === '') {
                     isValid = false;
-                    $('#errorModal p').html('Please upload the required file.')
-                    $('#errorModal').modal('show')
-                    // alert('Please upload the required file.');
+                    // $('#errorModal p').html('Please upload the required file.')
+                    // $('#errorModal').modal('show')
+                    alert('Please upload the required file.');
                     openTabs(this);
                     return false; 
                 }

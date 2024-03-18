@@ -1109,6 +1109,14 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         tripObj.endOdometerKms = endOdometers
         tripObj.endEngineHours = endEngineHours
         
+        for load in range(1,noOfLoads+1):
+            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first():
+                url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
+                messages.error(request, "Already exist docket from given docket.")
+                return redirect(url) 
+                # return redirect(request.META.get('HTTP_REFERER'))
+                # messages.success(request, "Docket Added successfully")
+        
         if loadSheetFile:
             fileName = loadSheetFile.name
             newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
