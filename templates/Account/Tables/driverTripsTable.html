@@ -139,11 +139,11 @@
                       {% if shifts %}
                         {% for shift in shifts %}
                         <tr class="{% if shift.deficit %}bg-danger-light{% endif %} {% if shift.archive %}archive{% else %}active{% endif %}">
-                          <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
-                          <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
-                          <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate|date:'Y-m-d' }}</a></td>
+                          <td><a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftType }}</a></td>
+                          <td><a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.driverName }}</a></td>
+                          <td><a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.shiftDate|date:'Y-m-d' }}</a></td>
                           <td>
-                            <a href="{% url 'Account:DriverTripEdit' id=shift.id%}">
+                            <a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">
                               {% if id_ != 2  and id_ != 0 %}
                                 {{ shift.verifiedBy }}
                               {% else %}
@@ -152,8 +152,8 @@
                             </a>
                           </td>
                           {% if id_ == 2 %}
-                            <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.timeDiff }}</a></td>
-                            <td><a href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.nextBreak|date:'Y-m-d H:i' }}</a></td>
+                            <td><a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.timeDiff }}</a></td>
+                            <td><a target="_blank" href="{% url 'Account:DriverTripEdit' id=shift.id%}">{{ shift.nextBreak|date:'Y-m-d H:i' }}</a></td>
                           {% endif %}
                         </tr>
                         {% endfor %}

@@ -46,8 +46,8 @@ def loginCheck(request):
                 CurrentUser_ = request.user
                 if CurrentUser_.groups.filter(name='Driver').exists():
                     request.session['user_type'] = 'Driver'
+                    messages.success(request, f"Hi, {CurrentUser_.username}!")
                     return redirect('index')
-                    
                 elif CurrentUser_.groups.filter(name='Accounts').exists():
                     request.session['user_type'] = 'Accounts'
                     return redirect('Account:index')
@@ -166,7 +166,6 @@ def changePasswordChange(request):
         else:
             messages.error(request, "Your old password is incorrect.")
             return redirect(request.META.get('HTTP_REFERER'))  
-
         
     else:
         messages.error(request, "User not logged In.")

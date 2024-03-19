@@ -1110,7 +1110,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         tripObj.endEngineHours = endEngineHours
         
         for load in range(1,noOfLoads+1):
-            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first():
+            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId, archive=False).first():
                 url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
                 messages.error(request, "Already exist docket from given docket.")
                 return redirect(url) 
@@ -2710,8 +2710,7 @@ def driverEntryUpdate(request, shiftId):
             docket.truckConnectionId = trip.truckConnectionId
             docket.save()
 
-            
-            if verified == 'True' :
+            if verified == 'True':
                 trip.verified = True
                 trip.save()
 
@@ -2719,7 +2718,6 @@ def driverEntryUpdate(request, shiftId):
                 reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docket.docketNumber, docketDate=docket.shiftDate , clientId = docket.clientId).first()
                 if not reconciliationDocketObj :
                     reconciliationDocketObj = ReconciliationReport()
-                    
                     
                 reconciliationDocketObj.driverId = shiftObj.driverId  
                 reconciliationDocketObj.clientId = docket.clientId
@@ -2770,12 +2768,12 @@ def driverEntryUpdate(request, shiftId):
                 shiftObj.save()
 
                 checkShiftRevenueDifference(tripObjs)
-    
-    
+        
+    if verified == 'True':
+        return redirect('Account:ShiftDetails', 1)
     
     messages.success(request, "Shift end successfully" if verified == 'True' else "Docket Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
-    return redirect(request.META.get('HTTP_REFERER'))
 
 @csrf_protect
 def tripEntry(request,shiftId):
@@ -3938,17 +3936,20 @@ def ShiftDetails(request,id):
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate),driverId=driverId, endDateTime=None)
         else:
             shifts = DriverShift.objects.filter(shiftDate__range=(startDate, endDate), endDateTime=None)
-            
     elif id == 0: # completed
-        if driverId:
+        if not (startDate or endDate):
+            shifts = DriverShift.objects.filter(Q(archive=False) & Q(verified=False))
+        elif driverId:
             shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) )
         else:
             shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) )
     else: # charged
-        if driverId:
-            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(driverId=driverId) & Q(archive=False))
+        if not (startDate or endDate):
+            shifts = DriverShift.objects.filter(Q(archive=False) & Q(verified=True))
+        elif driverId:
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True) & ~Q(endDateTime=None) & Q(driverId=driverId) & Q(archive=False))
         else:
-            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True if id == 1 else False) & ~Q(endDateTime=None) & Q(archive=False))
+            shifts = DriverShift.objects.filter(Q(shiftDate__range=(startDate, endDate)) & Q(verified=True) & ~Q(endDateTime=None) & Q(archive=False))
 
     for shift in shifts:
         shift.driverName = Driver.objects.filter(pk = shift.driverId).first()

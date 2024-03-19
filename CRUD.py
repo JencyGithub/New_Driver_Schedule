@@ -233,16 +233,3 @@ def checkTruckAndDriverAvailability(shiftObj, tripObj, endDateTime, startDateTim
     else:
         return True
         
-    existing_trips = DriverShiftTrip.objects.filter(
-        Q(startDateTime__lt=endDateTime, endDateTime__gt=startDateTime) &
-        ~Q(id=tripObj.id)  # Exclude the current trip
-    ).exists()
-
-    # If either shifts or trips exist within the given time range
-    if existing_shifts or existing_trips:
-        return True
-    else:
-        return False
-
-
-
