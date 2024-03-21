@@ -590,14 +590,14 @@ def mapFormView(request, startDate=None):
         currentDate = date(year, month, day)
         todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate, archive=False).first()
 
-        if todayShiftObj:
-            messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
-            return redirect(request.META.get('HTTP_REFERER'))
-        else:
-            params = {
-                'date': dateConverterFromTableToPageFormate(currentDate),
-            }
-            return render(request, 'Trip_details/DriverShift/mapForm.html', params)
+        # if todayShiftObj:
+        #     messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
+        #     return redirect(request.META.get('HTTP_REFERER'))
+        # else:
+        params = {
+            'date': dateConverterFromTableToPageFormate(currentDate),
+        }
+        return render(request, 'Trip_details/DriverShift/mapForm.html', params)
 
 @csrf_protect
 def mapDataSave(request, recurring=None):
@@ -1113,12 +1113,10 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         tripObj.endEngineHours = endEngineHours
         
         for load in range(1,noOfLoads+1):
-            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId,).first():
+            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first():
                 url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
                 messages.error(request, "Already exist docket from given docket.")
-                return redirect(url) 
-                # return redirect(request.META.get('HTTP_REFERER'))
-                # messages.success(request, "Docket Added successfully")
+                return redirect(url)
         
         if loadSheetFile:
             fileName = loadSheetFile.name
@@ -1131,6 +1129,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         if not clientObj.docketGiven:
             for load in range(1,noOfLoads+1):
                 transferKm = request.POST.get(f'transferKm{load}')
+                waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
+                waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
+                
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
                 docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
@@ -1142,7 +1143,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                # docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
                 docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
                 returnVal = request.POST.get(f'returnVal{load}')
                 if returnVal != 'noReturn':
@@ -1155,6 +1156,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                     docketObj.returnKm = request.POST.get(f'returnKm{load}')
                 # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
+                docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
+                docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
+                            
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                 docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
                 docketObj.comment = request.POST.get(f'comment{load}')
@@ -1169,6 +1173,9 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         else:
             for load in range(1,noOfLoads+1):
                 transferKm = request.POST.get(f'transferKm{load}')
+                waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
+                waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
+                
                 standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
                 standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
                 docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
@@ -1180,7 +1187,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                # docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
                 docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
                 returnVal = request.POST.get(f'returnVal{load}')
                 if returnVal != 'noReturn':
@@ -1192,6 +1199,10 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                     docketObj.returnKm = request.POST.get(f'returnKm{load}')
                 # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
+                
+                docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
+                docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
+                            
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                 docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
                 docketObj.save()

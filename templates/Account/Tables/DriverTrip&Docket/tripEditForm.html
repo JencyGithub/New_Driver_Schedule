@@ -347,7 +347,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" readonly onchange="countTotalWaitingTime(this,'{{docket.id}}','{{docket.tripId}}')">
+                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" {% if docket.waitingTimeEnd is None %} readonly {% endif %} onchange="countTotalWaitingTime(this,'{{docket.id}}','{{docket.tripId}}')">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
