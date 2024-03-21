@@ -9,9 +9,9 @@
         <div class="clearfix"></div>
         <div class="row">
             <div class="col-md-12 col-sm-12">
-                {% if data %}
+                {% if tollObj %}
                     <div class="float-right">
-                        <a href="{% url 'gearBox:driverHistory' driverId=data.driverId %}" class="btn btn-sm btn-history">History</a>
+                        <a href="{% url 'gearBox:tollHistory' tollId=tollObj.id %}" class="btn btn-sm btn-history" target="_blank">History</a>
                     </div>
                 {% endif %}
                 <div class="x_panel">
@@ -21,21 +21,8 @@
                     </div>
                     <div class="x_content">
                         <div class="cuatom-continer">
-                            <form action="#" method="POST" novalidate>
+                            <form action="{% if not tollObj %}{% url 'gearBox:tollFormSave'%}{% else %}{% url 'gearBox:tollFormEdit' tollId=tollObj.id %}{% endif %}" method="POST" novalidate  enctype="multipart/form-data">
                                 {% csrf_token %}
-                                {% comment %} <div class="row"> {% endcomment %}
-                                    {% comment %} <div class="col-md-12 col-sm-12">
-                                        <label for="driverId"
-                                            class="col-form-label col-md-3 col-sm-3 label-align">DriverId :<span
-                                                class="required">*</span></label>
-
-                                        <div class="field item form-group col-md-6 col-sm-6">
-                                            <input class="form-control" name="driverId" required="required"
-                                                id="driverId" type="number"
-                                                value="{% if data %}{{data.driverId}}{% else %}{% endif %}" {% if data %}readonly{% else %}{% endif %}/>
-                                        </div>
-                                    </div> {% endcomment %}
-                                {% comment %} </div> {% endcomment %}
                                 <div class="row">
                                     <div class="col-md-12 col-sm-12">
                                         <label for="truckNumber"
@@ -44,8 +31,8 @@
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <select name="truckNumber" id="truckNumber" class="form-control">
                                                 <option value="" disabled selected> Select Truck No.</option>
-                                                {% for truck in adminTruckObj %}
-                                                <option value="{{ truck.id }}" > {{truck.adminTruckNumber}}</option>
+                                                {% for truck in clientTruckObj %}
+                                                <option value="{{ truck.id }}"  {% if tollObj.truckNo.id == truck.id%}selected{% endif %}> {{truck.truckNumber.adminTruckNumber}} - {{truck.clientTruckId}} - {{truck.clientId.name}}</option>
                                                 {% endfor %}
                                             </select>
 
@@ -60,7 +47,7 @@
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="tollDate" required="required"
-                                                id="tollDate" type="date" max="{% now 'Y-m-d' %}" />
+                                                id="tollDate" type="date" value="{{ tollObj.tollDate|date:'Y-m-d'}}" max="{% now 'Y-m-d' %}" />
                                         </div>
                                     </div>
                                 </div>
@@ -71,7 +58,7 @@
                                                 class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input class="form-control" name="tollAmount" required="required"
-                                                id="tollAmount" type="number" min="0" />
+                                                id="tollAmount" value="{{tollObj.tollAmount}}" type="number" min="0" />
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +66,7 @@
                                     <div class="col-md-12 col-sm-12">
                                         <label for="comment" class="col-form-label col-md-3 col-sm-3 label-align">Comment :<span class="required">*</span></label>
                                         <div class="field item form-group col-md-6 col-sm-6">
-                                            <textarea class="form-control" name="comment" id="comment" autocomplete="off"></textarea>
+                                            <textarea class="form-control" name="comment" id="comment" autocomplete="off">{{tollObj.comment}}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -87,9 +74,12 @@
                                     <div class="col-md-12 col-sm-12">
                                         <label for="tollImage"
                                             class="col-form-label col-md-3 col-sm-3 label-align">Toll image :</label>
+                                            {% if tollObj %}
+                                            <div class="text-align-center"><a href="/{{tollObj.tollImage}}" class="text-primary" target="_blank">Toll mage</a></div>
+                                            {% endif %}
                                         <div class="field item form-group col-md-6 col-sm-6">
                                             <input  name="tollImage"
-                                                id="tollImage"  required="required" type="file"/>
+                                                id="tollImage" {% if not tollObj %}  required="required" {% endif %} type="file"/>
                                         </div>
                                     </div>
                                 </div>

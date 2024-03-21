@@ -247,11 +247,11 @@
                                 <a {% if docket.reconciliationObj %} href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" target="_blank" {% endif %}><h2 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h2></a>
                                 <div class="float-right">
                                     <input type="radio" id="tippingToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="tippingToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if item.tippingToYard %} checked {% endif %}>
+                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.tippingToYard %} checked {% endif %}>
                                     <label for="tippingToYard{{docket.id}}" class="ml-2"
                                     style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
                                     <input type="radio" id="returnToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="returnToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if item.returnToYard %} checked {% endif %}>
+                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" checked{% if docket.returnToYard %} checked {% endif %}>
                                     <label for="returnToYard{{docket.id}}" class="ml-2"
                                         style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
                                 

@@ -88,21 +88,23 @@
                                         style="width:100%">
                                         <thead>
                                             <tr>
-                                                <th>Employee</th>
-                                                <th>Reminder #</th>
-                                                <th>Type</th>
-                                                <th>Notes</th>
-                                                <th>Date Due</th>
+                                                <th>Truck Number</th>
+                                                <th> Toll Date</th>
+                                                <th>Total Amount</th>
+                                                <th>Comments</th>
+                                                <th>Toll Image</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {% for obj in tollObj %}
                                             <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td><a href="{% url 'gearBox:truckFormView' tollId=obj.id%}" class="text-dark">{{obj.truckNo.clientTruckId}}</a></td>
+                                                <td><a href="{% url 'gearBox:truckFormView' tollId=obj.id%}" class="text-dark">{{obj.tollDate|date:'Y-m-d'}}</a></td>
+                                                <td><a href="{% url 'gearBox:truckFormView' tollId=obj.id%}" class="text-dark">{{obj.tollAmount}}</a></td>
+                                                <td><a href="{% url 'gearBox:truckFormView' tollId=obj.id%}" class="text-dark">{{obj.comment}}</a></td>
+                                                <td> <a href="/{{obj.tollImage}}" class="text-dark" target="_blank"> Toll Image</a></td>
                                             </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>

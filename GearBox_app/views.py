@@ -279,6 +279,7 @@ def equipmentIssueTable(request):
 # ````````````````````````````````````````````````
 
 def reminderTable(request):
+
     return render(request, 'GearBox/table/reminderTable.html')
 
 
@@ -287,14 +288,49 @@ def reminderTable(request):
 # ````````````````````````````````````````````````
 
 def tollTable(request):
-    return render(request, 'GearBox/table/tollTable.html')
-
-def tollForm(request):
-    adminTruckObj = AdminTruck.objects.all()
+    tollObj = TruckToll.objects.all()
     params = {
-        'adminTruckObj' : adminTruckObj
+        'tollObj':tollObj
+    }
+    return render(request, 'GearBox/table/tollTable.html',params)
+
+def tollForm(request , tollId=None):
+    current_date = datetime.now().date()  
+    clientTruckObj = ClientTruckConnection.objects.filter(startDate__lte=current_date,endDate__gte = current_date)
+    tollObj = None
+    if tollId:
+        tollObj = TruckToll.objects.filter(pk=tollId).first()
+    params = {
+        'clientTruckObj' : clientTruckObj,
+        'tollObj':tollObj
     }
     return render(request, 'GearBox/tollForm.html',params)
+
+def tollFormSave(request , tollId=None):
+    if tollId:
+        truckTollObj = TruckToll.objects.filter(pk=tollId).first()
+    else:
+        truckTollObj = TruckToll()
+    if not request.POST.get('truckNumber'):
+        messages.error(request,'Please select truck no.')
+        return redirect(request.META.get('HTTP_REFERER'))
+    truckTollObj.truckNo  = ClientTruckConnection.objects.filter(pk=request.POST.get('truckNumber')).first()
+    truckTollObj.tollDate = request.POST.get('tollDate')
+    truckTollObj.tollAmount = request.POST.get('tollAmount')
+    truckTollObj.comment = request.POST.get('comment')
+    tollImage = request.FILES.get('tollImage')
+    if tollImage:
+        time = (str(timezone.now())).replace(':', '').replace('-', '').replace(' ', '').split('.')
+        time = time[0]
+        file_path = 'static/GearBox/toll/'
+        tollImageName = tollImage.name
+        new_filename = 'truck Files' + time +  '!_@' + tollImageName.replace(" ", "").replace("\t", "")   ##time + '!_@' +  '.' + fileName.split('.')[-1]
+        pfs = FileSystemStorage(location=file_path)
+        pfs.save(new_filename, tollImage)
+        truckTollObj.tollImage  = 'static/GearBox/toll/' + new_filename
+    truckTollObj.save()
+    messages.success(request,'Successfully Add.')
+    return redirect('gearBox:tollTable')    
 
 # ````````````````````````````````````````
 # Truck Section 
@@ -1141,6 +1177,21 @@ def reimbursementHistory(request, reimbursementId):
     params = {
         'data' : data,
         'title' : 'Client Office HIstory'
+    }
+    return render(request, 'historyTable.html', params)
+
+def tollHistory(request, tollId):
+    data = TruckToll.history.filter(id=tollId).values('history_type','history_date','history_user_id','truckNo','tollDate','tollAmount','comment','tollImage').order_by('history_id')
+    try:
+        for obj in data:
+            obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
+            
+    except:
+        pass
+    
+    params = {
+        'data' : data,
+        'title' : 'Truck Toll HIstory'
     }
     return render(request, 'historyTable.html', params)
 

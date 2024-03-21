@@ -244,11 +244,12 @@ function returnToYard(id, tag) {
   let selected = $(`#${tag.id}`).is(":checked");
 
   if (selected) {
-    $(`#returnQty${id}`).removeAttr("readonly");
-    $(`#returnKm${id}`).removeAttr("readonly");
-  } else {
     $(`#returnQty${id}`).attr("readonly", true);
     $(`#returnKm${id}`).attr("readonly", true);
+  } else {
+    
+    $(`#returnQty${id}`).removeAttr("readonly");
+    $(`#returnKm${id}`).removeAttr("readonly");
   }
 }
 

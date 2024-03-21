@@ -525,6 +525,7 @@ admin.site.register(HolcimTrip,HolcimTrip_)
 
 
 admin.site.register(RctiReport)
+admin.site.register(TruckToll)
 class RctiAdjustment_(admin.ModelAdmin):
     
     list_display = ['docketNumber','docketDate']

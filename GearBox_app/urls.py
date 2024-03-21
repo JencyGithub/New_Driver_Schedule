@@ -74,6 +74,9 @@ urlpatterns = [
     # Tolls
     path('tollTable', views.tollTable, name='tollTable'),    
     path('tollForm', views.tollForm, name='tollForm'),    
+    path('tollFormSave', views.tollFormSave, name='tollFormSave'),    
+    path('tollFormView/<int:tollId>', views.tollForm, name='truckFormView'),    
+    path('tollFormEdit/<int:tollId>', views.tollFormSave, name='tollFormEdit'),    
 
     # Truck Table 
     
@@ -178,5 +181,6 @@ urlpatterns = [
     path('history/employee/<int:clientId>/', views.clientHistory, name='clientHistory'), 
     path('history/client-office/<int:clientOfcId>/', views.clientOfficeHistory, name='clientOfficeHistory'), 
     path('history/reimbursement/<int:reimbursementId>/', views.reimbursementHistory, name='reimbursementHistory'), 
+    path('history/toll/<int:tollId>/', views.tollHistory, name='tollHistory'), 
     
 ]
