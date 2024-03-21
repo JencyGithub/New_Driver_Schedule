@@ -279,7 +279,22 @@ def equipmentIssueTable(request):
 # ````````````````````````````````````````````````
 
 def reminderTable(request):
-    return render(request, 'GearBox/reminderTable.html')
+    return render(request, 'GearBox/table/reminderTable.html')
+
+
+# ````````````````````````````````````````
+# Tolls
+# ````````````````````````````````````````````````
+
+def tollTable(request):
+    return render(request, 'GearBox/table/tollTable.html')
+
+def tollForm(request):
+    adminTruckObj = AdminTruck.objects.all()
+    params = {
+        'adminTruckObj' : adminTruckObj
+    }
+    return render(request, 'GearBox/tollForm.html',params)
 
 # ````````````````````````````````````````
 # Truck Section 

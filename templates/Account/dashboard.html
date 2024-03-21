@@ -10,6 +10,10 @@
   form strong{
     cursor: pointer;
   }
+  .alert{
+    padding: 0.25rem 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
 </style>
 
 {% endblock %}
@@ -184,7 +188,27 @@
           </div>
         </div>
       </div>
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Upcoming expire truck connection</h2>
+          <ul class="nav navbar-right panel_toolbox">
+            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content" style="overflow: overlay;max-height: 9.1rem;">
+          {% for truck in expireTruckConnection%}
+          <div class="alert alert-dark" role="alert">
+            <span>Truck Number :- <b>{{truck.clientTruckId}}</b> ClientName :- <b>{{truck.clientId.name}}</b> StartDate :- <b>{{truck.startDate|date:'Y-m-d'}}</b> EndDate :- <b>{{truck.endDate|date:'Y-m-d'}}</b></span>
+          </div>
+          {% endfor %}
+          
+
+        </div>
+      </div>
     </div>
+    
   </div>
   <!-- /top tiles -->
 </div>

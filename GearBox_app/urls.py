@@ -70,6 +70,10 @@ urlpatterns = [
 
     # Reminder
     path('reminderTable', views.reminderTable, name='reminderTable'),    
+    
+    # Tolls
+    path('tollTable', views.tollTable, name='tollTable'),    
+    path('tollForm', views.tollForm, name='tollForm'),    
 
     # Truck Table 
     

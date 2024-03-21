@@ -288,8 +288,44 @@
             docketContent += `<input type="datetime-local" name="standByTimeEnd${i}" id="standByTimeEnd${i}" class="form-control" readonly>`;
             docketContent += `</div>`;
 
-            // Transfer Km
+
+            // Cubic Meter
             docketContent += `<div class="col-md-3 col-12 my-1">`;
+            docketContent += `<label for="cubicMl${i}">Load Size:</label>`;
+            docketContent += `<input type="number" name="cubicMl${i}" id="cubicMl${i}" class="form-control" required >`;
+            docketContent += `</div>`;
+
+
+            // No of km
+            docketContent += `<div class="col-md-3 col-12 my-1">`;
+            docketContent += `<label for="noOfKm${i}">No. Of Km:</label>`;
+            docketContent += `<input type="number" name="noOfKm${i}" id="noOfKm${i}" class="form-control" required >`;
+            docketContent += `</div>`;
+
+                
+            docketContent += `<div class="col-md-6 col-12 my-1">`;
+            docketContent += `<label for="returnToYard${i}"class="mt-3">Return To Yard:</label>`;
+            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="returnToYard" id="returnToYard${i}" onchange="returnFun(${i})"  readonly>`;
+            docketContent += `<label for="tippingToYard${i}">Return To Tipping Site:</label>`;
+            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="tippingToYard" id="tippingToYard${i}" onchange="returnFun(${i})"  readonly>`;
+            docketContent += `<label for="noReturn${i}">No Return:</label>`;
+            docketContent += `<input type="radio" checked name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="noReturn" id="noReturn${i}" onchange="returnFun(${i})" readonly>`;
+            docketContent += `</div>`;
+
+             // Return Qty
+            docketContent += `<div class="col-md-4 col-12 my-1 returnQty d-none">`;
+            docketContent += `<label for="returnQty${i}">Return Qty:</label>`;
+            docketContent += `<input type="number" name="returnQty${i}" id="returnQty${i}" class="form-control">`;
+            docketContent += `</div>`;
+
+            // Return Km
+            docketContent += `<div class="col-md-4 col-12 my-1  returnKm d-none">`;
+            docketContent += `<label for="returnKm${i}">Return km:</label>`;
+            docketContent += `<input type="number" name="returnKm${i}" id="returnKm${i}" class="form-control">`;
+            docketContent += `</div>`;
+
+            // Transfer Km
+            docketContent += `<div class="col-md-4 col-12 my-1">`;
             docketContent += `<label for="transferKm${i}">Transfer km:</label>`;
             docketContent += `<input type="number" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
             docketContent += `</div>`;
@@ -304,7 +340,7 @@
             // docketContent += `</select>`
             // docketContent += `</div>`
 
-            docketContent += `<div class="col-md-6 col-12 my-1">`
+            docketContent += `<div class="col-md-12 col-12 my-1">`
             docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
             docketContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`
             docketContent += `</div>`
@@ -357,8 +393,44 @@
             detailsContent += `<input type="datetime-local" name="standByTimeEnd${i}" id="standByTimeEnd${i}" class="form-control" readonly>`;
             detailsContent += `</div>`;
 
-            // Transfer Km
+            // Cubic Meter
             detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<label for="cubicMl${i}">Load Size:</label>`;
+            detailsContent += `<input type="number" name="cubicMl${i}" id="cubicMl${i}" class="form-control" >`;
+            detailsContent += `</div>`;
+
+
+            // No of km
+            detailsContent += `<div class="col-md-3 col-12 my-1">`;
+            detailsContent += `<label for="noOfKm${i}">No. Of Km:</label>`;
+            detailsContent += `<input type="number" name="noOfKm${i}" id="noOfKm${i}" class="form-control" >`;
+            detailsContent += `</div>`;
+
+            // Return         
+            docketContent += `<div class="col-md-6 col-12 my-1">`;
+            docketContent += `<label for="returnToYard${i}"class="mt-3">Return To Yard:</label>`;
+            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="returnToYard" id="returnToYard${i}" onchange="returnFun(${i})"  readonly>`;
+            docketContent += `<label for="tippingToYard${i}">Return To Tipping Site:</label>`;
+            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="tippingToYard" id="tippingToYard${i}" onchange="returnFun(${i})"  readonly>`;
+            docketContent += `<label for="noReturn${i}">No Return:</label>`;
+            docketContent += `<input type="radio" checked name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="noReturn" id="noReturn${i}" onchange="returnFun(${i})" readonly>`;
+            docketContent += `</div>`;
+
+                // Return Qty
+            docketContent += `<div class="col-md-4 col-12 my-1 returnQty d-none">`;
+            docketContent += `<label for="returnQty${i}">Return Qty:</label>`;
+            docketContent += `<input type="number" name="returnQty${i}" id="returnQty${i}" class="form-control">`;
+            docketContent += `</div>`;
+
+            // Return Km
+            docketContent += `<div class="col-md-4 col-12 my-1  returnKm d-none">`;
+            docketContent += `<label for="returnKm${i}">Return km:</label>`;
+            docketContent += `<input type="number" name="returnKm${i}" id="returnKm${i}" class="form-control">`;
+            docketContent += `</div>`;
+    
+
+            // Transfer Km
+            detailsContent += `<div class="col-md-4 col-12 my-1">`;
             // detailsContent += `<div class="d-flex justify-content-between">`;
             detailsContent += `<label for="transferKm${i}">Transfer km:</label>`;
             // detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
@@ -377,7 +449,7 @@
             // detailsContent += `</div>`
 
             // Comment
-            detailsContent += `<div class="col-md-9 col-12 my-1">`;
+            detailsContent += `<div class="col-md-12 col-12 my-1">`;
             detailsContent += `<label for="comment${i}">Comment ${i}:</label>`;
             detailsContent += `<textarea type="text" name="comment${i}" id="comment${i}" class="form-control" rows="1"></textarea>`;
             detailsContent += `</div>`;
@@ -452,6 +524,36 @@
     
     infoWindow.open(map);
     }
+    // JavaScript function to handle radio button change
+    function returnFun(index) {
+        // Get the selected return option
+        var selectedReturnOption = document.querySelector('input[name="returnVal' + index + '"]:checked').value;
+    
+        // Get the return qty and km fields
+        var returnQtyField = document.getElementById('returnQty' + index);
+        var returnKmField = document.getElementById('returnKm' + index);
+    
+        // Get the div containers for return qty and km
+        var returnQtyDiv = returnQtyField.parentElement;
+        var returnKmDiv = returnKmField.parentElement;
+    
+        // Toggle visibility and required attribute based on the selected return option
+        if (selectedReturnOption === 'returnToYard' || selectedReturnOption === 'tippingToYard') {
+            returnQtyDiv.classList.remove('d-none');
+            returnKmDiv.classList.remove('d-none');
+            returnQtyField.setAttribute('required', true);
+            returnKmField.setAttribute('required', true);
+        }
+         else {
+            // For any other case, hide and remove required attributes
+            returnQtyDiv.classList.add('d-none');
+            returnKmDiv.classList.add('d-none');
+            returnQtyField.removeAttribute('required');
+            returnKmField.removeAttribute('required');
+        }
+    }
+    
+
     
     function locationGetFun(){
         event.preventDefault();

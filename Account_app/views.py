@@ -83,7 +83,9 @@ def index(request):
         elif report.reconciliationType == 3:
             writeOfCount += 1
             
-    
+    truckConnectionEnd = truckConnectionEndDay
+    futureDate = curDate + timedelta(days=truckConnectionEnd)
+    expireTruckConnection = ClientTruckConnection.objects.filter(endDate__range = (curDate ,futureDate))
     params = {
         'totalShiftsCount' : totalShiftsCount.count(),
         'continueShiftsCount' : continueShiftsCount,
@@ -96,7 +98,8 @@ def index(request):
         'shortPaidCount' : shortPaidCount,
         'writeOfCount' : writeOfCount,
         'openedEscalationCount' : openedEscalation.count(),
-        'oldEscalation' : oldEscalation
+        'oldEscalation' : oldEscalation,
+        'expireTruckConnection':expireTruckConnection
     }
     return render(request, 'Account/dashboard.html', params)
 
@@ -1139,6 +1142,17 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                # docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
+                returnVal = request.POST.get(f'returnVal{load}')
+                if returnVal != 'noReturn':
+                    if  returnVal == 'returnToYard':
+                        docketObj.returnToYard = True
+                    else:
+                        docketObj.tippingToYard = True
+                        
+                    docketObj.returnQty = request.POST.get(f'returnQty{load}')
+                    docketObj.returnKm = request.POST.get(f'returnKm{load}')
                 # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
@@ -1166,6 +1180,16 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                # docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
+                returnVal = request.POST.get(f'returnVal{load}')
+                if returnVal != 'noReturn':
+                    if  returnVal == 'returnToYard':
+                        docketObj.returnToYard = True
+                    else:
+                        docketObj.tippingToYard = True
+                    docketObj.returnQty = request.POST.get(f'returnQty{load}')
+                    docketObj.returnKm = request.POST.get(f'returnKm{load}')
                 # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None

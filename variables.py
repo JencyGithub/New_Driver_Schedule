@@ -8,3 +8,5 @@ typeDict = {
         9 : "custom",
         10 : "Expense",
     }
+
+truckConnectionEndDay = 15
