@@ -585,3 +585,15 @@ class TruckEntryError(models.Model):
 
     def __str__(self):
         return str(self.truckNo)
+    
+# Tolls
+class TruckToll(models.Model):
+    truckNo = models.ForeignKey(ClientTruckConnection,on_delete=models.CASCADE , null=True) 
+    tollDate = models.DateField(null=True)
+    tollAmount = models.FloatField(default=0,null=True)
+    comment = models.CharField(max_length=2048,default='',null=True)
+    tollImage = models.FileField(upload_to='static/GearBox/toll', null=True)
+    history = HistoricalRecords()
+    
+    def __str__(self):
+        return str(self.id)

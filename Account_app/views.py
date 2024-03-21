@@ -1110,7 +1110,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         tripObj.endEngineHours = endEngineHours
         
         for load in range(1,noOfLoads+1):
-            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId, archive=False).first():
+            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId,).first():
                 url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
                 messages.error(request, "Already exist docket from given docket.")
                 return redirect(url) 
@@ -1139,7 +1139,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
+                # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                 docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
@@ -1166,7 +1166,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.clientId = clientObj.clientId
                 docketObj.truckConnectionId = tripObj.truckConnectionId
                 docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
+                # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
                 docketObj.transferKM = transferKm if transferKm else 0
                 docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
                 docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
