@@ -46,8 +46,10 @@ urlpatterns = [
     path('appointment/',include('Appointment_app.urls')),
 
     # Progressive Web
-    path('', include('pwa.urls'))
+    path('', include('pwa.urls')),
     
     
-    
+    # APIs
+    path('api/loginCheck/', views.apiLoginCheck, name='apiLoginCheck'),
+
 ]

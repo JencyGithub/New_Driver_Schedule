@@ -6,7 +6,7 @@ from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django import template
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.models import User , Group
 from GearBox_app.models import *
 from django.core.mail import send_mail
@@ -33,7 +33,6 @@ class LoginForm(forms.Form):
 @csrf_protect   
 def loginCheck(request):
     form = LoginForm()
-    message = ''
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -60,37 +59,6 @@ def loginCheck(request):
             else:
                 messages.error(request, "Login failed!")
                 return redirect(request.META.get('HTTP_REFERER'))
-            
-    # if len(request.POST.get('username').split('@')) > 1:
-    #     db_name = request.POST.get('username').split('@')[-1]+'_db'
-    #     username = request.POST.get('username')
-    #     password = request.POST.get('password')
-    #     user = authenticate(username=username,password=password,db_name = db_name)
-
-    #     if user:
-    #         login(request, user)
-    #         print('User Name 1',request.user)
-            
-    #         CurrentUser_ = request.user
-    #         request.session['db_name'] = db_name
-    #         # return HttpResponse(getDatabase(request))
-    #         if CurrentUser_.groups.filter(name='Driver').exists():
-    #             request.session['user_type'] = 'Driver'
-    #             return redirect('index')
-                
-    #         elif CurrentUser_.groups.filter(name='Accounts').exists():
-    #             request.session['user_type'] = 'Accounts'
-    #         elif CurrentUser_.groups.filter(name='HR').exists():
-    #             request.session['user_type'] = 'HR'
-    #         else:
-    #             request.session['user_type'] = 'SuperUser'
-    #         return redirect('Account:index')
-    #     else:
-    #         messages.error(request, "Login failed!")
-    #         return redirect(request.META.get('HTTP_REFERER'))
-    # else:
-    #     messages.error(request,'Invalid username')
-    #     return redirect(request.META.get('HTTP_REFERER'))
     
 
 def CustomLogOut(request):
@@ -132,12 +100,10 @@ def ForgetMail(request):
     except:
         messages.error(request, "This email is not valid !")
         return redirect(request.META.get('HTTP_REFERER'))
-    # return HttpResponse(driverObj.password)
 
 def changePasswordView(request):
     return render(request, 'change-password.html')
 
-# @api_view(['POST'])
 @csrf_protect
 def changePasswordChange(request):
     if request.user.is_authenticated:
@@ -170,3 +136,30 @@ def changePasswordChange(request):
     else:
         messages.error(request, "User not logged In.")
         return redirect(request.META.get('HTTP_REFERER')) 
+    
+    
+    
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+# API functions
+# --------------------------------------------------------------------------------------------------------------------------------
+
+@csrf_protect
+@api_view(['POST'])
+def apiLoginCheck(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    if username and password:
+        if User.objects.filter(username=username).exists():
+            user = authenticate(username=username, password=password)
+            if user:
+                userData = User.objects.filter(username=str(user)).values('id','is_superuser','username','first_name','last_name','email','is_staff','is_active').first()
+                userData['user_type'] = 'Driver'
+                return JsonResponse({'status':200, 'user':userData})
+            else:
+                return JsonResponse({'status':404, 'user':'Password not matched.'})
+        else:
+            return JsonResponse({'status':404, 'user':'User not found'})
+    else:
+        return JsonResponse({'status':404, 'user': ('username' if not username else 'password') + ' not found.'})
+
