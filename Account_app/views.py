@@ -1080,6 +1080,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
     try:
+        print('coming')
         endOdometers = request.POST.get('endOdometers')
         endEngineHours = request.POST.get('endEngineHours')
         curTimeStr = getCurrentTimeInString()

@@ -169,6 +169,47 @@
     $(document).ready(function(){
         getLocation()
     });
+
+
+    // file compress
+    function compressFiles(files){
+        files.forEach(input => {
+            input.addEventListener('change', async (e) => {  
+                console.log(input)          
+                const { files } = e.target;
+                    if (!files.length) return;
+                    const dataTransfer = new DataTransfer();
+                    for (const file of files) {
+                        const compressedFile = await compressImage(file, {
+                        quality: 0.01,
+                        type: 'image/jpeg',
+                    });
+                    dataTransfer.items.add(compressedFile);
+                }
+                e.target.files = dataTransfer.files;
+            });
+        });
+    }
+
+    const compressImage = async (file, { quality = 1, type = file.type }) => {        
+        const imageBitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = imageBitmap.width;
+        canvas.height = imageBitmap.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imageBitmap, 0, 0);
+        const blob = await new Promise((resolve) =>
+            canvas.toBlob(resolve, type, quality)
+        );
+        return new File([blob], file.name, {
+            type: blob.type,
+        });
+    };
+
+    var fileInputs = document.querySelectorAll('input[type="file"]');
+    compressFiles(fileInputs)
+    // file compress
+
     $(`#dispute`).on('change', function(){
         if($(this).prop('checked')){
             $('textarea[name="comment"]').attr('required', true)
@@ -198,14 +239,7 @@
 
         docketFileInputs.each(function() {
             var inputValue = $(this).val();
-            var fileExt = inputValue.split('.').pop()
-            // console.log(inputValue.split('.').pop() == "jpg", inputValue.split('.').pop())
-            // if (values.includes(inputValue)) {
-            //     isUnique = false;
-            //     msg = "Please ensure you haven't uploaded the same file multiple times."
-            //     return false;
-            // }
-            // else if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
+            var fileExt = inputValue.split('.').pop().toLowerCase();
             if(fileExt != "jpg" && fileExt != "jpeg" && fileExt != "png"){
                 isUnique = false;
                 msg = "Please Upload docket file in JPG, JPEG pr PNG formate."
@@ -218,12 +252,14 @@
             alert(msg);
         } else {
             this.submit();
-            // event.preventDefault();
             $('#submitSpinner').removeClass('d-none')
             $('#overlay').css('display', 'block')
+            //  event.preventDefault();
         }
-    });
+    }); 
 
+ 
+    
     function changeStatus(startId, endId = null) {
         const startInput = $(`#${startId}`);
         const endInput = $(`#${endId}`);
@@ -353,14 +389,6 @@
             docketContent += `</div>`
             docketContent += `</div>`
 
-            /* docketContent += `<div class="col-md-6 col-12 my-1">`;
-            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="returnToYard" id="returnToYard${i}" onchange="returnFun(${i})" readonly>`;
-            docketContent += `<label for="returnToYard${i}"class="mt-3">Return To Yard:</label>`;
-            docketContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="tippingToYard" id="tippingToYard${i}" onchange="returnFun(${i})" readonly>`;
-            docketContent += `<label for="tippingToYard${i}">Return To Tipping Site:</label>`;
-            docketContent += `<input type="radio" checked name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="noReturn" id="noReturn${i}" onchange="returnFun(${i})" readonly>`;
-            docketContent += `<label for="noReturn${i}">No Return:</label>`;
-            docketContent += `</div>`; */
 
             // Return Qty
             docketContent += `<div class="col-md-6 col-12 my-1 returnQty d-none">`;
@@ -373,17 +401,6 @@
             docketContent += `<label for="returnKm${i}">Return km:</label>`;
             docketContent += `<input type="number" step="0.01" name="returnKm${i}" id="returnKm${i}" class="form-control">`;
             docketContent += `</div>`;
-
-
-            // Surcharge
-            // docketContent += `<div class="col-md-3 col-12 my-1">`
-            // docketContent += `<label for="surcharge${i}">Select Surcharge</label>`
-            // docketContent += `<select name="surcharge${i}" id="surcharge${i}" class="form-control text-capitalize">`
-            // docketContent += `{% for surcharge in surcharges %}`
-            // docketContent += `<option value="{{surcharge.id}}" class="text-capitalize">{{surcharge.surcharge_Name}}</option>`
-            // docketContent += `{% endfor %}`
-            // docketContent += `</select>`
-            // docketContent += `</div>`
 
             docketContent += `<div class="col-md-12 col-12 my-1">`
             docketContent += `<label for="comment${i}">Comment for docket ${i}:</label>`
@@ -477,15 +494,6 @@
             detailsContent += `</div>`
             detailsContent += `</div>`
 
-            /* detailsContent += `<div class="col-md-6 col-12 my-1">`;
-            detailsContent += `<label for="returnToYard${i}"class="mt-3">Return To Yard:</label>`;
-            detailsContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="returnToYard" id="returnToYard${i}" onchange="returnFun(${i})"  readonly>`;
-            detailsContent += `<label for="tippingToYard${i}">Return To Tipping Site:</label>`;
-            detailsContent += `<input type="radio" name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="tippingToYard" id="tippingToYard${i}" onchange="returnFun(${i})"  readonly>`;
-            detailsContent += `<label for="noReturn${i}">No Return:</label>`;
-            detailsContent += `<input type="radio" checked name="returnVal${i}" style="margin-left:1rem; margin-right:1rem;" value="noReturn" id="noReturn${i}" onchange="returnFun(${i})" readonly>`;
-            detailsContent += `</div>`; */
-
             // Return Qty
             detailsContent += `<div class="col-md-4 col-12 my-1 returnQty d-none">`;
             detailsContent += `<label for="returnQty${i}">Return Qty:</label>`;
@@ -497,17 +505,6 @@
             detailsContent += `<label for="returnKm${i}">Return km:</label>`;
             detailsContent += `<input type="number" step="0.01" name="returnKm${i}" id="returnKm${i}" class="form-control">`;
             detailsContent += `</div>`;
-    
-
-            // Surcharge
-            // detailsContent += `<div class="col-md-3 col-12 my-1">`
-            // detailsContent += `<label for="surcharge${i}">Select Surcharge</label>`
-            // detailsContent += `<select name="surcharge${i}" id="surcharge${i}" class="form-control text-capitalize">`
-            // detailsContent += `{% for surcharge in surcharges %}`
-            // detailsContent += `<option value="{{surcharge.id}}" class="text-capitalize">{{surcharge.surcharge_Name}}</option>`
-            // detailsContent += `{% endfor %}`
-            // detailsContent += `</select>`
-            // detailsContent += `</div>`
 
             // Comment
             detailsContent += `<div class="col-md-12 col-12 my-1">`;
@@ -530,6 +527,8 @@
             }else{
                 $('#loadsContainer').append(detailsAdd(noOfLoads));
             }
+            fileInputs = document.querySelectorAll('input[type="file"]');
+            compressFiles(fileInputs)
 
             let submitBtnText = ''
             submitBtnText += `<div class="row mt-2">`
@@ -543,6 +542,7 @@
             let url = "{% url 'Account:collectedDocketSave' shiftId=shiftId tripId=tripObj.id endShift=endShift %}"
             $("#docketsForm").attr('action', url)
             $(noOfLoads).attr('readonly', true)
+            
         }
     }  
     function getLocation() {
