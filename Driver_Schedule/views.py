@@ -155,11 +155,11 @@ def apiLoginCheck(request):
             if user:
                 userData = User.objects.filter(username=str(user)).values('id','is_superuser','username','first_name','last_name','email','is_staff','is_active').first()
                 userData['user_type'] = 'Driver'
-                return JsonResponse({'status':200, 'user':userData})
+                return JsonResponse({'successBody' : {'statusCode':200, 'Data':userData}})
             else:
-                return JsonResponse({'status':404, 'user':'Password not matched.'})
+                return JsonResponse({'errorBody' : {'statusCode':401, 'message':'Incorrect password.'}})
         else:
-            return JsonResponse({'status':404, 'user':'User not found'})
+            return JsonResponse({'errorBody' : {'statusCode':404, 'message':'User not found.'}})
     else:
-        return JsonResponse({'status':404, 'user': ('username' if not username else 'password') + ' not found.'})
+        return JsonResponse({'errorBody' : {'statusCode':404, 'message': ('username' if not username else 'password') + ' not found.'}})
 

@@ -736,6 +736,11 @@ def DriverPreStartSave(request, tripId , endShift = None):
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))    
     currentUTCDateTime = datetime.utcnow()
     tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
+    if currentDateTime < shiftObj.startDateTime:
+        messages.error(request,'Trip start time is must be greater than shift start time')
+        return redirect(request.META.get('HTTP_REFERER'))
+    
     tripObj.startTimeUTC = currentUTCDateTime
     tripObj.startDateTime = currentDateTime
     tripObj.save()
