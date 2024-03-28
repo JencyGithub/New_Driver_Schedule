@@ -73,11 +73,11 @@
             
             <div class="col-md-12 col-sm-12">
                 
-                <form id="tripForm" class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}"    enctype="multipart/form-data">
+                <form id="tripForm" class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" enctype="multipart/form-data">
                     {% csrf_token %}   
-                    <input type="hidden" name="currentDateTime"  id="currentDateTime">
-                    <input class="form-control" id="veriFied" value="{{shiftObj.verified}}" type="hidden"   name="veriFied">
-                    <input class="form-control"   type="hidden" name="shiftEndTime" style="padding: 0.25rem 0.2rem;"  >
+                    <input type="hidden" name="currentDateTime" id="currentDateTime">
+                    <input class="form-control" id="veriFied" value="{{shiftObj.verified}}" type="hidden" name="veriFied">
+                    <input class="form-control" type="hidden" name="shiftEndTime" style="padding: 0.25rem 0.2rem;">
 
                     <div class="x_title">
                         <h2>Shift Details</h2> 
@@ -488,7 +488,7 @@
             </div>
             <input class="form-control"   type="hidden" name="oldShiftEndTime" style="padding: 0.25rem 0.2rem;" required="required" id="oldShiftEndTime">
             <div class="modal-footer">
-                <button onclick="shiftEndTimeFun()"  class="btn btn-default btn-sm">Submit</button>
+                <button onclick="shiftEndTimeFun('{{ shiftObj.startDateTime }}')"  class="btn btn-default btn-sm">Submit</button>
             </div>
         </div>
     </div>
@@ -537,10 +537,6 @@
     </div>
     </div>
 </div>
-
-
-
-
 
 <!-- /page content -->
 {% endblock %}
@@ -611,7 +607,6 @@
         });
 
         $('#locationModal').modal('show')
-
     });
 </script>
 {% endblock %}

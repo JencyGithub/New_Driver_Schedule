@@ -9,6 +9,7 @@ $(document).ready(function () {
   }
 });
 
+
 function verifiedBtnFun(shiftId){
   $.ajax({
     type: "POST",
@@ -50,11 +51,13 @@ function verifiedBtnFun(shiftId){
   });
 }
 
-function shiftEndTimeFun() {
+function shiftEndTimeFun(shiftStartDateTime) {
   var newShiftEndTimeInput = document.getElementById("shiftEndTime");
   var oldShiftEndTimeInput = document.getElementById("oldShiftEndTime");
   var newDateTime = newShiftEndTimeInput.value;
   var oldDateTime = oldShiftEndTimeInput.value;
+
+  console.log(shiftStartDateTime)
 
   var newDate = new Date(newDateTime);
   var oldDate = new Date(oldDateTime);
@@ -127,7 +130,6 @@ function endTripFun(tripId){
   $(`#endDateTime`+tripId).prop('readonly',false);
   $(`#endDateTime`+tripId).prop('disabled',false);
   $(`#subBtn`).prop('disabled',false);
-
 }
 
 function hideshow() {

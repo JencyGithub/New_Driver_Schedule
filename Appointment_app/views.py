@@ -33,21 +33,18 @@ def createShift(request,shiftId=None):
         'driver_ids' : driver_ids,
         'shiftObj' : shiftObj,
     }
-
     return render(request,'Appointment/shifts/createShift.html',params)
 
 def createShiftSave(request):
     longitude = request.POST.get('longitude')
     latitude = request.POST.get('latitude')
     driverId = request.POST.get('driverId')
-    startDateTime = request.POST.get('startDateTime')
-    startDateTime = startDateTime
+    startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime'))
     
     shiftType = request.POST.get('shiftType')
     minute_ = int(request.POST.get('number'))
     startOdometerKms = request.POST.get('startOdometerKms')
     startEngineHours = request.POST.get('startEngineHours')
-    truckNum = request.POST.get('truckNum')
     
     clientName = request.POST.get('clientId')
     truckNum = request.POST.get('truckNum').split('-')
@@ -56,26 +53,29 @@ def createShiftSave(request):
     clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
 
-
-    datetime_object = dateTimeObj(dateTimeObj=startDateTime)
     cur_UTC = datetime.utcnow()
-
     if minute_ > 0:
         cur_UTC = cur_UTC + timedelta(minutes=minute_)
     else:
         cur_UTC = cur_UTC - timedelta(minutes=abs(minute_))
 
-    existShitObj =  DriverShift.objects.filter(driverId = driverId,endDateTime__isnull=True, archive=False).first()
+    existShitObj = DriverShift.objects.filter(driverId = driverId,endDateTime__isnull=True, archive=False).first()
     if existShitObj:
         messages.error(request,'Driver is not available for this shift.')
-        return redirect(request.META.get( 'HTTP_REFERER' ))
+        return redirect(request.META.get( 'HTTP_REFERER'))
+    
+    existShitObj = DriverShift.objects.filter(driverId=driverId, startDateTime__lte=startDateTime, endDateTime__gte=startDateTime).first()
+    if existShitObj:
+        messages.error(request,'This shift is already exist according to selected driver.')
+        return redirect(request.META.get( 'HTTP_REFERER'))
+    
     shiftObj = DriverShift()
     shiftObj.longitude = longitude
     shiftObj.latitude = latitude
     shiftObj.driverId = driverId
     shiftObj.shiftType = shiftType
-    shiftObj.startDateTime = datetime_object
-    shiftObj.shiftDate = datetime_object.date()
+    shiftObj.startDateTime = startDateTime
+    shiftObj.shiftDate = startDateTime.date()
     shiftObj.startTimeUTC = cur_UTC
     shiftObj.save()
 

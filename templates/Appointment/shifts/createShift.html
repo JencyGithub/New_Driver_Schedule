@@ -56,6 +56,32 @@
                         <div class="custom-continer">
                             <div class="row">
                                 <div class="col-md-4 col-sm-4">
+                                    <div class="my-1">
+                                        <label for="date">Date: <span class="required">*</span></label>
+                                        <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
+                                    <div class="my-1">
+                                        <label for="number">Time (-): </label>
+                                        <div class="input-group">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button" id="minusButton">-</button>
+                                            </span>
+                                            <input type="text" name="number" value="0" id="number" class="form-control" readonly>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-4 col-sm-4">
+                                    <div class="my-1">
+                                        <label for="shiftType">Shift Type: <span class="required">*</span></label>
+                                        <select name="shiftType" id="shiftType" class="form-control">
+                                            <option value="Day">Day</option>
+                                            <option value="Night">Night</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-4">
                                     <label for="driver">Client :<span class="required">*</span></label>
                                     <div class="field item form-group">
                                         {% if clientName %}
@@ -96,18 +122,9 @@
                                 
                                 <div class="col-md-4 col-sm-4">
                                     <div class="my-1">
-                                        <label for="shiftType">Shift Type: <span class="required">*</span></label>
-                                        <select name="shiftType" id="shiftType" class="form-control">
-                                            <option value="Day">Day</option>
-                                            <option value="Night">Night</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <div class="my-1">
                                         <label for="longitude">Longitude: <span class="required">*</span></label>
-                                        <input type="checkbox" id="locationCheck" onclick="locationCheckBoxFun()" class="float-right"><span class="float-right mr-2">Location not available</span>
-                                        <input type="text" name="longitude"  id="longitude" class="form-control" required>
+                                        <input type="checkbox" id="locationCheck" onclick="locationCheckBoxFun()" class="float-right"><label for="locationCheck" class="float-right mr-2">Location not available</label>
+                                        <input type="text" name="longitude" id="longitude" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-sm-4">
@@ -116,23 +133,7 @@
                                         <input type="text" name="latitude" id="latitude"  class="form-control" required>
                                     </div>
                                 </div>                                
-                                <div class="col-md-4 col-sm-4">
-                                    <div class="my-1">
-                                        <label for="date">Date: <span class="required">*</span></label>
-                                        <input type="datetime-local" name="startDateTime" id="startDateTime" class="form-control" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-4">
-                                    <div class="my-1">
-                                        <label for="number">Time (-): </label>
-                                        <div class="input-group">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-default" type="button" id="minusButton">-</button>
-                                            </span>
-                                            <input type="text" name="number" value="0" id="number" class="form-control" readonly>
-                                        </div>
-                                    </div>
-                                </div>               
+                                              
                                 {% comment %} <div class="col-md-4 col-sm-4">
                                     <div class="my-1">
                                         <label for="minute">Minute: </label>
@@ -200,10 +201,8 @@
         $('#truckNum').select2();
         
         $("#clientId").on("change", function () {
-
             var startDateTime = document.getElementById('startDateTime').value;
-
-
+            console.log(startDateTime)
             let clientId = $(this).val();
 
             if (clientId) {
@@ -320,11 +319,14 @@
         var currentValue = parseInt(numberInput.value) || 0;
         numberInput.value = currentValue - 10; // Adjust decrement by 10
         updateFields();
+        console.log('selected')
+        $('#clientId').val(null).trigger('change')
+        $('#truckNum').val(null).trigger('change').prop('disabled', true)
+
     });
 
     updateFields();
     
-
 </script>
 
 {% endblock  %}
