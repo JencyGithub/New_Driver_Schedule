@@ -185,15 +185,20 @@ def formatDateTimeForDBSave(dateTimeStr):
         dateTimeStr = None
     return dateTimeStr
 
-def dateTimeObj(date=None, time=None, dateTimeObj=None):
-    if dateTimeObj:
-        return datetime.fromisoformat(dateTimeObj)
-    elif date and time:
-        year, month, day = map(int, date.split('-'))
+def dateTimeObj(dateStr=None, time=None, dateTimeObj=None, dateTimeStr=None):
+    if dateTimeStr:
+        dateStr, time = map(str, dateTimeStr.split())
+        year, month, day = map(int, dateStr.split('-'))
         hours, minutes, seconds = map(int, time.split(':'))
         return datetime(int(year), int(month), int(day), int(hours), int(minutes), int(seconds))
-    elif date:
-        year, month, day = map(int, date.split('-'))        
+    if dateTimeObj:
+        return datetime.fromisoformat(dateTimeObj)
+    elif dateStr and time:
+        year, month, day = map(int, dateStr.split('-'))
+        hours, minutes, seconds = map(int, time.split(':'))
+        return datetime(int(year), int(month), int(day), int(hours), int(minutes), int(seconds))
+    elif dateStr:
+        year, month, day = map(int, dateStr.split('-')) 
         return date(int(year), int(month), int(day))
     elif time:
         hours, minutes, seconds = map(int, time.split(':'))

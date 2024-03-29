@@ -86,11 +86,8 @@ urlpatterns = [
     path('driver/cancel-request/<int:id>/', views.cancelLeaveRequest, name='cancelLeaveRequest'),
 
     
-    
     # Driver trip path end
     
-    
-
     path('getTrucks/', views.getTrucks, name='getTrucks'), 
     
     path('Rcti/', views.rcti, name='rcti'), 
@@ -296,4 +293,17 @@ urlpatterns = [
 
     path('history/rcti/<int:rctiId>/', views.rctiHistory, name='rctiHistory'), 
     path('history/escalation/<int:escalationId>/', views.escalationHistory, name='escalationHistory'), 
+    
+    
+    # ***********************************************
+    # API urls
+    # ***********************************************
+    
+    path('api/shift-start/', views.apiMapDataSave, name='apiMapDataSave'),
+    path('api/getClients/', views.getClients, name='getClients'),
+    path('api/getTrucks/', views.getTrucks, name='getTrucks'),
+
+    path('api/apiClientAndTruckData/save/', views.apiClientAndTruckDataSave, name='apiClientAndTruckDataSave'),
+    path('api/getPreStartQuestions/', views.getPreStartQuestions, name='getPreStartQuestions'),
+    
 ]

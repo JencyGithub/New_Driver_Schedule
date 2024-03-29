@@ -155,11 +155,18 @@ def apiLoginCheck(request):
             if user:
                 userData = User.objects.filter(username=str(user)).values('id','is_superuser','username','first_name','last_name','email','is_staff','is_active').first()
                 userData['user_type'] = 'Driver'
-                return JsonResponse({'successBody' : {'statusCode':200, 'Data':userData}})
+                shiftObj = DriverShift.objects.filter(driverId=Driver.objects.filter(name=userData['username']).first().driverId, endDateTime=None).first()
+                tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+                userData['currentShiftId'] = shiftObj.id if shiftObj else None
+                userData['currentTripId'] = tripObj.id if tripObj else None
+                
+                return JsonResponse({'status':True,
+                                     'message': 'Data fetching successfully.',
+                                     'Data':userData})
             else:
-                return JsonResponse({'errorBody' : {'statusCode':401, 'message':'Incorrect password.'}})
+                return JsonResponse({'status':False, 'message':'Incorrect password.'})
         else:
-            return JsonResponse({'errorBody' : {'statusCode':404, 'message':'User not found.'}})
+            return JsonResponse({'status':False, 'message':'User not found.'})
     else:
-        return JsonResponse({'errorBody' : {'statusCode':404, 'message': ('username' if not username else 'password') + ' not found.'}})
+        return JsonResponse({'status':False, 'message': ('username' if not username else 'password') + ' not found.'})
 

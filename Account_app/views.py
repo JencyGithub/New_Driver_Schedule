@@ -609,7 +609,7 @@ def mapDataSave(request, recurring=None):
             lng = request.POST.get('longitude')
             date = request.POST.get('date')
             time = request.POST.get('time')
-            datetime_object = dateTimeObj(date=date, time=time)
+            datetime_object = dateTimeObj(dateStr=date, time=time)
             
             # result = "Day" if 6 <= datetime_object.time().hour <= 17 else "Night"
             result = request.POST.get('shiftType')
@@ -817,7 +817,7 @@ def DriverPreStartSave(request, tripId , endShift = None):
             shiftObj.save()
         
             questions_with_answer = DriverPreStartQuestion.objects.filter(pk__in = questionIdList)
-            if  len(questions_with_answer)>0:
+            if len(questions_with_answer)>0:
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
                 truckNo = clientTruckConnectionObj.truckNumber.adminTruckNumber
                 clientName = clientTruckConnectionObj.clientId.name
@@ -1330,7 +1330,7 @@ def getTrucks(request):
     clientName = request.POST.get('clientName')
     client = Client.objects.get(name=clientName)
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
-        
+    
     if request.POST.get('shiftId'):
         shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
         currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
@@ -4526,3 +4526,114 @@ def escalationHistory(request, escalationId):
         'title' : 'Escalation HIstory'
     }
     return render(request, 'historyTable.html', params)
+
+
+# ***********************************************
+# API Functions
+# ***********************************************   
+
+@csrf_protect
+@api_view(['POST'])
+def apiMapDataSave(request, recurring=None):    
+    lat = request.POST.get('latitude')
+    lng = request.POST.get('longitude')
+    locationImg = request.FILES.get('locationImage')
+    
+    startDate = request.POST.get('startDate')
+    startTime = request.POST.get('startTime')
+    utcTime = dateTimeObj(dateTimeStr=request.POST.get('utcTime'))
+    shiftDate = dateTimeObj(dateStr=request.POST.get('shiftDate'))
+    shiftType = request.POST.get('shiftType')
+    driverId = request.POST.get('driverId')
+    
+    existingShiftObj = DriverShift.objects.filter(driverId=driverId, endDateTime=None).first()
+    if existingShiftObj:
+        return JsonResponse({'status':False, 'message':'Shift already exist for given driver.','Data' : {'shiftId':existingShiftObj.id}})
+    
+    if driverId is None or startDate is None or startTime is None or utcTime is None or shiftDate is None or shiftType is None:
+        return JsonResponse({'status':False, 'message': 'driverId or startDate or startTime or utcTime or shiftDate or shiftType not found properly'})
+    
+    driverObj = Driver.objects.filter(pk=driverId).first()
+    if not driverObj:
+        return JsonResponse({'status':False, 'message':'Matching driver not found.'})
+ 
+    startDate = dateTimeObj(dateStr=startDate, time=startTime)  
+    if (not lat or not lng) and (not locationImg):
+        return JsonResponse({'status':False, 'message':'Location or location image is missing.'})
+    
+    shiftObj = DriverShift()
+    shiftObj.latitude = lat
+    shiftObj.longitude = lng
+    shiftObj.shiftDate = shiftDate
+    shiftObj.shiftType = shiftType
+    shiftObj.startDateTime = startDate    
+    shiftObj.startTimeUTC = utcTime
+    shiftObj.driverId = driverObj.driverId
+    
+    if locationImg:
+        path = 'static/Account/driverLocationFiles'
+        fileName = locationImg.name
+        newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
+        pfs = FileSystemStorage(location=path)
+        pfs.save(newFileName, locationImg)            
+        shiftObj.locationImg = f'{path}/{newFileName}'
+    shiftObj.save()
+    return JsonResponse({'status':True, 'message':'Shift save successfully.', 'Data' : {'shiftId':shiftObj.id}})
+
+@csrf_protect
+@api_view(['POST'])
+def getClients(request):
+    clients = Client.objects.all().values('clientId','name','email','docketGiven')
+    return JsonResponse({'status':True, 'message':'Clients fetch successfully.', 'Data' : list(clients)})
+     
+    
+@csrf_protect
+@api_view(['POST'])
+def apiClientAndTruckDataSave(request):
+    shiftId = request.POST.get('shiftId')
+    clientId = request.POST.get('clientId')
+    truckNum = request.POST.get('truckNum').split('-')
+    startOdometers = request.POST.get('startOdometers')
+    startEngineHours = request.POST.get('startEngineHours')
+    
+    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftId, endDateTime=None).first()
+    if tripObj:
+        return JsonResponse({'status':False, 'message':'Trip already exist for given driver.','Data' : {'tripId':tripObj.id}})
+        
+    adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
+    clientTruckNum = truckNum[1]
+    clientObj = Client.objects.filter(pk=clientId).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
+    truckInfoObj = truckConnectionObj.truckNumber.truckInformation
+    truckInfoObj.odometerKms = startOdometers
+    truckInfoObj.engineHours = startEngineHours
+    truckInfoObj.save()
+
+    tripObj = DriverShiftTrip()
+    tripObj.shiftId = shiftId
+    tripObj.clientId = clientObj.clientId
+    tripObj.truckConnectionId = truckConnectionObj.id
+    tripObj.startOdometerKms = startOdometers
+    tripObj.startEngineHours = startEngineHours
+    tripObj.save()
+    
+    return JsonResponse({'status':True, 'message':'Trip created successfully.','Data' : {'tripId':tripObj.id}})
+
+@csrf_protect
+@api_view(['POST'])
+def getPreStartQuestions(request):
+    shiftId = request.POST.get('shiftId')
+    tripId = request.POST.get('tripId')
+    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False).values()
+    
+    params = {
+        'questions': list(preStartQuestions),
+        'shiftId' : shiftId,
+        'tripId' : tripId
+    }
+    
+    return JsonResponse({'status':True, 'message':'Fetch pre-start questions successfully.', 'Data' : params})
+    
