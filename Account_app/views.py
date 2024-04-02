@@ -4578,13 +4578,13 @@ def apiMapDataSave(request, recurring=None):
         pfs.save(newFileName, locationImg)            
         shiftObj.locationImg = f'{path}/{newFileName}'
     shiftObj.save()
-    return JsonResponse({'status':True, 'message':'Shift save successfully.', 'Data' : {'shiftId':shiftObj.id}})
+    return JsonResponse({'status':True, 'message':'Shift save successfully.', 'data' : {'shiftId':shiftObj.id}})
 
 @csrf_protect
 @api_view(['POST'])
 def getClients(request):
     clients = Client.objects.all().values('clientId','name','email','docketGiven')
-    return JsonResponse({'status':True, 'message':'Clients fetch successfully.', 'Data' : list(clients)})
+    return JsonResponse({'status':True, 'message':'Clients fetch successfully.', 'data' : list(clients)})
      
     
 @csrf_protect
@@ -4598,7 +4598,7 @@ def apiClientAndTruckDataSave(request):
     
     tripObj = DriverShiftTrip.objects.filter(shiftId=shiftId, endDateTime=None).first()
     if tripObj:
-        return JsonResponse({'status':False, 'message':'Trip already exist for given driver.','Data' : {'tripId':tripObj.id}})
+        return JsonResponse({'status':False, 'message':'Trip already exist for given driver.','data' : {'tripId':tripObj.id}})
         
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
     clientTruckNum = truckNum[1]
@@ -4635,5 +4635,5 @@ def getPreStartQuestions(request):
         'tripId' : tripId
     }
     
-    return JsonResponse({'status':True, 'message':'Fetch pre-start questions successfully.', 'Data' : params})
+    return JsonResponse({'status':True, 'message':'Fetch pre-start questions successfully.', 'data' : params})
     

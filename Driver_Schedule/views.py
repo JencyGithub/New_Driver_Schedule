@@ -153,16 +153,17 @@ def apiLoginCheck(request):
         if User.objects.filter(username=username).exists():
             user = authenticate(username=username, password=password)
             if user:
-                userData = User.objects.filter(username=str(user)).values('id','is_superuser','username','first_name','last_name','email','is_staff','is_active').first()
+                userData = User.objects.filter(username=str(user)).values('id','username','first_name','last_name','email').first()
                 userData['user_type'] = 'Driver'
                 shiftObj = DriverShift.objects.filter(driverId=Driver.objects.filter(name=userData['username']).first().driverId, endDateTime=None).first()
-                tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
-                userData['currentShiftId'] = shiftObj.id if shiftObj else None
-                userData['currentTripId'] = tripObj.id if tripObj else None
+                if shiftObj:
+                    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+                    userData['currentShiftId'] = shiftObj.id if shiftObj else None
+                    userData['currentTripId'] = tripObj.id if tripObj else None
                 
                 return JsonResponse({'status':True,
                                      'message': 'Data fetching successfully.',
-                                     'Data':userData})
+                                     'data':userData})
             else:
                 return JsonResponse({'status':False, 'message':'Incorrect password.'})
         else:

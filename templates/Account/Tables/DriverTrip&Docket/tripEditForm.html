@@ -163,7 +163,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="numberOfLoads{{trip.id}}">No. Of Loads:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input readonly class="form-control" value="{{trip.numberOfLoads}}" type="number"
+                                            <input readonly class="form-control" value="{{trip.numberOfLoads}}" type="number" step="0.01" 
                                                 name="numberOfLoads{{trip.id}}" required='required' style="padding: 0.25rem 0.2rem;"
                                                 id="numberOfLoads{{trip.id}}">
                                         </div>
@@ -304,32 +304,32 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="noOfKm{{docket.id}}">Number Of Km:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.noOfKm}}" type="number"name="noOfKm{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="noOfKm{{docket.id}}">
+                                            <input class="form-control" value="{{docket.noOfKm}}" type="number" step="0.01" name="noOfKm{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="noOfKm{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="transferKM{{docket.id}}">Transfer Km :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.transferKM}}" type="number" name="transferKM{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="transferKM{{docket.id}}">
+                                            <input class="form-control" value="{{docket.transferKM}}" type="number" step="0.01"  name="transferKM{{docket.id}}" required='required'style="padding: 0.25rem 0.2rem;" id="transferKM{{docket.id}}">
                                         </div>
                                     </div>
                                     <!--    returnQty  returnKm  waitingTimeStart      -->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="cubicMl{{docket.id}}">Load Qty :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.cubicMl}}" type="number" name="cubicMl{{docket.id}}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
+                                            <input class="form-control" value="{{docket.cubicMl}}" type="number" step="0.01"  name="cubicMl{{docket.id}}" required="required" style="padding: 0.25rem 0.2rem;" id="cubicMl{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnQty{{docket.id}}">Return Qty:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnQty}}" type="number"name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnQty}}" type="number" step="0.01" name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnKm{{docket.id}}">Return Km:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnKm}}" type="number" name="returnKm{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnKm}}" type="number" step="0.01"  name="returnKm{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" readonly>
                                         </div>
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
@@ -353,7 +353,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="totalWaitingInMinute{{docket.id}}">Total Waiting In Minute :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" readonly value="{{docket.totalWaitingInMinute}}" type="number" name="totalWaitingInMinute{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute{{docket.id}}">
+                                            <input class="form-control" readonly value="{{docket.totalWaitingInMinute}}" type="number" step="0.01"  name="totalWaitingInMinute{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="totalWaitingInMinute{{docket.id}}">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -370,7 +370,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="surcharge_duration{{docket.id}}">Surcharge Duration :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.surcharge_duration}}" type="number"name="surcharge_duration{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="surcharge_duration{{docket.id}}">
+                                            <input class="form-control" value="{{docket.surcharge_duration}}" type="number" step="0.01" name="surcharge_duration{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="surcharge_duration{{docket.id}}">
                                         </div>
                                     </div>
                                     
@@ -396,13 +396,13 @@
                                             <div class="col-md-6 col-sm-6">
                                                 <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control" readonly  type="number" name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                                    <input class="form-control" readonly  type="number" step="0.01"  name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-6">
                                                 <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
                                                 <div class="field item form-group">
-                                                    <input class="form-control" value="{{docket.others}}" type="number" name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
+                                                    <input class="form-control" value="{{docket.others}}" type="number" step="0.01"  name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
                                                 </div>
                                             </div>
                                             <div class="col-md-12 col-sm-12">
