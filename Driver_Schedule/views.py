@@ -19,7 +19,6 @@ register = template.Library()
 def has_group(user, group_name):
      return user.groups.filter(name=group_name).exists()     
 
-
 def index(request):
     return render(request,'index.html')
 
@@ -35,31 +34,45 @@ def loginCheck(request):
     form = LoginForm()
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password'],
-            )
-            if user is not None:
-                login(request, user)
-                CurrentUser_ = request.user
-                if CurrentUser_.groups.filter(name='Driver').exists():
-                    request.session['user_type'] = 'Driver'
-                    messages.success(request, f"Hi, {CurrentUser_.username}!")
-                    return redirect('index')
-                elif CurrentUser_.groups.filter(name='Accounts').exists():
-                    request.session['user_type'] = 'Accounts'
-                    return redirect('Account:index')
-                elif CurrentUser_.groups.filter(name='HR').exists():
-                    request.session['user_type'] = 'HR'
-                    return redirect('Account:index')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        try:
+            driverId = int(username)
+        except:
+            driverId = None
+
+        if form.is_valid():            
+            driverObj = Driver.objects.filter(Q(Q(name=username) | Q(email=username) | Q(driverId=driverId)) & Q(password=password)).first()
+            userObj = User.objects.filter(Q(username=username) | Q(email=username)).first()
+            
+            if userObj or driverObj:
+                username = driverObj.name if driverObj else userObj.username
+                user = authenticate(
+                    username=username,
+                    password=password,
+                )                
+                if user:
+                    login(request, user)
+                    CurrentUser_ = request.user
+                    if CurrentUser_.groups.filter(name='Driver').exists():
+                        request.session['user_type'] = 'Driver'
+                        messages.success(request, f"Hi, {CurrentUser_.username}!")
+                        return redirect('index')
+                    elif CurrentUser_.groups.filter(name='Accounts').exists():
+                        request.session['user_type'] = 'Accounts'
+                        return redirect('Account:index')
+                    elif CurrentUser_.groups.filter(name='HR').exists():
+                        request.session['user_type'] = 'HR'
+                        return redirect('Account:index')
+                    else:
+                        request.session['user_type'] = 'SuperUser'
+                        return redirect('Account:index')
                 else:
-                    request.session['user_type'] = 'SuperUser'
-                    return redirect('Account:index')
+                    messages.error(request, "Authentication failed!")
+                    return redirect(request.META.get('HTTP_REFERER'))
             else:
-                messages.error(request, "Login failed!")
-                return redirect(request.META.get('HTTP_REFERER'))
-    
+                messages.error(request, "User not found!")
+                return redirect(request.META.get('HTTP_REFERER'))    
 
 def CustomLogOut(request):
     logout(request)
@@ -67,7 +80,6 @@ def CustomLogOut(request):
     return redirect('login')
 
 
-    
     # Check if the user is a member of the "driver" group
     is_driver = user.groups.filter(name='driver').exists()
 
@@ -147,11 +159,18 @@ def changePasswordChange(request):
 @csrf_protect
 @api_view(['POST'])
 def apiLoginCheck(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
+    username = request.POST.get('username').strip()
+    password = request.POST.get('password').strip()
     if username and password:
-        if User.objects.filter(username=username).exists():
-            user = authenticate(username=username, password=password)
+        try:
+            driverId = int(username)
+        except:
+            driverId = None
+
+        driverObj = Driver.objects.filter(Q(Q(name=username) | Q(email=username) | Q(driverId=driverId)) & Q(password=password)).first()
+        
+        if driverObj:
+            user = authenticate(username=driverObj.name, password=password)
             if user:
                 userData = User.objects.filter(username=str(user)).values('id','username','first_name','last_name','email').first()
                 userData['user_type'] = 'Driver'
