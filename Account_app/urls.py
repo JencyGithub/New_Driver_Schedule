@@ -247,6 +247,7 @@ urlpatterns = [
     # Trip 
     path('Driver/Shift/Form/<int:id>', views.DriverShiftForm, name='DriverShiftForm'),
     path('Driver/Shift/Details/<int:id>', views.ShiftDetails, name='ShiftDetails'),
+    path('running-trucks/', views.runningTrucks, name='runningTrucks'),
     
     # Holcim 
     path('Holcim/Docket/View/<int:id>', views.HolcimDocketView, name='HolcimDocketView'),

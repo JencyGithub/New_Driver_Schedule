@@ -18,15 +18,6 @@
     float: right! important;
   }
 
-  {% comment %} /* Hide extra fields in pagination controls */
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.next,
-.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    display: none;
-} {% endcomment %}
-
-
   /* Hide all buttons (copy,csv,excel,pdf,print) */
   .dt-buttons.btn-group>a {
     display: none !important;
@@ -107,6 +98,7 @@
               <div class="btn-group float-right mr-4" role="group">
                 <button type="button" class="btn btn-sm btn-dark" id="activeBtn">Active</button>
                 <button type="button" class="btn btn-sm btn-dark" id="archiveBtn">Archive</button>
+                <a href="{% url 'Account:runningTrucks' %}" target="_blank" class="btn btn-sm btn-outline-dark ml-2 rounded">Running trucks</a>
               </div>
               {% endif %}
             </form>

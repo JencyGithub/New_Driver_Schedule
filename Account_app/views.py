@@ -1080,7 +1080,6 @@ def collectDockets(request, shiftId, tripId, endShift=None):
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
     try:
-        print('coming')
         endOdometers = request.POST.get('endOdometers')
         endEngineHours = request.POST.get('endEngineHours')
         curTimeStr = getCurrentTimeInString()
@@ -1148,7 +1147,7 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
                 docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
                 returnVal = request.POST.get(f'returnVal{load}')
                 if returnVal != 'noReturn':
-                    if  returnVal == 'returnToYard':
+                    if returnVal == 'returnToYard':
                         docketObj.returnToYard = True
                     else:
                         docketObj.tippingToYard = True
@@ -4028,6 +4027,30 @@ def ShiftDetails(request,id):
     return render(request, 'Account/Tables/driverTripsTable.html', params)
 
 
+def runningTrucks(request):
+    trips = DriverShiftTrip.objects.filter(endDateTime=None, archive=False).exclude(startDateTime=None)
+    truckList = []
+    for trip in trips:
+        truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first()
+        shiftObj = DriverShift.objects.filter(pk=trip.shiftId).first()
+        if shiftObj:
+            driverObj = Driver.objects.filter(pk=shiftObj.driverId).first()
+            if driverObj:
+                driverName = f'{driverObj.firstName} {driverObj.lastName}' 
+        if truckNum:
+            truckNum = truckNum.truckNumber.adminTruckNumber
+        
+        obj = {
+            'tripDate' : trip.startDateTime,
+            'truckNum' : truckNum,
+            'driverName' : driverName,   
+        }
+        
+        truckList.append(obj)
+
+    return render(request, 'Account/Tables/runningTrucks.html', {'truckList':truckList})
+
+    
 @csrf_protect
 def driverShiftCsv(request):
     data_list = []
