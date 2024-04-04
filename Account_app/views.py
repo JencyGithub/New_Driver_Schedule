@@ -569,7 +569,28 @@ def checkShiftStartedOrNot(request):
             return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
     else:
         return False
-    
+ 
+ 
+def driverProfileView(request):
+    currentUser = request.user.username
+    driverObj = Driver.objects.filter(name=currentUser).first()
+    shiftObjs = DriverShift.objects.filter(driverId=driverObj.driverId)
+    tripObjs = []
+    for shift in shiftObjs:
+        trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
+        tripObjs.extend(trips)
+
+    leaves = LeaveRequest.objects.filter(employee=driverObj)
+    params = {
+        'driverObj' : driverObj,
+        'shiftObjs' : shiftObjs,
+        'tripObjs' : tripObjs,
+        'leaves' : leaves
+    }
+
+    return render(request, 'Trip_details/driverProfile.html', params) 
+
+   
 def mapFormView(request, startDate=None):
     driverObj = Driver.objects.filter(name=request.user.username).first()
 

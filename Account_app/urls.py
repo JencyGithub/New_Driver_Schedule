@@ -49,6 +49,9 @@ urlpatterns = [
     path('timeOfStart/save/', views.timeOfStartSave, name='timeOfStartSave'),
     
     
+    path('driver/show-profile/', views.driverProfileView, name='driverProfileView'),
+
+
     path('mapForm/view/', views.mapFormView, name='mapFormView'),
     path('mapForm/view/<str:startDate>', views.mapFormView, name='mapFormViewWithDate'),
     path('mapForm/save/', views.mapDataSave, name='mapDataSave'),
@@ -235,8 +238,6 @@ urlpatterns = [
     
     
      
-    
-    
     # Base plant routes
     path('SurchargeTable/', views.surchargeTable, name='surchargeTable'),
     path('Surcharge/add/', views.surchargeForm, name='surchargeAdd'),
