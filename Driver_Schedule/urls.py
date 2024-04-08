@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path , include
 from . import views
+from Account_app import views as Account_Views
 
 
 urlpatterns = [
@@ -51,5 +52,13 @@ urlpatterns = [
     
     # APIs
     path('api/loginCheck/', views.apiLoginCheck, name='apiLoginCheck'),
+    
+    # Account API
+    path('api/shift-start/', Account_Views.apiMapDataSave, name='apiMapDataSave'),
+    path('api/getClients/', Account_Views.getClients, name='getClients'),
+    path('api/getTrucks/', Account_Views.getTrucks, name='getTrucks'),
+
+    path('api/apiClientAndTruckData/save/', Account_Views.apiClientAndTruckDataSave, name='apiClientAndTruckDataSave'),
+    path('api/getPreStartQuestions/', Account_Views.getPreStartQuestions, name='getPreStartQuestions'),
 
 ]

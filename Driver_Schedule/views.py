@@ -174,6 +174,8 @@ def apiLoginCheck(request):
             if user:
                 userData = User.objects.filter(username=str(user)).values('id','username','first_name','last_name','email').first()
                 userData['user_type'] = 'Driver'
+                userData['driverId'] = driverObj.driverId
+                
                 shiftObj = DriverShift.objects.filter(driverId=Driver.objects.filter(name=userData['username']).first().driverId, endDateTime=None).first()
                 if shiftObj:
                     tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()

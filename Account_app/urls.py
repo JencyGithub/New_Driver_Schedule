@@ -301,11 +301,11 @@ urlpatterns = [
     # API urls
     # ***********************************************
     
-    path('api/shift-start/', views.apiMapDataSave, name='apiMapDataSave'),
-    path('api/getClients/', views.getClients, name='getClients'),
-    path('api/getTrucks/', views.getTrucks, name='getTrucks'),
+    # path('api/shift-start/', views.apiMapDataSave, name='apiMapDataSave'),
+    # path('api/getClients/', views.getClients, name='getClients'),
+    # path('api/getTrucks/', views.getTrucks, name='getTrucks'),
 
-    path('api/apiClientAndTruckData/save/', views.apiClientAndTruckDataSave, name='apiClientAndTruckDataSave'),
-    path('api/getPreStartQuestions/', views.getPreStartQuestions, name='getPreStartQuestions'),
+    # path('api/apiClientAndTruckData/save/', views.apiClientAndTruckDataSave, name='apiClientAndTruckDataSave'),
+    # path('api/getPreStartQuestions/', views.getPreStartQuestions, name='getPreStartQuestions'),
     
 ]
