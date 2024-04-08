@@ -171,6 +171,7 @@ def apiLoginCheck(request):
         
         if driverObj:
             user = authenticate(username=driverObj.name, password=password)
+
             if user:
                 userData = User.objects.filter(username=str(user)).values('id','username','first_name','last_name','email').first()
                 userData['user_type'] = 'Driver'

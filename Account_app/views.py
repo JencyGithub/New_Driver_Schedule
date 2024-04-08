@@ -1051,12 +1051,11 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         driverBreaksTimeList = []
         totalDriverBreak = 0    
         for breakObj in breaksObjs:
-            print('break:',breakObj)
             if breakObj.endDateTime > endDateTime:
-                messages.error(request, "Entered breaks is not valid, please enter the correct break details.")
-                return redirect('Account:driverShiftView',shiftId=shiftId), -1
+                messages.error(request, f"You have added a break between {breakObj.startDateTime} to {breakObj.endDateTime}, You can end the shift after {breakObj.endDateTime} or change break details.")
+                return redirect('Account:driverShiftView',shiftId=shiftId)
             if breakObj.durationInMinutes >= 15:
-                totalDriverBreak += breakObj.durationInMinutes
+                totalDriverBreak += breakObj.durationInMinutes 
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
         return totalDriverBreak, driverBreaksTimeList
 
