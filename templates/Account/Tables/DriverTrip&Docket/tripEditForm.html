@@ -430,7 +430,7 @@
                     <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
                         <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
                         {% if numberOfLoadsCount != 0 %}
-                        <button id = "verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">{% if not shiftObj.endDateTime %} End shift & reconcile {% else %} Verify & reconcile {% endif %}</button>
+                        <button id="verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">{% if not shiftObj.endDateTime %} End shift & reconcile {% else %} Verify & reconcile {% endif %}</button>
                         {% endif %}
                     </div>
                     {% endif%}
@@ -486,7 +486,7 @@
                     </div>
                 </div>
             </div>
-            <input class="form-control"   type="hidden" name="oldShiftEndTime" style="padding: 0.25rem 0.2rem;" required="required" id="oldShiftEndTime">
+            <input class="form-control" type="hidden" name="oldShiftEndTime" style="padding: 0.25rem 0.2rem;" required="required" id="oldShiftEndTime">
             <div class="modal-footer">
                 <button onclick="shiftEndTimeFun('{{ shiftObj.startDateTime }}')"  class="btn btn-default btn-sm">Submit</button>
             </div>

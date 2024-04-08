@@ -40,12 +40,16 @@ function verifiedBtnFun(shiftId){
         }
 
         else{
-          $('#shiftEndTimeModel').modal('show');
-          $('#oldShiftEndTime').val(endDateTimeValue);
-          $('#shiftEndTime').val(endDateTimeValue);
-        }
-
-        
+          if (data.shiftObj['endDateTime']) {
+            $('#veriFied').val('True');
+            setDateTime('currentDateTime')
+            $('#tripForm').submit();
+          }else{
+            $('#shiftEndTimeModel').modal('show');
+            $('#oldShiftEndTime').val(endDateTimeValue);
+            $('#shiftEndTime').val(endDateTimeValue);
+          }
+        }        
       }
     },
   });
