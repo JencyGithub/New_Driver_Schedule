@@ -359,8 +359,10 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
     try:
         if docketObj.standByStartTime and docketObj.standByStartTime:
             if tripObj:
-                docketObj.standByStartTime = docketObj.standByStartTime.strftime("%H:%M:%S")
-                docketObj.standByEndTime = docketObj.standByEndTime.strftime("%H:%M:%S")
+                if type(docketObj.standByStartTime) is not str:
+                    docketObj.standByStartTime = docketObj.standByStartTime.strftime("%H:%M:%S")
+                    docketObj.standByEndTime = docketObj.standByEndTime.strftime("%H:%M:%S")
+                
                 totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
                 standBySlot = 0
                 if float(totalStandByTime) > float(graceObj.chargeable_standby_time_starts_after):
@@ -369,7 +371,8 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
                 return standBySlot
         else:
             return 0
-    except:
+    except Exception as e:
+        print('DriverTripCheckStandByTotal:',e)
         return -404
     
     

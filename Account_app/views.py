@@ -2675,6 +2675,8 @@ def driverEntryUpdate(request, shiftId):
         if shiftTimeDiff > maxShiftTime:
             messages.error(request,'Please ensure the shift is completed within 24 hours.') 
             return redirect(request.META.get( 'HTTP_REFERER' ))
+    else:
+        shiftEndTime = shiftObj.endDateTime
     tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id)
     currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('currentDateTime'))
     cur_UTC = datetime.utcnow()
@@ -2686,7 +2688,7 @@ def driverEntryUpdate(request, shiftId):
             shiftObj.endDateTime = shiftEndTime
             shiftObj.endTimeUTC = cur_UTC + timedelta(minutes=timeDiff)
             shiftObj.save()
-            
+   
     for trip in tripObjs:
         endDateTime = dateTimeObj(dateTimeObj=request.POST.get(f'endDateTime{trip.id}'))
         startDateTime = dateTimeObj(dateTimeObj=request.POST.get(f'startDateTime{trip.id}'))
@@ -2798,6 +2800,7 @@ def driverEntryUpdate(request, shiftId):
                         driverWaitingTimeCost = checkLoadCalculatedWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                     else:  
                         driverWaitingTimeCost = checkWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+                
                 slotSize = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
                 driverStandByCost = checkStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj,slotSize =slotSize)
                 driverTransferKmCost = checkTransferCost(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
@@ -2894,17 +2897,18 @@ def checkTripDeficit(request):
     return JsonResponse({'status':True if 'True' in getTrueOrFalse else False, 'getDeficit':getDeficit}) 
  
     
-    
 @csrf_protect
 def getLastTrip(request):
     shiftId = request.POST.get('shiftId')  # Provide the key 'shiftId'
     tripObj = None
 
+    shiftObj = DriverShift.objects.filter(pk=shiftId).values().first()
     if shiftId:
         tripObj = DriverShiftTrip.objects.filter(shiftId=shiftId).order_by('-id').first()
 
     if tripObj:
-        return JsonResponse({'status': True, 'tripId': tripObj.id})
+        return JsonResponse({'status': True, 'tripId': tripObj.id, 'shiftObj': shiftObj})
+    
     
 # ````````````````````````````````````
 # Reconciliation
