@@ -249,7 +249,7 @@ $("#driverBreaks .close").on("click", function(){
 function returnToYard(id, tag) {
   let selected = $(`#${tag.id}`).is(":checked");
 
-  if (selected) {
+  if (!selected) {
     $(`#returnQty${id}`).attr("readonly", true);
     $(`#returnKm${id}`).attr("readonly", true);
   } else {

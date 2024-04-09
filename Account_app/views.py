@@ -2739,6 +2739,7 @@ def driverEntryUpdate(request, shiftId):
             docket.noOfKm = request.POST.get(f'noOfKm{docket.id}')
             docket.transferKM = request.POST.get(f'transferKM{docket.id}')
             docket.surcharge_type = request.POST.get(f'surcharge_type{docket.id}')
+        
             if request.POST.get(f'returnToYard{docket.id}') == f'returnToYard{docket.id}':
                 docket.returnQty = request.POST.get(f'returnQty{docket.id}')
                 docket.returnKm = request.POST.get(f'returnKm{docket.id}')
@@ -2747,7 +2748,11 @@ def driverEntryUpdate(request, shiftId):
                 docket.returnQty = request.POST.get(f'returnQty{docket.id}')
                 docket.returnKm = request.POST.get(f'returnKm{docket.id}')
                 docket.tippingToYard = True
-                
+            else:
+                docket.returnQty = 0
+                docket.returnKm = 0
+                docket.tippingToYard = False
+                docket.returnToYard = False
                 
             if request.POST.get(f'waitingCheck{docket.id}'):
                 docket.waitingTimeStart = request.POST.get(f'waitingTimeStart{docket.id}')

@@ -251,7 +251,7 @@
                                     <label for="tippingToYard{{docket.id}}" class="ml-2"
                                     style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
                                     <input type="radio" id="returnToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="returnToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" checked{% if docket.returnToYard %} checked {% endif %}>
+                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.returnToYard %} checked {% endif %}>
                                     <label for="returnToYard{{docket.id}}" class="ml-2"
                                         style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
                                 
@@ -323,13 +323,13 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnQty{{docket.id}}">Return Qty:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnQty}}" type="number" step="0.01" name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnQty}}" type="number" step="0.01" name="returnQty{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnQty{{docket.id}}" {% if not docket.tippingToYard and not docket.returnToYard %}readonly{% endif %}>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="returnKm{{docket.id}}">Return Km:<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.returnKm}}" type="number" step="0.01"  name="returnKm{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" readonly>
+                                            <input class="form-control" value="{{docket.returnKm}}" type="number" step="0.01"  name="returnKm{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="returnKm{{docket.id}}" {% if not docket.returnToYard and not docket.tippingToYard %}readonly{% endif %}>
                                         </div>
                                     </div>
                                     {% comment %} {{docket.waitingTimeStart}} {% endcomment %}
