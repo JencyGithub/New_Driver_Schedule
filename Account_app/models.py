@@ -79,6 +79,7 @@ class DriverShift(models.Model):
     endLocationImg = models.FileField(upload_to='static/Account/driverLocationFiles', null=True)
     totalRunTime = models.FloatField(default=0)
     totalBreakInMinute = models.FloatField(default=0)
+    chargeJobEditReason = models.CharField(max_length=2048, null=True, blank=True)
     history = HistoricalRecords()
     
     def __str__(self) -> str:
@@ -141,6 +142,8 @@ class DriverShiftDocket(models.Model):
     minimumLoad = models.FloatField(default=0)
     others = models.FloatField(default=0)
     comment = models.CharField(max_length=255, null=True, default='')
+    archive = models.BooleanField(default=False)
+
     history = HistoricalRecords()
 
     def __str__(self) -> str:
