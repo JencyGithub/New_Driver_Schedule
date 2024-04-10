@@ -30,7 +30,10 @@
     <div class="card border-0">
         <div class="card-body">
             <h6 class="card-title text-uppercase text-default d-inline-block">Select client and truck number</h6>
+            {% if trips %}
             <span class="btn btn-sm btn-outline-danger float-end" id="endShift">End Shift</span>
+            {% endif %}
+
             <hr>  
             <form action="{% url 'Account:clientAndTruckDataSave' id=shiftObj.id %}" method="POST" id="clientForm">
                 {% csrf_token %}

@@ -670,7 +670,9 @@ def showClientAndTruckNumGet(request, shiftId):
     
     shiftObj = DriverShift.objects.filter(pk=shiftId).first()
     if shiftObj:
+        tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id) 
         params['shiftObj'] = shiftObj
+        params['trips'] = tripObjs
         existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
         if existingTrip:
             return redirect('Account:showPreStartForm',shiftId=shiftObj.id, tripId=existingTrip.id)
@@ -4059,6 +4061,7 @@ def ShiftDetails(request,id):
 def runningTrucks(request):
     trips = DriverShiftTrip.objects.filter(endDateTime=None, archive=False).exclude(startDateTime=None)
     truckList = []
+    driverName = None
     for trip in trips:
         truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first()
         shiftObj = DriverShift.objects.filter(pk=trip.shiftId).first()
@@ -4267,7 +4270,7 @@ def EscalationForm(request ,id = None):
         escalationDocketObj.docketDate = dateConverterFromTableToPageFormate(escalationDocketObj.docketDate)
 
 
-    params ={
+    params = {
         'escalationObj':escalationObj,
         'clientNames':clientNames,
         'escalationDocketObj':escalationDocketObj,
@@ -4600,7 +4603,7 @@ def apiMapDataSave(request, recurring=None):
     
     existingShiftObj = DriverShift.objects.filter(driverId=driverId, endDateTime=None).first()
     if existingShiftObj:
-        return JsonResponse({'status':False, 'message':'Shift already exist for given driver.','Data' : {'shiftId':existingShiftObj.id}})
+        return JsonResponse({'status':False, 'message':'Shift already exist for given driver.','data' : {'shiftId':existingShiftObj.id}})
     
     if driverId is None or startDate is None or startTime is None or utcTime is None or shiftDate is None or shiftType is None:
         return JsonResponse({'status':False, 'message': 'driverId or startDate or startTime or utcTime or shiftDate or shiftType not found properly'})
@@ -4669,7 +4672,7 @@ def apiClientAndTruckDataSave(request):
     tripObj.startEngineHours = startEngineHours
     tripObj.save()
     
-    return JsonResponse({'status':True, 'message':'Trip created successfully.','Data' : {'tripId':tripObj.id}})
+    return JsonResponse({'status':True, 'message':'Trip created successfully.','data' : {'tripId':tripObj.id}})
 
 @csrf_protect
 @api_view(['POST'])
