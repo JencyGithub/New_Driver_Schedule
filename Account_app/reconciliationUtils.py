@@ -43,8 +43,6 @@ def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterOb
 
     
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
-
-
     totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
     standBySlot = 0
     if totalStandByTime > graceObj.chargeable_standby_time_starts_after:
@@ -82,7 +80,6 @@ def checkLoadAndKmCost(docketObj , shiftObj , rateCard , costParameterObj , grac
 
 def checkMinLoadCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
-        
         driverDocketLoadSize = docketObj.cubicMl 
         date_= docketObj.shiftDate
         driverDocketKm = 0 if float(docketObj.noOfKm) <= float(graceObj.load_km_grace) else float(docketObj.noOfKm) - float(graceObj.load_km_grace)
@@ -101,7 +98,7 @@ def checkMinLoadCost(docketObj , shiftObj , rateCard , costParameterObj , graceO
         
     except Exception as e : 
         
-        return -404.0 
+        return -0.1 
 
 def checkSurcharge(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     
@@ -135,46 +132,54 @@ def checkSurcharge(docketObj , shiftObj , rateCard , costParameterObj , graceObj
             
 
     # except Exception as e :
-    #     return -404.0
+    #     return -0.1
         
 def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
         date_= docketObj.shiftDate
-        
-        if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
-            docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
-            # print('Total Waiting Time' , docketObj.totalWaitingInMinute)
-            totalWaitingTime = float(docketObj.totalWaitingInMinute) 
-            if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
-                totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
-                if totalWaitingTime > 0: 
-                    totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
-                else:
-                    totalWaitingCost = 0
-                return round(totalWaitingCost,2) 
-            else:
-                return 0
-        else:
-            return 0
+        totalWaitingTime = DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj)
+        totalWaitingCost = 0
+        if totalWaitingTime > 0: 
+            totalWaitingCost = round(float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute), 2)
+                    
+        return totalWaitingCost 
+            
+        # if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
+        #     docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
+        #     # print('Total Waiting Time' , docketObj.totalWaitingInMinute)
+        #     totalWaitingTime = float(docketObj.totalWaitingInMinute) 
+        #     if float(totalWaitingTime) > float(graceObj.chargeable_waiting_time_starts_after):
+        #         totalWaitingTime = float(totalWaitingTime) - float(graceObj.waiting_time_grace_in_minutes)
+        #         if totalWaitingTime > 0: 
+        #             totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)        
+        #         else:
+        #             totalWaitingCost = 0
+        #         return round(totalWaitingCost,2) 
+        #     else:
+        #         return 0
+        # else:
+        #     return 0
         
     except Exception as e :
         print('Error',e)
-        return -404.0
+        return -0.1
     
 def checkLoadCalculatedWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
         date_= docketObj.shiftDate
         loadSize = graceObj.minimum_load_size_for_waiting_time_grace
+        
         if docketObj.waitingTimeStart and docketObj.waitingTimeEnd:
             docketObj.totalWaitingInMinute = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
         
-            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes )
+            totalWaitingTime = float(docketObj.totalWaitingInMinute) + float(graceObj.waiting_time_grace_in_minutes)
             
             if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
                 loadSize = float(docketObj.cubicMl)
                 
             loadWaitingMinuteCount = float(loadSize) * float(graceObj.waiting_time_grace_per_cubic_meter) + float(graceObj.waiting_time_grace_in_minutes)
             totalWaitingTime = float(totalWaitingTime) - math.ceil(loadWaitingMinuteCount)
+            
             if totalWaitingTime > 0:
                 totalWaitingCost = float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute)    
                 return round(totalWaitingCost,2)     
@@ -184,9 +189,9 @@ def checkLoadCalculatedWaitingTime(docketObj , shiftObj , rateCard , costParamet
             return 0
         
     except Exception as e :
-        return -404.0
+        return -0.1
     
-def checkStandByTotal( docketObj , shiftObj , rateCard , costParameterObj , graceObj, slotSize):
+def checkStandByTotal(docketObj, shiftObj, rateCard, costParameterObj, graceObj, slotSize):
     try:
         if slotSize > 0:
             date_= docketObj.shiftDate
@@ -200,7 +205,7 @@ def checkStandByTotal( docketObj , shiftObj , rateCard , costParameterObj , grac
         return round(finalStandByCost,2)  
 
     except Exception as e :
-        return -404.0
+        return -0.1
       
 def checkTransferCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
@@ -212,14 +217,14 @@ def checkTransferCost(docketObj , shiftObj , rateCard , costParameterObj , grace
         
         return round(driverDocketTransferKmCostTotal,2)
     except Exception as e : 
-        return -404.0
+        return -0.1
 
 def checkReturnCost(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     try:
         driverReturnCostTotal = (float(docketObj.returnKm) -  float(graceObj.return_km_grace)) * float(docketObj.returnQty) 
         return round(driverReturnCostTotal,2)
     except Exception as e : 
-        return -404.0
+        return -0.1
     
 def checkTotalCost(driverDocketNumber,docketDate ,costDict = costDict):
     try:

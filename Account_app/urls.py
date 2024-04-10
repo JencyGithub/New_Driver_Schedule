@@ -174,6 +174,7 @@ urlpatterns = [
     
     # Edit
     path('driverTrip/edit/<int:id>/', views.DriverTripEditForm, name='DriverTripEdit'), 
+    path('charge-job/edit/<int:id>/<int:typeOfShift>/', views.DriverTripEditForm, name='chargeJobEdit'), 
     path('ongoing/shift/end/<int:tripId>/', views.ongoingShiftEnd, name='ongoingShiftEnd'), 
     path('driverShift/archive/<int:shiftId>/', views.DriverShiftArchive, name='DriverShiftArchive'), 
     path('driverShift/restore/<int:shiftId>/', views.RestoreDriverShift, name='RestoreDriverShift'),

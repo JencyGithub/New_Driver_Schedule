@@ -27,7 +27,7 @@ from PIL import Image
 import pytesseract
 from django.core.mail import send_mail
 
-
+# @login_required
 def index(request):
     curDate = getCurrentDateTimeObj().date()
     totalShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate)
@@ -286,7 +286,6 @@ def assignedJobShow(request):
     else:
         messages.error(request,'Please fill up Pre-start first.')
         return redirect('Account:timeOfStart')
-
 
 
 def assignedJobAccept(request,id):
@@ -2289,8 +2288,6 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             docketObj.waitingTimeStart = None
             docketObj.waitingTimeEnd = None
             
-
-            
         if request.POST.get('standByCheck'):
             docketObj.standByStartTime = request.POST.get('standByStartTime')
             docketObj.standByEndTime = request.POST.get('standByEndTime')
@@ -2306,12 +2303,12 @@ def driverDocketEntrySave(request, tripId, errorId=None):
         # Count the number of objects in the queryset
         tripObj.numberOfLoads = driver_dockets.count()
         tripObj.save()
+        
         if errorId:
             reconciliationDocketObj = ReconciliationReport.objects.filter(docketNumber = docketObj.docketNumber, docketDate=docketObj.shiftDate , clientId = clientObj.clientId).first()
                                 
-            if not  reconciliationDocketObj :
+            if not reconciliationDocketObj :
                 reconciliationDocketObj = ReconciliationReport()
-                
                 
             reconciliationDocketObj.driverId = shiftObj.driverId  
             reconciliationDocketObj.clientId = tripObj.clientId
@@ -2345,7 +2342,8 @@ def driverDocketEntrySave(request, tripId, errorId=None):
             # TotalCost 
             driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
             reconciliationDocketObj.docketNumber = docketObj.docketNumber  
-            reconciliationDocketObj.docketDate = shiftObj.shiftDate 
+            # reconciliationDocketObj.docketDate = shiftObj.shiftDate 
+            reconciliationDocketObj.docketDate = tripObj.startDateTime.date() 
             reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
             reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
             reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
@@ -2577,6 +2575,10 @@ def DriverShiftArchive(request, shiftId):
     for trip in driverTrips:
         trip.archive = True
         trip.save()
+        dockets = DriverShiftDocket.objects.filter(tripId=trip.id)
+        for docket in dockets:
+            docket.archive = True
+            docket.save()
         
     messages.success(request, "Driver shift archive successfully")
     return redirect('Account:index')
@@ -2593,9 +2595,9 @@ def RestoreDriverShift(request, shiftId):
     messages.success(request, "Driver shift restored successfully")
     return redirect('Account:index')
 
-
 @csrf_protect
-def DriverTripEditForm(request, id):
+def DriverTripEditForm(request, id, typeOfShift=None):
+    rctiGiven = False
     numberOfLoadsCount= 0
     superUser = False
     if request.user.is_superuser:
@@ -2619,6 +2621,9 @@ def DriverTripEditForm(request, id):
             costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             graceObj = Grace.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
             docket.reconciliationObj = ReconciliationReport.objects.filter(docketNumber=docket.docketNumber, clientId=docket.clientId, truckConnectionId=docket.truckConnectionId, docketDate=docket.shiftDate).first()
+            if docket.reconciliationObj:
+                if not rctiGiven:
+                    rctiGiven = True if docket.reconciliationObj.fromRcti else False
             if docket.waitingTimeStart and docket.waitingTimeEnd:
                 docket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
             if docket.standByStartTime and docket.standByEndTime:
@@ -2628,9 +2633,12 @@ def DriverTripEditForm(request, id):
     clientName = Client.objects.all()
     # clientTruck = ClientTruckConnection.objects.all()
     surcharges = Surcharge.objects.all()
-        
     base_plant = BasePlant.objects.all()
-
+    
+    if typeOfShift == 1:
+        if not rctiGiven:
+            shiftObj.verified = False
+        
     params = {
         'driverTrip': tripObj,
         'shiftObj':shiftObj,
@@ -2640,7 +2648,9 @@ def DriverTripEditForm(request, id):
         'Client': clientName,
         'surcharges' : surcharges,
         'superUser':superUser,
-        'numberOfLoadsCount':numberOfLoadsCount
+        'numberOfLoadsCount':numberOfLoadsCount,
+        'rctiGiven' : rctiGiven,
+        'typeOfShift' : typeOfShift
     }
     # return HttpResponse(params['driverTrip'])
     return render(request, 'Account/Tables/DriverTrip&Docket/tripEditForm.html', params)
@@ -2655,7 +2665,6 @@ def driverDocketUpdate(request):
     docketNumber = request.POST.get('docketNumber')
 
     tempDocketObj = DriverShiftDocket.objects.filter(docketNumber = docketNumber, shiftDate = docketObj.shiftDate , clientId = docketObj.clientId).first()
-    print(tempDocketObj)
     if tempDocketObj:
         print(docketId,docketNumber)
         return JsonResponse({'status': False})
@@ -2685,6 +2694,8 @@ def driverEntryUpdate(request, shiftId):
     
     # set to shiftEnd Time
     if shiftEndTime:
+        chargeJobEditReason = request.POST.get('chargeJobEditReason')
+        shiftObj.chargeJobEditReason = chargeJobEditReason
         timeDiff = (shiftEndTime - currentDateTime).total_seconds()/60
         if timeDiff > 0:
             shiftObj.endDateTime = shiftEndTime
@@ -2817,7 +2828,7 @@ def driverEntryUpdate(request, shiftId):
                 # TotalCost 
                 driverTotalCost = driverLoadAndKmCost +driverSurchargeCost + driverWaitingTimeCost + driverStandByCost + driverTransferKmCost + driverReturnKmCost +driverLoadDeficit
                 reconciliationDocketObj.docketNumber = docket.docketNumber  
-                reconciliationDocketObj.docketDate = shiftObj.shiftDate 
+                reconciliationDocketObj.docketDate = trip.startDateTime.date() 
                 reconciliationDocketObj.driverLoadAndKmCost = driverLoadAndKmCost 
                 reconciliationDocketObj.driverSurchargeCost = driverSurchargeCost 
                 reconciliationDocketObj.driverWaitingTimeCost = driverWaitingTimeCost 
@@ -2886,7 +2897,6 @@ def getDriverBreak(request):
 def checkTripDeficit(request):
     shiftId = request.POST.get('shiftId')
     tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftId)
-    print(tripObjs)
     checkShiftRevenueDifference(tripObjs)
     getDeficit = []
     getTrueOrFalse = []

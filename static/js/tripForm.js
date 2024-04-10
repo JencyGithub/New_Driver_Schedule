@@ -24,11 +24,17 @@ function verifiedBtnFun(shiftId){
       if (data.tripId) {
         var endDateTimeValue = $('#endDateTime' + data.tripId).val();
         var emptyField = '';
-        $('#tripForm input[required]').each(function() {
+        $('#tripForm input[required], #tripForm textarea[required] ').each(function() {
             if ($(this).val() === '') {
                 emptyField = $(this).attr('name') || $(this).attr('id') || 'an input field';
                 return false; // Exit the loop early if an empty required field is found
             }
+            if ($(this).attr('id') == 'chargeJobEditReason') {
+              if ($(this).val().length < 30) {
+                emptyField = 'Please enter update reason with at least 30 characters.';
+                return false;
+              }
+          }          
         });
         if (endDateTimeValue == ''){
           alert('Please add end time for the trip')
@@ -162,6 +168,7 @@ var validator = new FormValidator(
 document.forms[0].onsubmit = function (e) {
   setDateTime('currentDateTime')
   $('input[name="csrfmiddlewaretoken"], #currentDateTime').removeAttr('disabled')
+
   var submit = true,
     validatorResult = validator.checkAll(this);
   // return !!validatorResult.valid;
