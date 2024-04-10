@@ -4597,9 +4597,36 @@ def escalationHistory(request, escalationId):
 # API Functions
 # ***********************************************   
 
+@api_view(['POST'])
+def getCurrentStatusOfShift(request):
+    driverId = request.POST.get('driverId')
+    shiftObj = DriverShift.objects.filter(endDateTime=None, driverId=driverId, archive=False).first()
+    if driverId and shiftObj:
+        message = "Shift status fetched successfully."
+        data = {
+            "driverId" : int(driverId),
+            "shiftId" : shiftObj.id,
+            "tripDetails" : []
+        }
+        tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
+        if len(tripObjs) > 0:
+            for tripObj in tripObjs:
+                preStartObj = DriverPreStart.objects.filter(tripId=tripObj.id)   
+                tripDict = {
+                    'tripId' : tripObj.id,
+                    'preStartFilled' : True if preStartObj else False
+                }
+                data['tripDetails'].append(tripDict)
+    else:
+        message = "No current shift found for this driver."
+        data = {"driverId" : int(driverId)}
+        
+    return JsonResponse({'status' : False, 'message' : message, 'data' : data})
+
+
 @csrf_protect
 @api_view(['POST'])
-def apiMapDataSave(request, recurring=None):    
+def apiMapDataSave(request):    
     lat = request.POST.get('latitude')
     lng = request.POST.get('longitude')
     locationImg = request.FILES.get('locationImage')

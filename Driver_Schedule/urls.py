@@ -54,6 +54,8 @@ urlpatterns = [
     path('api/loginCheck/', views.apiLoginCheck, name='apiLoginCheck'),
     
     # Account API
+    path('api/shift/get-current-status/', Account_Views.getCurrentStatusOfShift, name='getCurrentStatusOfShift'),
+    
     path('api/shift-start/', Account_Views.apiMapDataSave, name='apiMapDataSave'),
     path('api/getClients/', Account_Views.getClients, name='getClients'),
     path('api/getTrucks/', Account_Views.getTrucks, name='getTrucks'),
