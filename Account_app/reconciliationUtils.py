@@ -43,6 +43,7 @@ def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterOb
 
     
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
+    
     totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
     standBySlot = 0
     if totalStandByTime > graceObj.chargeable_standby_time_starts_after:

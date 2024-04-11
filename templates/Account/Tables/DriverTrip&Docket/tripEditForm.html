@@ -346,7 +346,7 @@
                                             onclick="waitingCheck('{{docket.id}}',this)" {% if docket.waitingTimeStart %} checked {% endif %}>
                                         <label for="waitingTimeStart{{docket.id}}">Waiting Time Start :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,'{{docket.id}}')">
+                                            <input class="form-control" {% if docket.waitingTimeStart is None %} readonly {% else %} required {% endif %}  value="{{docket.waitingTimeStart}}" type="time" name="waitingTimeStart{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeStart{{docket.id}}" onchange="openWaitingTimeEnd(this,'{{docket.id}}')">
                                         </div>
                                     </div>
 
@@ -355,7 +355,7 @@
                                     <div class="col-md-4 col-sm-4">
                                         <label for="waitingTimeEnd{{docket.id}}">Waiting Time End :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" {% if docket.waitingTimeEnd is None %} readonly {% endif %} onchange="countTotalWaitingTime(this,'{{docket.id}}','{{docket.tripId}}')">
+                                            <input class="form-control"  value="{{docket.waitingTimeEnd}}" type="time" name="waitingTimeEnd{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="waitingTimeEnd{{docket.id}}" {% if docket.waitingTimeEnd is None %} readonly {% else %} required {% endif %} onchange="countTotalWaitingTime(this,'{{docket.id}}','{{docket.tripId}}')">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
@@ -388,14 +388,14 @@
                                         onclick="standByCheck('{{docket.id}}',this)" {% if docket.standByStartTime %} checked {% endif %}>
                                         <label for="standByStartTime{{docket.id}}">StandBy start Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByStartTime}}" {% if docket.standByStartTime is None %} readonly {% endif %} type="time" name="standByStartTime{{docket.id}}"   style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,'{{docket.id}}')">
+                                            <input class="form-control" value="{{docket.standByStartTime}}" {% if docket.standByStartTime is None %} readonly {% else %} required {% endif %} type="time" name="standByStartTime{{docket.id}}" style="padding: 0.25rem 0.2rem;" id="standByStartTime{{docket.id}}" onchange="openStandByEnd(this,'{{docket.id}}')">
                                         </div>
                                     </div>
                                     <!--     standByEndTime   others  comment-->
                                     <div class="col-md-4 col-sm-4">
                                         <label for="standByEndTime{{docket.id}}">StandBy End Time :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% endif %} name="standByEndTime{{docket.id}}"  style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,'{{docket.id}}','{{docket.tripId}}')">
+                                            <input class="form-control" value="{{docket.standByEndTime}}" type="time" {% if docket.standByEndTime is None %} readonly {% else %} required {% endif %} name="standByEndTime{{docket.id}}" style="padding: 0.25rem 0.2rem;" id="standByEndTime{{docket.id}}" onchange="countStandBySlot(this,'{{docket.id}}','{{docket.tripId}}')">
                                         </div>
                                     </div>
 

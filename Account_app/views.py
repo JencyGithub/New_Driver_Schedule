@@ -2626,6 +2626,8 @@ def DriverTripEditForm(request, id, typeOfShift=None):
                     rctiGiven = True if docket.reconciliationObj.fromRcti else False
             if docket.waitingTimeStart and docket.waitingTimeEnd:
                 docket.totalWaitingInMinute = DriverTripCheckWaitingTime(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
+            docket.standByStartTime = str(docket.standByStartTime) if docket.standByStartTime else None
+            docket.standByEndTime = str(docket.standByEndTime)  if docket.standByEndTime else None
             if docket.standByStartTime and docket.standByEndTime:
                 docket.standBySlot = DriverTripCheckStandByTotal(docketObj=docket, shiftObj=shiftObj, rateCard=rateCard, costParameterObj=costParameterObj,graceObj=graceObj)
 

@@ -306,13 +306,13 @@ function standByCheck(id, tag) {
 function openWaitingTimeEnd(lineData, count_) {
   let waitingTimeStart = lineData.value;
   if (waitingTimeStart) {
-    $(`#waitingTimeEnd${count_}`).removeAttr("readonly");
+    $(`#waitingTimeEnd${count_}`).removeAttr("readonly").attr("required", true);;
   }
 }
 function openStandByEnd(lineData, count_) {
   let standByEndTime = lineData.value;
   if (standByEndTime) {
-    $(`#standByEndTime${count_}`).removeAttr("readonly");
+    $(`#standByEndTime${count_}`).removeAttr("readonly").attr('required',true);
   }
 }
 function setDocketNumberFun(docketNumber,docketId){

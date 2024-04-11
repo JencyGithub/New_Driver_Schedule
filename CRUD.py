@@ -128,9 +128,12 @@ def getYesterdayDate(curDate):
     
 def getTimeDifference(startTime,endTime):
     try:
-        startTime = int(startTime[0:2])*60 + int(startTime[3:5])
-        endTime = int(endTime[0:2])*60 + int(endTime[3:5])
-        return abs(endTime-startTime)
+        if startTime != 'None' and endTime != 'None':
+            startTime = int(startTime[0:2])*60 + int(startTime[3:5])
+            endTime = int(endTime[0:2])*60 + int(endTime[3:5])
+            return abs(endTime-startTime)
+        else:
+            return 0
     except Exception as e:
         return e
 
