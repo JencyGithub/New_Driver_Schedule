@@ -204,7 +204,8 @@
                                             target="_blank">LogSheet_file</a>
                                         {% endif %}
                                         <div  class="field item form-group">
-                                            <input {% if not superUser %}disabled{% endif %} class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet{{trip.id}}"
+                                            <!-- {% if not superUser %}disabled{% endif %} -->
+                                            <input class="form-control" value="{{trip.loadSheet}}" type="file" name="loadSheet{{trip.id}}"
                                                 style="padding: 0.25rem 0.2rem;" id="loadSheet{{trip.id}}">
                                         </div>
                                     </div>

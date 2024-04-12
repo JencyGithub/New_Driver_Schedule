@@ -1054,7 +1054,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
         for breakObj in breaksObjs:
             if breakObj.endDateTime > endDateTime:
                 messages.error(request, f"You have added a break between {breakObj.startDateTime} to {breakObj.endDateTime}, You can end the shift after {breakObj.endDateTime} or change break details.")
-                return redirect('Account:driverShiftView',shiftId=shiftId)
+                return redirect('Account:driverShiftView',shiftId=shiftId), None
             if breakObj.durationInMinutes >= 15:
                 totalDriverBreak += breakObj.durationInMinutes 
                 driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])

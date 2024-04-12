@@ -23,8 +23,10 @@ costDict = {
 }
 def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     date_= docketObj.shiftDate
-    docketObj.waitingTimeStart = docketObj.waitingTimeStart.strftime("%H:%M:%S")
-    docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
+    if type(docketObj.waitingTimeStart) is not str:
+        docketObj.waitingTimeStart = docketObj.waitingTimeStart.strftime("%H:%M:%S")
+    if type(docketObj.waitingTimeEnd) is not str:
+        docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
     totalWaitingTime = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
     
     if  graceObj.waiting_load_calculated_on_load_size :
