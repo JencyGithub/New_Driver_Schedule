@@ -3,7 +3,24 @@
 {% block title %} | Driver Trip &Docket Edit {% endblock %}
 {% block headStyle %}
 <link rel="stylesheet" href="{% static 'css/form.css' %}" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />      
+
 <style>
+    .select2.select2-container{
+        width:100%!important;
+    }
+    .select2-selection.select2-selection--single{
+        height:auto!important;
+    } 
+    .select2-selection__rendered{
+        padding:0.3rem 0.5rem !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: auto!important;
+        top: 1.4em!important;
+        right: 0.8em!important;
+    }
+
     .cuatom-continer {
         margin: 0 5rem;
     }
@@ -18,6 +35,10 @@
     .isInvalid {
         border: 1px solid rgb(255, 0, 0) !important;
         border-radius: 7px !important;
+    }
+
+    label{
+        margin-bottom: 0 !important;
     }
 
     b.ocrBtn, #location{
@@ -35,6 +56,10 @@
     #endLocationModal #map{
         height: 85vh;
         width: 74.1vw;
+    }
+
+    .close:focus{
+        outline:none !important;
     }
     
     @media (max-width: 576px) {
@@ -70,9 +95,7 @@
     <div class="">
         <div class="clearfix"></div>
         <div class="row">
-            
             <div class="col-md-12 col-sm-12">
-                
                 <form id="tripForm" class="" method="POST" action="{% url 'Account:driverEntryUpdate' shiftId=shiftObj.id%}" enctype="multipart/form-data">
                     {% csrf_token %}   
                     <input type="hidden" name="currentDateTime" id="currentDateTime">
@@ -83,15 +106,28 @@
                         <h2>Shift Details</h2> 
                         <b class="d-inline-block m-1 mt-2 text-secondary">
                             (started  {% if shiftObj.latitude and shiftObj.longitude %}<span id="location" class="text-info">from location</span>{% elif shiftObj.locationImg %}<a href="/{{ shiftObj.locationImg }}" target="_blank" class="text-info">from location</a>{% endif %} at <span class="text-success">{{ shiftObj.startDateTime|date:'Y-m-d/H:i' }}</span>
-                             {%if shiftObj.endDateTime %} ended  {% if shiftObj.endLatitude and shiftObj.endLongitude %}<span id="endLocation" class="text-info">at location</span>{% elif shiftObj.endLocationImg %}<a href="/{{ shiftObj.endLocationImg }}" target="_blank" class="text-info">at location</a>{% endif %} at <span class="text-success">{{ shiftObj.endDateTime|date:'Y-m-d/H:i' }} {% endif %}</span>)</b>
-                        <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-dark float-right"  onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
-                        {% if not shiftObj.verified %}
+                             {%if shiftObj.endDateTime %} ended  {% if shiftObj.endLatitude and shiftObj.endLongitude %}<span id="endLocation" class="text-info">at location</span>{% elif shiftObj.endLocationImg %}<a href="/{{ shiftObj.endLocationImg }}" target="_blank" class="text-info">at location</a>{% endif %} at <span class="text-success">{{ shiftObj.endDateTime|date:'Y-m-d/H:i' }} {% endif %}</span>)
+                        </b>
+
+                        <div class="btn-group float-right" role="group" aria-label="Basic example">
+                            <label id="viewBreaks" name="viewBreaks" class="btn btn-sm btn-outline-default" onclick="showBreaks('{{shiftObj.id}}')">Breaks </label>
+                            {% if shiftObj.archive %}
+                            <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="btn btn-sm btn-outline-default" title="Restore">Restore</a>
+                            {% endif %}
+                            {% if not shiftObj.verified and not shiftObj.archive %}
+                                <button type="button" class="btn btn-sm btn-outline-default" id="tripAdd">Add trip</button>
+                                <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="btn btn-sm btn-outline-default">Archive</a>
+                            {% endif %} 
+                        </div>
+
+                        <!-- {% if not shiftObj.verified %}
                             {% if not shiftObj.archive %}
                                 {% comment %} <a href="{% url 'Account:RestoreDriverShift' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Restore"><i class="fa-solid fa-arrow-rotate-left text-success" style="font-size: 1.5rem;"></i></a> 
                              {% else %}  {% endcomment %}
                                 <a href="{% url 'Account:DriverShiftArchive' shiftId=shiftObj.id %}" class="float-right mr-2 mt-1" title="Archive"><i class="fa-solid fa-box-archive text-default" style="font-size: 1.5rem;"></i></a>
                              {% endif %} 
-                        {% endif %}
+                        {% endif %} -->
+
                         <div class="clearfix"></div>
                     </div>
                     {% if typeOfShift == 1 and not rctiGiven %}
@@ -100,69 +136,70 @@
                         <textarea name="chargeJobEditReason" id="chargeJobEditReason" rows="1" class="form-control mb-2" placeholder="Add reason of edit charge-job in minimum 30 character." {% if typeOfShift == 1 and not rctiGiven %} required {% endif %}></textarea>
                     </div>
                     {% endif %}
-                    {% for trip in driverTrip %}
-                        {% if trip %}
-                        <div class="float-right">
-                            <a href="{% url 'Account:tripHistory' tripId=trip.id %}" class="btn btn-sm btn-history">History</a>
-                        </div>
-                        {% endif %}
-                        <div class="x_panel">
-                            <div class="x_title mb-0">
-                                <h2 class="text-primary">Trip {{forloop.counter}}</h2>
-                                {% if trip.preStartObj %} <b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b> {% else %} <b class="d-inline-block m-1 mt-2"> Pre-start not available as this shift was not started by driver </b> {% endif %}
-                                <div class="float-right">
-                                    {% if trip.revenueDeficit > 0 %}
-                                    <i class="text-danger" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
-                                    {% endif %}
-                                    {% if shiftObj.verified is False and trip.startDateTime and not shiftObj.archive%}
-                                    <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}" class="btn btn-dark btn-sm">Add Docket</a> 
-                                    {% endif %}
-                                </div>
-                                <div class="clearfix"></div>
-                                
+                    {% if driverTrip|length > 0 %}
+                        {% for trip in driverTrip %}
+                            {% if trip %}
+                            <div class="float-right">
+                                <a href="{% url 'Account:tripHistory' tripId=trip.id %}" class="btn btn-sm btn-history">History</a>
                             </div>
-                            <div class="x_content ">
-                                {% if not trip.startDateTime %}
-                                <div class="alert alert-warning col-12">
-                                <small > Trip timings not available as driver has not filled pre start.  </small> 
+                            {% endif %}
+                            <div class="x_panel">
+                                <div class="x_title mb-0">
+                                    <h2 class="text-primary">Trip {{forloop.counter}}</h2>
+                                    {% if trip.preStartObj %} <b class="d-inline-block m-1 mt-2">(started with <a href="{% url 'Appointment:driverPreStartView' preStartId=trip.preStartObj.id %}" target="_blank" class="text-info">Pre-start</a>)</b> {% else %} <b class="d-inline-block m-1 mt-2"> Pre-start not available as this shift was not started by driver </b> {% endif %}
                                     <div class="float-right">
-                                        <input  type="checkbox"
-                                            name="byPassPreStart{{trip.id}}"   style="padding: 0.25rem 0.2rem;"
-                                            id="byPassPreStart{{trip.id}}" onchange="byPassPreStartFun('{{trip.id}}')">
-                                        <label for="byPassPreStart{{trip.id}}">By pass pre start end edit trip timing:</label>
+                                        {% if trip.revenueDeficit > 0 %}
+                                        <i class="text-danger" style="font-size: 0.8rem;">There is a deficit of ${{trip.revenueDeficit}} for this trip.</i>
+                                        {% endif %}
+                                        {% if shiftObj.verified is False and trip.startDateTime and not shiftObj.archive%}
+                                        <a href="{% url 'Account:driverDocketEntry' tripId=trip.id%}" class="btn btn-dark btn-sm">Add Docket</a> 
+                                        {% endif %}
                                     </div>
+                                    <div class="clearfix"></div>
+                                    
                                 </div>
-                                {% endif %}
-                                <br>
-                                <div class="custom-continer">
-                                    <!-- driver-id client-name shift-type  -->
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="driverId{{trip.id}}">Driver Id:<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <select disabled name="driverId{{trip.id}}" class="form-control">
-                                                {% for D_id in Driver %}
-                                                <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
-                                                {% endfor %}
-                                            </select>
+                                <div class="x_content ">
+                                    {% if not trip.startDateTime %}
+                                    <div class="alert alert-warning col-12">
+                                    <small > Trip timings not available as driver has not filled pre start.  </small> 
+                                        <div class="float-right">
+                                            <input  type="checkbox"
+                                                name="byPassPreStart{{trip.id}}"   style="padding: 0.25rem 0.2rem;"
+                                                id="byPassPreStart{{trip.id}}" onchange="byPassPreStartFun('{{trip.id}}')">
+                                            <label for="byPassPreStart{{trip.id}}">By pass pre start end edit trip timing:</label>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="clientName{{trip.id}}">Client Name :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <select readonly required name="clientName{{trip.id}}" class="form-control">
-                                                <option value=""disabled selected>Select Client Name</option>
-                                                {% for C_id in Client %}
-                                                <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
-                                                {% endfor %}
-                                            </select>
+                                    {% endif %}
+                                    <br>
+                                    <div class="custom-continer">
+                                        <!-- driver-id client-name shift-type  -->
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="driverId{{trip.id}}">Driver Id:<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select disabled name="driverId{{trip.id}}" class="form-control">
+                                                    {% for D_id in Driver %}
+                                                    <option value="{{D_id.driverId}}" {% if shiftObj.driverId == D_id.driverId %}selected="selected" {% endif %}>{{D_id.driverId}}-{{ D_id.name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4 ">
-                                        <label for="shiftType{{trip.id}}">ShiftType :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <select {% if not superUser %}disabled{% endif %} name="shiftType{{trip.id}}" class="form-control">
-                                                <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
-                                                <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="clientName{{trip.id}}">Client Name :<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select readonly required name="clientName{{trip.id}}" class="form-control">
+                                                    <option value=""disabled selected>Select Client Name</option>
+                                                    {% for C_id in Client %}
+                                                    <option value="{{ C_id.clientId }}" {% if trip.clientId == C_id.clientId %}selected="selected" {%endif %}>{{ C_id.name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 ">
+                                            <label for="shiftType{{trip.id}}">ShiftType :<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select {% if not superUser %}disabled{% endif %} name="shiftType{{trip.id}}" class="form-control">
+                                                    <option value="Day" {% if shiftObj.shiftType == 'Day' %}selected="selected"{% endif %}>Day</option>
+                                                    <option value="Night" {% if shiftObj.shiftType == 'Night' %}selected="selected" {% endif %}>Night</option>
 
                                             </select>
                                         </div>
@@ -210,87 +247,87 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 col-sm-4  startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
-                                        <label for="startDateTime{{trip.id}}">Start Time : <span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input  class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                            name="startDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
-                                            id="startDateTime{{trip.id}}">
+                                        <div class="col-md-4 col-sm-4  startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
+                                            <label for="startDateTime{{trip.id}}">Start Time : <span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input  class="form-control" value="{{ trip.startDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                                name="startDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
+                                                id="startDateTime{{trip.id}}">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4 startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
-                                        <!-- {% if numberOfLoadsCount != 0 and shiftObj.startDateTime   %}
-                                        <label class="float-right" for="endDateTime"> <a  onclick="endTripFun('{{trip.id}}')">End Shift :</a></label>
-                                        {% endif %} -->
-                                        <label for="endDateTime{{trip.id}}">End Time :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
-                                            name="endDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
-                                                id="endDateTime{{trip.id}}">
+                                        <div class="col-md-4 col-sm-4 startDateTime{{trip.id}} {% if not trip.startDateTime %}d-none{% endif %}">
+                                            <!-- {% if numberOfLoadsCount != 0 and shiftObj.startDateTime   %}
+                                            <label class="float-right" for="endDateTime"> <a  onclick="endTripFun('{{trip.id}}')">End Shift :</a></label>
+                                            {% endif %} -->
+                                            <label for="endDateTime{{trip.id}}">End Time :<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <input class="form-control" value="{{ trip.endDateTime|date:'Y-m-d\TH:i:s' }}" type="datetime-local"
+                                                name="endDateTime{{trip.id}}" {% if  trip.startDateTime %}required='required'{% endif %} style="padding: 0.25rem 0.2rem;"
+                                                    id="endDateTime{{trip.id}}">
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    
-                                    <!-- comment  -->
-                                    <div class="col-md-12 col-sm-12">
-                                        <label for="comment{{trip.id}}">Comment :<span class="required">*</span></label>
-                                        <div  class="field item form-group">
-                                            <textarea placeholder="comment" name="comment{{trip.id}}" id="comment{{trip.id}}"
-                                            {% if not superUser %}readonly{% endif %}  class="form-control">{{trip.comment}}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
-
-                        {% for docket in trip.tripDockets %}
-                        {% if docket %}
-                        <div class="float-right">
-                            <a href="{% url 'Account:docketHistory' docketId=docket.id %}" class="btn btn-sm btn-history">History</a>
-                        </div>
-                        {% endif %}
-                        <div class="x_panel">
-                            <div class="x_title">
-                                <!-- {% if docket.reconciliationObj %}<a href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" class="mr-2" style="font-size: 1.2rem;" target="_blank" data-toggle="tooltip" data-placement="top" title="View Reconciliation"><i class="fa-solid fa-paste"></i></a>{% endif %}<h5 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h5> -->
-                                <a {% if docket.reconciliationObj %} href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" target="_blank" {% endif %}><h2 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h2></a>
-                                <div class="float-right">
-                                    <input type="radio" id="tippingToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="tippingToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.tippingToYard %} checked {% endif %}>
-                                    <label for="tippingToYard{{docket.id}}" class="ml-2"
-                                    style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
-                                    <input type="radio" id="returnToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="returnToYard{{docket.id}}"
-                                    style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.returnToYard %} checked {% endif %}>
-                                    <label for="returnToYard{{docket.id}}" class="ml-2"
-                                        style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
-                                
-                                    <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{docket.id}}" onclick="resetRadio('{{docket.id}}')"></i>
-                                </div>
-                                
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div class="custom-continer">
-
-                                    <!--  docketNumber docketFile  -->
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="docketNumber{{docket.id}}">Docket Number :<span class="required">*</span></label>
-                                        {% if shiftObj.verified != True%}
                                         
-                                        <a href="" class="text-primary" onclick="setDocketNumberFun('{{docket.docketNumber}}','{{docket.id}}')" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
-                                        {% endif %}
-                                        <div class="field item form-group">
-                                            <input class="form-control" readonly value="{{docket.docketNumber}}" type="text"
-                                                name="docketNumber{{docket.id}}" required='required'
-                                                style="padding: 0.25rem 0.2rem;" id="docketNumber{{docket.id}}">
+                                        
+                                        <!-- comment  -->
+                                        <div class="col-md-12 col-sm-12">
+                                            <label for="comment{{trip.id}}">Comment :<span class="required">*</span></label>
+                                            <div  class="field item form-group">
+                                                <textarea placeholder="comment" name="comment{{trip.id}}" id="comment{{trip.id}}"
+                                                {% if not superUser %}readonly{% endif %}  class="form-control">{{trip.comment}}</textarea>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="docketFile{{docket.id}}">Docket File :<span class="required">*</span></label>
-                                        {% if docket.docketFile %}
-                                        <a href="/{{docket.docketFile}}" class="text-primary" target="_blank">Docket File</a>
-                                        {% endif %}
+                                </div>
+                            </div>
+
+                            {% for docket in trip.tripDockets %}
+                            {% if docket %}
+                            <div class="float-right">
+                                <a href="{% url 'Account:docketHistory' docketId=docket.id %}" class="btn btn-sm btn-history">History</a>
+                            </div>
+                            {% endif %}
+                            <div class="x_panel">
+                                <div class="x_title">
+                                    <!-- {% if docket.reconciliationObj %}<a href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" class="mr-2" style="font-size: 1.2rem;" target="_blank" data-toggle="tooltip" data-placement="top" title="View Reconciliation"><i class="fa-solid fa-paste"></i></a>{% endif %}<h5 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h5> -->
+                                    <a {% if docket.reconciliationObj %} href="{% url 'Account:reconciliationDocketView' reconciliationId=docket.reconciliationObj.id %}" target="_blank" {% endif %}><h2 class ="text-primary d-inline-block"> Load #{{forloop.counter}} </h2></a>
+                                    <div class="float-right">
+                                        <input type="radio" id="tippingToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="tippingToYard{{docket.id}}"
+                                        style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.tippingToYard %} checked {% endif %}>
+                                        <label for="tippingToYard{{docket.id}}" class="ml-2"
+                                        style="margin-right: 1rem; padding-top:0.7rem;">Tipping To Yard</label>
+                                        <input type="radio" id="returnToYard{{docket.id}}" name="returnToYard{{docket.id}}" value="returnToYard{{docket.id}}"
+                                        style="margin-top: .8rem;"  onclick="returnToYard('{{docket.id}}',this)" {% if docket.returnToYard %} checked {% endif %}>
+                                        <label for="returnToYard{{docket.id}}" class="ml-2"
+                                            style="margin-right: 1rem; padding-top:0.7rem;">Return To Yard</label>
+                                    
+                                        <i class="fa fa-close text-danger ml-2" style="font-size: 1.2rem;" id="resetRadio{{docket.id}}" onclick="resetRadio('{{docket.id}}')"></i>
+                                    </div>
+                                    
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="custom-continer">
+
+                                        <!--  docketNumber docketFile  -->
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="docketNumber{{docket.id}}">Docket Number :<span class="required">*</span></label>
+                                            {% if shiftObj.verified != True%}
+                                            
+                                            <a href="" class="text-primary" onclick="setDocketNumberFun('{{docket.docketNumber}}','{{docket.id}}')" data-toggle="modal" data-target="#editDocketModel">Edit Docket Number</a>
+                                            {% endif %}
+                                            <div class="field item form-group">
+                                                <input class="form-control" readonly value="{{docket.docketNumber}}" type="text"
+                                                    name="docketNumber{{docket.id}}" required='required'
+                                                    style="padding: 0.25rem 0.2rem;" id="docketNumber{{docket.id}}">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="docketFile{{docket.id}}">Docket File :<span class="required">*</span></label>
+                                            {% if docket.docketFile %}
+                                            <a href="/{{docket.docketFile}}" class="text-primary" target="_blank">Docket File</a>
+                                            {% endif %}
 
                                         <b class="float-right text-default ocrBtn" id="ocr{{docket.id}}">OCR</b>
                                         <div class="field item form-group">
@@ -400,52 +437,56 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-8 col-sm-8">
-                                        <div class="row">
-                                            <div class="col-md-6 col-sm-6">
-                                                <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
-                                                <div class="field item form-group">
-                                                    <input class="form-control" readonly  type="number" step="0.01"  name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                        <div class="col-md-8 col-sm-8">
+                                            <div class="row">
+                                                <div class="col-md-6 col-sm-6">
+                                                    <label for="standBySlot{{docket.id}}">Stand By Slot :<span class="required">*</span></label>
+                                                    <div class="field item form-group">
+                                                        <input class="form-control" readonly  type="number" step="0.01"  name="standBySlot{{docket.id}}" required='required' style="padding: 0.25rem 0.2rem;" id="standBySlot{{docket.id}}" value="{% if docket %}{{docket.standBySlot}}{% else %}0{% endif %}">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6 col-sm-6">
-                                                <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
-                                                <div class="field item form-group">
-                                                    <input class="form-control" value="{{docket.others}}" type="number" step="0.01"  name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
+                                                <div class="col-md-6 col-sm-6">
+                                                    <label for="others{{docket.id}}">Others :<span class="required">*</span></label>
+                                                    <div class="field item form-group">
+                                                        <input class="form-control" value="{{docket.others}}" type="number" step="0.01"  name="others{{docket.id}}" style="padding: 0.25rem 0.2rem;" required="required" id="others{{docket.id}}">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-12 col-sm-12">
-                                                <label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>
-                                                <div class="field item form-group">
-                                                    <textarea placeholder="comment" name="comment{{docket.id}}" class="form-control">{{docket.comment}}</textarea>
+                                                <div class="col-md-12 col-sm-12">
+                                                    <label for="comment{{docket.id}}">Comment :<span class="required">*</span></label>
+                                                    <div class="field item form-group">
+                                                        <textarea placeholder="comment" name="comment{{docket.id}}" class="form-control">{{docket.comment}}</textarea>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-4">
-                                        <label for="ocrTextArea{{docket.id}}">OCR content :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <textarea name="ocrTextArea{{docket.id}}" id="ocrTextArea{{docket.id}}" rows="5" class="form-control" disabled></textarea>
+                                        <div class="col-md-4 col-sm-4">
+                                            <label for="ocrTextArea{{docket.id}}">OCR content :<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <textarea name="ocrTextArea{{docket.id}}" id="ocrTextArea{{docket.id}}" rows="5" class="form-control" disabled></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-
-                    
-                    {% if not shiftObj.verified  and shiftObj.startDateTime and not shiftObj.archive %}
-                    <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
-                        {% if typeOfShift != 1 %}
-                        <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
-                        {% endif %}
-                        {% if numberOfLoadsCount != 0 %}
-                        <button id="verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">{% if not shiftObj.endDateTime %} End shift & reconcile {% elif typeOfShift == 1 %} Update {% else %} Verify & reconcile {% endif %}</button>
-                        {% endif %}
+                        {% if not shiftObj.verified  and shiftObj.startDateTime and not shiftObj.archive %}
+                        <div class="col-md-12 text-right py-2 px-0 position-sticky" style ="bottom:3%;">
+                            {% if typeOfShift != 1 %}
+                            <button id = "subBtn" type='submit' class="btn btn-sm btn-default px-3">Save</button>
+                            {% endif %}
+                            {% if numberOfLoadsCount != 0 %}
+                            <button id="verifiedBtn" type="button" onclick="verifiedBtnFun('{{shiftObj.id}}')" class="btn btn-sm btn-default px-3">{% if not shiftObj.endDateTime %} End shift & reconcile {% elif typeOfShift == 1 %} Update {% else %} Verify & reconcile {% endif %}</button>
+                            {% endif %}
+                        </div>
+                        {% endif%}
+                    {% else %}
+                    <div class="x_panel">
+                        <div class="mb-0">
+                            <h2>No Trips Found</h2>
+                        </div>
                     </div>
-                    {% endif%}
-                    </div>
+                    {% endif %}
                 </form>
             </div>
         </div>
@@ -549,6 +590,61 @@
     </div>
 </div>
 
+<!-- Add trip modal -->
+<!-- Modal -->
+<div class="modal fade" id="addTripModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="addTripModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form action="{% url 'Appointment:createTripSave' shiftId=shiftObj.id %}" id="tripAddForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-header py-2">
+                    <h5 class="modal-title" id="addTripModalLabel">Add trip</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 col-12">
+                                <label for="tripStartDateTime">Start Date Time:</label>
+                                <input type="datetime-local" name="tripStartDateTime" id="tripStartDateTime" class="form-control" required/>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-12">
+                                <label for="tripOdometerStart">Odometer start:</label>
+                                <input type="number" name="tripOdometerStart" id="tripOdometerStart" class="form-control"/>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-12">
+                                <label for="tripEnginHour">Engin-hour start:</label>
+                                <input type="number" name="tripEnginHour" id="tripEnginHour" class="form-control"/>
+                            </div>                            
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <label for="tripClient">Client:</label>
+                                <select name="tripClient" class="form-control w-100" id="tripClient" required disabled>
+                                    <option value="" disabled selected>Select Client Name</option>
+                                    {% for client_name in Client %}
+                                    <option value="{{ client_name }}">{{ client_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-12">
+                                <label for="tripTruckNum">Truck:</label>
+                                <select name="tripTruckNum" class="form-control w-100" id="tripTruckNum" required disabled>
+                                    <option value="" disabled selected>Select Truck</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2">
+                    <button type="submit" class="btn btn-sm btn-outline-default">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>
 <!-- /page content -->
 {% endblock %}
 
@@ -559,7 +655,7 @@
 <script src="{% static 'Dashboard/vendors/validator/validator.js' %}"></script>
 <script src="{% static 'js/tripForm.js' %}"></script>
 <script>
-
+   
     if ('{{shiftObj.archive}}' == "True"){
         $('input,select,textarea').prop( "disabled", true );
     }
@@ -620,4 +716,8 @@
         $('#locationModal').modal('show')
     });
 </script>
+{% endblock %}
+
+{% block footerStyleEnd %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {% endblock %}
