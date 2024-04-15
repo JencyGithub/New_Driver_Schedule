@@ -26,77 +26,128 @@ import numpy as np
 from PIL import Image
 import pytesseract
 from django.core.mail import send_mail
+import logging
+from django.http import HttpResponseServerError
+
+logger = logging.getLogger(__name__)
 
 # @login_required
 def index(request):
-    curDate = getCurrentDateTimeObj().date()
-    totalShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate)
-    continueShiftsCount = DriverShift.objects.filter(archive=False,  endDateTime=None).count()
-    completedShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime__isnull=False).count()
-    reimbursementCount = DriverReimbursement.objects.filter(raiseDate__date=curDate).count()
-    preStartPendingCount = 0
-    disputeCount = 0
-    oldEscalation = []
-    previous_month_date = (getCurrentDateTimeObj() - relativedelta(months=1)).date()
-    
-    # reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = previous_month_date.month, docketDate__year=previous_month_date.year)
-    reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month = 1 , docketDate__year=2023)
-    
-    openedEscalation = Escalation.objects.exclude(escalationStep=4)
-    dateBefore3days = curDate - timedelta(days=3)
-    oldEscalation = []
+    try:
+        curDate = getCurrentDateTimeObj().date()
 
-    for escalation in openedEscalation:
-        if escalation.escalationType == "External":
-            lastMail = EscalationMail.objects.filter(escalationId=escalation).order_by('mailDate').first()
-            if lastMail and lastMail.mailDate <= dateBefore3days:
-                if len(oldEscalation) <= 5:
-                    escalation.lastMailDate = lastMail.mailDate
-                    oldEscalation.append(escalation)
-                else:
-                    break
+        try:
+            totalShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate)
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching total shifts count: {e}")
+            totalShiftsCount = []
 
-    for shift in totalShiftsCount:
-        # pre-start pending 
-        preStart = DriverPreStart.objects.filter(shiftId=shift.id).first()
-        if not preStart:
-            preStartPendingCount +=1
-            
-        # dispute check
-        trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
-        for trip in trips:
-            if trip.dispute:
-                disputeCount += 1
-    
-    writeOfCount = reconciliationCount = shortPaidCount = 0 
-    
-    for report in reconciliationObjs:
-        if report.reconciliationType == 0:
-            reconciliationCount += 1
-        elif report.reconciliationType == 1:
-            shortPaidCount += 1
-        elif report.reconciliationType == 3:
-            writeOfCount += 1
-            
-    truckConnectionEnd = truckConnectionEndDay
-    futureDate = curDate + timedelta(days=truckConnectionEnd)
-    expireTruckConnection = ClientTruckConnection.objects.filter(endDate__range = (curDate ,futureDate))
-    params = {
-        'totalShiftsCount' : totalShiftsCount.count(),
-        'continueShiftsCount' : continueShiftsCount,
-        'completedShiftsCount' : completedShiftsCount,
-        'preStartPendingCount' : preStartPendingCount,
-        'disputeCount' : disputeCount,
-        'reimbursementCount' : reimbursementCount,
-        'reportCount' : reconciliationObjs.count(),
-        'reconciliationCount' : reconciliationCount,
-        'shortPaidCount' : shortPaidCount,
-        'writeOfCount' : writeOfCount,
-        'openedEscalationCount' : openedEscalation.count(),
-        'oldEscalation' : oldEscalation,
-        'expireTruckConnection':expireTruckConnection
-    }
-    return render(request, 'Account/dashboard.html', params)
+        try:
+            continueShiftsCount = DriverShift.objects.filter(archive=False, endDateTime=None).count()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching continue shifts count: {e}")
+            continueShiftsCount = 0
+
+        try:
+            completedShiftsCount = DriverShift.objects.filter(archive=False, shiftDate=curDate, endDateTime__isnull=False).count()
+        except Exception as e:
+            logger.exception("An exception occurred while fetching completed shifts count: {e}")
+            completedShiftsCount = 0
+
+        try:
+            reimbursementCount = DriverReimbursement.objects.filter(raiseDate__date=curDate).count()
+        except Exception as e:
+            logger.exception("An exception occurred while fetching reimbursement count: {e}")
+            reimbursementCount = 0
+
+        preStartPendingCount = 0
+        disputeCount = 0
+        oldEscalation = []
+        previous_month_date = (getCurrentDateTimeObj() - relativedelta(months=1)).date()
+
+        try:
+            reconciliationObjs = ReconciliationReport.objects.filter(docketDate__month=1, docketDate__year=2023)
+        except Exception as e:
+            logger.exception("An exception occurred while fetching reconciliation objects: {e}")
+            reconciliationObjs = []
+
+        openedEscalation = Escalation.objects.exclude(escalationStep=4)
+        dateBefore3days = curDate - timedelta(days=3)
+
+        for escalation in openedEscalation:
+            try:
+                if escalation.escalationType == "External":
+                    lastMail = EscalationMail.objects.filter(escalationId=escalation).order_by('mailDate').first()
+                    if lastMail and lastMail.mailDate <= dateBefore3days:
+                        if len(oldEscalation) <= 5:
+                            escalation.lastMailDate = lastMail.mailDate
+                            oldEscalation.append(escalation)
+                        else:
+                            break
+            except Exception as e:
+                logger.exception("An exception occurred while processing escalation: {e}")
+                continue
+
+        for shift in totalShiftsCount:
+            try:
+                preStart = DriverPreStart.objects.filter(shiftId=shift.id).first()
+                if not preStart:
+                    preStartPendingCount += 1
+
+                trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
+                for trip in trips:
+                    if trip.dispute:
+                        disputeCount += 1
+            except Exception as e:
+                logger.exception("An exception occurred while processing shift: {e}")
+                continue
+
+        writeOfCount = reconciliationCount = shortPaidCount = 0
+
+        for report in reconciliationObjs:
+            try:
+                if report.reconciliationType == 0:
+                    reconciliationCount += 1
+                elif report.reconciliationType == 1:
+                    shortPaidCount += 1
+                elif report.reconciliationType == 3:
+                    writeOfCount += 1
+            except Exception as e:
+                logger.exception("An exception occurred while processing reconciliation report: {e}")
+                continue
+
+        truckConnectionEnd = truckConnectionEndDay
+        futureDate = curDate + timedelta(days=truckConnectionEnd)
+
+        try:
+            expireTruckConnection = ClientTruckConnection.objects.filter(endDate__range=(curDate, futureDate))
+        except Exception as e:
+            logger.exception("An exception occurred while fetching expire truck connection: {e}")
+            expireTruckConnection = []
+
+        logger.info(f"Metrics retrieved successfully: Total Shifts Count: {totalShiftsCount.count()}, Continue Shifts Count: {continueShiftsCount}, Completed Shifts Count: {completedShiftsCount}, Pre-start Pending Count: {preStartPendingCount}, Dispute Count: {disputeCount}, Reimbursement Count: {reimbursementCount}, Report Count: {reconciliationObjs.count()}, Reconciliation Count: {reconciliationCount}, Short Paid Count: {shortPaidCount}, Write Off Count: {writeOfCount}, Opened Escalation Count: {openedEscalation.count()}, Expire Truck Connection Count: {expireTruckConnection.count()}")
+
+        params = {
+            'totalShiftsCount': totalShiftsCount.count(),
+            'continueShiftsCount': continueShiftsCount,
+            'completedShiftsCount': completedShiftsCount,
+            'preStartPendingCount': preStartPendingCount,
+            'disputeCount': disputeCount,
+            'reimbursementCount': reimbursementCount,
+            'reportCount': reconciliationObjs.count(),
+            'reconciliationCount': reconciliationCount,
+            'shortPaidCount': shortPaidCount,
+            'writeOfCount': writeOfCount,
+            'openedEscalationCount': openedEscalation.count(),
+            'oldEscalation': oldEscalation,
+            'expireTruckConnection': expireTruckConnection
+        }
+
+        return render(request, 'Account/dashboard.html', params)
+
+    except Exception as e:
+        logger.exception("An exception occurred in the index view function: {e}")
+        return HttpResponseServerError("An error occurred while processing the request")
 
 def getForm1(request):
     if request.user.is_authenticated:
@@ -571,126 +622,233 @@ def checkShiftStartedOrNot(request):
  
  
 def driverProfileView(request):
-    currentUser = request.user.username
-    driverObj = Driver.objects.filter(name=currentUser).first()
-    shiftObjs = DriverShift.objects.filter(driverId=driverObj.driverId)
-    tripObjs = []
-    for shift in shiftObjs:
-        trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
-        tripObjs.extend(trips)
+    try:
+        currentUser = request.user.username
 
-    leaves = LeaveRequest.objects.filter(employee=driverObj)
-    params = {
-        'driverObj' : driverObj,
-        'shiftObjs' : shiftObjs,
-        'tripObjs' : tripObjs,
-        'leaves' : leaves
-    }
+        try:
+            driverObj = Driver.objects.filter(name=currentUser).first()
+        except Exception as e:
+            logger.exception("An exception occurred while fetching driver object: {e}")
+            driverObj = None
 
-    return render(request, 'Trip_details/driverProfile.html', params) 
+        try:
+            shiftObjs = DriverShift.objects.filter(driverId=driverObj.driverId)
+        except Exception as e:
+            logger.exception("An exception occurred while fetching driver shift objects: {e}")
+            shiftObjs = []
 
-   
+        tripObjs = []
+
+        try:
+            logger.info(f"Viewing profile for driver: {driverObj.name}, ID: {driverObj.driverId}")
+
+            for shift in shiftObjs:
+                trips = DriverShiftTrip.objects.filter(shiftId=shift.id)
+                tripObjs.extend(trips)
+        except Exception as e:
+            logger.exception("An exception occurred while fetching driver trip objects: {e}")
+
+        try:
+            leaves = LeaveRequest.objects.filter(employee=driverObj)
+        except Exception as e:
+            logger.exception("An exception occurred while fetching leaves: {e}")
+            leaves = []
+
+        params = {
+            'driverObj': driverObj,
+            'shiftObjs': shiftObjs,
+            'tripObjs': tripObjs,
+            'leaves': leaves
+        }
+
+        return render(request, 'Trip_details/driverProfile.html', params)
+
+    except Exception as e:
+        logger.exception(f"An exception occurred in driverProfileView: {e}")
+        return HttpResponseServerError("An error occurred")
+
 def mapFormView(request, startDate=None):
-    driverObj = Driver.objects.filter(name=request.user.username).first()
+    try:
+        driverObj = Driver.objects.filter(name=request.user.username).first()
 
-    if not driverObj:
-        messages.error(request, "Only driver can access this.")
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    redirect_response = checkShiftStartedOrNot(request)
-    if redirect_response:
-        return redirect_response
-    else:    
-        year, month, day = map(int, startDate.split('-')) 
-        currentDate = date(year, month, day)
-        todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate, archive=False).first()
+        try:
+            if not driverObj:
+                messages.error(request, "Only driver can access this.")
+                return redirect(request.META.get('HTTP_REFERER'))
+        except Exception as e:
+            logger.exception(f"An exception occurred while checking driver object: {e}")
+            messages.error(request, "An error occurred while checking driver access.")
+            return redirect(request.META.get('HTTP_REFERER'))
+        
+        try:
+            redirect_response = checkShiftStartedOrNot(request)
+            if redirect_response:
+                return redirect_response
+        except Exception as e:
+            logger.exception(f"An exception occurred while checking shift status: {e}")
+            messages.error(request, "An error occurred while checking shift status.")
+            return redirect(request.META.get('HTTP_REFERER'))
 
-        # if todayShiftObj:
-        #     messages.error(request, "One shift per day limit enforced; contact management for additional shift requests.")
-        #     return redirect(request.META.get('HTTP_REFERER'))
-        # else:
+        try:
+            year, month, day = map(int, startDate.split('-')) 
+            currentDate = date(year, month, day)
+        except Exception as e:
+            logger.exception(f"An exception occurred while parsing start date: {e}")
+            messages.error(request, "An error occurred while parsing start date.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        try:
+            todayShiftObj = DriverShift.objects.filter(driverId=driverObj.driverId, startDateTime__date=currentDate, archive=False).first()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching driver shift object: {e}")
+            messages.error(request, "An error occurred while fetching shift details.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        logger.info(f"mapFormView accessed by user: {request.user.username}, startDate: {startDate}, currentDate: {currentDate}")
+
         params = {
             'date': dateConverterFromTableToPageFormate(currentDate),
         }
         return render(request, 'Trip_details/DriverShift/mapForm.html', params)
 
+    except Exception as e:
+        logger.exception(f"An exception occurred in mapFormView: {e}")  
+        return HttpResponseServerError("An error occurred")
+
 @csrf_protect
 def mapDataSave(request, recurring=None):
-    driverObj = Driver.objects.filter(name=request.user.username).first()
-    shiftObj = DriverShift.objects.filter(archive=False, endDateTime=None, driverId=driverObj.driverId).first()
-    result = None
-    
-    redirect_response = checkShiftStartedOrNot(request)
-    if redirect_response:
-        return redirect_response
-    else:
-        if not recurring:
-            lat = request.POST.get('latitude')
-            lng = request.POST.get('longitude')
-            date = request.POST.get('date')
-            time = request.POST.get('time')
-            datetime_object = dateTimeObj(dateStr=date, time=time)
-            
-            # result = "Day" if 6 <= datetime_object.time().hour <= 17 else "Night"
-            result = request.POST.get('shiftType')
-            
-            locationImg = request.FILES.get('locationImg')
-            if (not lat or not lng) and (not locationImg) :
-                messages.error(request, "Please enable location access to proceed.")
-                return redirect(request.META.get('HTTP_REFERER'))
-            
-            shiftObj = DriverShift()
-            shiftObj.latitude = lat
-            shiftObj.longitude = lng
-            shiftObj.shiftDate = date
-            shiftObj.shiftType = result
-            # shiftObj.verifiedBy = request.user
-            shiftObj.startDateTime = datetime_object    
-            currentUTCDateTime = datetime.utcnow()
-            shiftObj.startTimeUTC = currentUTCDateTime
-            shiftObj.driverId = driverObj.driverId
-            
-            if locationImg:
-                path = 'static/Account/driverLocationFiles'
-                fileName = locationImg.name
-                newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
-                pfs = FileSystemStorage(location=path)
-                pfs.save(newFileName, locationImg)            
-                shiftObj.locationImg = f'{path}/{newFileName}'
-            shiftObj.save()
-            
-        return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
-
-def showClientAndTruckNumGet(request, shiftId):
-    client_ids = Client.objects.all()
-    params = {
-        'client_ids' : client_ids
-    }
-    
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    if shiftObj:
-        tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id) 
-        params['shiftObj'] = shiftObj
-        params['trips'] = tripObjs
-        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
-        if existingTrip:
-            return redirect('Account:showPreStartForm',shiftId=shiftObj.id, tripId=existingTrip.id)
+    try:
+        driverObj = Driver.objects.filter(name=request.user.username).first()
+        shiftObj = DriverShift.objects.filter(archive=False, endDateTime=None, driverId=driverObj.driverId).first()
+        result = None
         
-    return render(request, 'Trip_details/DriverShift/clientForm.html', params)
+        try:
+            redirect_response = checkShiftStartedOrNot(request)
+            if redirect_response:
+                return redirect_response
+        except Exception as e:
+            logger.exception(f"An exception occurred while checking shift status: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        if not recurring:
+            try:
+                lat = request.POST.get('latitude')
+                lng = request.POST.get('longitude')
+                date = request.POST.get('date')
+                time = request.POST.get('time')
+                datetime_object = dateTimeObj(dateStr=date, time=time)
+                
+                result = request.POST.get('shiftType')
+                
+                locationImg = request.FILES.get('locationImg')
+                if (not lat or not lng) and (not locationImg) :
+                    messages.error(request, "Please enable location access to proceed.")
+                    return redirect(request.META.get('HTTP_REFERER'))
+                
+                shiftObj = DriverShift()
+                shiftObj.latitude = lat
+                shiftObj.longitude = lng
+                shiftObj.shiftDate = date
+                shiftObj.shiftType = result
+                shiftObj.startDateTime = datetime_object    
+                currentUTCDateTime = datetime.utcnow()
+                shiftObj.startTimeUTC = currentUTCDateTime
+                shiftObj.driverId = driverObj.driverId
+                
+                if locationImg:
+                    path = 'static/Account/driverLocationFiles'
+                    fileName = locationImg.name
+                    newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
+                    pfs = FileSystemStorage(location=path)
+                    pfs.save(newFileName, locationImg)            
+                    shiftObj.locationImg = f'{path}/{newFileName}'
+                shiftObj.save()
+                
+                logger.info(f"mapDataSave: Data saved - Driver: {driverObj}, Shift: {shiftObj}, Latitude: {lat}, Longitude: {lng}, Date: {date}, Time: {time}, Shift Type: {result}")
+            except Exception as e:
+                logger.exception(f"An exception occurred while saving shift data: {e}")
+                return HttpResponseServerError("An error occurred while saving shift data")
+                
+            return redirect('Account:showClientAndTruckNumGet', shiftObj.id)
+    
+    except Exception as e:
+        logger.exception(f"An exception occurred in mapDataSave: {e}")
+        return HttpResponseServerError("An error occurred")
+    
+def showClientAndTruckNumGet(request, shiftId):
+    try:
+        logger.info("Received request to show client and truck number")
+        
+        try:
+            client_ids = Client.objects.all()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching client IDs: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        params = {
+            'client_ids': client_ids
+        }
+        
+        try:
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            if shiftObj:
+                tripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id) 
+                params['shiftObj'] = shiftObj
+                params['trips'] = tripObjs
+                existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+                if existingTrip:
+                    logger.info(f"Redirecting to showPreStartForm - shiftId: {shiftObj.id}, tripId: {existingTrip.id}")
+                    return redirect('Account:showPreStartForm', shiftId=shiftObj.id, tripId=existingTrip.id)
+        except Exception as e:
+            logger.exception(f"An exception occurred while processing shift and trip objects: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        logger.info("Rendering client form")
+        return render(request, 'Trip_details/DriverShift/clientForm.html', params)
+    
+    except Exception as e:
+        logger.exception(f"An exception occurred in showClientAndTruckNumGet: {e}")
+        return HttpResponseServerError("An error occurred")
 
 def showPreStartForm(request, shiftId, tripId):
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
-    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False)
+    try:
+        try:
+            tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching trip object: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching truck connection object: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching pre-start object: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False)
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching pre-start questions: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        logger.info(f"showPreStartForm accessed - shiftId: {shiftId}, tripId: {tripId}, tripObj: {tripObj}, truckConnectionObj: {truckConnectionObj}, preStart: {preStart}")
+
+        params = {
+            'preStartQuestions': preStartQuestions,
+            'shiftId': shiftId,
+            'tripObj': tripObj
+        }
+
+        return render(request, 'Trip_details/pre-startForm.html', params)
     
-    params = {
-        'preStartQuestions':preStartQuestions,
-        'shiftId' : shiftId,
-        'tripObj' : tripObj
-    }
-     
-    return render(request, 'Trip_details/pre-startForm.html',params)
+    except Exception as e:
+        logger.exception("An exception occurred in showPreStartForm: {e}")
+        return HttpResponseServerError("An error occurred")
     
 @csrf_protect
 def clientAndTruckDataSave(request, id):
@@ -749,358 +907,486 @@ def checkQuestionRequired(request):
     return JsonResponse({'status': status, 'queType' : questionObj.questionType})
     
 @csrf_protect
-def DriverPreStartSave(request, tripId , endShift = None):
-    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))    
-    currentUTCDateTime = datetime.utcnow()
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
-    if currentDateTime < shiftObj.startDateTime:
-        messages.error(request,'Trip start time is must be greater than shift start time')
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    tripObj.startTimeUTC = currentUTCDateTime
-    tripObj.startDateTime = currentDateTime
-    tripObj.save()
-    
-    if not endShift:
-        tripObj.endDateTime = currentDateTime
-        currentUTCDateTime = datetime.utcnow()
-        tripObj.endTimeUTC = currentUTCDateTime
-    shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
-    truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
-    preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStartObj.id)
-    driverObj = Driver.objects.filter(name=request.user.username).first()
-    currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
-    
-    for trip in currentTrips:
-        trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
-        trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
-
-    questionIdList = []
-    driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
-    if driverPreStartObj:
-        messages.error(request,'You already filled Pre-start before.')
-        return redirect('Account:driverShiftView', shiftObj.id)
-    else:
-        driverPreStartObj = DriverPreStart()
-        driverPreStartObj.shiftId = shiftObj
-        driverPreStartObj.tripId = tripObj
-        driverPreStartObj.truckConnectionId = truckConnectionObj
-        driverPreStartObj.clientId = truckConnectionObj.clientId
-        driverPreStartObj.preStartId = preStartObj
-        driverPreStartObj.driverId = driverObj
-        driverPreStartObj.curDateTime = currentDateTime
-        driverPreStartObj.comment = request.POST.get('comment')
-        driverPreStartObj.save()
-
-        for question in preStartQuestions:
-            queFile, queComment = None, None
-            answerObj = DriverPreStartQuestion()
-            ansText = request.POST.get(f'selector{question.id}')
-            answerObj.preStartId = driverPreStartObj
-            answerObj.questionId = question
-            answerObj.answer = ansText
-
-            if ansText == question.optionTxt1 and question.wantFile1:
-                queFile =  request.FILES.get(f'f{question.id}o1')
-                queComment = request.POST.get(f'c{question.id}o1')
-            elif ansText == question.optionTxt2 and question.wantFile2:
-                queFile =  request.FILES.get(f'f{question.id}o2')
-                queComment = request.POST.get(f'c{question.id}o2')
-            elif ansText == question.optionTxt3 and question.wantFile3:
-                queFile =  request.FILES.get(f'f{question.id}o3')
-                queComment = request.POST.get(f'c{question.id}o3')
-            elif ansText == question.optionTxt4 and question.wantFile4:
-                queFile =  request.FILES.get(f'f{question.id}o4')
-                queComment = request.POST.get(f'c{question.id}o4')
-                
-            answerObj.comment = queComment        
-            if queFile:  
-                curTimeStr = getCurrentTimeInString()
-                path = 'static/img/preStartImages'
-                fileName = queFile.name
-                newFileName = 'Pre-start' + curTimeStr + '!_@' + fileName
-                pfs = FileSystemStorage(location=path)
-                pfs.save(newFileName, queFile)
-                answerObj.answerFile = f'{path}/{newFileName}'
-            answerObj.save()
-            
-            if answerObj.comment:
-                driverPreStartObj.failed = True
-                if endShift:
-                    questionIdList.append(answerObj.id)
-                
-        driverPreStartObj.save()
-        if endShift:
-            shiftObj.endDateTime = currentDateTime
+def DriverPreStartSave(request, tripId, endShift=None):
+    try:
+        try:
+            currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))    
             currentUTCDateTime = datetime.utcnow()
-            shiftObj.endTimeUTC = currentUTCDateTime
-            shiftObj.save()
-        
-            questions_with_answer = DriverPreStartQuestion.objects.filter(pk__in = questionIdList)
-            if len(questions_with_answer)>0:
-                clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
-                truckNo = clientTruckConnectionObj.truckNumber.adminTruckNumber
-                clientName = clientTruckConnectionObj.clientId.name
-                latitude = driverPreStartObj.shiftId.latitude
-                longitude = driverPreStartObj.shiftId.longitude
-                startTime = driverPreStartObj.shiftId.startDateTime
+            tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+            shiftObj = DriverShift.objects.filter(pk=tripObj.shiftId).first()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching trip and shift objects: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            if currentDateTime < shiftObj.startDateTime:
+                messages.error(request, 'Trip start time must be greater than shift start time')
+                return redirect(request.META.get('HTTP_REFERER'))
+        except Exception as e:
+            logger.exception(f"An exception occurred while validating start time: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            tripObj.startTimeUTC = currentUTCDateTime
+            tripObj.startDateTime = currentDateTime
+            tripObj.save()
+        except Exception as e:
+            logger.exception(f"An exception occurred while saving trip start time: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            if not endShift:
+                tripObj.endDateTime = currentDateTime
+                tripObj.endTimeUTC = currentUTCDateTime
+        except Exception as e:
+            logger.exception(f"An exception occurred while setting trip end time: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
+            preStartObj = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+            preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStartObj.id)
+            driverObj = Driver.objects.filter(name=request.user.username).first()
+            currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching additional data: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        try:
+            questionIdList = []
+            driverPreStartObj = DriverPreStart.objects.filter(shiftId=shiftObj, tripId=tripObj, truckConnectionId=truckConnectionObj).first()
+            if driverPreStartObj:
+                messages.error(request, 'Pre-start form has already been filled')
+                return redirect('Account:driverShiftView', shiftObj.id)
+            else:
+                driverPreStartObj = DriverPreStart()
+                driverPreStartObj.shiftId = shiftObj
+                driverPreStartObj.tripId = tripObj
+                driverPreStartObj.truckConnectionId = truckConnectionObj
+                driverPreStartObj.clientId = truckConnectionObj.clientId
+                driverPreStartObj.preStartId = preStartObj
+                driverPreStartObj.driverId = driverObj
+                driverPreStartObj.curDateTime = currentDateTime
+                driverPreStartObj.comment = request.POST.get('comment')
+                driverPreStartObj.save()
+
+                for question in preStartQuestions:
+                    queFile, queComment = None, None
+                    answerObj = DriverPreStartQuestion()
+                    ansText = request.POST.get(f'selector{question.id}')
+                    answerObj.preStartId = driverPreStartObj
+                    answerObj.questionId = question
+                    answerObj.answer = ansText
+
+                    if ansText == question.optionTxt1 and question.wantFile1:
+                        queFile = request.FILES.get(f'f{question.id}o1')
+                        queComment = request.POST.get(f'c{question.id}o1')
+                    elif ansText == question.optionTxt2 and question.wantFile2:
+                        queFile = request.FILES.get(f'f{question.id}o2')
+                        queComment = request.POST.get(f'c{question.id}o2')
+                    elif ansText == question.optionTxt3 and question.wantFile3:
+                        queFile = request.FILES.get(f'f{question.id}o3')
+                        queComment = request.POST.get(f'c{question.id}o3')
+                    elif ansText == question.optionTxt4 and question.wantFile4:
+                        queFile = request.FILES.get(f'f{question.id}o4')
+                        queComment = request.POST.get(f'c{question.id}o4')
+
+                    answerObj.comment = queComment
+                    if queFile:  
+                        curTimeStr = getCurrentTimeInString()
+                        path = 'static/img/preStartImages'
+                        fileName = queFile.name
+                        newFileName = 'Pre-start' + curTimeStr + '!_@' + fileName
+                        pfs = FileSystemStorage(location=path)
+                        pfs.save(newFileName, queFile)
+                        answerObj.answerFile = f'{path}/{newFileName}'
+                    answerObj.save()
+                    
+                    if answerObj.comment:
+                        driverPreStartObj.failed = True
+                        if endShift:
+                            questionIdList.append(answerObj.id)
                 
-                subject = f'Error : Pre-start Failure for  {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
-                bodyMessage = 'Hi Agi Hire,\n\nFollowing driver has failed a pre-start for truck'
-                driverMessage = f'Driver Name : {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
-                truckNoMessage = f'Truck No: {truckNo}'
-                clientMessage = f'Client Name : {clientName}'
-                locationMessage = f'Location : Latitude - {latitude} , Longitude = {longitude} '
-                startTime = f'Start Time : {startTime} '
-                questionMessage = '\n'.join([f'{obj.questionId.questionText}: {obj.answer}' for obj in questions_with_answer])
+                driverPreStartObj.save()
                 
-                message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
-                from_email = 'siddhantethansrec@gmail.com'  # Replace with your email
-                mailSendList = [ 'siddhantkhannamailbox@gmail.com'] 
-                # agihire@pnrgroup.com.au
-                send_mail(subject, message, from_email, recipient_list=mailSendList)
-                messages.error(request,'You have failed the Pre-start please contact office for more details.')
-                return redirect('index')
+                if endShift:
+                    shiftObj.endDateTime = currentDateTime
+                    shiftObj.endTimeUTC = currentUTCDateTime
+                    shiftObj.save()
+
+                    questions_with_answer = DriverPreStartQuestion.objects.filter(pk__in=questionIdList)
+                    if len(questions_with_answer) > 0:
+                        clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+                        truckNo = clientTruckConnectionObj.truckNumber.adminTruckNumber
+                        clientName = clientTruckConnectionObj.clientId.name
+                        latitude = driverPreStartObj.shiftId.latitude
+                        longitude = driverPreStartObj.shiftId.longitude
+                        startTime = driverPreStartObj.shiftId.startDateTime
+                        subject = f'Error: Pre-start Failure for {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
+                        bodyMessage = 'Hi Agi Hire,\n\nFollowing driver has failed a pre-start for truck'
+                        driverMessage = f'Driver Name: {driverObj.firstName} {driverObj.middleName} {driverObj.lastName}'
+                        truckNoMessage = f'Truck No: {truckNo}'
+                        clientMessage = f'Client Name: {clientName}'
+                        locationMessage = f'Location: Latitude - {latitude}, Longitude = {longitude}'
+                        startTime = f'Start Time: {startTime}'
+                        questionMessage = '\n'.join([f'{obj.questionId.questionText}: {obj.answer}' for obj in questions_with_answer])
+                        message = f'{bodyMessage}\n{driverMessage}\n{truckNoMessage}\n{clientMessage}\n{locationMessage}\n{startTime}\n{questionMessage}'
+                        from_email = 'siddhantethansrec@gmail.com'  
+                        mailSendList = ['siddhantkhannamailbox@gmail.com']
+                        send_mail(subject, message, from_email, recipient_list=mailSendList)
+                        messages.error(request, 'You have failed the Pre-start. Please contact office for more details.')
+                        return redirect('index')
+        except Exception as e:
+            logger.exception(f"An exception occurred during pre-start form processing: {e}")
+            return HttpResponseServerError("An error occurred")
+
+        return redirect('Account:driverShiftView', shiftObj.id)
     
-    return redirect('Account:driverShiftView', shiftObj.id)
-    
-    
+    except Exception as e:
+        logger.exception("An exception occurred in DriverPreStartSave: {e}")
+        return HttpResponseServerError("An error occurred")
+
 def driverShiftView(request, shiftId):
-    tripObj = None
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
-    minEndDateTime = str(shiftObj.startDateTime).split('+')[0]
-    for trip in currentTrips:
-        trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
-        trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
-        
-        if trip.endDateTime == None:
-            tripObj = trip
-            
-    truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
-    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
-    reimbursements = DriverReimbursement.objects.filter(shiftId=shiftObj)
-    
-    params = {
-        'tripObj' : tripObj,
-        'currentTrips' : currentTrips,
-        'shiftObj' : shiftObj,
-        'clientObj' : truckConnectionObj.clientId,
-        'truckObj' : truckConnectionObj,
-        'breaks' : breaks,
-        'reimbursements' : reimbursements,
-        'minEndDateTime' : minEndDateTime
-    }
-    return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
+    try:
+        try:
+            tripObj = None
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            currentTrips = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).order_by('-startDateTime')
+            minEndDateTime = str(shiftObj.startDateTime).split('+')[0]
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching shift and trip data: {e}")
+            return HttpResponseServerError("An error occurred while processing the request")
+
+        try:
+            for trip in currentTrips:
+                trip.clientName = Client.objects.filter(pk=trip.clientId).first().name
+                trip.truckNum = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId).first().clientTruckId
+                
+                if trip.endDateTime is None:
+                    tripObj = trip
+        except Exception as e:
+            logger.exception(f"An exception occurred while processing current trips: {e}")
+            return HttpResponseServerError("An error occurred while processing the request")
+
+        try:
+            truckConnectionObj = ClientTruckConnection.objects.filter(id=tripObj.truckConnectionId).first()
+            breaks = DriverBreak.objects.filter(shiftId=shiftObj)
+            reimbursements = DriverReimbursement.objects.filter(shiftId=shiftObj)
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching additional data: {e}")
+            return HttpResponseServerError("An error occurred while processing the request")
+
+        try:
+            logger.info(f"Driver shift view accessed: Shift ID: {shiftId}, Shift Start Date: {shiftObj.startDateTime}, Number of Current Trips: {len(currentTrips)}, Min End Date Time: {minEndDateTime}")
+        except Exception as e:
+            logger.exception(f"An exception occurred while logging shift details: {e}")
+
+        params = {
+            'tripObj' : tripObj,
+            'currentTrips' : currentTrips,
+            'shiftObj' : shiftObj,
+            'clientObj' : truckConnectionObj.clientId,
+            'truckObj' : truckConnectionObj,
+            'breaks' : breaks,
+            'reimbursements' : reimbursements,
+            'minEndDateTime' : minEndDateTime
+        }
+
+        return render(request, 'Trip_details/DriverShift/shiftPage.html', params)
+
+    except Exception as e:
+        logger.exception("An exception occurred in the driverShiftView function: {e}")
+        return HttpResponseServerError("An error occurred while processing the request")
 
 
 def addDriverBreak(request, shiftId, breakId=None):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
-    shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
-    currentTime = str(getCurrentDateTimeObj()).split('.')[0]
-    clientName = Client.objects.filter(pk=tripObj.clientId).first().name
-    
-    params = {
-        'shiftObj' : shiftObj,
-        'tripObj' : tripObj,
-        'clientName' : clientName,
-        'currentTime' : currentTime
-    }
-    
-    if breakId:
-        breakData = DriverBreak.objects.filter(pk=breakId).first()
-        breakData.startDateTime = breakData.startDateTime.strftime('%Y-%m-%dT%H:%M')
-        breakData.endDateTime = breakData.endDateTime.strftime('%Y-%m-%dT%H:%M')
-        params['breakData'] = breakData
+    try:
+        try:
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()        
+            shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
+            currentTime = str(getCurrentDateTimeObj()).split('.')[0]
+            clientName = Client.objects.filter(pk=tripObj.clientId).first().name
+            params = {
+                'shiftObj': shiftObj,
+                'tripObj': tripObj,
+                'clientName': clientName,
+                'currentTime': currentTime
+            }
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching shift and trip data: {e}")
+            return HttpResponseServerError("An error occurred while processing the request")
 
-    return render(request, 'Trip_details/DriverShift/addBreak.html', params)
+        if breakId:
+            try:
+                breakData = DriverBreak.objects.filter(pk=breakId).first()
+                breakData.startDateTime = breakData.startDateTime.strftime('%Y-%m-%dT%H:%M')
+                breakData.endDateTime = breakData.endDateTime.strftime('%Y-%m-%dT%H:%M')
+                params['breakData'] = breakData
+            except Exception as e:
+                logger.exception(f"An exception occurred while fetching break data: {e}")
+                return HttpResponseServerError("An error occurred while processing the request")
+
+        return render(request, 'Trip_details/DriverShift/addBreak.html', params)
+
+    except Exception as e:
+        logger.exception(f"An exception occurred in addDriverBreak: {e}")
+        return HttpResponseServerError("An error occurred")
 
 @csrf_protect
 def saveDriverBreak(request, shiftId, breakId=None):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    lastTripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id ,endDateTime = None).first()
-    breakObj = DriverBreak() if not breakId else DriverBreak.objects.filter(pk=breakId).first()
-    startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime')) 
-    endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
-    lastBreakObj  = DriverBreak.objects.filter(shiftId=shiftObj).order_by('-startDateTime').first()
-    driverId = Driver.objects.filter(name=request.user.username).first()
-    
-    if breakId:
-        existing_break = DriverBreak.objects.filter(
-            ~Q(pk=breakId), 
-            Q(shiftId=shiftObj), 
-            Q(driverId = driverId), 
-            Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
-        )
-    else:
-        existing_break = DriverBreak.objects.filter(
-            Q(shiftId=shiftObj), 
-            Q(driverId = driverId), 
-            Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
-        )
-    if existing_break:
-        messages.error(request,'In the given time range , you already added break before ')
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    if lastBreakObj:
-        timeDifference = (startDateTime - lastBreakObj.startDateTime ).total_seconds()//60
-    else:
-        timeDifference = (startDateTime - shiftObj.startDateTime ).total_seconds()//60
-        
-    if timeDifference >315:
-        messages.error(request,'You cannot driver for more then five hours and fifteen minutes in one go ')
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    if startDateTime < shiftObj.startDateTime or startDateTime > endDateTime:
-        messages.error(request, "Break time is not valid.")
-        return redirect(request.META.get('HTTP_REFERER')) 
-    
-    breakObj.shiftId = shiftObj
-    breakObj.driverId = driverId
-    breakObj.tripId = lastTripObj
-    breakObj.startDateTime = startDateTime 
-    breakObj.endDateTime = endDateTime
-    breakObj.location = request.POST.get('curLocation')
-    breakObj.description = request.POST.get('description')
-    shiftObj.totalBreakInMinute += (endDateTime - startDateTime).total_seconds() / 60
-    breakFile = request.FILES.get('breakFile')
-    if breakFile:
-        curTimeStr = getCurrentTimeInString()
-        path = 'static/img/breakFiles'
-        fileName = breakFile.name
-        newFileName = 'break-file' + curTimeStr + '!_@' + fileName
-        pfs = FileSystemStorage(location=path)
-        pfs.save(newFileName, breakFile)
-        breakObj.breakFile = f'{path}/{newFileName}'
+    try:
+        shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+        lastTripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, endDateTime=None).first()
+        breakObj = DriverBreak() if not breakId else DriverBreak.objects.filter(pk=breakId).first()
+        startDateTime = dateTimeObj(dateTimeObj=request.POST.get('startDateTime'))
+        endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
+        lastBreakObj = DriverBreak.objects.filter(shiftId=shiftObj).order_by('-startDateTime').first()
+        driverId = Driver.objects.filter(name=request.user.username).first()
 
-    breakObj.save()
-    shiftObj.save()
-    
-    return redirect('Account:driverShiftView', shiftId)
-    
+        try:
+            if breakId:
+                existing_break = DriverBreak.objects.filter(
+                    ~Q(pk=breakId), 
+                    Q(shiftId=shiftObj), 
+                    Q(driverId=driverId), 
+                    Q(Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | 
+                      Q(startDateTime__lte=startDateTime, endDateTime__gte=startDateTime) |
+                      Q(startDateTime__gte=startDateTime, endDateTime__lte=endDateTime) |
+                      Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+                )
+            else:
+                existing_break = DriverBreak.objects.filter(
+                    Q(shiftId=shiftObj), 
+                    Q(driverId=driverId), 
+                    Q(Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | 
+                      Q(startDateTime__lte=startDateTime, endDateTime__gte=startDateTime) |
+                      Q(startDateTime__gte=startDateTime, endDateTime__lte=endDateTime) |
+                      Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+                )
+
+            if existing_break:
+                messages.error(request, 'In the given time range, you already added a break before')
+                return redirect(request.META.get('HTTP_REFERER'))
+        except Exception as e:
+            logger.exception(f"An exception occurred while checking existing breaks: {e}")
+            raise
+
+        try:
+            if lastBreakObj:
+                timeDifference = (startDateTime - lastBreakObj.startDateTime).total_seconds() // 60
+            else:
+                timeDifference = (startDateTime - shiftObj.startDateTime).total_seconds() // 60
+
+            if timeDifference > 315:
+                messages.error(request, 'You cannot drive for more than five hours and fifteen minutes in one go')
+                return redirect(request.META.get('HTTP_REFERER'))
+
+            if startDateTime < shiftObj.startDateTime or startDateTime > endDateTime:
+                messages.error(request, 'Break time is not valid.')
+                return redirect(request.META.get('HTTP_REFERER'))
+        except Exception as e:
+            logger.exception(f"An exception occurred while validating break time: {e}")
+            raise
+
+        try:
+            breakObj.shiftId = shiftObj
+            breakObj.driverId = driverId
+            breakObj.tripId = lastTripObj
+            breakObj.startDateTime = startDateTime 
+            breakObj.endDateTime = endDateTime
+            breakObj.location = request.POST.get('curLocation')
+            breakObj.description = request.POST.get('description')
+            shiftObj.totalBreakInMinute += (endDateTime - startDateTime).total_seconds() / 60
+            breakFile = request.FILES.get('breakFile')
+            if breakFile:
+                curTimeStr = getCurrentTimeInString()
+                path = 'static/img/breakFiles'
+                fileName = breakFile.name
+                newFileName = 'break-file' + curTimeStr + '!_@' + fileName
+                pfs = FileSystemStorage(location=path)
+                pfs.save(newFileName, breakFile)
+                breakObj.breakFile = f'{path}/{newFileName}'
+
+            breakObj.save()
+            shiftObj.save()
+
+            return redirect('Account:driverShiftView', shiftId)
+        except Exception as e:
+            logger.exception(f"An exception occurred while saving break data: {e}")
+            raise
+
+    except Exception as e:
+        logger.exception(f"An exception occurred in saveDriverBreak outer try block: {e}")
+        return HttpResponseServerError("An error occurred") 
 
 def addReimbursementView(request, shiftId):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
-    shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
-    currentTime = str(getCurrentDateTimeObj()).split('.')[0]
-    clientName = Client.objects.filter(pk=tripObj.clientId).first().name
-    
-    params = {
-        'shiftObj' : shiftObj,
-        'tripObj' : tripObj,
-        'clientName' : clientName,
-        'currentTime' : currentTime
-    }
-    return render(request, 'Trip_details/DriverShift/reimbursement.html', params)
+    try:
+        try:
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            tripObj = DriverShiftTrip.objects.filter(shiftId=shiftObj.id).first()
+            shiftObj.startDateTime = str(shiftObj.startDateTime).split('.')[0]
+            currentTime = str(getCurrentDateTimeObj()).split('.')[0]
+            clientName = Client.objects.filter(pk=tripObj.clientId).first().name
+
+            params = {
+                'shiftObj': shiftObj,
+                'tripObj': tripObj,
+                'clientName': clientName,
+                'currentTime': currentTime
+            }
+            return render(request, 'Trip_details/DriverShift/reimbursement.html', params)
+        except Exception as inner_exc:
+            logger.exception(f"An exception occurred in the inner try block of addReimbursementView: {inner_exc}")
+            raise
+    except Exception as outer_exc:
+        logger.exception(f"An exception occurred in addReimbursementView outer try block: {outer_exc}")
+        return HttpResponseServerError("An error occurred")
     
 @csrf_protect
 def addReimbursementSave(request, shiftId):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    driverId = Driver.objects.filter(name=request.user.username).first()
-    tripObj = DriverShiftTrip.objects.filter(endDateTime=None, shiftId=shiftId).first()
-    curDateTime = getCurrentDateTimeObj()
+    try:
+        try:
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            driverId = Driver.objects.filter(name=request.user.username).first()
+            tripObj = DriverShiftTrip.objects.filter(endDateTime=None, shiftId=shiftId).first()
+            curDateTime = getCurrentDateTimeObj()
 
-    reimbursementObj = DriverReimbursement()
-    reimbursementObj.shiftId = shiftObj
-    reimbursementObj.driverId = driverId
-    reimbursementObj.raiseDate = curDateTime
-    reimbursementObj.notes = request.POST.get('notes')
-    reimbursementObj.amount = request.POST.get('amount')
+            reimbursementObj = DriverReimbursement()
+            reimbursementObj.shiftId = shiftObj
+            reimbursementObj.driverId = driverId
+            reimbursementObj.raiseDate = curDateTime
+            reimbursementObj.notes = request.POST.get('notes')
+            reimbursementObj.amount = request.POST.get('amount')
 
-    reimbursementFile = request.FILES.get('reimbursementFile')
-    if reimbursementFile:
-        curTimeStr = getCurrentTimeInString()
-        path = 'static/img/reimbursementFiles'
-        fileName = reimbursementFile.name
-        newFileName = 'break-file' + curTimeStr + '!_@' + fileName
-        pfs = FileSystemStorage(location=path)
-        pfs.save(newFileName, reimbursementFile)
-        reimbursementObj.reimbursementFile = f'{path}/{newFileName}'
-    
-    reimbursementObj.save()
-    return redirect('Account:driverShiftView', shiftObj.id)
+            reimbursementFile = request.FILES.get('reimbursementFile')
+            if reimbursementFile:
+                curTimeStr = getCurrentTimeInString()
+                path = 'static/img/reimbursementFiles'
+                fileName = reimbursementFile.name
+                newFileName = 'break-file' + curTimeStr + '!_@' + fileName
+                pfs = FileSystemStorage(location=path)
+                pfs.save(newFileName, reimbursementFile)
+                reimbursementObj.reimbursementFile = f'{path}/{newFileName}'
+            
+            reimbursementObj.save()
+            return redirect('Account:driverShiftView', shiftObj.id)
+        except Exception as inner_exc:
+            logger.exception(f"An exception occurred in the inner try block of addReimbursementSave: {inner_exc}")
+            raise
+    except Exception as outer_exc:
+        logger.exception(f"An exception occurred in addReimbursementSave outer try block: {outer_exc}")
+        return HttpResponseServerError("An error occurred")
 
 @csrf_protect
 def collectDockets(request, shiftId, tripId, endShift=None):
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    clientObj = Client.objects.filter(pk=tripObj.clientId).first()
-    surcharges = Surcharge.objects.all()
-    driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
-    endDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
-    manualEndTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
-    breaks = DriverBreak.objects.filter(shiftId=shiftObj)
-    
-    if endDateTime <= shiftObj.startDateTime or endDateTime <= tripObj.startDateTime:
-        messages.error(request, "End shift date-time is not valid.")
-        return redirect(request.META.get('HTTP_REFERER')) 
-    
-    if manualEndTime:
-        endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
+    try:
+        shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+        tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+        clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+        surcharges = Surcharge.objects.all()
+        driverBreaks = DriverBreak.objects.filter(shiftId=shiftObj)
+        endDateTime = dateTimeObj(dateTimeObj=request.POST.get('dateTime'))
+        manualEndTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
+        breaks = DriverBreak.objects.filter(shiftId=shiftObj)
         
-    for obj in breaks:
-        obj.startDateTime = str(obj.startDateTime).split('+')[0]   
-        obj.endDateTime = str(obj.endDateTime).split('+')[0]   
-        
-    shiftTime = (endDateTime - shiftObj.startDateTime).total_seconds() / 60 
-    
-    def checkBreaks(breaksObjs):  
-        driverBreaksTimeList = []
-        totalDriverBreak = 0    
-        for breakObj in breaksObjs:
-            if breakObj.endDateTime > endDateTime:
-                messages.error(request, f"You have added a break between {breakObj.startDateTime} to {breakObj.endDateTime}, You can end the shift after {breakObj.endDateTime} or change break details.")
-                return redirect('Account:driverShiftView',shiftId=shiftId), None
-            if breakObj.durationInMinutes >= 15:
-                totalDriverBreak += breakObj.durationInMinutes 
-                driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
-        return totalDriverBreak, driverBreaksTimeList
+        try:
+            logger.info(f"Collecting dockets: Shift ID: {shiftId}, Trip ID: {tripId}, End Shift: {endShift}")
 
-    totalDriverBreak , breakCount = checkBreaks(driverBreaks)
-    if breakCount == -1:
-        return totalDriverBreak
-    breaksIsAllReady = True
-    
-    totalTime = shiftTime-totalDriverBreak
-    if totalTime < 315:
-        pass
-    elif totalTime >= 315 and totalTime < 450:
-        if totalDriverBreak < 15:
-            breaksIsAllReady = False
-            msg = "You need to add a break of 15 minutes before ending the trip."
-    elif totalTime >= 450 and totalTime <660:
-        if totalDriverBreak < 30: 
-            breaksIsAllReady = False
-            msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 30 minutes."
-    elif totalTime >= 660 and totalTime < 1440:
-        if totalDriverBreak < 60: 
-            breaksIsAllReady = False
-            msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 60 minutes.."
-    elif shiftTime > 1440:
-        breaksIsAllReady = False
-        msg = f"It appears you have forgotten to end you shift earlier. Please select the checkbox and supply the time manually."
-    if not breaksIsAllReady:
-        messages.error(request, msg)
-        return redirect(request.META.get('HTTP_REFERER'))      
-    
-    params = {
-        'docket' : 1 if clientObj.docketGiven else 0,
-        'shiftId' : shiftId,
-        'endShift': endShift,
-        'tripObj' : tripObj,
-        'breaks' : breaks,
-        'surcharges' : surcharges
-    }
-    return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
+            if endDateTime <= shiftObj.startDateTime or endDateTime <= tripObj.startDateTime:
+                messages.error(request, "End shift date-time is not valid.")
+                return redirect(request.META.get('HTTP_REFERER'))
+        except Exception as e:
+            logger.exception(f"An exception occurred in if block: {e}")
+            raise
 
+        if manualEndTime:
+            endDateTime = dateTimeObj(dateTimeObj=request.POST.get('endDateTime'))
 
+        try:
+            for obj in breaks:
+                obj.startDateTime = str(obj.startDateTime).split('+')[0]   
+                obj.endDateTime = str(obj.endDateTime).split('+')[0]   
+        except Exception as for_exc:
+            logger.exception(f"An exception occurred in for loop: {for_exc}")
+            raise
+
+        try:
+            shiftTime = (endDateTime - shiftObj.startDateTime).total_seconds() / 60 
+
+            def checkBreaks(breaksObjs):  
+                driverBreaksTimeList = []
+                totalDriverBreak = 0    
+                for breakObj in breaksObjs:
+                    if breakObj.endDateTime > endDateTime:
+                        messages.error(request, f"You have added a break between {breakObj.startDateTime} to {breakObj.endDateTime}, You can end the shift after {breakObj.endDateTime} or change break details.")
+                        return redirect('Account:driverShiftView',shiftId=shiftId)
+                    if breakObj.durationInMinutes >= 15:
+                        totalDriverBreak += breakObj.durationInMinutes 
+                        driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
+                return totalDriverBreak, driverBreaksTimeList
+        except Exception as e:
+            logger.exception(f"An exception occurred in inner try block of checkBreaks function: {e}")
+            raise
+
+        try:
+            totalDriverBreak , breakCount = checkBreaks(driverBreaks)
+            if breakCount == -1:
+                return totalDriverBreak
+            breaksIsAllReady = True
+        except Exception as e:
+            logger.exception(f"An exception occurred in if block: {e}")
+            raise
+
+        try:
+            totalTime = shiftTime-totalDriverBreak
+            if totalTime < 315:
+                pass
+            elif totalTime >= 315 and totalTime < 450:
+                if totalDriverBreak < 15:
+                    breaksIsAllReady = False
+                    msg = "You need to add a break of 15 minutes before ending the trip."
+            elif totalTime >= 450 and totalTime <660:
+                if totalDriverBreak < 30: 
+                    breaksIsAllReady = False
+                    msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 30 minutes."
+            elif totalTime >= 660 and totalTime < 1440:
+                if totalDriverBreak < 60: 
+                    breaksIsAllReady = False
+                    msg = f"You have added {totalDriverBreak} minutes of break instead of minimum 60 minutes.."
+            elif shiftTime > 1440:
+                breaksIsAllReady = False
+                msg = f"It appears you have forgotten to end you shift earlier. Please select the checkbox and supply the time manually."
+            if not breaksIsAllReady:
+                messages.error(request, msg)
+                return redirect(request.META.get('HTTP_REFERER'))      
+        except Exception as e:
+            logger.exception(f"An exception occurred in if block: {e}")
+            raise
+
+        try:
+            params = {
+                'docket' : 1 if clientObj.docketGiven else 0,
+                'shiftId' : shiftId,
+                'endShift': endShift,
+                'tripObj' : tripObj,
+                'breaks' : breaks,
+                'surcharges' : surcharges
+            }
+        except Exception as e:
+            logger.exception(f"An exception occurred in if block: {e}")
+            raise
+
+        return render(request, 'Trip_details/DriverShift/collectDockets.html', params)
+    except Exception as e:
+        logger.exception(f"An exception occurred in outer try block: {e}")
+        return HttpResponseServerError("An error occurred while processing the request")
+  
 @csrf_protect
 def collectedDocketSave(request,  shiftId, tripId, endShift):
     try:
+        logger.info("Collected docket save request received.")
+
         endOdometers = request.POST.get('endOdometers')
         endEngineHours = request.POST.get('endEngineHours')
         curTimeStr = getCurrentTimeInString()
@@ -1109,169 +1395,201 @@ def collectedDocketSave(request,  shiftId, tripId, endShift):
         loadPath = 'static/img/finalloadSheet'
         shiftObj = DriverShift.objects.filter(pk=shiftId).first()
         tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-        
-        # largest_end_date = DriverBreak.objects.filter(shiftId=shiftObj).aggregate(Max('endDateTime'))['endDateTime__max']
-        # driver_break_object = DriverBreak.objects.filter(shiftId=shiftObj, endDateTime=largest_end_date).first()
-        
-        # if driver_break_object and driver_break_object.endDateTime > currentDateTime:
-        #     messages.error(request, "Entered breaks is not valid, please enter the correct break details.")
-        #     return redirect('Account:driverShiftView',shiftId=shiftId)
-        
-        truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
-        truckInfoObj = truckConnectionObj.truckNumber.truckInformation
-        truckInfoObj.odometerKms = endOdometers
-        truckInfoObj.engineHours = endEngineHours
-        truckInfoObj.save()    
-        clientObj = Client.objects.filter(pk=tripObj.clientId).first()
-        loadSheetFile = request.FILES.get('loadSheet')
-        noOfLoads = int(request.POST.get('noOfLoads'))
-        tripObj.numberOfLoads = noOfLoads
-        tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
-        tripObj.endDateTime = currentDateTime
-        currentUTCDateTime = datetime.utcnow()
-        tripObj.endTimeUTC = currentUTCDateTime
-        tripObj.endOdometerKms = endOdometers
-        tripObj.endEngineHours = endEngineHours
-        
-        for load in range(1,noOfLoads+1):
-            if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first():
-                url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
-                messages.error(request, "Already exist docket from given docket.")
-                return redirect(url)
-        
-        if loadSheetFile:
-            fileName = loadSheetFile.name
-            newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
-            pfs = FileSystemStorage(location=loadPath)
-            pfs.save(newFileName, loadSheetFile)
-            tripObj.loadSheet = f'{loadPath}/{newFileName}'
-        tripObj.save()  
-        
-        if not clientObj.docketGiven:
-            for load in range(1,noOfLoads+1):
-                transferKm = request.POST.get(f'transferKm{load}')
-                waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
-                waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
-                
-                standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
-                standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
-                if not docketObj:
-                    docketObj = DriverShiftDocket()
-                docketObj.tripId = tripObj.id
-                docketObj.shiftId = shiftId
-                docketObj.shiftDate = tripObj.startDateTime.date()
-                docketObj.clientId = clientObj.clientId
-                docketObj.truckConnectionId = tripObj.truckConnectionId
-                docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
-                docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
-                returnVal = request.POST.get(f'returnVal{load}')
-                if returnVal != 'noReturn':
-                    if returnVal == 'returnToYard':
-                        docketObj.returnToYard = True
-                    else:
-                        docketObj.tippingToYard = True
-                        
-                    docketObj.returnQty = request.POST.get(f'returnQty{load}')
-                    docketObj.returnKm = request.POST.get(f'returnKm{load}')
-                # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-                docketObj.transferKM = transferKm if transferKm else 0
-                docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
-                docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
-                            
-                docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
-                docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
-                docketObj.comment = request.POST.get(f'comment{load}')
-                docketFile = request.FILES.get(f'docketFile{load}')
-                if docketFile:
-                    docketFileName = docketFile.name
-                    newFileName = 'load-sheet' + getCurrentTimeInString() + '_' + str(load) + '_' + '!_@' + docketFileName
-                    docketPfs = FileSystemStorage(location=docketPath)
-                    docketPfs.save(newFileName, docketFile)
-                    docketObj.docketFile = f'{docketPath}/{newFileName}'
-                docketObj.save()
-        else:
-            for load in range(1,noOfLoads+1):
-                transferKm = request.POST.get(f'transferKm{load}')
-                waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
-                waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
-                
-                standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
-                standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
-                docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
-                if not docketObj:
-                    docketObj = DriverShiftDocket()
-                docketObj.tripId = tripObj.id
-                docketObj.shiftId = shiftId
-                docketObj.shiftDate = tripObj.startDateTime.date()
-                docketObj.clientId = clientObj.clientId
-                docketObj.truckConnectionId = tripObj.truckConnectionId
-                docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
-                docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
-                docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
-                returnVal = request.POST.get(f'returnVal{load}')
-                if returnVal != 'noReturn':
-                    if  returnVal == 'returnToYard':
-                        docketObj.returnToYard = True
-                    else:
-                        docketObj.tippingToYard = True
-                    docketObj.returnQty = request.POST.get(f'returnQty{load}')
-                    docketObj.returnKm = request.POST.get(f'returnKm{load}')
-                # docketObj.surchargeType = int(request.POST.get(f'surcharge{load}'))
-                docketObj.transferKM = transferKm if transferKm else 0
-                
-                docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
-                docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
-                            
-                docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
-                docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
-                docketObj.save()
-        
-        if endShift == 1:
-            shiftObj.endDateTime = currentDateTime
+
+        try:
+            logger.debug(f"Shift ID: {shiftId}, Trip ID: {tripId}, End Shift: {endShift}")
+
+            truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+            truckInfoObj = truckConnectionObj.truckNumber.truckInformation
+            truckInfoObj.odometerKms = endOdometers
+            truckInfoObj.engineHours = endEngineHours
+            truckInfoObj.save()    
+            clientObj = Client.objects.filter(pk=tripObj.clientId).first()
+            loadSheetFile = request.FILES.get('loadSheet')
+            noOfLoads = int(request.POST.get('noOfLoads'))
+            tripObj.numberOfLoads = noOfLoads
+            tripObj.dispute = True if request.POST.get('dispute') == 'dispute' else False
+            tripObj.endDateTime = currentDateTime
             currentUTCDateTime = datetime.utcnow()
-            shiftObj.endTimeUTC = currentUTCDateTime
-            endLocationImg =request.FILES.get('endLocationImg')
-            if request.FILES.get('endLocationImg'):
-                path = 'static/Account/driverLocationFiles'
-                fileName = endLocationImg.name
-                newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
-                pfs = FileSystemStorage(location=path)
-                pfs.save(newFileName, endLocationImg)            
-                shiftObj.endLocationImg = f'{path}/{newFileName}'
-            shiftObj.endLatitude = 0 if not request.POST.get('endLatitude') else request.POST.get('endLatitude')
-            shiftObj.endLongitude = 0 if not request.POST.get('endLongitude') else request.POST.get('endLongitude')
-            shiftObj.save()  
-            messages.success(request, "Shift completed successfully.")
-            return redirect('index')
-        else:
-            return redirect('Account:recurringTrip', 1)
+            tripObj.endTimeUTC = currentUTCDateTime
+            tripObj.endOdometerKms = endOdometers
+            tripObj.endEngineHours = endEngineHours
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            for load in range(1,noOfLoads+1):
+                if DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftDate=tripObj.startDateTime.date(), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first():
+                    url = reverse('Account:driverShiftView', kwargs={'shiftId':shiftId})
+                    messages.error(request, "Already exist docket from given docket.")
+                    return redirect(url)
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            if loadSheetFile:
+                fileName = loadSheetFile.name
+                newFileName = 'load-sheet' + curTimeStr + '!_@' + fileName
+                pfs = FileSystemStorage(location=loadPath)
+                pfs.save(newFileName, loadSheetFile)
+                tripObj.loadSheet = f'{loadPath}/{newFileName}'
+            tripObj.save()  
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            if not clientObj.docketGiven:
+                for load in range(1,noOfLoads+1):
+                    transferKm = request.POST.get(f'transferKm{load}')
+                    waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
+                    waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
+
+                    standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+                    standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
+                    docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
+                    if not docketObj:
+                        docketObj = DriverShiftDocket()
+                    docketObj.tripId = tripObj.id
+                    docketObj.shiftId = shiftId
+                    docketObj.shiftDate = tripObj.startDateTime.date()
+                    docketObj.clientId = clientObj.clientId
+                    docketObj.truckConnectionId = tripObj.truckConnectionId
+                    docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                    docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                    docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
+                    returnVal = request.POST.get(f'returnVal{load}')
+                    if returnVal != 'noReturn':
+                        if returnVal == 'returnToYard':
+                            docketObj.returnToYard = True
+                        else:
+                            docketObj.tippingToYard = True
+                        docketObj.returnQty = request.POST.get(f'returnQty{load}')
+                        docketObj.returnKm = request.POST.get(f'returnKm{load}')
+
+                    docketObj.transferKM = transferKm if transferKm else 0
+                    docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
+                    docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
+                    docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+                    docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None            
+                    docketObj.comment = request.POST.get(f'comment{load}')
+                    docketFile = request.FILES.get(f'docketFile{load}')
+                    if docketFile:
+                        docketFileName = docketFile.name
+                        newFileName = 'load-sheet' + getCurrentTimeInString() + '_' + str(load) + '_' + '!_@' + docketFileName
+                        docketPfs = FileSystemStorage(location=docketPath)
+                        docketPfs.save(newFileName, docketFile)
+                        docketObj.docketFile = f'{docketPath}/{newFileName}'
+                    docketObj.save()
+            else:
+                for load in range(1,noOfLoads+1):
+                    transferKm = request.POST.get(f'transferKm{load}')
+                    waitingTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeStart{load}'))
+                    waitingTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'waitingTimeEnd{load}'))
+
+                    standByTimeStart = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeStart{load}'))
+                    standByTimeEnd = dateTimeObj(dateTimeObj=request.POST.get(f'standByTimeEnd{load}'))
+                    docketObj = DriverShiftDocket.objects.filter(docketNumber=request.POST.get(f'docketNumber{load}'), shiftId=shiftId, tripId=tripObj.id, clientId=clientObj.clientId).first()
+                    if not docketObj:
+                        docketObj = DriverShiftDocket()
+                    docketObj.tripId = tripObj.id
+                    docketObj.shiftId = shiftId
+                    docketObj.shiftDate = tripObj.startDateTime.date()
+                    docketObj.clientId = clientObj.clientId
+                    docketObj.truckConnectionId = tripObj.truckConnectionId
+                    docketObj.docketNumber = request.POST.get(f'docketNumber{load}')
+                    docketObj.cubicMl = request.POST.get(f'cubicMl{load}')
+                    docketObj.noOfKm = request.POST.get(f'noOfKm{load}')
+                    returnVal = request.POST.get(f'returnVal{load}')
+                    if returnVal != 'noReturn':
+                        if  returnVal == 'returnToYard':
+                            docketObj.returnToYard = True
+                        else:
+                            docketObj.tippingToYard = True
+                        docketObj.returnQty = request.POST.get(f'returnQty{load}')
+                        docketObj.returnKm = request.POST.get(f'returnKm{load}')
+
+                    docketObj.transferKM = transferKm if transferKm else 0
+                    docketObj.waitingTimeStart = waitingTimeStart if waitingTimeStart else None
+                    docketObj.waitingTimeEnd = waitingTimeEnd if waitingTimeEnd else None
+                    docketObj.standByStartTime = standByTimeStart if standByTimeStart else None
+                    docketObj.standByEndTime = standByTimeEnd if standByTimeEnd else None
+                    docketObj.save()
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            if endShift == 1:
+                shiftObj.endDateTime = currentDateTime
+                currentUTCDateTime = datetime.utcnow()
+                shiftObj.endTimeUTC = currentUTCDateTime
+                endLocationImg =request.FILES.get('endLocationImg')
+                if request.FILES.get('endLocationImg'):
+                    path = 'static/Account/driverLocationFiles'
+                    fileName = endLocationImg.name
+                    newFileName = 'LocationFile' + getCurrentTimeInString() + '!_@' + fileName
+                    pfs = FileSystemStorage(location=path)
+                    pfs.save(newFileName, endLocationImg)            
+                    shiftObj.endLocationImg = f'{path}/{newFileName}'
+                shiftObj.endLatitude = 0 if not request.POST.get('endLatitude') else request.POST.get('endLatitude')
+                shiftObj.endLongitude = 0 if not request.POST.get('endLongitude') else request.POST.get('endLongitude')
+                shiftObj.save()  
+                messages.success(request, "Shift completed successfully.")
+                return redirect('index')
+            else:
+                return redirect('Account:recurringTrip', 1)
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
     except Exception as e:
-        return HttpResponse(e)
-  
-  
+        logger.exception("An exception occurred in collectedDocketSave view function: {e}")
+        return HttpResponseServerError("An error occurred while processing the request")
+ 
 @csrf_protect
 def endShift(request, shiftId):
-    comment = request.POST.get('comment')
-    endShiftImg = request.FILES.get('endShiftImg')
-    curDateTime = request.POST.get('curDateTime')
-    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    filePath = 'static/img/shiftImg'
-    if endShiftImg:
-        fileName = endShiftImg.name
-        newFileName = 'load-sheet' + getCurrentTimeInString() + '!_@' + fileName
-        pfs = FileSystemStorage(location=filePath)
-        pfs.save(newFileName, endShiftImg)
-        shiftObj.endShiftImg = f'{filePath}/{newFileName}'
-        
-    shiftObj.comment = comment
-    shiftObj.endDateTime = curDateTime
-    shiftObj.endTimeUTC = datetime.utcnow()
-    shiftObj.save()
+    try:
+        try:
+            logger.info("Received request to end shift")
+            
+            comment = request.POST.get('comment')
+            endShiftImg = request.FILES.get('endShiftImg')
+            curDateTime = request.POST.get('curDateTime')
+            shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+            filePath = 'static/img/shiftImg'
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            if endShiftImg:
+                fileName = endShiftImg.name
+                newFileName = 'load-sheet' + getCurrentTimeInString() + '!_@' + fileName
+                pfs = FileSystemStorage(location=filePath)
+                pfs.save(newFileName, endShiftImg)
+                shiftObj.endShiftImg = f'{filePath}/{newFileName}'
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        try:
+            shiftObj.comment = comment
+            shiftObj.endDateTime = curDateTime
+            shiftObj.endTimeUTC = datetime.utcnow()
+            shiftObj.save()
+        except Exception as e:
+            logger.exception(f"An exception occurred in try block: {e}")
+            raise
+
+        logger.info("Shift ended successfully")
+        messages.success(request,'Your Shift is ended successfully.')
+        return redirect('index')
     
-    messages.success(request,'Your Shift is ended successfully.')
-    return redirect('index')
+    except Exception as e:
+        logger.exception("An exception occurred in endShift: {e}")
+        return HttpResponseServerError("An error occurred")
   
 @api_view(['POST'])
 def ocrRead(request):
@@ -1292,90 +1610,183 @@ def ocrRead(request):
 
     
 def driverLeaveRequestShow(request):
-    reasons = NatureOfLeave.objects.all()
-    params = {
-        'reasons' : reasons
-    }
-    return render(request, 'Trip_details/leaveSection/leaveRequestForm.html', params)
-
+    try:
+        try:
+            reasons = NatureOfLeave.objects.all()
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching reasons: {e}")
+            raise
+        
+        try:
+            params = {
+                'reasons': reasons
+            }
+        except Exception as e:
+            logger.exception(f"An exception occurred while creating parameters: {e}")
+            raise
+        
+        try:
+            logger.info("Driver leave request form shown successfully")
+        except Exception as e:
+            logger.exception(f"An exception occurred while logging success: {e}")
+            raise
+        
+        return render(request, 'Trip_details/leaveSection/leaveRequestForm.html', params)
+    
+    except Exception as e:
+        logger.exception("An exception occurred in driverLeaveRequestShow: {e}")
+        return HttpResponseServerError("An error occurred")
 
 def pastLeaveRequestShow(request):
-    driverObj =  Driver.objects.filter(name=request.user.username).first()
-    leaveObjs = LeaveRequest.objects.filter(employee=driverObj)
-    params = {
-        'leaveObjs' : leaveObjs
-    }
-    return render(request, 'Trip_details/leaveSection/pastLeaveRequest.html', params)
+    try:
+        try:
+            driverObj = Driver.objects.filter(name=request.user.username).first()
+            leaveObjs = LeaveRequest.objects.filter(employee=driverObj)
+            params = {'leaveObjs': leaveObjs}
+        except Exception as e:
+            logger.exception(f"An exception occurred while fetching leave requests: {e}")
+            raise
+
+        try:
+            logger.info(f"Past leave requests shown for user: {request.user.username}")
+            return render(request, 'Trip_details/leaveSection/pastLeaveRequest.html', params)
+        except Exception as e:
+            logger.exception(f"An exception occurred while rendering past leave requests: {e}")
+            raise
+
+    except Exception as e:
+        logger.exception("An exception occurred in pastLeaveRequestShow: {e}")
+        return HttpResponseServerError("An error occurred")
 
 def cancelLeaveRequest(request, id):
-    requestObj = LeaveRequest.objects.filter(pk=id).first()
-    requestObj.status = "Cancel"
-    requestObj.save()
-    return redirect('Account:pastLeaveRequestShow')
+    try:
+        try:
+            requestObj = LeaveRequest.objects.filter(pk=id).first()
+            requestObj.status = "Cancel"
+            requestObj.save()
+        except Exception as e:
+            logger.exception(f"An exception occurred while canceling leave request with ID {id}: {e}")
+            raise
+
+        try:
+            logger.info(f"Leave request with ID {id} canceled successfully.")
+            return redirect('Account:pastLeaveRequestShow')
+        except Exception as e:
+            logger.exception(f"An exception occurred while redirecting after canceling leave request: {e}")
+            raise
+
+    except Exception as e:
+        logger.exception(f"An exception occurred in cancelLeaveRequest: {e}")
+        return HttpResponseServerError("An error occurred")
     
 @csrf_protect
 def driverLeaveRequestSave(request):
-    startDate = request.POST.get('from')
-    endDate = request.POST.get('to')
-    reasonId = request.POST.get('reasonId')
-    if not reasonId:
-        messages.error(request, "Please select reason first.")
-        return redirect(request.META.get('HTTP_REFERER'))
-    leaveReason = NatureOfLeave.objects.filter(pk=reasonId).first()
-    driverObj =  Driver.objects.filter(name=request.user.username).first()
-    
-    existingRequest = LeaveRequest.objects.filter(
-        Q(start_date__range=(startDate, endDate)) |
-        Q(end_date__range=(startDate, endDate)) |
-        (Q(start_date__lte=startDate) & Q(end_date__gte=endDate)),
-        ~Q(status='Cancel')
-    ).first()
-    if existingRequest:
-        messages.error(request, "Oops! It seems you've already requested leave for these dates.")
-        return redirect(request.META.get('HTTP_REFERER'))
-    
-    leaveObj = LeaveRequest()
-    leaveObj.employee = driverObj
-    leaveObj.start_date = startDate
-    leaveObj.end_date = endDate
-    leaveObj.reason = leaveReason
-    leaveObj.save()
-    
-    return redirect('Account:pastLeaveRequestShow')
+    try:
+        startDate = request.POST.get('from')
+        endDate = request.POST.get('to')
+        reasonId = request.POST.get('reasonId')
+
+        if not reasonId:
+            messages.error(request, "Please select a reason first.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        try:
+            leaveReason = NatureOfLeave.objects.filter(pk=reasonId).first()
+        except NatureOfLeave.DoesNotExist as e:
+            logger.exception(f"NatureOfLeave object with ID {reasonId} does not exist: {e}")
+            messages.error(request, "Invalid leave reason selected.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        driverObj = Driver.objects.filter(name=request.user.username).first()
+
+        if not driverObj:
+            logger.error("Driver object not found.")
+            messages.error(request, "Driver not found.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        try:
+            existingRequest = LeaveRequest.objects.filter(
+                Q(start_date__range=(startDate, endDate)) |
+                Q(end_date__range=(startDate, endDate)) |
+                (Q(start_date__lte=startDate) & Q(end_date__gte=endDate)),
+                ~Q(status='Cancel')
+            ).first()
+        except Exception as e:
+            logger.exception("An exception occurred while checking existing leave requests: {e}")
+            return HttpResponseServerError("An error occurred while checking existing leave requests.")
+
+        if existingRequest:
+            logger.warning(f"Leave request already exists for driver: {driverObj.name}, start date: {startDate}, end date: {endDate}")
+            messages.error(request, "Oops! It seems you've already requested leave for these dates.")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        leaveObj = LeaveRequest()
+        leaveObj.employee = driverObj
+        leaveObj.start_date = startDate
+        leaveObj.end_date = endDate
+        leaveObj.reason = leaveReason
+        leaveObj.save()
+
+        logger.info(f"Leave request saved successfully for driver: {driverObj.name}, start date: {startDate}, end date: {endDate}")
+
+        return redirect('Account:pastLeaveRequestShow')
+
+    except Exception as e:
+        logger.exception("An exception occurred in driverLeaveRequestSave: {e}")
+        return HttpResponseServerError("An error occurred")
     
 @csrf_protect
 @api_view(['POST'])
 def getTrucks(request):
-    connections = []
-    clientName = request.POST.get('clientName')
-    client = Client.objects.get(name=clientName)
-    print(request.POST.get('curDate'))
-    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
-    
-    print(clientName,client,currentDateTime)
-    
-    if request.POST.get('shiftId'):
-        shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
-        currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
-        for trip in currentTripObjs:
+    try:
+        connections = []
+        clientName = request.POST.get('clientName')
+        
+        try:
+            client = Client.objects.get(name=clientName)
+        except Client.DoesNotExist:
+            logger.exception(f"Client with name '{clientName}' does not exist.")
+            return JsonResponse({'status': False, 'error': 'Client not found'})
+
+        curDate = request.POST.get('curDate')
+        
+        try:
+            currentDateTime = dateTimeObj(dateTimeObj=curDate)
+        except Exception as e:
+            logger.exception(f"Error parsing current date time: {e}")
+            return JsonResponse({'status': False, 'error': 'Invalid current date time format'})
+
+        shiftId = request.POST.get('shiftId')
+        
+        if shiftId:
+            try:
+                shiftObj = DriverShift.objects.get(pk=shiftId)
+                currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
+                for trip in currentTripObjs:
+                    connections.append(trip.truckConnectionId)
+            except DriverShift.DoesNotExist:
+                logger.exception(f"DriverShift with ID '{shiftId}' does not exist.")
+                return JsonResponse({'status': False, 'error': 'Driver shift not found'})
+
+        allCurrentTrips = DriverShiftTrip.objects.filter((Q(startDateTime__lte=currentDateTime,endDateTime__isnull=True) | Q(startDateTime__lte=currentDateTime,endDateTime__gte=currentDateTime)) & Q(archive=False))
+        for trip in allCurrentTrips:
             connections.append(trip.truckConnectionId)
         
-    allCurrentTrips = DriverShiftTrip.objects.filter((Q(startDateTime__lte=currentDateTime,endDateTime__isnull=True) | Q(startDateTime__lte=currentDateTime,endDateTime__gte=currentDateTime)) & Q(archive=False))
-    for trip in allCurrentTrips:
-        connections.append(trip.truckConnectionId)
+        truckList = []
+        truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDateTime.date() , endDate__gte=currentDateTime.date())
+        docket = client.docketGiven
     
-    truckList = []
-    truck_connections = ClientTruckConnection.objects.filter(clientId=client.clientId , startDate__lte=currentDateTime.date() , endDate__gte=currentDateTime.date())
-    docket = client.docketGiven
-
-    for truck_connection in truck_connections:
-        if truck_connection.id in connections:
-            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId) + ' Already in use')
-        else:
-            truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
-            
-    return JsonResponse({'status': True, 'trucks': truckList, 'docket': docket})
-
+        for truck_connection in truck_connections:
+            if truck_connection.id in connections:
+                truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId) + ' Already in use')
+            else:
+                truckList.append(str(truck_connection.truckNumber) + '-' + str(truck_connection.clientTruckId))
+                
+        return JsonResponse({'status': True, 'trucks': truckList, 'docket': docket})
+    
+    except Exception as e:
+        logger.exception(f"An exception occurred in getTrucks: {e}")
+        return JsonResponse({'status': False, 'error': 'An error occurred'})
 
 def rcti(request):
 
@@ -1435,6 +1846,7 @@ def rctiForm(request, id= None , clientId = None , errorId = None , date = None)
         'truckConnectionObj':truckConnectionObj,
     }
     return render(request, 'Account/Tables/rctiForm.html', params)
+
 def rctiErrorSolveView(request,solveId):
     rcti = None
     rctiErrorObj = RctiErrors.objects.filter(pk=solveId).first()
@@ -1618,6 +2030,7 @@ def newRctiWithErrorResolve(request):
     clientId = request.POST.get('clientId')
     date = request.POST.get('startDate')
     return redirect('Account:rctiFormViewWithErrorId',errorId,clientId,date)
+
 def rctiErrorForm(request ,errorId ):
     errorObj = RctiErrors.objects.filter(pk=errorId).first()
     clientName = Client.objects.all()
@@ -4792,18 +5205,26 @@ def apiClientAndTruckDataSave(request):
 @csrf_protect
 @api_view(['POST'])
 def getPreStartQuestions(request):
-    shiftId = request.POST.get('shiftId')
-    tripId = request.POST.get('tripId')
-    tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
-    truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
-    preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
-    preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False).values()
+    try:
+        shiftId = request.POST.get('shiftId')
+        tripId = request.POST.get('tripId')
+
+        tripObj = DriverShiftTrip.objects.filter(pk=tripId).first()
+        truckConnectionObj = ClientTruckConnection.objects.filter(pk=tripObj.truckConnectionId).first()
+        preStart = PreStart.objects.filter(pk=truckConnectionObj.pre_start_name).first()
+        preStartQuestions = PreStartQuestion.objects.filter(preStartId=preStart.id, archive=False).values()
+        
+        params = {
+            'questions': list(preStartQuestions),
+            'shiftId': shiftId,
+            'tripId': tripId
+        }
+        
+        logger.info(f"Pre-start questions fetched successfully. Shift ID: {shiftId}, Trip ID: {tripId}")
+        
+        return JsonResponse({'status': True, 'message': 'Fetch pre-start questions successfully.', 'data': params})
     
-    params = {
-        'questions': list(preStartQuestions),
-        'shiftId' : shiftId,
-        'tripId' : tripId
-    }
-    
-    return JsonResponse({'status':True, 'message':'Fetch pre-start questions successfully.', 'data' : params})
+    except Exception as e:
+        logger.exception("An exception occurred in getPreStartQuestions")
+        return JsonResponse({'status': False, 'message': 'An error occurred while fetching pre-start questions.'})
     
