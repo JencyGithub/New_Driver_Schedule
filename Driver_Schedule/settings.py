@@ -198,3 +198,32 @@ AWS_SECRET_ACCESS_KEY = '5UetzxjUQr+hTvLytdTuiMXj0CI5CuBciuNeuQqJ'
 EMAIL_BACKEND ='django_ses.SESBackend'
 AWS_SES_REGION_NAME = 'ap-southeast-2'
 AWS_SES_REGION_ENDPOINT = 'email.ap-southeast-2.amazonaws.com'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'static/logFile/logFile.log',
+        },
+    },
+    'loggers': {
+        'Account_app': {  
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'Appointment_app': {  
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'GearBox_app': {  
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

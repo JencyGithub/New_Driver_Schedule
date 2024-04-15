@@ -33,6 +33,7 @@ fleetInformation.json
 ReportFiles
 data.json
 driverLocationFiles
+logFile
 
 sendEmailOnPreStartAndShiftEndNotFilled.py
 sendEmailOnPreStartAndShiftEndNotFilled.txt
