@@ -1,12 +1,54 @@
 const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 $(document).ready(function () {
+  
   // Retrieve the value of #veriFied
   var veriFiedValue = $("#veriFied").val();
   if (veriFiedValue === "True") {
     $("#tripForm :input , #tripForm select").prop("disabled", true);
     $("#verified").css("display", "none");
   }
+
+  $('#tripClient').select2();
+  $('#tripTruckNum').select2();
+
+  $('#tripStartDateTime').on('change', function(){
+    $("#tripClient").prop("disabled", false);
+    $('#tripClient').val(null).trigger('change')
+    $('#tripTruckNum').val(null).trigger('change').prop("disabled", true);
+  })
+
+  $("#tripClient").on("change", function () {
+    var startDateTime = document.getElementById('tripStartDateTime').value;
+    console.log(startDateTime)
+    let clientId = $(this).val();
+
+    if (clientId) {
+      $("#tripTruckNum").prop("disabled", false);
+      $("#tripTruckNum").html('<option value="">Loading...</option>');
+      $.ajax({
+          type: "POST",
+          url: "/account/getTrucks/",
+          data: {
+              clientName: $(this).val(),
+              curDate : startDateTime
+          },
+          beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          },
+          success: function (data) {
+              $("#tripTruckNum").html('<option value="">Select an Item</option>');
+              data.trucks.forEach(function (item) {
+                  $("#tripTruckNum").append(
+                      `<option value="${item}" ${item.includes('Already in use') ? 'disabled' : ''}>${item}</option>`
+                  );
+              });
+              $("#tripTruckNum").trigger("change.select2");
+          },
+      });
+    }
+  });
+
 });
 
 
@@ -394,3 +436,20 @@ function countStandBySlot(lineData, count_, tripId) {
     });
   }
 }
+
+
+$('#tripAdd').on('click', function(){
+  isTrue = true
+  $('[id^="endDateTime"]').each(function(){
+    if($(this).val() == ''){
+      isTrue = false;
+    }
+  });
+  if(isTrue){
+    $('#addTripModal').modal('show')
+  }else{
+    alert('Please end current trip first.')
+  }
+
+})
+

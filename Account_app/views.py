@@ -3000,16 +3000,89 @@ def DriverShiftArchive(request, shiftId):
     return redirect('Account:index')
 
 def RestoreDriverShift(request, shiftId):
-    driverShiftObj = DriverShift.objects.filter(pk=shiftId).first()
-    if driverShiftObj:
-        driverShiftObj.archive = False
-        driverShiftObj.save()
-    driverTrips = DriverShiftTrip.objects.filter(shiftId=driverShiftObj.id)
-    for trip in driverTrips:
-        trip.archive = False
-        trip.save()
-    messages.success(request, "Driver shift restored successfully")
-    return redirect('Account:index')
+    shiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    existingShift = None
+    if shiftObj.endDateTime:
+        existingShift = DriverShift.objects.filter(
+            ~Q(pk=shiftObj.id), 
+            Q(driverId = shiftObj.driverId), 
+            Q( 
+                Q(startDateTime__lte=shiftObj.endDateTime, endDateTime__gte=shiftObj.endDateTime) | 
+                Q(startDateTime__lte=shiftObj.startDateTime, endDateTime__gte=shiftObj.startDateTime) | 
+                Q(startDateTime__gte = shiftObj.startDateTime , endDateTime__lte = shiftObj.endDateTime) |
+                Q(startDateTime__lte=shiftObj.startDateTime, endDateTime__gte=shiftObj.endDateTime)
+            ),
+            Q(archive=False)
+        )
+    else:                                                                                                       
+        existingShift = DriverShift.objects.filter(
+            ~Q(pk=shiftObj.id),
+            Q(driverId = shiftObj.driverId),
+            Q(startDateTime__lte=shiftObj.startDateTime), 
+            Q(endDateTime__gte=shiftObj.startDateTime),
+            Q(archive=False)
+        ).first()
+    if not existingShift:
+        tripObjs =  DriverShiftTrip.objects.filter(shiftId=shiftId)
+        existingTrips = None
+        existingTripFlag = False
+        for tripObj in tripObjs:
+            if not existingTrips:                
+                if tripObj.startDateTime and tripObj.endDateTime:
+                    existingTrips = DriverShiftTrip.objects.filter(
+                        ~Q(pk=tripObj.id), 
+                        Q(truckConnectionId = tripObj.truckConnectionId), 
+                        Q( 
+                            Q(startDateTime__lte=tripObj.endDateTime, endDateTime__gte=tripObj.endDateTime) | 
+                            Q(startDateTime__lte=tripObj.startDateTime, endDateTime__gte=tripObj.startDateTime) |                                    
+                            Q(startDateTime__gte = tripObj.startDateTime , endDateTime__lte = tripObj.endDateTime) |
+                            Q(startDateTime__lte=tripObj.startDateTime, endDateTime__gte=tripObj.endDateTime)
+                        ),
+                        Q(archive=False)
+                    ).first()
+                elif tripObj.startDateTime:
+                    existingTrips = DriverShiftTrip.objects.filter(
+                        ~Q(pk=tripObj.id), 
+                        Q(truckConnectionId = tripObj.truckConnectionId),
+                        Q(startDateTime__lte=tripObj.startDateTime), 
+                        Q(endDateTime__gte=tripObj.startDateTime),
+                        Q(archive=False)
+                    ).first() 
+                existingTripFlag = True if existingTrips else False
+            else:
+                break
+            
+        if not existingTripFlag:
+            shiftObj.archive = False
+            shiftObj.save()
+            for tripObj in tripObjs:
+                tripObj.archive = False
+                tripObj.save()
+                docketObjs = DriverShiftDocket.objects.filter(shiftId=shiftId, tripId=tripObj.id)
+                for docketObj in docketObjs:
+                    docketObj.archive = False
+                    docketObj.save()
+            messages.success(request, "Driver shift restored successfully")
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            messages.error(request, "Any trip is matching with the given shift is already in use.")
+            return redirect(request.META.get('HTTP_REFERER'))
+    else:
+        messages.error(request, "Any shift is matching with the given shift is already in use.")
+        return redirect(request.META.get('HTTP_REFERER'))
+
+            
+    # return HttpResponse(shiftId)
+    # driverShiftObj = DriverShift.objects.filter(pk=shiftId).first()
+    # if driverShiftObj:
+    #     driverShiftObj.archive = False
+    #     driverShiftObj.save()
+    # driverTrips = DriverShiftTrip.objects.filter(shiftId=driverShiftObj.id)
+    # for trip in driverTrips:
+    #     trip.archive = False
+    #     trip.save()
+    # messages.success(request, "Driver shift restored successfully")
+    # return redirect('Account:index')
 
 @csrf_protect
 def DriverTripEditForm(request, id, typeOfShift=None):
@@ -3102,7 +3175,7 @@ def driverEntryUpdate(request, shiftId):
         shiftTimeDiff = shiftEndTime - shiftObj.startDateTime
         maxShiftTime = timedelta(hours=24)
         if shiftTimeDiff > maxShiftTime:
-            messages.error(request,'Please ensure the shift is completed within 24 hours.') 
+            messages.error(request,'Please ensure the shift is complete within 24 hours.') 
             return redirect(request.META.get( 'HTTP_REFERER' ))
     else:
         shiftEndTime = shiftObj.endDateTime
@@ -3222,7 +3295,7 @@ def driverEntryUpdate(request, shiftId):
                 reconciliationDocketObj.clientId = docket.clientId
                 reconciliationDocketObj.truckConnectionId = trip.truckConnectionId
                 # return HttpResponse(reconciliationDocketObj.truckId)
-                # for ReconciliationReport 
+                # for ReconciliationReport
                 clientTruckConnectionObj = ClientTruckConnection.objects.filter(pk=trip.truckConnectionId,startDate__lte = docket.shiftDate,endDate__gte = docket.shiftDate, clientId = trip.clientId).first()
                 rateCard = clientTruckConnectionObj.rate_card_name
                 costParameterObj = CostParameters.objects.filter(rate_card_name = rateCard.id,start_date__lte = docket.shiftDate,end_date__gte = docket.shiftDate).first()
@@ -3272,7 +3345,7 @@ def driverEntryUpdate(request, shiftId):
     if verified == 'True':
         return redirect('Account:ShiftDetails', 1)
     
-    messages.success(request, "Shift end successfully" if verified == 'True' else "Docket Updated successfully")
+    messages.success(request, "Shift end successfully" if verified == 'True' else "Data Updated successfully")
     return redirect('Account:DriverTripEdit',shiftId)
 
 @csrf_protect
@@ -4426,9 +4499,9 @@ def ShiftDetails(request,id):
         return redirect(url_name)
     if id == 3: # pre-start not filled
         if driverId:
-            shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate), driverId=driverId)
+            shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate), driverId=driverId, archive=False)
         else:
-            shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate))
+            shifts = DriverShift.objects.filter(driverprestart__isnull=True, shiftDate__range=(startDate, endDate), archive=False)
     elif id == 2: # on going
         if not (startDate and endDate):
             shifts = DriverShift.objects.filter(endDateTime=None)

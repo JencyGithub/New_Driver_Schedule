@@ -227,13 +227,15 @@ def checkTruckAndDriverAvailability(shiftObj, tripObj, endDateTime, startDateTim
     existing_trips = DriverShiftTrip.objects.filter(
         ~Q(shiftId=shiftObj.id), 
         Q(truckConnectionId = truckConnectionId) , 
-        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime)),
+        Q(archive=False)
     )
     
     existing_shifts = DriverShift.objects.filter(
         ~Q(pk=shiftObj.id), 
         Q(driverId = driverId) , 
-        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime))
+        Q( Q(startDateTime__lte=endDateTime, endDateTime__gte=endDateTime) | Q( startDateTime__lte=startDateTime, endDateTime__gte=startDateTime ,)| Q( startDateTime__gte = startDateTime , endDateTime__lte = endDateTime ,) |Q(startDateTime__lte=startDateTime, endDateTime__gte=endDateTime)),
+        Q(archive=False)
     )
     print(existing_shifts,existing_trips)
     if existing_shifts or existing_trips:

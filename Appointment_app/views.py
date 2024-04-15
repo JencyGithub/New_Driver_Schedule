@@ -89,6 +89,46 @@ def createShiftSave(request):
     messages.success(request,"Driver Shift has been added successfully")  
     return redirect('Account:index')
 
+@csrf_protect
+def createTripSave(request, shiftId):
+    startDateTime = dateTimeObj(dateTimeObj=request.POST.get('tripStartDateTime'))
+    startOdometerKms = request.POST.get('tripOdometerStart') if request.POST.get('tripOdometerStart') else 0
+    startEngineHours = request.POST.get('tripEnginHour') if request.POST.get('tripEnginHour') else 0
+    
+    clientName = request.POST.get('tripClient')
+    clientObj = Client.objects.filter(name=clientName).first()
+    clientId = clientObj.clientId if clientObj else None
+
+    if request.POST.get('tripTruckNum'):
+        truckNum = request.POST.get('tripTruckNum').split('-')
+        adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
+        clientTruckNum = truckNum[1]
+        truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
+
+        existingTrip = DriverShiftTrip.objects.filter(shiftId=shiftId, startDateTime__lte=startDateTime, endDateTime__gte=startDateTime).first()
+        if not existingTrip:
+            shiftObj = DriverShift.objects.filter(id=shiftId).first()
+            if shiftObj.startDateTime < startDateTime:
+                tripObj = DriverShiftTrip()
+                tripObj.shiftId = shiftId
+                tripObj.startDateTime = startDateTime
+                tripObj.clientId = clientId
+                tripObj.truckConnectionId = truckConnectionObj.id
+                tripObj.startOdometerKms = startOdometerKms
+                tripObj.startEngineHours = startEngineHours 
+                tripObj.save()
+                messages.success(request, 'Trip created successfully.')
+                return redirect(request.META.get('HTTP_REFERER'))
+            else:
+                messages.error(request, 'Trip start time is must be grater than shift start time.')
+                return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            messages.error(request, 'Trip already exist between given time.')
+            return redirect(request.META.get('HTTP_REFERER'))
+    else:
+        messages.error(request, 'Please enter truck number.')
+        return redirect(request.META.get('HTTP_REFERER'))
+    
 # ````````````````````````````````````
 # Appointment
 

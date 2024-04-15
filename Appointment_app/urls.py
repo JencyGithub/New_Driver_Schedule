@@ -26,6 +26,8 @@ urlpatterns = [
     path('create/shift/', views.createShift,name="createShift"),
     path('create/shift/<int:shiftId>/', views.createShift,name="createTrip"),
     path('create/shift/save/', views.createShiftSave,name="createShiftSave"),
+
+    path('create/trip/save/<int:shiftId>/', views.createTripSave,name="createTripSave"),
     # path('start/shift/<str:startDate>/', views.startShift,name="startShiftWithDate"),
 
     # Appointment

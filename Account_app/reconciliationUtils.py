@@ -23,11 +23,13 @@ costDict = {
 }
 def DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
     date_= docketObj.shiftDate
-    docketObj.waitingTimeStart = docketObj.waitingTimeStart.strftime("%H:%M:%S")
-    docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
+    if type(docketObj.waitingTimeStart) is not str:
+        docketObj.waitingTimeStart = docketObj.waitingTimeStart.strftime("%H:%M:%S")
+    if type(docketObj.waitingTimeEnd) is not str:
+        docketObj.waitingTimeEnd = docketObj.waitingTimeEnd.strftime("%H:%M:%S")
     totalWaitingTime = timeDifference(docketObj.waitingTimeStart,docketObj.waitingTimeEnd)
     
-    if  graceObj.waiting_load_calculated_on_load_size :
+    if graceObj.waiting_load_calculated_on_load_size :
         loadSize = graceObj.minimum_load_size_for_waiting_time_grace
         
         if float(docketObj.cubicMl) >= float(graceObj.minimum_load_size_for_waiting_time_grace):
@@ -139,6 +141,7 @@ def checkWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceO
     try:
         date_= docketObj.shiftDate
         totalWaitingTime = DriverTripCheckWaitingTime(docketObj , shiftObj , rateCard , costParameterObj , graceObj)
+        print('totalWaitingTime:', totalWaitingTime)
         totalWaitingCost = 0
         if totalWaitingTime > 0: 
             totalWaitingCost = round(float(totalWaitingTime) * float(costParameterObj.waiting_cost_per_minute), 2)
@@ -356,9 +359,6 @@ def checkMissingComponents(reconciliationReportObj):
     reconciliationReportObj.save()
 
 
-    
-    
-
 def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterObj , graceObj):
 
     tripObj = DriverShiftTrip.objects.filter(pk=docketObj.tripId).first()
@@ -370,6 +370,7 @@ def DriverTripCheckStandByTotal(docketObj , shiftObj , rateCard , costParameterO
                     docketObj.standByEndTime = docketObj.standByEndTime.strftime("%H:%M:%S")
                 
                 totalStandByTime = getTimeDifference(docketObj.standByStartTime,docketObj.standByEndTime)
+                print('totalStandByTime:',totalStandByTime)
                 standBySlot = 0
                 if float(totalStandByTime) > float(graceObj.chargeable_standby_time_starts_after):
                     totalStandByTime = float(totalStandByTime) - float(graceObj.standby_time_grace_in_minutes)

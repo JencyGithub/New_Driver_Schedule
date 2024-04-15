@@ -11,6 +11,7 @@ with open('last_subprocess_run_time.txt','w')as f:
     f.write('0')
 
 reconciliationQuerySet = ReconciliationReport.objects.all()
+# reconciliationQuerySet = ReconciliationReport.objects.filter(pk=5655)
 
 for reconciliationDocketObj in reconciliationQuerySet:
     # if reconciliationDocketObj.docketNumber != 27191835:

@@ -5158,6 +5158,18 @@ form:after {
 	text-decoration: none
 }
 
+.btn-outline-default {
+    color: #2A3F54;
+    border-color: #2A3F54;
+}
+
+.btn-outline-default:hover {
+    color: #fff;
+    background-color: #2A3F54;
+    border-color: #2A3F54;
+}
+
+
 .login_content a:hover {
 	text-decoration: underline
 }
