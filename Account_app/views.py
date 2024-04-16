@@ -5171,8 +5171,8 @@ def apiMapDataSave(request):
     shiftObj.save()
     return JsonResponse({'status':True, 'message':'Shift save successfully.', 'data' : {'shiftId':shiftObj.id}})
 
-@csrf_protect
-@api_view(['POST'])
+# @csrf_protect
+# @api_view(['POST'])
 def getClients(request):
     clients = Client.objects.all().values('clientId','name','email','docketGiven')
     return JsonResponse({'status':True, 'message':'Clients fetch successfully.', 'data' : list(clients)})
