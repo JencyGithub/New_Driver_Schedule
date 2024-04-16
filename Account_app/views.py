@@ -1738,7 +1738,6 @@ def driverLeaveRequestSave(request):
 @csrf_protect
 @api_view(['POST'])
 def getTrucks(request):
-<<<<<<< Updated upstream
     try:
         connections = []
         clientName = request.POST.get('clientName')
@@ -1771,17 +1770,6 @@ def getTrucks(request):
 
         allCurrentTrips = DriverShiftTrip.objects.filter((Q(startDateTime__lte=currentDateTime,endDateTime__isnull=True) | Q(startDateTime__lte=currentDateTime,endDateTime__gte=currentDateTime)) & Q(archive=False))
         for trip in allCurrentTrips:
-=======
-    connections = []
-    clientName = request.POST.get('clientName')
-    client = Client.objects.get(name=clientName)
-    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
-        
-    if request.POST.get('shiftId'):
-        shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
-        currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
-        for trip in currentTripObjs:
->>>>>>> Stashed changes
             connections.append(trip.truckConnectionId)
         
         truckList = []
