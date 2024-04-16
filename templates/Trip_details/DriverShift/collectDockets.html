@@ -327,14 +327,14 @@
             // Cubic Meter
             docketContent += `<div class="col-md-3 col-12 my-1">`;
             docketContent += `<label for="cubicMl${i}">Load Size:</label>`;
-            docketContent += `<input type="number" step="0.01" name="cubicMl${i}" id="cubicMl${i}" class="form-control" required >`;
+            docketContent += `<input type="number" step="0.01" value="0" name="cubicMl${i}" id="cubicMl${i}" class="form-control" required >`;
             docketContent += `</div>`;
 
 
             // No of km
             docketContent += `<div class="col-md-3 col-12 my-1">`;
             docketContent += `<label for="noOfKm${i}">No. Of Km:</label>`;
-            docketContent += `<input type="number" step="0.01" name="noOfKm${i}" id="noOfKm${i}" class="form-control" required >`;
+            docketContent += `<input type="number" step="0.01" value="0" name="noOfKm${i}" id="noOfKm${i}" class="form-control" required >`;
             docketContent += `</div>`;
 
             // Waiting Time Start
@@ -355,7 +355,7 @@
             // Transfer Km
             docketContent += `<div class="col-md-4 col-12 my-1">`;
             docketContent += `<label for="transferKm${i}">Transfer km:</label>`;
-            docketContent += `<input type="number" step="0.01" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
+            docketContent += `<input type="number" step="0.01" value="0" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
             docketContent += `</div>`;
     
             // Stand By Time Start
@@ -426,14 +426,14 @@
             // Cubic Meter
             detailsContent += `<div class="col-md-4 col-12 my-1">`;
             detailsContent += `<label for="cubicMl${i}">Load Size:</label>`;
-            detailsContent += `<input type="number" step="0.01" name="cubicMl${i}" id="cubicMl${i}" class="form-control" >`;
+            detailsContent += `<input type="number" step="0.01" value="0" name="cubicMl${i}" id="cubicMl${i}" class="form-control" >`;
             detailsContent += `</div>`;
 
 
             // No of km
             detailsContent += `<div class="col-md-4 col-12 my-1">`;
             detailsContent += `<label for="noOfKm${i}">No. Of Km:</label>`;
-            detailsContent += `<input type="number" step="0.01" name="noOfKm${i}" id="noOfKm${i}" class="form-control" >`;
+            detailsContent += `<input type="number" step="0.01" value="0" name="noOfKm${i}" id="noOfKm${i}" class="form-control" >`;
             detailsContent += `</div>`;
 
     
@@ -459,7 +459,7 @@
             detailsContent += `<label for="transferKm${i}">Transfer km:</label>`;
             // detailsContent += `<input type="checkbox" name="transferKmActive${i}" id="transferKmActive${i}" onclick="changeStatus('transferKm${i}',null)">`;
             // detailsContent += `</div>`;
-            detailsContent += `<input type="number" step="0.01" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
+            detailsContent += `<input type="number" step="0.01" value="0" name="transferKm${i}" id="transferKm${i}" class="form-control" required>`;
             detailsContent += `</div>`;
 
             // Stand By Time Start

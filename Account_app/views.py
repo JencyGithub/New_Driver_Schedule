@@ -1738,6 +1738,7 @@ def driverLeaveRequestSave(request):
 @csrf_protect
 @api_view(['POST'])
 def getTrucks(request):
+<<<<<<< Updated upstream
     try:
         connections = []
         clientName = request.POST.get('clientName')
@@ -1770,6 +1771,17 @@ def getTrucks(request):
 
         allCurrentTrips = DriverShiftTrip.objects.filter((Q(startDateTime__lte=currentDateTime,endDateTime__isnull=True) | Q(startDateTime__lte=currentDateTime,endDateTime__gte=currentDateTime)) & Q(archive=False))
         for trip in allCurrentTrips:
+=======
+    connections = []
+    clientName = request.POST.get('clientName')
+    client = Client.objects.get(name=clientName)
+    currentDateTime = dateTimeObj(dateTimeObj=request.POST.get('curDate'))
+        
+    if request.POST.get('shiftId'):
+        shiftObj = DriverShift.objects.filter(pk=request.POST.get('shiftId')).first()
+        currentTripObjs = DriverShiftTrip.objects.filter(shiftId=shiftObj.id, archive=False)
+        for trip in currentTripObjs:
+>>>>>>> Stashed changes
             connections.append(trip.truckConnectionId)
         
         truckList = []
@@ -3495,7 +3507,6 @@ def reconciliationAnalysis(request,dataType, download=None):
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId).values()
         else:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId,reconciliationType=dataType).values()
-
     elif clientId :
         if dataType == 7:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId).values()
@@ -3517,6 +3528,13 @@ def reconciliationAnalysis(request,dataType, download=None):
             redirectUrl = "Account/Tables/expensesTable.html"
         else:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate,endDate),reconciliationType=dataType).values()
+    
+    totalRcti , totalDriver = 0, 0 
+    if dataType == 7: # Revenue report
+        if dataList:
+            for data in dataList:
+                totalRcti += data['rctiTotalCost']
+                totalDriver += data['driverTotalCost']
   
     clientName = 'clientName_id' if dataType == 10 else 'clientId'
     for data in dataList:   
@@ -3526,6 +3544,8 @@ def reconciliationAnalysis(request,dataType, download=None):
     params['dataList']= dataList
     params['dataType']= typeDict[dataType]
     params['dataTypeInt']= dataType
+    params['totalRcti']= round(totalRcti, 2)
+    params['totalDriver']= round(totalDriver, 2)
 
     if download:
         with open('scripts/data.json', 'r') as file:
