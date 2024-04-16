@@ -1320,7 +1320,7 @@ def collectDockets(request, shiftId, tripId, endShift=None):
                 for breakObj in breaksObjs:
                     if breakObj.endDateTime > endDateTime:
                         messages.error(request, f"You have added a break between {breakObj.startDateTime} to {breakObj.endDateTime}, You can end the shift after {breakObj.endDateTime} or change break details.")
-                        return redirect('Account:driverShiftView',shiftId=shiftId)
+                        return redirect('Account:driverShiftView',shiftId=shiftId), None
                     if breakObj.durationInMinutes >= 15:
                         totalDriverBreak += breakObj.durationInMinutes 
                         driverBreaksTimeList.append([breakObj.durationInMinutes, breakObj])
@@ -3495,7 +3495,6 @@ def reconciliationAnalysis(request,dataType, download=None):
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId).values()
         else:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId,reconciliationType=dataType).values()
-
     elif clientId :
         if dataType == 7:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId).values()
@@ -3517,6 +3516,13 @@ def reconciliationAnalysis(request,dataType, download=None):
             redirectUrl = "Account/Tables/expensesTable.html"
         else:
             dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate,endDate),reconciliationType=dataType).values()
+    
+    totalRcti , totalDriver = 0, 0 
+    if dataType == 7: # Revenue report
+        if dataList:
+            for data in dataList:
+                totalRcti += data['rctiTotalCost']
+                totalDriver += data['driverTotalCost']
   
     clientName = 'clientName_id' if dataType == 10 else 'clientId'
     for data in dataList:   
@@ -3526,6 +3532,8 @@ def reconciliationAnalysis(request,dataType, download=None):
     params['dataList']= dataList
     params['dataType']= typeDict[dataType]
     params['dataTypeInt']= dataType
+    params['totalRcti']= round(totalRcti, 2)
+    params['totalDriver']= round(totalDriver, 2)
 
     if download:
         with open('scripts/data.json', 'r') as file:
