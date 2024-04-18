@@ -206,7 +206,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'static/logFile/logFile.log',
+            'filename': 'static/logFile/logFile.log'
         },
     },
     'loggers': {

@@ -416,6 +416,7 @@ def truckForm(request, id=None, viewOnly= None):
 def truckFormSave(request,truckId=None):
     adminTruckObj = AdminTruck()
     truckInformationObj = TruckInformation()
+    print('group and sub:' ,request.POST.get('groups'), request.POST.get('subGroups'))
     viewOnly = 1 if request.POST.get('viewOnly') != 'None' else 0
     truckNo = request.POST.get('truckNo')
     truckObj = AdminTruck.objects.filter(adminTruckNumber = truckNo).first()
@@ -427,14 +428,13 @@ def truckFormSave(request,truckId=None):
             adminTruckObj = AdminTruck.objects.filter(pk=truckId).first()
             truckInformationObj = adminTruckObj.truckInformation
             
-
         adminTruckObj.adminTruckNumber = truckNo
         adminTruckObj.createdBy = request.user
         adminTruckObj.truckActive = True    
         
         truckInformationObj.fleet = truckNo
-        truckInformationObj.groups = request.POST.get('groups')
-        truckInformationObj.subGroups = request.POST.get('subGroups')
+        truckInformationObj.group = request.POST.get('groups') if request.POST.get('groups') else 0
+        truckInformationObj.subGroup = request.POST.get('subGroups') if request.POST.get('subGroups') else 0
         truckInformationObj.vehicleType = request.POST.get('vehicleType')
         truckInformationObj.serviceGroup = request.POST.get('serviceGroup')
 

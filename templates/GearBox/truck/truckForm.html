@@ -110,7 +110,7 @@
                                     <label for="groups">Groups : </label>
                                     <div class="field item form-group">
                                         <select name="groups" id="groups" onchange="subGroupFun(this)" class="form-control text-uppercase">
-                                            <option value="" disabled selected class="text-uppercase"> Select Group</option>
+                                            <option value="0" disabled selected class="text-uppercase"> Select Group</option>
                                             {% for group in groups %}
                                             <option {% if truckInformationObj.group == group.id %}selected{% endif %} value="{{group.id}}" class="text-uppercase">{{group.name}}</option>
                                             {% endfor %}
@@ -120,10 +120,10 @@
                                 <div class="col-md-4 col-sm-4">
                                     <label for="subGroups">Sub groups : </label>
                                     <div class="field item form-group">
-                                        <select name="subGroups" id="subGroups" disabled class="form-control">
+                                        <select name="subGroups" id="subGroups" value="0" disabled class="form-control">
                                             <option value="" disabled selected class="text-uppercase"> Select SubGroup</option>
                                             {% for subGroup in subGroups %}
-                                            <option {% if truckInformationObj.group == subGroup.id %}selected{% endif %} value="{{group.id}}" class="text-uppercase">{{subGroup.name}}</option>
+                                            <option {% if truckInformationObj.subGroup == subGroup.id %}selected{% endif %} value="{{group.id}}" class="text-uppercase">{{subGroup.name}}</option>
                                             {% endfor %}
 
                                         </select>
@@ -281,7 +281,7 @@
                             <h6 class="d-inline-block" style="font-weight:bold">Registration</h6>
                             
                             <span class="float-right">
-                                <input type="checkbox" {%if  truckInformationObj.registered  %}checked{%endif%} value="registered"  name="registered" id="registered" onchange="registeredFun(this)">
+                                <input type="checkbox" {% if truckInformationObj and not truckInformationObj.registered %}checked{%endif%} value="registered"  name="registered" id="registered" onchange="registeredFun(this)">
                                 <label for="registered">Un-Registered</label>
                             </span>
                             <div class="clearfix"></div>
@@ -292,39 +292,39 @@
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registration" style="margin-bottom: 0.3rem!important;">Registration :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control" {%if  truckInformationObj.registered  %}disabled{%endif%} value="{% if not truckInformationObj.registered %}{{ truckInformationObj.registration }} {% endif %}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
+                                            <input class="form-control" {% if truckInformationObj and not truckInformationObj.registered %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registration }} {% endif %}"  type="text" name="registration"  style="padding: 0.25rem 0.2rem;" id="registration" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-6">
                                         <label for="registrationCode" style="margin-bottom: 0.3rem!important;">Code :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  {%if  truckInformationObj.registered  %}disabled{%endif%} value="{% if not truckInformationObj.registered %}{{ truckInformationObj.registrationCode }} {% endif %}" type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
+                                            <input class="form-control"  {% if truckInformationObj and not truckInformationObj.registered %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registrationCode }} {% endif %}" type="text" name="registrationCode"  style="padding: 0.25rem 0.2rem;" id="registrationCode" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationState" style="margin-bottom: 0.3rem!important;">State : <span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <select name="registrationState" {% if  truckInformationObj.registered %}disabled{%endif%} required id="registrationState"  class="form-control">
+                                            <select name="registrationState" {% if truckInformationObj and not truckInformationObj.registered %}disabled{%endif%} required id="registrationState"  class="form-control">
                                                 <option selected disabled>Select State</option>
-                                                <option {% if  truckInformationObj.registrationState == 'VIC' %}selected{% endif %} value="VIC" >VIC</option>
-                                                <option {% if  truckInformationObj.registrationState == 'NSW' %}selected{% endif %} value="NSW" >NSW</option>
-                                                <option {% if  truckInformationObj.registrationState == 'QLD' %}selected{% endif %} value="QLD" >QLD</option>
+                                                <option {% if  truckInformationObj.registrationState == 'VIC' %}selected{% endif %} value="VIC">VIC</option>
+                                                <option {% if  truckInformationObj.registrationState == 'NSW' %}selected{% endif %} value="NSW">NSW</option>
+                                                <option {% if  truckInformationObj.registrationState == 'QLD' %}selected{% endif %} value="QLD">QLD</option>
                                                 </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationDueDate" style="margin-bottom: 0.3rem!important;">Registration Due Date :</label>
                                         <div class="field item form-group">
-                                            <input class="form-control"  {%if  truckInformationObj.registered  %}disabled{%endif%} value="{% if not truckInformationObj.registered %}{{ truckInformationObj.registrationDueDate|date:'Y-m-d' }}{% endif %}" type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
+                                            <input class="form-control" {% if truckInformationObj and not truckInformationObj.registered %}disabled{%endif%} value="{% if truckInformationObj.registered %}{{ truckInformationObj.registrationDueDate|date:'Y-m-d' }}{% endif %}" type="date" name="registrationDueDate"  style="padding: 0.25rem 0.2rem;" id="registrationDueDate" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-4">
                                         <label for="registrationInterval" style="margin-bottom: 0.3rem!important;">Interval : </label>
                                         <div class="field item form-group">
-                                            <select name="registrationInterval" {%if  truckInformationObj.registered  %}disabled{%endif%} id="registrationInterval"  class="form-control">
+                                            <select name="registrationInterval" {% if truckInformationObj and not truckInformationObj.registered %}disabled{%endif%} id="registrationInterval" required class="form-control">
                                                 <option selected disabled>Select Interval</option>
                                                 <option {% if  truckInformationObj.registrationInterval == 'Annual' %}selected{% endif %} value="Annual">Annual</option>
-
+                                                <option {% if  truckInformationObj.registrationInterval == 'Partial' %}selected{% endif %} value="Partial">Partial</option>
                                             </select>
                                         </div>
                                     </div>

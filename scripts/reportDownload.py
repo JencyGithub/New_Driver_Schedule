@@ -86,7 +86,6 @@ try:
         
     startDate, endDate, dataType, reportType = data['reportDownload']['startDate'], data['reportDownload']['endDate'], data['reportDownload']['type'], data['reportDownload']['reportType']
     if startDate and endDate:
-        # print(data)
         csv_file = f"static/Account/ReportFiles/{reportType}_{startDate} to {endDate}_{data['reportDownload']['type'] }.csv"
         reconciliationObjs = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),reconciliationType = dataType).values()
 

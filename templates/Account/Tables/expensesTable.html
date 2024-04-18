@@ -11,6 +11,8 @@
     rel="stylesheet">
 <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}"
     rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />      
+
 
 <style>
     .dt-buttons.btn-group {
@@ -49,6 +51,57 @@
     ul.wizard_steps{
         padding-left: 0;
     }
+
+    .card {
+        background-color: #2a3f5410;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.1);
+        min-height: 10rem;
+    }
+    .card i {
+        font-size: 36px;
+        color: #2a3f54;
+    }
+    .card .count {
+        font-size: 28px;
+        margin-top: 10px;
+    }
+    .card .label {
+        font-size: 18px;
+        color: #2a3f54;
+    }
+      
+
+    .select2.select2-container{
+        width:100%!important;
+    }
+    .select2-selection.select2-selection--single{
+        height:auto!important;
+    } 
+    .select2-selection__rendered{
+        padding:0.3rem 0.5rem !important;
+    }
+    .select2-search__field{
+        width: 100%!important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: auto!important;
+        top: 1.15em!important;
+        right: 0.8em!important;
+    }
+
+    .close:focus {
+        outline: 0!important;
+    }
+
+    label{
+        margin-bottom: 0 !important;
+        margin-top: 0.7em !important;
+    }
+
     @media (max-width: 576px) {
         .custom-continer {
             margin: 0;
@@ -73,7 +126,7 @@
         <div class="row">
             <div class="col-md-12 col-sm-12 ">
                 
-                <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
+                {% comment %} <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
                     {% csrf_token %}
                     <div  class="x_panel">
                         <div class="row">
@@ -103,7 +156,43 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </form> {% endcomment %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                <div class="count">${{totalRcti}}</div>
+                                <div class="label">Total of RCTI</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+                                <div class="count">${{totalDriver}}</div>
+                                <div class="label">Total of Driver</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                                <div class="count {% if totalDiff.0 %} text-danger {% else %} text-success {% endif %}">${{ totalDiff.1 }}</div>
+                                <div class="label">Diffrence</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                            <p class="mb-1">
+                                <strong class="text-muted">From: {{ startDate }}</strong>
+                            </p>
+                            <p class="mb-1">
+                                <strong class="text-muted">To: {{ endDate }}</strong>
+                            </p>
+                            <span class="btn btn-sm btn-outline-default mt-auto" id="customizationBtn">Customize</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="x_panel" style="max-height: 150vh; overflow-y: auto;">
                     <div class="x_title">
                         <div class="col-md-3 col-sm-3">
@@ -189,27 +278,200 @@
         </div>
     </div>
 </div>
+
+<!-- Customization modal -->
+<div class="modal fade" id="customizeModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <form action="{% url 'Account:reconciliationAnalysis' dataType=dataTypeInt %}" method="POST" novalidate id="reconciliationForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customizeModalLabel">Customization</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <label for="startDate">Start Date: </label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate }}">
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="endDate">End Date: </label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <label for="groupSelect">Groups: </label>
+                            <select id="groupSelect" name="groupSelect" multiple="multiple" style="width:100%">
+                                {% for group in groupAll %}
+                                <option value="{{group.id}}" {% if group.id|stringformat:"d" in selectedGroupIds %}selected{% endif %}>{{group.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="subGroupSelect">Sub Groups: </label>
+                            <select id="subGroupSelect" name="subGroupSelect" multiple="multiple" style="width:100%">                                
+                                {% for subGroup in subGroupAll %}
+                                <option value="{{subGroup.id}}" {% if subGroup.id|stringformat:"d" in selectedSubGroupIds %}selected{% endif %}>{{subGroup.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <label for="clientSelect">Clients: </label>
+                            <select id="clientSelect" name="clientSelect" class="form-control">
+                                <option value="Select Client" selected disabled>Select Client</option>
+                                {% for client in clientAll %}
+                                <option value="{{client.clientId}}" {% if client.clientId|stringformat:"d" in selectedClientIds %}selected{% endif %}>{{client.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- <div class="col-md-6 col-sm-6">
+                            <label for="depotSelect">BasePlant: </label>
+                            <select id="depotSelect" name="depotSelect" multiple="multiple" style="width:100%">
+                                {% for depot in depotAll %}
+                                <option value="{{depot.id}}">{{depot.basePlant}}</option>
+                                {% endfor %}
+                            </select>
+                        </div> -->
+                        <div class="col-md-6 col-sm-6">
+                            <label for="truckNumSelect">Truck numbers: </label>
+                            <select id="truckNumSelect" name="truckNumSelect" multiple="multiple" style="width:100%">
+                                {% for truckNum in clientTruckAll %}
+                                <option value="{{truckNum.id}}" {% if truckNum.id|stringformat:"d" in selectedTruckIds %}selected{% endif %}>{{ truckNum.truckNumber.adminTruckNumber}} - {{truckNum.clientTruckId}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="clearBtn">Clear</button>
+                    <button type="submit" class="btn btn-sm btn-outline-default">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 
 {% block footerStyleEnd %}
 <script src="{% static 'js/reconciliation_analysis.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    const redirectButton = document.getElementById('redirectButton');
-
-    redirectButton.addEventListener('click', function () {
-        const djangoURL = redirectButton.getAttribute('data-url');
-
-        window.location.href = djangoURL;
-    });
-
-</script>
-<script>
+   
     $(document).ready(function () {
         $('#datatable-buttons').DataTable();
         
-    
+        $("#groupSelect").select2({
+            placeholder: "Select Group",
+        });
+        $("#subGroupSelect").select2({
+            placeholder: "Select Subgroup",
+        });
+        /* $("#depotSelect").select2({
+            placeholder: "Select Depot",
+        }); */
+        $("#truckNumSelect").select2({
+            placeholder: "Select Truck number",
+        });
+        $("#driverSelect").select2({
+            placeholder: "Select driver",
+        });      
+        $('#customizationBtn').on('click', function() {
+            $('#customizeModal').modal('show')
+        });
+
+        
+        $('#groupSelect').on('change', function(){
+            var clientId = $('#clientSelect').val() ;
+            var groups = $('#groupSelect').val();
+            var subGroups = $('#subGroupSelect').val();
+            $.ajax({
+                url: "/account/reconciliation-filter/",
+                method: "POST",
+                data: {
+                    groupIds: groups,
+                    subGroupIds: subGroups,
+                    clientId: clientId,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    if (data.status) {
+                        $("#subGroupSelect").html('<option value="">Select SubGroup</option>');
+                        $("#truckNumSelect").html('<option value="">Select Truck number</option>');
+
+                        data.subGroupObj.forEach(function (item) {
+                            $("#subGroupSelect").append(
+                                `<option value="${item.id}">${item.name}</option>`
+                            );
+                        });
+                        data.clientTruckConnectionObj.forEach(function (item) {
+                            $("#truckNumSelect").append(
+                                `<option value="${item.id}">${item.truckNumber} - ${item.clientTruckId}</option>`
+                            );
+                        });
+
+                        $("#subGroupSelect").trigger("change.select2");
+                        $("#truckNumSelect").trigger("change.select2");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                }
+            });
+        })
+          
+        $('#subGroupSelect, #clientSelect').on('change', function(){
+            var clientId = $('#clientSelect').val() ;
+            var groups = $('#groupSelect').val();
+            var subGroups = $('#subGroupSelect').val();
+
+            $.ajax({
+                url: "/account/reconciliation-filter/",
+                method: "POST",
+                data: {
+                    groupIds: groups,
+                    subGroupIds: subGroups,
+                    clientId: clientId,
+                },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data) {
+                    if (data.status) {
+                    $("#truckNumSelect").html('<option value="">Select Truck number</option>');
+                    data.clientTruckConnectionObj.forEach(function (item) {
+                        $("#truckNumSelect").append(
+                            `<option value="${item.id}">${item.truckNumber} - ${item.clientTruckId}</option>`
+                        );
+                    });
+                    $("#truckNumSelect").trigger("change.select2");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching data:", error);
+                }
+            });
+        })
+
+        $('#clearBtn').on('click', function(){
+            $('#groupSelect').val(null).trigger('change');
+            $('#subGroupSelect').val(null).trigger('change');
+            // $('#depotSelect').val(null).trigger('change');
+            $('#truckNumSelect').val(null).trigger('change');
+            $('#driverSelect').val(null).trigger('change');
+            $('#clientSelect').val('Select Client');
+        })
     });
 </script>
 <!-- Datatables -->
