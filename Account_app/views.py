@@ -2424,10 +2424,7 @@ def expensesTableView(request):
     endDate = request.POST.get('endDate_')
     clientName = request.POST.get('clientName_')
     clientTruckNo = request.POST.get('truckNo_')
-    clientDocketYard = request.POST.get('docketYard_')
-    # startDate = datetime.strptime(startDate, '%B %d, %Y').strftime('%Y-%m-%d')
-    # endDate = datetime.strptime(endDate, '%B %d, %Y').strftime('%Y-%m-%d')  
-    print(startDate,endDate)
+    clientDocketYard = request.POST.get('docketYard_') 
     data = []
     if clientName:
         clientName = Client.objects.filter(clientId = clientName).first()
@@ -2440,7 +2437,6 @@ def expensesTableView(request):
     # return HttpResponse('work')
     if clientName :
         rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName=clientName).values()
-        
     if clientTruckNo:
         rcti_expenses_query = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),truckNo= clientTruckNo.clientTruckId).values()
         
@@ -3465,65 +3461,113 @@ def reconciliationForm(request, dataType):
         
     return render(request, 'Reconciliation/reconciliation.html', params)
 
+@csrf_protect
+def reconciliationFilters(request):
+    truckObj, clientTruckConnectionObj = None, None
+    subGroupIds = request.POST.getlist('subGroupIds[]')
+    groupIds = request.POST.getlist('groupIds[]')
+    clientId = request.POST.get('clientId') 
+    subGroupObj = TruckSubGroup.objects.all().values() if len(groupIds) == 0 else TruckSubGroup.objects.filter(truckGroup__id__in=groupIds).values() 
+
+    if len(groupIds) > 0 and len(subGroupIds) > 0:
+        truckObj = TruckInformation.objects.filter(group__in = groupIds, subGroup__in = subGroupIds).values_list('fleet')
+    elif len(groupIds) > 0 and len(subGroupIds) == 0:
+        truckObj = TruckInformation.objects.filter(group__in = groupIds).values_list('fleet')
+    else:
+        truckObj = TruckInformation.objects.all().values_list('fleet')
+
+    clientTruckConnectionObj = ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in = truckObj, clientId__clientId=clientId).values() if clientId else ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in = truckObj).values()
+        
+    for truckConnection in clientTruckConnectionObj:
+        adminTruckObj = AdminTruck.objects.filter(id = truckConnection['truckNumber_id']).first()
+        truckConnection['truckNumber'] = adminTruckObj.adminTruckNumber if adminTruckObj else None
+
+    return JsonResponse({'status':True, 'clientTruckConnectionObj':list(clientTruckConnectionObj), 'subGroupObj':list(subGroupObj)})
+
 
 @csrf_protect
 def reconciliationAnalysis(request,dataType, download=None):
     startDate = dateConvert(request.POST.get('startDate'))
     endDate = dateConvert(request.POST.get('endDate'))
-    driverId = request.POST.get('driverId')
-    clientId = request.POST.get('clientName')
+    
+    truckIds = request.POST.getlist('truckNumSelect')
+    groupIds = request.POST.getlist('groupSelect') 
+    subGroupIds = request.POST.getlist('subGroupSelect')
+    driverIds = request.POST.getlist('driverSelect') if len(request.POST.getlist('driverSelect')) > 0 else Driver.objects.all().values_list('driverId')
+    clientIds = [request.POST.get('clientSelect')] if request.POST.get('clientSelect') else Client.objects.all().values_list('clientId')
+    
     clientAll = Client.objects.all()
     driverAll = Driver.objects.all()
+    depotAll = BasePlant.objects.all()
+    groupAll = TruckGroup.objects.all()
+    subGroupAll = TruckSubGroup.objects.all()
+    clientTruckAll = ClientTruckConnection.objects.all()
     redirectUrl = 'Reconciliation/reconciliation-result.html'
+    
+    if len(groupIds) > 0:
+        subGroupAll = TruckSubGroup.objects.filter(truckGroup__id__in=groupIds)        
 
+    truckInfoObj = []
+    if len(groupIds) > 0 and len(subGroupIds) > 0:
+        truckInfoObj = TruckInformation.objects.filter(group__in = groupIds, subGroup__in = subGroupIds).values_list('fleet')
+    elif len(groupIds) > 0 and len(subGroupIds) == 0:
+        truckInfoObj = TruckInformation.objects.filter(group__in = groupIds).values_list('fleet')
+
+    if truckInfoObj:
+        clientTruckAll = ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in = truckInfoObj, clientId__clientId__in=clientIds)
+            
+        for truckConnection in clientTruckAll:
+            adminTruckObj = AdminTruck.objects.filter(id = truckConnection.truckNumber_id).first()
+            truckConnection.truckNumber = adminTruckObj if adminTruckObj else None
+        
     params = {
         'startDate': dateConverterFromTableToPageFormate(startDate),
         'endDate': dateConverterFromTableToPageFormate(endDate),
         'clientAll' : clientAll,
         'driverAll' : driverAll,
-        'clientId' : int(clientId) if clientId else None,
-        'driver_Id' : int(driverId) if driverId else None,
+        'depotAll' : depotAll,
+        'groupAll' : groupAll,
+        'subGroupAll' : subGroupAll,
+        'clientTruckAll' : clientTruckAll,
+        'selectedGroupIds' : groupIds if len(groupIds) > 0 else [],
+        'selectedSubGroupIds' : request.POST.getlist('subGroupSelect') if len(request.POST.getlist('subGroupSelect')) > 0 else [],
+        'selectedClientIds' : request.POST.get('clientSelect') if request.POST.get('clientSelect') else None,
+        'selectedTruckIds' : truckIds if len(truckIds) > 0 else [],
+        'selectedDriverIds' : driverIds if len(request.POST.getlist('driverSelect')) > 0 else [],
     }
-
+    
+    # print('truckIds:', truckIds, 'driverIds:', driverIds, 'groupIds:', groupIds, 'subGroupIds:', subGroupIds, 'clientIds:', clientIds)
     params['dataType'] = typeDict[dataType]
     params['dataTypeInt'] = dataType
 
-    dataList = []
+    if len(truckIds) <= 0:
+        if len(groupIds) <= 0 and  len(subGroupIds) <= 0:
+            truckIds = ClientTruckConnection.objects.all().values_list('id')
+        else:
+            groupIds = request.POST.getlist('groupSelect') if len(request.POST.getlist('groupSelect')) > 0 else TruckGroup.objects.all().values_list('id')
+            subGroupIds = request.POST.getlist('subGroupSelect') if len(request.POST.getlist('subGroupSelect')) > 0 else TruckSubGroup.objects.all().values_list('id')
+            truckInfoList = TruckInformation.objects.filter(group__in=groupIds, subGroup__in=subGroupIds).values_list('fleet')
+            truckIds = ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in=truckInfoList).values_list('id')
 
-    if clientId and driverId :
-        if dataType == 7 :   
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId).values()
-        else:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,driverId=driverId,reconciliationType=dataType).values()
-    elif clientId :
-        if dataType == 7:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId).values()
-        elif dataType == 10:
-            dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate),clientName__clientId=clientId).values()
-            redirectUrl = "Account/Tables/expensesTable.html"
-        else:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),clientId=clientId,reconciliationType=dataType).values()
-    elif driverId :
-        if dataType == 7:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),driverId=driverId).values()
-        else:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate),driverId=driverId,reconciliationType=dataType).values()
+    dataList = []
+    if dataType == 7:
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate), clientId__in=clientIds, driverId__in=driverIds, truckConnectionId__in=truckIds).values()
+    elif dataType == 10:
+        truckNumbers = ClientTruckConnection.objects.filter(id__in=truckIds).values_list('clientTruckId')
+        dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate), truckNo__in=truckNumbers).values()
+        redirectUrl = "Account/Tables/expensesTable.html"
     else:
-        if dataType == 7:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate)).values()
-        elif dataType == 10:
-            dataList = RctiExpense.objects.filter(docketDate__range=(startDate, endDate)).values()
-            redirectUrl = "Account/Tables/expensesTable.html"
-        else:
-            dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate,endDate),reconciliationType=dataType).values()
+        dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate), clientId__in=clientIds, driverId__in=driverIds, truckConnectionId__in=truckIds, reconciliationType=dataType).values()
+
     
     totalRcti , totalDriver = 0, 0 
-    if dataType == 7: # Revenue report
-        if dataList:
-            for data in dataList:
-                totalRcti += data['rctiTotalCost']
-                totalDriver += data['driverTotalCost']
-  
+    if dataList:
+        for data in dataList:
+            totalRcti += data['rctiTotalCost']
+            totalDriver += data['driverTotalCost']
+    totalDiff = round(totalRcti - totalDriver, 2)
+    totalDiff = [True, abs(totalDiff)] if totalDiff < 0 else [False, abs(totalDiff)]
+        
     clientName = 'clientName_id' if dataType == 10 else 'clientId'
     for data in dataList:   
         client = Client.objects.filter(pk=data[clientName]).first()
@@ -3534,6 +3578,7 @@ def reconciliationAnalysis(request,dataType, download=None):
     params['dataTypeInt']= dataType
     params['totalRcti']= round(totalRcti, 2)
     params['totalDriver']= round(totalDriver, 2)
+    params['totalDiff']= totalDiff
 
     if download:
         with open('scripts/data.json', 'r') as file:
@@ -3869,7 +3914,7 @@ def reconciliationEscalationComplete(request, id):
     messages.success(request, "Escalation completed successfully.")
     return redirect('Account:index')
     
-    
+
 
 # ```````````````````````````````````
 # Public holiday
@@ -5171,13 +5216,10 @@ def apiMapDataSave(request):
     shiftObj.save()
     return JsonResponse({'status':True, 'message':'Shift save successfully.', 'data' : {'shiftId':shiftObj.id}})
 
-# @csrf_protect
-# @api_view(['POST'])
 def getClients(request):
     clients = Client.objects.all().values('clientId','name','email','docketGiven')
     return JsonResponse({'status':True, 'message':'Clients fetch successfully.', 'data' : list(clients)})
-     
-    
+
 @csrf_protect
 @api_view(['POST'])
 def apiClientAndTruckDataSave(request):
@@ -5207,8 +5249,8 @@ def apiClientAndTruckDataSave(request):
     tripObj.startOdometerKms = startOdometers
     tripObj.startEngineHours = startEngineHours
     tripObj.save()
-    
     return JsonResponse({'status':True, 'message':'Trip created successfully.','data' : {'tripId':tripObj.id}})
+
 
 @csrf_protect
 @api_view(['POST'])

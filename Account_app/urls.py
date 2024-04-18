@@ -215,6 +215,8 @@ urlpatterns = [
     path('reconciliation/escalation/form2/<int:escalationId>/', views.showReconciliationEscalation2, name='showReconciliationEscalation2'),
     path('reconciliation/escalation/form3/<int:id>/', views.reconciliationEscalationForm3, name='reconciliationEscalationForm3'),
     path('reconciliation/escalation/complete/<int:id>/', views.reconciliationEscalationComplete, name='reconciliationEscalationComplete'),
+   
+    path('reconciliation-filter/', views.reconciliationFilters, name='reconciliationFilters'),
 
 
     # Public holiday
