@@ -15,7 +15,7 @@ from CRUD import *
 from .models import RCTI
 from Account_app.reconciliationUtils import *
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Sum, Avg, Count, Min, Max
 from dateutil.relativedelta import relativedelta
 from Driver_Schedule.settings import *
 from django.contrib.auth.decorators import login_required
@@ -3514,8 +3514,7 @@ def reconciliationAnalysis(request,dataType, download=None):
         truckInfoObj = TruckInformation.objects.filter(group__in = groupIds).values_list('fleet')
 
     if truckInfoObj:
-        clientTruckAll = ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in = truckInfoObj, clientId__clientId__in=clientIds)
-            
+        clientTruckAll = ClientTruckConnection.objects.filter(truckNumber__adminTruckNumber__in = truckInfoObj, clientId__clientId__in=clientIds)     
         for truckConnection in clientTruckAll:
             adminTruckObj = AdminTruck.objects.filter(id = truckConnection.truckNumber_id).first()
             truckConnection.truckNumber = adminTruckObj if adminTruckObj else None
@@ -3559,7 +3558,6 @@ def reconciliationAnalysis(request,dataType, download=None):
     else:
         dataList = ReconciliationReport.objects.filter(docketDate__range=(startDate, endDate), clientId__in=clientIds, driverId__in=driverIds, truckConnectionId__in=truckIds, reconciliationType=dataType).values()
 
-    
     totalRcti , totalDriver = 0, 0 
     if dataList:
         for data in dataList:
@@ -3647,6 +3645,134 @@ def reconciliationDocketView(request, reconciliationId):
     }
 
     return render(request, 'Reconciliation/reconciliation-docket.html', params)
+
+def format_timedelta(td):
+    # Convert timedelta to days, hours, minutes, seconds
+    days = td.days
+    hours, remainder = divmod(td.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    # Format the timedelta based on days
+    if days > 0:
+        return "{} Day, {:02}:{:02}:{:02}".format(days, hours, minutes, seconds)
+    else:
+        return "{:02}:{:02}:{:02}".format(hours, minutes, seconds)
+
+
+@csrf_protect
+def customReportView(request):
+    startDate = dateConvert(request.POST.get('startDate'))
+    endDate = dateConvert(request.POST.get('endDate'))
+    filterValues = request.POST.getlist('filterSelect') if len(request.POST.getlist('filterSelect')) > 0 else ['Shift','Trip','Break','Leave','CuMi','TransferKms','WaitingTime','StandByTime','Reimbursement']
+    driverObjs = Driver.objects.filter(driverId__in=request.POST.getlist("driverSelect")) if len(request.POST.getlist("driverSelect")) > 0 else Driver.objects.all()
+    driverData, driverAll = [], []
+    for driverObj in driverObjs:
+        driver_shifts = DriverShift.objects.filter(Q(driverId=driverObj.driverId), Q(shiftDate__range=(startDate, endDate)), ~Q(endDateTime=None), Q(archive=False), Q(verified=True))
+        if len(driver_shifts) > 0:
+            driver_shift_trips = DriverShiftTrip.objects.filter(Q(shiftId__in=driver_shifts.values_list('id', flat=True)), ~Q(endDateTime=None))
+            if len(driver_shift_trips) > 0:
+                driver_shift_dockets = DriverShiftDocket.objects.filter(shiftId__in=driver_shifts.values_list('id', flat=True))
+                driverAll.append(driverObj)
+                print('driverObj:', driverObj)
+                dictObj = {
+                    'driver' : f'{driverObj.firstName} {driverObj.lastName}',
+                    'Total shifts count' : driver_shifts.count(),
+                    'Total Trips count' : driver_shift_trips.count(),
+                }
+
+                
+                if 'Shift' in filterValues:
+                    total_shift_time = sum(((shift.endDateTime - shift.startDateTime) for shift in driver_shifts), timedelta(0))
+                    average_shift_time = total_shift_time / driver_shifts.count() if driver_shifts.count() > 0 else timedelta(0)
+                    dictObj['Total shift Time'] = format_timedelta(total_shift_time)
+                    dictObj['Average Shift Time'] = format_timedelta(average_shift_time)
+                
+                if 'Trip' in filterValues:
+                    total_trip_time = sum((trip.endDateTime - trip.startDateTime for trip in driver_shift_trips), timedelta(0))
+                    average_trip_time = total_trip_time / driver_shift_trips.count() if driver_shift_trips.count() > 0 else timedelta(0)
+                    dictObj['Total trip time'] = format_timedelta(total_trip_time)
+                    dictObj['Average trip time'] = format_timedelta(average_trip_time)
+                
+                if 'TransferKms' in filterValues:
+                    total_transfer_kms = driver_shift_dockets.aggregate(total_transfer_kms=Sum('transferKM')).get('total_transfer_kms')
+                    dictObj['Total transferKms'] = round(total_transfer_kms, 2) if total_transfer_kms else 0
+                    dictObj['Average transferKms'] = round((total_transfer_kms / driver_shift_dockets.count() if driver_shift_dockets.count() > 0 else 0), 2) if total_transfer_kms else 0
+                    
+                if 'WaitingTime' in filterValues:    
+                    total_waiting_time = driver_shift_dockets.aggregate(total_waiting_time=Sum('totalWaitingInMinute')).get('total_waiting_time')
+                    average_waiting_time = round((total_waiting_time / driver_shift_dockets.count() if driver_shift_dockets.count() > 0 else 0), 2) if total_waiting_time else timedelta(0)
+                    total_waiting_time_formatted = format_timedelta(timedelta(minutes=total_waiting_time)) if total_waiting_time else timedelta(0)
+                    average_waiting_time_formatted = format_timedelta(timedelta(minutes=average_waiting_time)) if average_waiting_time else timedelta(0)
+
+
+                    dictObj['Total waitingTime'] = total_waiting_time_formatted
+                    dictObj['Average waitingTime'] = average_waiting_time_formatted
+                   
+                # Remain
+                if 'StandByTime' in filterValues:
+                    total_standby_time = timedelta()
+                    for docket in driver_shift_dockets:
+                        if docket.standByEndTime and docket.standByStartTime:
+                            start_datetime = datetime.combine(datetime.today(), docket.standByEndTime)
+                            end_datetime = datetime.combine(datetime.today(), docket.standByStartTime)
+                            standby_duration = end_datetime - start_datetime
+                            total_standby_time += standby_duration
+
+                    average_standby_time = total_standby_time / driver_shifts.count() if driver_shifts.count() > 0 else timedelta(0)
+                    dictObj['Total standBy time'] = format_timedelta(total_standby_time)
+                    dictObj['Average standBy time'] = format_timedelta(average_standby_time)
+
+                if 'CuMi' in filterValues:
+                    total_cuMi = driver_shift_dockets.aggregate(total_cuMi=Sum('cubicMl')).get('total_cuMi')
+                    load_deficit = driver_shift_dockets.aggregate(load_deficit=Count('minimumLoad')).get('load_deficit')
+                    dictObj['Total cubic Mi'] = round(float(total_cuMi),2) if total_cuMi else 0
+                    dictObj['Load deficit count'] = round(load_deficit,2)
+                    dictObj['Average cubic Mi'] = round((total_cuMi / driver_shift_dockets.count() if driver_shift_dockets.count() > 0 else 0), 2) if total_cuMi else 0
+                
+                if 'Leave' in  filterValues:
+                    total_leaves = LeaveRequest.objects.filter(employee=driverObj, start_date__lte=endDate, end_date__gte=startDate,status='Approved').count()
+                    dictObj['Total leaves'] = total_leaves
+
+                if 'Reimbursement' in filterValues:
+                    total_raised_reimbursement_objs = DriverReimbursement.objects.filter(driverId=driverObj,raiseDate__range=(startDate, endDate), status=1)
+                    total_raised_reimbursement = total_raised_reimbursement_objs.aggregate(total_amount=Sum('actualAmount')).get('total_amount', 0)
+                    average_raised_reimbursement = total_raised_reimbursement/len(total_raised_reimbursement_objs) if len(total_raised_reimbursement_objs) > 0 else 0
+
+                    dictObj['Total reimbursement'] = total_raised_reimbursement if total_raised_reimbursement else 0
+                    dictObj['Average reimbursement'] = average_raised_reimbursement
+                    
+                if 'Break' in filterValues:
+                    total_breaks_objs = DriverBreak.objects.filter(shiftId__in=driver_shifts, driverId=driverObj, startDateTime__range=(startDate, endDate), endDateTime__range=(startDate, endDate)).order_by('shiftId','startDateTime')
+                    average_breaks = total_breaks_objs.count()/len(driver_shifts) if total_breaks_objs.count() > 0 else 0
+
+                    total_duration = timedelta()
+                    for break_obj in total_breaks_objs:
+                        if break_obj.startDateTime and break_obj.endDateTime:
+                            duration = break_obj.endDateTime - break_obj.startDateTime
+                            total_duration += duration
+                    average_duration = total_duration / total_breaks_objs.count() if total_breaks_objs.count() > 0 else timedelta()
+                    
+                    dictObj['Total breaks'] = total_breaks_objs.count()
+                    dictObj['Average breaks'] = round(average_breaks,2)
+                    dictObj['Total duration'] = format_timedelta(total_duration) if total_duration else timedelta(0)
+                    dictObj['Average duration'] = format_timedelta(average_duration) if average_duration else timedelta(0)
+                    
+                driverData.append(dictObj)
+                    
+    params = {
+        'startDate' : str(startDate),
+        'endDate' : str(endDate),
+        # 'driverAll' : Driver.objects.all(),
+        'driverAll' : driverAll,
+        'selectedDrivers' : request.POST.getlist("driverSelect"),
+        'selectedFilters' : request.POST.getlist('filterSelect'),
+        'driverData' : driverData
+    }
+    
+    # print(driverData)
+    return render(request, 'Reconciliation/customReport.html', params)
+
+
 
 @csrf_protect
 @api_view(['POST'])

@@ -218,6 +218,8 @@ urlpatterns = [
    
     path('reconciliation-filter/', views.reconciliationFilters, name='reconciliationFilters'),
 
+    # Custom report
+    path('Custom-report/view/', views.customReportView, name='customReportView'),
 
     # Public holiday
     path('publicHoliday/', views.publicHoliday, name='publicHoliday'),

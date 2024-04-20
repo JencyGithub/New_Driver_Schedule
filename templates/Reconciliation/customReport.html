@@ -1,0 +1,275 @@
+{% extends "main/main.html" %} 
+{% load static %} 
+{% block title %} | Custom Report{% endblock %} 
+{% block headStyle %}
+
+
+{% comment %} <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link type="text/css"
+    href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" /> {% endcomment %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />      
+ <!-- Datatables -->
+ <link href="{% static 'Dashboard/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+ <link href="{% static 'Dashboard/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+<style>
+
+    #customTable_filter{
+        display: inline-block;
+        margin-left: 1em;
+    }
+
+    #customTable_length{
+        display: inline-block;
+    }
+
+    .bg-info {
+        background-color: #17a2b878 !important;
+    }
+    .bg-warning {
+        background-color: #ffc1078f !important;
+    }
+    
+    .bg-secondary {
+        background-color: #6c757da3 !important;
+        color: white;
+    }
+      
+    label{
+        margin-bottom: 0 !important;
+        margin-top: 0.7em !important;
+    }
+</style>
+{% endblock %} 
+{% block content %}
+
+<div class="right_col">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2>Custom Report</h2>
+                                <div class="float-right">
+                                    <button class="btn btn-sm btn-outline-default" id="filterBtn">Filters</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>   
+                    <div class="x_content">
+                        <div class="table-responsive" style="max-height: 120vh; overflow-y: auto;">
+                            <div class="search-pagination">
+                                <!-- Search box and pagination content here -->
+                            </div>
+                            <table id="customTable" class="table table-striped table-bordered">
+                                {% if driverData|length > 0 %}
+                                    <thead>
+                                        {% for item in driverData.0.keys %}
+                                            <th class="text-capitalize {% if 'count' in item %}bg-secondary{% elif 'Total' in item %}bg-info{% elif 'Average' in item %}bg-warning{% endif %}">{{item}}</th>
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for item in driverData %}
+                                        <tr>
+                                            {% for value in item.values %}
+                                            <td class="{% if forloop.counter == 1 %}bg-dark text-white{% endif %}">
+                                                {{ value }}
+                                            </td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                {% else %}
+                                    <thead>No records found</thead>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Customization modal -->
+<div class="modal fade" id="customizeModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <form action="{% url 'Account:customReportView' %}" method="POST" novalidate id="reconciliationForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customizeModalLabel">Customization</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <label for="startDate">Start Date: </label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" value="{{ startDate }}" required>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="endDate">End Date: </label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" value="{{ endDate }}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <label for="driverSelect">Matching Drivers: </label>
+                            <select id="driverSelect" name="driverSelect" multiple="multiple" style="width:100%">
+                                {% for driver in driverAll %}
+                                <option value="{{driver.driverId}}"{% if driver.driverId|stringformat:"d" in selectedDrivers %}selected{% endif %}>{{driver.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="filterSelect">Filters: </label>
+                            <select id="filterSelect" name="filterSelect" multiple="multiple" style="width:100%">
+                                <option value="Shift" {% if "Shift" in selectedFilters %}selected{% endif %}>Shift</option>
+                                <option value="Trip" {% if "Trip" in selectedFilters %}selected{% endif %}>Trip</option>
+                                <option value="Break" {% if "Break" in selectedFilters %}selected{% endif %}>Break</option>
+                                <option value="Leave" {% if "Leave" in selectedFilters %}selected{% endif %}>Leave</option>
+                                <option value="CuMi" {% if "CuMi" in selectedFilters %}selected{% endif %}>Cubic Mi</option>
+                                <option value="TransferKms" {% if "TransferKms" in selectedFilters %}selected{% endif %}>Transfer Kms</option>
+                                <option value="WaitingTime" {% if "WaitingTime" in selectedFilters %}selected{% endif %}>Waiting Time</option>
+                                <option value="StandByTime" {% if "StandByTime" in selectedFilters %}selected{% endif %}>StandBy Time</option>
+                                <option value="Reimbursement" {% if "Reimbursement" in selectedFilters %}selected{% endif %}>Reimbursement</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="clearBtn">Clear</button>
+                    <button type="submit" class="btn btn-sm btn-outline-default">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 
+{% block footerStyleEnd %}
+
+{% comment %} <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> {% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+    integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- Datatables -->
+<script src="{% static 'Dashboard/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/jszip/dist/jszip.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+<script src="{% static 'Dashboard/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        // $("#customTable").DataTable();
+
+        $('#customTable').DataTable( {
+            dom: '<lf<t>ip>'
+        } )
+
+
+        $("#driverSelect").select2({
+            placeholder: "Select driver",
+        });      
+        $("#filterSelect").select2({
+            placeholder: "Select filter",
+        });      
+
+        $('#clearBtn').on('click', function(){
+            $('#driverSelect').val(null).trigger('change');
+            $('#filterSelect').val(null).trigger('change');
+        })
+
+        function getSelectedDockets(){
+            var selectedRows = table.column(0).checkboxes.selected();
+            var selectedDockets = [];
+            $.each(selectedRows, function(key,docket){
+                selectedDockets.push(docket)
+            })
+            if(selectedDockets.length > 0){
+                return selectedDockets
+            }else{
+                alert("Please select at least one docket");
+                return false
+            }
+        }
+        $('#filterBtn').on('click', function() {
+            $('#customizeModal').modal('show')
+        });
+
+    });
+    function filterFun(){
+        let selectClient = document.getElementById("clientName");
+        let client = selectClient.value
+        let selectDriver = document.getElementById("driverId");
+        let driver = selectDriver.value
+        let selectStartDate = $("#startDate").val();
+        let selectEndDate = $("#endDate").val();   
+        
+        $.ajax({
+            url: "/account/reconciliation/report/filter/",
+            method: "POST",
+            data: {
+                client_: client,
+                driver_: driver,
+                selectStartDate_: selectStartDate,
+                selectEndDate_: selectEndDate,
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function (data) {
+
+                if (data.status) {
+                    $('#dataTable').DataTable().clear().draw();
+                    
+                    data.reconciliationObjList.forEach(function(item) {
+                        // var docketColorClass = item.fromDriver && item.fromRcti ? 'text-success' : 'text-danger';
+                        $('#dataTable').DataTable().row.add([
+                            item.docketNumber,
+                            `<a href="/account/reconciliation/docket/view/${item.id}/" target="_blank" class="${item.fromDriver && item.fromRcti ? 'text-success' : 'text-danger'}">${item.docketNumber} </a>`, item.clientId, item.driverId,
+                            `<span class="${item.driverLoadAndKmCost == item.rctiLoadAndKmCost ? 'text-success' : 'text-danger'}">${item.driverLoadAndKmCost} / ${item.rctiLoadAndKmCost}</span>`,
+                            `<span class="${item.driverSurchargeCost == item.rctiSurchargeCost ? 'text-success' : 'text-danger'}">${item.driverSurchargeCost} / ${item.rctiSurchargeCost}</span>`,
+                            `<span class="${item.driverWaitingTimeCost == item.rctiWaitingTimeCost ? 'text-success' : 'text-danger'}">${item.driverWaitingTimeCost} / ${item.rctiWaitingTimeCost}</span>`,
+                            `<span class="${item.driverStandByCost == item.rctiStandByCost ? 'text-success' : 'text-danger'}">${item.driverStandByCost} / ${item.rctiStandByCost}</span>`,
+                            `<span class="${item.driverTotalCost == item.rctiTotalCost ? 'text-success' : 'text-danger'}">${item.driverTotalCost} / ${item.rctiTotalCost}</span>`,
+                            `<span class="text-danger">${item.missingComponent}</span>`,
+                        ]).draw();
+                    });
+                }
+              // setDataInTable("datatable-buttons", data.data);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching data:", error);
+            }
+        });
+
+    }
+</script>
+
+<script type="text/javascript"
+    src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js"></script>
+
+{% endblock %}
