@@ -5350,7 +5350,7 @@ def getClients(request):
 @api_view(['POST'])
 def apiClientAndTruckDataSave(request):
     shiftId = request.POST.get('shiftId')
-    clientId = request.POST.get('clientId')
+    clientName = request.POST.get('clientName')
     truckNum = request.POST.get('truckNum').split('-')
     startOdometers = request.POST.get('startOdometers')
     startEngineHours = request.POST.get('startEngineHours')
@@ -5361,7 +5361,7 @@ def apiClientAndTruckDataSave(request):
         
     adminTruckNum = AdminTruck.objects.filter(adminTruckNumber=truckNum[0]).first()
     clientTruckNum = truckNum[1]
-    clientObj = Client.objects.filter(pk=clientId).first()
+    clientObj = Client.objects.filter(name=clientName).first()
     truckConnectionObj = ClientTruckConnection.objects.filter(truckNumber=adminTruckNum,clientTruckId=clientTruckNum).first()
     truckInfoObj = truckConnectionObj.truckNumber.truckInformation
     truckInfoObj.odometerKms = startOdometers
