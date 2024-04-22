@@ -266,7 +266,16 @@
                                                     id="endDateTime{{trip.id}}">
                                             </div>
                                         </div>
-                                        
+                                        <div class="col-md-4 col-sm-4 ">
+                                            <label for="tripBasePlant{{trip.id}}">BasePlant :<span class="required">*</span></label>
+                                            <div class="field item form-group">
+                                                <select name="tripBasePlant{{trip.id}}" class="form-control">
+                                                    {% for basePlant_ in basePlants %}
+                                                    <option value="{{ basePlant_.id }}" {% if trip.basePlant == basePlant_.id %}selected="selected" {% endif %}>{{ basePlant_.basePlant }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
                                         
                                         <!-- comment  -->
                                         <div class="col-md-12 col-sm-12">

@@ -3225,6 +3225,7 @@ def driverEntryUpdate(request, shiftId):
                 updated_UTC = cur_UTC + timedelta(minutes=timeDiff)
             else:
                 updated_UTC = cur_UTC - timedelta(minutes=abs(timeDiff))
+            trip.basePlant = request.POST.get(f'tripBasePlant{trip.id}')
             trip.startDateTime = startDateTime
             trip.startTimeUTC = updated_UTC
         
@@ -5194,7 +5195,7 @@ def basePlantHistory(request, id):
 
 
 def tripHistory(request, tripId):
-    data = DriverShiftTrip.history.filter(id=tripId).values('history_type','history_date','history_user_id','startDateTime','endDateTime','dispute','numberOfLoads','revenueDeficit','loadSheet','comment','archive','startOdometerKms','endOdometerKms','startEngineHours','endEngineHours').order_by('history_id')
+    data = DriverShiftTrip.history.filter(id=tripId).values('history_type','history_date','history_user_id','basePlant','startDateTime','endDateTime','dispute','numberOfLoads','revenueDeficit','loadSheet','comment','archive','startOdometerKms','endOdometerKms','startEngineHours','endEngineHours').order_by('history_id')
     try:
         for obj in data:
             obj['history_user_id'] = User.objects.filter(pk=obj['history_user_id']).first().username
