@@ -22,16 +22,35 @@
                             <div class="x_content">
                                 <div class="custom-continer">
                                     <!-- truckNo,docketNumber,docketDate,docketYard -->
-                                    <div class="col-md-3 col-sm-3">
-                                        <label for="truckNo">Truck no :<span class="required">*</span></label>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="docketDate">Docket date :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" required type="number" name="truckNo"
-                                                pattern="[0-9]*" required data-validate-length-range="0,5"
-                                                style="padding: 0.25rem 0.2rem;" value="{{ rcti.truckNo }}" id="truckNo"
-                                                {% if rcti %}  readonly {% endif  %} >
+                                            <input class="form-control" required type="date" name="docketDate" 
+                                                style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketDate }}"
+                                                id="docketDate" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="clientId">Client  :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select name="clientId" id="clientId" required class="form-control">
+                                                <option value=""disabled selected> Select Client  </option>
+                                                {% for client in clientObj %}
+                                                <option value="{{client.name}}" class="text-capitalize">{{client.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
+                                        <label for="truckNo">Truck no :<span class="required">*</span></label>
+                                        <div class="field item form-group">
+                                            <select name="truckNo" id="truckNo" disabled required class="form-control">
+                                                <option value=""disabled selected> Select Truck No </option>
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-4">
                                         <label for="docketNumber">Docket number :<span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <input class="form-control" required type="text" name="docketNumber"
@@ -40,20 +59,15 @@
                                                 id="docketNumber" {% if rcti %}  readonly {% endif  %}>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-3">
-                                        <label for="docketDate">Docket date :<span class="required">*</span></label>
-                                        <div class="field item form-group">
-                                            <input class="form-control" required type="date" name="docketDate" 
-                                                style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketDate }}"
-                                                id="docketDate" {% if rcti %}  readonly {% endif  %}>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-3">
+                                    <div class="col-md-4 col-sm-4">
                                         <label for="docketYard">Docket yard :<span class="required">*</span></label>
                                         <div class="field item form-group">
-                                            <input class="form-control" required type="text" name="docketYard"
-                                                style="padding: 0.25rem 0.2rem;" value="{{ rcti.docketYard }}"
-                                                id="docketYard" {% if rcti %}  readonly {% endif  %}>
+                                            <select name="docketYard" id="docketYard" required class="form-control">
+                                                <option value=""disabled selected> Select Docket Yard </option>
+                                                {% for basePlant in basePlantObj %}
+                                                <option value="{{basePlant.id}}">{{basePlant.basePlant}}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
 
@@ -161,6 +175,37 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 
+    $("#clientId , #docketDate").on("change", function () {
+        let clientId = $('#clientId').val();
+        let docketDate = $('#docketDate').val();
+    if (clientId != null && docketDate != '') {
+        $("#truckNo").prop("disabled", false);
+        $("#truckNo").html('<option value="">Loading...</option>');
+        $.ajax({
+        type: "POST",
+        url: "/account/getTrucks/",
+        data: {
+            clientName: clientId,
+            curDate : docketDate
+        },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        },
+        success: function (data) {
+            $("#truckNo").html('<option value="">Select  Truck</option>');
+            console.log(data);
+            data.trucks.forEach(function (item) {
+            item = item.includes('Already in use') ?  item.split('Already in use')[0] : item;
+            
+                $("#truckNo").append(
+                '<option value="' + item + '">' + item + "</option>"
+            );
+            });
+
+        },
+        });
+    }
+    });
     var validator = new FormValidator({
         "events": ['blur', 'input', 'change']
     }, document.forms[0]);

@@ -317,6 +317,14 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="basePlantSelect">BasePlant: </label>
+                            <select id="basePlantSelect" name="basePlantSelect" multiple="multiple" style="width:100%">
+                                {% for basePlant in basePlantAll %}
+                                <option value="{{basePlant.id}}"{% if basePlant.id|stringformat:"d" in selectedBasePlantIds %}selected{% endif %}>{{basePlant.basePlant}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -353,6 +361,9 @@
         });
         $("#driverSelect").select2({
             placeholder: "Select driver",
+        });      
+        $("#basePlantSelect").select2({
+            placeholder: "Select baseplant",
         });      
 
         $('#groupSelect').on('change', function(){
@@ -435,6 +446,7 @@
             // $('#depotSelect').val(null).trigger('change');
             $('#truckNumSelect').val(null).trigger('change');
             $('#driverSelect').val(null).trigger('change');
+            $('#basePlantSelect').val(null).trigger('change');
             $('#clientSelect').val('Select Client');
         })
 

@@ -167,18 +167,18 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card text-center">
+                            {% comment %} <div class="card text-center">
                                 <i class="fa-solid fa-screwdriver-wrench"></i>
                                 <div class="count">${{totalDriver}}</div>
                                 <div class="label">Total of Driver</div>
-                            </div>
+                            </div> {% endcomment %}
                         </div>
                         <div class="col-md-3">
-                            <div class="card text-center">
+                            {% comment %} <div class="card text-center">
                                 <i class="fa-solid fa-hand-holding-dollar"></i>
                                 <div class="count {% if totalDiff.0 %} text-danger {% else %} text-success {% endif %}">${{ totalDiff.1 }}</div>
                                 <div class="label">Diffrence</div>
-                            </div>
+                            </div> {% endcomment %}
                         </div>
                         <div class="col-md-3">
                             <div class="card">
@@ -346,6 +346,14 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-6 col-sm-6">
+                            <label for="basePlantSelect">BasePlant: </label>
+                            <select id="basePlantSelect" name="basePlantSelect" multiple="multiple" style="width:100%">
+                                {% for basePlant in basePlantAll %}
+                                <option value="{{basePlant.id}}"{% if basePlant.id|stringformat:"d" in selectedBasePlantIds %}selected{% endif %}>{{basePlant.basePlant}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -384,6 +392,9 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         });
         $("#driverSelect").select2({
             placeholder: "Select driver",
+        });      
+        $("#basePlantSelect").select2({
+            placeholder: "Select basePlant",
         });      
         $('#customizationBtn').on('click', function() {
             $('#customizeModal').modal('show')
@@ -470,6 +481,8 @@ crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             // $('#depotSelect').val(null).trigger('change');
             $('#truckNumSelect').val(null).trigger('change');
             $('#driverSelect').val(null).trigger('change');
+            $('#basePlantSelect').val(null).trigger('change');
+
             $('#clientSelect').val('Select Client');
         })
     });
