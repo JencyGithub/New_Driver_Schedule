@@ -95,6 +95,7 @@ class DriverShiftTrip(models.Model):
     truckConnectionId = models.IntegerField(null=True, blank=True)
     dispute = models.BooleanField(default = False)
     numberOfLoads = models.FloatField(default=0)
+    basePlant = models.PositiveIntegerField(default=0)
     revenueDeficit = models.FloatField(default=0)
     loadSheet = models.FileField(upload_to='static/img/finalloadSheet',null=True, blank=True)
     comment = models.CharField(max_length=200, default='None')
