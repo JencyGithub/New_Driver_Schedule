@@ -744,13 +744,19 @@
         });
     }
 
-    if ($('#viewOnly').val() == 1){
-        
-        $('input:not([type="submit"]), select, textarea').each(function(){
-            $(this).prop("disabled", true);
-        });
-        $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
-    }
+    $(document).ready(function(){
+        if ($('#viewOnly').val() == 1){
+            $('input:not([type="submit"]), select, textarea').each(function(){
+                $(this).prop("disabled", true);
+            });
+            $('div#informationIcon .dd-selected').css({
+                'background': '#e9ecef',
+                'cursor': 'auto'
+            }).off();
+            $('#informationIcon .dd-options, #add-file').remove();
+            $('#viewOnly, input[name="csrfmiddlewaretoken"]').removeAttr('disabled');
+        }
+    })
 
     $("#informationIcon").ddslick({
         width:"100%",

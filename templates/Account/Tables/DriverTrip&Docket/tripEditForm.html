@@ -174,7 +174,7 @@
                                     <div class="custom-continer">
                                         <!-- driver-id client-name shift-type  -->
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="driverId{{trip.id}}">Driver Id:<span class="required">*</span></label>
+                                            <label for="driverId{{trip.id}}"> <a href="{% url 'gearBox:driverFormEdit' id=shiftObj.driverId%}" target="_blank"> Driver Id: </a><span class="required">*</span></label>
                                             <div class="field item form-group">
                                                 <select disabled name="driverId{{trip.id}}" class="form-control">
                                                     {% for D_id in Driver %}
@@ -184,7 +184,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4">
-                                            <label for="clientName{{trip.id}}">Client Name :<span class="required">*</span></label>
+                                            <label for="clientName{{trip.id}}"> <a href="{% url 'gearBox:clientEdit' id=trip.clientId%}" target="_blank"> Client Name : </a><span class="required">*</span></label>
                                             <div class="field item form-group">
                                                 <select readonly required name="clientName{{trip.id}}" class="form-control">
                                                     <option value=""disabled selected>Select Client Name</option>
@@ -267,7 +267,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4 col-sm-4 ">
-                                            <label for="tripBasePlant{{trip.id}}">BasePlant :<span class="required">*</span></label>
+                                            <label for="tripBasePlant{{trip.id}}"><a href="{% url 'Account:basePlantEdit' id=trip.basePlant%}" target="_blank"> BasePlant : </a> <span class="required">*</span></label>
                                             <div class="field item form-group">
                                                 <select name="tripBasePlant{{trip.id}}" class="form-control">
                                                     {% for basePlant_ in basePlants %}
@@ -347,7 +347,7 @@
                                     </div>
                                     <!-- basePlant noOfKm  transferKM  -->
                                     <div class="col-md-4 col-sm-4 ">
-                                        <label for="basePlant{{docket.id}}">BasePlant :<span class="required">*</span></label>
+                                        <label for="basePlant{{docket.id}}"><a href="{% url 'Account:basePlantEdit' id=docket.basePlant%}" target="_blank"> BasePlant : </a> <span class="required">*</span></label>
                                         <div class="field item form-group">
                                             <select name="basePlant{{docket.id}}" class="form-control">
                                                 {% for basePlant_ in basePlants %}
